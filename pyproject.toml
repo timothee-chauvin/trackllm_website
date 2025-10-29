@@ -1,0 +1,17 @@
+[project]
+name = "trackllm-website"
+version = "0.1.0"
+description = "TrackLLM website"
+readme = "README.md"
+authors = [
+    { name = "Timothee Chauvin", email = "timothee.chauvin28@gmail.com" },
+]
+requires-python = ">=3.14"
+dependencies = []
+
+[project.scripts]
+trackllm-website = "trackllm_website:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
