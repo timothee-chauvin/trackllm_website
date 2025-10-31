@@ -1,2 +1,3 @@
-def main() -> None:
-    print("Hello from trackllm-website!")
+from beartype.claw import beartype_this_package
+
+beartype_this_package()

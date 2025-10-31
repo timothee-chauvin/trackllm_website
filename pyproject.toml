@@ -6,8 +6,14 @@ readme = "README.md"
 authors = [
     { name = "Timothee Chauvin", email = "timothee.chauvin28@gmail.com" },
 ]
-requires-python = ">=3.14"
-dependencies = []
+requires-python = ">=3.13"
+dependencies = [
+    "beartype>=0.22.4",
+    "numpy>=2.3.4",
+    "orjson>=3.11.4",
+    "pydantic>=2.12.3",
+    "pydantic-settings>=2.11.0",
+]
 
 [project.scripts]
 trackllm-website = "trackllm_website:main"
