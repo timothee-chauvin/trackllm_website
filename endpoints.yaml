@@ -1,0 +1,10 @@
+endpoints:
+  - api: openrouter
+    model: qwen/qwen3-32b
+    provider: chutes
+    cost: [0.017992692, 0.07200576]
+
+  - api: openrouter
+    model: meta-llama/llama-3.2-11b-vision-instruct
+    provider: lambda/bf16
+    cost: [0.05, 0.05]
