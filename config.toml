@@ -1,0 +1,4 @@
+[api.top_logprobs_openrouter]
+fireworks = 5
+azure = 5
+xai = 8
