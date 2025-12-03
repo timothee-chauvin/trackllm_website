@@ -3,6 +3,7 @@ data_dir = "data"
 
 [api]
 max_retries = 15
+max_workers = 60
 top_logprobs_openrouter_default = 20
 
 [api.top_logprobs_openrouter]

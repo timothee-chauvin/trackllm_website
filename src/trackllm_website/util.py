@@ -1,4 +1,30 @@
+import asyncio
 import hashlib
+from collections.abc import AsyncIterator, Coroutine
+from typing import Any
+
+
+async def gather_with_concurrency_streaming(
+    n: int, *coros: Coroutine[Any, Any, Any]
+) -> AsyncIterator[Any]:
+    """Run coroutines with limited concurrency, yielding results as they complete."""
+    semaphore = asyncio.Semaphore(n)
+
+    async def sem_coro(coro: Coroutine[Any, Any, Any]) -> Any:
+        async with semaphore:
+            return await coro
+
+    # Create the semaphore-wrapped coroutines
+    sem_coros = [sem_coro(c) for c in coros]
+
+    # Use as_completed to get results as they finish
+    for coro in asyncio.as_completed(sem_coros):
+        yield await coro
+
+
+def trim_to_length(s: str, length: int) -> str:
+    """Trim a string to a maximum length, adding ellipsis if truncated."""
+    return s[:length] + "..." if len(s) > length else s
 
 
 def slugify(s: str, max_length: int = 1000, hash_length: int = 0) -> str:

@@ -53,6 +53,7 @@ class ApiConfig(BaseModel):
     top_logprobs_openrouter: dict[str, int]
     top_logprobs_openrouter_default: int
     max_retries: int
+    max_workers: int
 
 
 class Config(BaseSettings):

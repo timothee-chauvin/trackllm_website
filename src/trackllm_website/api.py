@@ -79,7 +79,6 @@ class OpenRouterClient:
                 error=None,
             )
 
-        logger.error(f"No logprobs returned for {endpoint}")
         return Response(
             date=datetime.now(tz=timezone.utc),
             endpoint=endpoint,
@@ -112,7 +111,6 @@ class OpenRouterClient:
                     ).decode()
                 except orjson.JSONDecodeError | orjson.JSONEncodeError:
                     message = str(e)
-                logger.error(f"Error querying {endpoint}: {http_code} {message}")
             else:
                 http_code, message = 0, str(e)
             return Response(
@@ -171,7 +169,7 @@ async def retry_with_exponential_backoff(
             if not retryable or attempt >= max_retries:
                 raise
             wait_time = calc_delay(attempt)
-            logger.warning(
+            logger.debug(
                 f"{msg}. Retrying in {wait_time:.2f}s ({attempt + 1}/{max_retries + 1})"
             )
             await asyncio.sleep(wait_time)
