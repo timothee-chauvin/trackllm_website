@@ -1,11 +1,5 @@
 endpoints:
 - api: openrouter
-  model: qwen/qwen3-32b
-  provider: chutes/bf16
-  cost:
-  - 0.017992692
-  - 0.07200576
-- api: openrouter
   model: meta-llama/llama-3.1-8b-instruct
   provider: cerebras/fp16
   cost:
@@ -210,12 +204,6 @@ endpoints:
   - 0.6
   - 2.5
 - api: openrouter
-  model: qwen/qwen3-coder
-  provider: hyperbolic/fp8
-  cost:
-  - 2.0
-  - 2.0
-- api: openrouter
   model: z-ai/glm-4.6
   provider: cerebras
   cost:
@@ -245,12 +233,6 @@ endpoints:
   cost:
   - 3.0
   - 5.0
-- api: openrouter
-  model: deepseek/deepseek-r1
-  provider: nebius/fast
-  cost:
-  - 2.0
-  - 6.0
 - api: openrouter
   model: openai/gpt-4o
   provider: azure
