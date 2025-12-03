@@ -2,8 +2,8 @@ name: Run Main Script
 
 on:
   schedule:
-    # Run every hour
-    - cron: '0 * * * *'
+    # Run every hour at minute 17
+    - cron: '17 * * * *'
   workflow_dispatch:  # Allow manual triggering
 
 permissions:
