@@ -39,6 +39,7 @@ class OpenRouterClient:
                 url="https://openrouter.ai/api/v1/chat/completions",
                 headers={"Authorization": f"Bearer {config.openrouter_api_key}"},
                 json=request_data,
+                timeout=aiohttp.ClientTimeout(total=config.api.timeout),
             ) as resp:
                 if not resp.ok:
                     error_text = await resp.text()
@@ -111,6 +112,8 @@ class OpenRouterClient:
                     ).decode()
                 except orjson.JSONDecodeError | orjson.JSONEncodeError:
                     message = str(e)
+            elif isinstance(e, asyncio.TimeoutError):
+                http_code, message = 0, f"Timeout after {config.api.timeout}s"
             else:
                 http_code, message = 0, str(e)
             return Response(
@@ -137,10 +140,6 @@ async def retry_with_exponential_backoff(
     base_delay: float = 1.0,
     max_delay: float = 60.0,
     jitter: bool = True,
-    retryable_exceptions: tuple[type[Exception], ...] = (
-        aiohttp.ClientError,
-        asyncio.TimeoutError,
-    ),
     retryable_status_codes: tuple[int, ...] = (429, 500, 502, 503, 504),
     **kwargs,
 ) -> Any:
@@ -156,8 +155,8 @@ async def retry_with_exponential_backoff(
             and e.status in retryable_status_codes
         ):
             return True, f"HTTP {e.status}"
-        if isinstance(e, retryable_exceptions):
-            return True, str(e)
+        elif isinstance(e, asyncio.TimeoutError):
+            return True, f"Timeout after {config.api.timeout}s"
         return False, ""
 
     last_exception: Exception | None = None

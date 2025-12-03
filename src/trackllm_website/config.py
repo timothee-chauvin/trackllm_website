@@ -13,7 +13,7 @@ from pydantic_settings import (
 )
 
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 # logging.getLogger("httpx").setLevel(logging.WARNING)
 logger = logging.getLogger("trackllm-website")
@@ -54,6 +54,7 @@ class ApiConfig(BaseModel):
     top_logprobs_openrouter_default: int
     max_retries: int
     max_workers: int
+    timeout: float
 
 
 class Config(BaseSettings):
