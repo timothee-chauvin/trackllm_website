@@ -5,33 +5,38 @@ import numpy as np
 import orjson
 from pydantic import BaseModel
 
+from trackllm_website.config import Endpoint
 from trackllm_website.util import slugify
 
 
-class LogprobVector(BaseModel, arbitrary_types_allowed=True):
+class ResponseLogprobs(BaseModel, arbitrary_types_allowed=True):
     """A vector of returned logprobs and the corresponding tokens. May be returned to multiple queries if non-determinism is low."""
 
     tokens: list[str]
     logprobs: list[np.float32]
 
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, LogprobVector):
-            return False
-        return self.tokens == other.tokens and self.logprobs == other.logprobs
-
 
 class IdxLogprobVector(BaseModel, arbitrary_types_allowed=True):
-    """Like `LogprobVector`, but the tokens are replaced by indices."""
+    """Like `ResponseLogprobs`, but the tokens are replaced by indices."""
 
     tokens: list[int]
     logprobs: list[np.float32]
 
 
-class LogprobResponse(BaseModel):
-    """A logprob vector returned to a specific query."""
+class ResponseError(BaseModel):
+    http_code: int
+    message: str
+
+
+class Response(BaseModel):
+    """A response from an LLM API."""
 
     date: datetime
-    logprob_vector: LogprobVector
+    endpoint: Endpoint
+    prompt: str
+    logprobs: ResponseLogprobs | None
+    error: ResponseError | None = None
+    cost: float | int
 
 
 class MonthlyData:
@@ -39,14 +44,21 @@ class MonthlyData:
 
     logprob_filename: str = "logprobs.json"
     queries_filename: str = "queries.json"
+    errors_filename: str = "errors.json"
 
     def __init__(
-        self, prompt: str, year: int, month: int, responses: list[LogprobResponse]
+        self,
+        prompt: str,
+        year: int,
+        month: int,
+        responses: list[ResponseLogprobs],
+        errors: list[ResponseError],
     ):
         self.prompt = prompt
         self.year = year
         self.month = month
         self.responses = responses
+        self.errors = errors
 
     @classmethod
     def load_existing(
@@ -55,29 +67,37 @@ class MonthlyData:
         """Load existing data from disk if it exists, otherwise return empty MonthlyData."""
         logprobs_path = path / cls.logprob_filename
         queries_path = path / cls.queries_filename
+        errors_path = path / cls.errors_filename
 
-        if not logprobs_path.exists() or not queries_path.exists():
-            return cls(prompt=prompt, year=year, month=month, responses=[])
+        if (
+            not logprobs_path.exists()
+            or not queries_path.exists()
+            or not errors_path.exists()
+        ):
+            return cls(prompt=prompt, year=year, month=month, responses=[], errors=[])
 
         # Load the condensed data
         with open(logprobs_path, "rb") as f:
             logprob_data = orjson.loads(f.read())
         with open(queries_path, "rb") as f:
             queries_data = orjson.loads(f.read())
+        with open(errors_path, "rb") as f:
+            errors_data = orjson.loads(f.read())
 
-        # Reconstruct LogprobVector objects
+        # Reconstruct Response objects
         seen_tokens = logprob_data["seen_tokens"]
         seen_logprobs = logprob_data["seen_logprobs"]
+
+        seen_errors = errors_data["seen_errors"]
 
         logprob_vectors = []
         for idx_logprob in seen_logprobs:
             tokens = [seen_tokens[i] for i in idx_logprob["tokens"]]
             logprobs = [np.float32(lp) for lp in idx_logprob["logprobs"]]
-            logprob_vectors.append(LogprobVector(tokens=tokens, logprobs=logprobs))
+            logprob_vectors.append(ResponseLogprobs(tokens=tokens, logprobs=logprobs))
 
-        # Reconstruct LogprobResponse objects
         responses = []
-        for date_str, logprob_idx in queries_data:
+        for date_str, idx in queries_data:
             # Parse date from "dd HH:MM:SS" format using the known year and month
             day_time = datetime.strptime(date_str, "%d %H:%M:%S")
             full_date = datetime(
@@ -89,15 +109,28 @@ class MonthlyData:
                 day_time.second,
                 tzinfo=timezone.utc,
             )
+            logprobs = None
+            error = None
+            if isinstance(idx, int):
+                # Index of a ResponseLogprob
+                logprobs = logprob_vectors[idx]
+            else:
+                # "e" followed by the index of an error
+                err_idx = int(idx[1:])
+                error = seen_errors[err_idx]
             responses.append(
-                LogprobResponse(
-                    date=full_date, logprob_vector=logprob_vectors[logprob_idx]
+                Response(
+                    date=full_date,
+                    endpoint=endpoint,
+                    prompt=prompt,
+                    logprobs=logprobs,
+                    error=error,
                 )
             )
 
         return cls(prompt=prompt, year=year, month=month, responses=responses)
 
-    def merge_and_deduplicate(self, new_responses: list[LogprobResponse]) -> None:
+    def merge_and_deduplicate(self, new_responses: list[ResponseLogprobs]) -> None:
         """Merge new responses with existing ones, remove duplicates, and sort by date."""
         # Create a set of existing response signatures to detect duplicates
         existing_sigs = {
@@ -121,7 +154,7 @@ class MonthlyData:
 
     @staticmethod
     def _condense_responses(
-        responses: list[LogprobResponse],
+        responses: list[ResponseLogprobs],
     ) -> tuple[list[LogprobVector], list[tuple[str, int]]]:
         """Return a list of the unique logprob vectors, and a list of queries with shortened dates and using indices to the logprob vectors instead of the full logprob vectors."""
         logprobs = []
@@ -177,22 +210,10 @@ class ResultsStorage:
         self.data_dir = Path(data_dir)
         self.data_dir.mkdir(parents=True, exist_ok=True)
 
-    def store_response(self, response):
-        """Store a single API response to disk.
-
-        Args:
-            response: A Response object with endpoint, prompt, logprobs, cost, and error fields.
-        """
-        if response.logprobs is None:
-            # Skip storing responses without logprobs
-            return
-
+    def store_response(self, response: Response):
+        """Store a single API response to storage."""
         # Create directory structure: data_dir / model_provider / year / month
-        model_slug = slugify(
-            f"{response.endpoint.model}#{response.endpoint.provider}",
-            max_length=250,
-            hash_length=0,
-        )
+        model_slug = slugify(f"{response.endpoint.model}#{response.endpoint.provider}")
         year = response.logprobs.date.year
         month = response.logprobs.date.month
 
