@@ -5,18 +5,14 @@ from typing import Any, Awaitable, Callable
 
 import aiohttp
 import numpy as np
-from pydantic import BaseModel
+import orjson
 
 from trackllm_website.config import Endpoint, config, logger
-from trackllm_website.storage import LogprobResponse, LogprobVector
-
-
-class Response(BaseModel):
-    endpoint: Endpoint
-    prompt: str
-    logprobs: LogprobResponse | None
-    cost: float | int
-    error: str | None = None
+from trackllm_website.storage import (
+    Response,
+    ResponseError,
+    ResponseLogprobs,
+)
 
 
 class OpenRouterClient:
@@ -38,8 +34,6 @@ class OpenRouterClient:
         if endpoint.provider:
             request_data["provider"]["only"] = [endpoint.provider]
 
-        print(request_data)
-
         async with aiohttp.ClientSession() as session:
             async with session.post(
                 url="https://openrouter.ai/api/v1/chat/completions",
@@ -52,17 +46,16 @@ class OpenRouterClient:
                         request_info=resp.request_info,
                         history=resp.history,
                         status=resp.status,
-                        message=f"HTTP {resp.status}: {error_text}",
+                        message=error_text,
                     )
                 response = await resp.json()
-                print(response)
                 # Sometimes we get a 200 OK response with a JSON that says "Internal Server Error" 500...
                 if set(response.keys()) == {"error", "user_id"}:
                     raise aiohttp.ClientResponseError(
                         request_info=resp.request_info,
                         history=resp.history,
                         status=int(response["error"]["code"]),
-                        message=f"HTTP {response['error']['code']}: {response['error']['message']}",
+                        message=response["error"]["message"],
                     )
 
         cost = compute_cost(response["usage"], endpoint)
@@ -75,26 +68,28 @@ class OpenRouterClient:
             tokens = [logprob["token"] for logprob in logprobs_data]
             probs = [np.float32(logprob["logprob"]) for logprob in logprobs_data]
 
-            logprob_vector = LogprobVector(tokens=tokens, logprobs=probs)
-            logprob_response = LogprobResponse(
-                date=datetime.now(tz=timezone.utc), logprob_vector=logprob_vector
-            )
+            logprobs = ResponseLogprobs(tokens=tokens, logprobs=probs)
 
             return Response(
+                date=datetime.now(tz=timezone.utc),
                 endpoint=endpoint,
                 prompt=prompt,
-                logprobs=logprob_response,
+                logprobs=logprobs,
                 cost=cost,
                 error=None,
             )
 
         logger.error(f"No logprobs returned for {endpoint}")
         return Response(
+            date=datetime.now(tz=timezone.utc),
             endpoint=endpoint,
             prompt=prompt,
             logprobs=None,
             cost=cost,
-            error="No logprobs returned",
+            error=ResponseError(
+                http_code=resp.status,
+                message="No logprobs returned",
+            ),
         )
 
     async def query(
@@ -109,12 +104,24 @@ class OpenRouterClient:
                 max_retries=config.api.max_retries,
             )
         except Exception as e:
-            # TODO didn't always try config.api.max_retries times.
-            logger.error(
-                f"Error querying {endpoint} after {config.api.max_retries} retries: {e}"
-            )
+            if isinstance(e, aiohttp.ClientResponseError):
+                http_code, message_json = e.status, e.message
+                try:
+                    message = orjson.dumps(
+                        orjson.loads(message_json.encode()).get("error", e)
+                    ).decode()
+                except orjson.JSONDecodeError | orjson.JSONEncodeError:
+                    message = str(e)
+                logger.error(f"Error querying {endpoint}: {http_code} {message}")
+            else:
+                http_code, message = 0, str(e)
             return Response(
-                endpoint=endpoint, prompt=prompt, logprobs=None, cost=0.0, error=str(e)
+                date=datetime.now(tz=timezone.utc),
+                endpoint=endpoint,
+                prompt=prompt,
+                logprobs=None,
+                cost=0.0,
+                error=ResponseError(http_code=http_code, message=message),
             )
 
 
