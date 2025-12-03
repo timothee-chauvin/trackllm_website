@@ -30,6 +30,21 @@ class Endpoint(BaseModel):
     cost: tuple[int | float, int | float]
     max_logprobs: int | None = None
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Endpoint):
+            return False
+        return (self.api, self.model, self.provider) == (
+            other.api,
+            other.model,
+            other.provider,
+        )
+
+    def __hash__(self) -> int:
+        return hash((self.api, self.model, self.provider))
+
+    def __str__(self) -> str:
+        return f"{self.api}#{self.model}#{self.provider}"
+
     @model_validator(mode="after")
     def check_provider(self) -> "Endpoint":
         if self.api == "openrouter" and self.provider is None:
@@ -54,13 +69,16 @@ class ApiConfig(BaseModel):
     top_logprobs_openrouter_default: int
     temperature: float
     max_retries: int
+    max_cost_mtok: float
     max_workers: int
     timeout: float
+    abandon_after: int
 
 
 class Config(BaseSettings):
+    endpoints_yaml_path: Path = root / "endpoints.yaml"
     model_config = SettingsConfigDict(
-        yaml_file=root / "endpoints.yaml",
+        yaml_file=endpoints_yaml_path,
         toml_file=root / "config.toml",
         env_file=root / ".env",
     )

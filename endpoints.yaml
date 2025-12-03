@@ -1,20 +1,313 @@
 endpoints:
-  - api: openrouter
-    model: qwen/qwen3-32b
-    provider: chutes/bf16
-    cost: [0.017992692, 0.07200576]
-
-  - api: openrouter
-    model: qwen/qwen3-coder
-    provider: hyperbolic/fp8
-    cost: [2.0, 2.0]
-
-  - api: openrouter
-    model: deepseek/deepseek-r1
-    provider: nebius/fast
-    cost: [2.0, 6.0]
-
-  - api: openrouter
-    model: openai/gpt-4o
-    provider: openai
-    cost: [2.0, 8.0]
+- api: openrouter
+  model: qwen/qwen3-32b
+  provider: chutes/bf16
+  cost:
+  - 0.017992692
+  - 0.07200576
+- api: openrouter
+  model: meta-llama/llama-3.1-8b-instruct
+  provider: cerebras/fp16
+  cost:
+  - 0.1
+  - 0.1
+- api: openrouter
+  model: neversleep/llama-3.1-lumimaid-8b
+  provider: mancer/fp16
+  cost:
+  - 0.1
+  - 0.5
+- api: openrouter
+  model: deepseek/deepseek-v3.2
+  provider: deepseek
+  cost:
+  - 0.28
+  - 0.42
+- api: openrouter
+  model: openai/gpt-4o-mini
+  provider: azure
+  cost:
+  - 0.15
+  - 0.6
+- api: openrouter
+  model: openai/gpt-4o-mini
+  provider: openai
+  cost:
+  - 0.15
+  - 0.6
+- api: openrouter
+  model: openai/gpt-4o-mini-2024-07-18
+  provider: openai
+  cost:
+  - 0.15
+  - 0.6
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: crusoe/bf16
+  cost:
+  - 0.15
+  - 0.6
+- api: openrouter
+  model: meta-llama/llama-3.3-70b-instruct
+  provider: crusoe/bf16
+  cost:
+  - 0.25
+  - 0.75
+- api: openrouter
+  model: moonshotai/kimi-linear-48b-a3b-instruct
+  provider: parasail/bf16
+  cost:
+  - 0.5
+  - 0.6
+- api: openrouter
+  model: qwen/qwen3-32b
+  provider: cerebras
+  cost:
+  - 0.4
+  - 0.8
+- api: openrouter
+  model: gryphe/mythomax-l2-13b
+  provider: mancer/fp8
+  cost:
+  - 0.5
+  - 0.75
+- api: openrouter
+  model: undi95/remm-slerp-l2-13b
+  provider: mancer/fp8
+  cost:
+  - 0.5
+  - 0.75
+- api: openrouter
+  model: deepseek/deepseek-chat-v3.1
+  provider: gmicloud/fp8
+  cost:
+  - 0.27
+  - 1.0
+- api: openrouter
+  model: minimax/minimax-m2
+  provider: fireworks
+  cost:
+  - 0.3
+  - 1.2
+- api: openrouter
+  model: qwen/qwen3-235b-a22b-2507
+  provider: cerebras
+  cost:
+  - 0.6
+  - 1.2
+- api: openrouter
+  model: deepseek/deepseek-chat-v3-0324
+  provider: fireworks
+  cost:
+  - 0.9000000000000001
+  - 0.9000000000000001
+- api: openrouter
+  model: meta-llama/llama-3.3-70b-instruct
+  provider: fireworks/fp16
+  cost:
+  - 0.9000000000000001
+  - 0.9000000000000001
+- api: openrouter
+  model: qwen/qwen2.5-vl-32b-instruct
+  provider: fireworks
+  cost:
+  - 0.9000000000000001
+  - 0.9000000000000001
+- api: openrouter
+  model: z-ai/glm-4.5
+  provider: mancer/fp8
+  cost:
+  - 0.375
+  - 1.5
+- api: openrouter
+  model: z-ai/glm-4.6
+  provider: mancer/fp8
+  cost:
+  - 0.45
+  - 1.5
+- api: openrouter
+  model: deepseek/deepseek-chat-v3-0324
+  provider: crusoe/fp8
+  cost:
+  - 0.5
+  - 1.5
+- api: openrouter
+  model: openai/gpt-3.5-turbo
+  provider: openai
+  cost:
+  - 0.5
+  - 1.5
+- api: openrouter
+  model: meta-llama/llama-3.3-70b-instruct
+  provider: cerebras/fp16
+  cost:
+  - 0.85
+  - 1.2
+- api: openrouter
+  model: deepseek/deepseek-chat-v3.1
+  provider: parasail/fp8
+  cost:
+  - 0.45
+  - 1.75
+- api: openrouter
+  model: deepseek/deepseek-chat-v3.1
+  provider: byteplus
+  cost:
+  - 0.56
+  - 1.68
+- api: openrouter
+  model: deepseek/deepseek-chat-v3.1
+  provider: fireworks
+  cost:
+  - 0.56
+  - 1.68
+- api: openrouter
+  model: mancer/weaver
+  provider: mancer/fp8
+  cost:
+  - 1.125
+  - 1.125
+- api: openrouter
+  model: qwen/qwen3-coder
+  provider: fireworks
+  cost:
+  - 0.45
+  - 1.8
+- api: openrouter
+  model: moonshotai/kimi-k2-thinking
+  provider: parasail/int4
+  cost:
+  - 0.5
+  - 2.5
+- api: openrouter
+  model: neversleep/noromaid-20b
+  provider: mancer/fp8
+  cost:
+  - 1.0
+  - 2.0
+- api: openrouter
+  model: openai/gpt-3.5-turbo-0613
+  provider: azure
+  cost:
+  - 1.0
+  - 2.0
+- api: openrouter
+  model: moonshotai/kimi-k2-0905
+  provider: byteplus
+  cost:
+  - 0.6
+  - 2.5
+- api: openrouter
+  model: moonshotai/kimi-k2-0905
+  provider: fireworks/fp8
+  cost:
+  - 0.6
+  - 2.5
+- api: openrouter
+  model: moonshotai/kimi-k2-thinking
+  provider: nebius/fp8
+  cost:
+  - 0.6
+  - 2.5
+- api: openrouter
+  model: qwen/qwen3-coder
+  provider: hyperbolic/fp8
+  cost:
+  - 2.0
+  - 2.0
+- api: openrouter
+  model: z-ai/glm-4.6
+  provider: cerebras
+  cost:
+  - 2.25
+  - 2.75
+- api: openrouter
+  model: deepseek/deepseek-r1-0528
+  provider: crusoe/fp8
+  cost:
+  - 1.35
+  - 5.4
+- api: openrouter
+  model: openai/gpt-3.5-turbo-16k
+  provider: azure
+  cost:
+  - 3.0
+  - 4.0
+- api: openrouter
+  model: openai/gpt-3.5-turbo-16k
+  provider: openai
+  cost:
+  - 3.0
+  - 4.0
+- api: openrouter
+  model: anthracite-org/magnum-v4-72b
+  provider: mancer/fp8
+  cost:
+  - 3.0
+  - 5.0
+- api: openrouter
+  model: deepseek/deepseek-r1
+  provider: nebius/fast
+  cost:
+  - 2.0
+  - 6.0
+- api: openrouter
+  model: openai/gpt-4o
+  provider: azure
+  cost:
+  - 2.5
+  - 10.0
+- api: openrouter
+  model: openai/gpt-4o
+  provider: openai
+  cost:
+  - 2.5
+  - 10.0
+- api: openrouter
+  model: openai/gpt-4o-2024-08-06
+  provider: azure
+  cost:
+  - 2.5
+  - 10.0
+- api: openrouter
+  model: openai/gpt-4o-2024-08-06
+  provider: openai
+  cost:
+  - 2.5
+  - 10.0
+- api: openrouter
+  model: openai/gpt-4o-2024-11-20
+  provider: openai
+  cost:
+  - 2.5
+  - 10.0
+- api: openrouter
+  model: alpindale/goliath-120b
+  provider: mancer/int4
+  cost:
+  - 6.0
+  - 8.0
+- api: openrouter
+  model: openai/chatgpt-4o-latest
+  provider: openai
+  cost:
+  - 5.0
+  - 15.0
+- api: openrouter
+  model: openai/gpt-4o-2024-05-13
+  provider: azure
+  cost:
+  - 5.0
+  - 15.0
+- api: openrouter
+  model: openai/gpt-4o-2024-05-13
+  provider: openai
+  cost:
+  - 5.0
+  - 15.0
+- api: openrouter
+  model: openai/gpt-4o:extended
+  provider: openai
+  cost:
+  - 6.0
+  - 18.0

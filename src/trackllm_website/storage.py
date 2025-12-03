@@ -5,7 +5,7 @@ import numpy as np
 import orjson
 from pydantic import BaseModel
 
-from trackllm_website.config import Endpoint
+from trackllm_website.config import Endpoint, config
 from trackllm_website.util import slugify
 
 
@@ -337,3 +337,47 @@ class ResultsStorage:
 
         # Serialize back to disk
         monthly_data.serialize(path=month_dir)
+
+    def get_prompt_latest_queries(
+        self, prompt_path: Path, n: int
+    ) -> list[tuple[datetime, ResponseLogprobs | ResponseError]]:
+        """Get the latest `n` queries for an endpoint, in a given prompt directory."""
+        latest_queries = []
+        month_dirs = sorted(
+            [d for d in prompt_path.iterdir() if d.is_dir()], reverse=True
+        )
+        for month_dir in month_dirs:
+            year, month = map(int, month_dir.name.split("-"))
+            monthly_data = MonthlyData.load_existing(
+                path=month_dir, year=year, month=month
+            )
+            latest_queries.extend(monthly_data.logprob_responses)
+            latest_queries.extend(monthly_data.error_responses)
+            if len(latest_queries) >= n:
+                latest_queries.sort(key=lambda x: x[0], reverse=True)
+                return latest_queries[:n]
+        return latest_queries
+
+    def get_latest_queries(
+        self, prompt_paths: list[Path], n: int
+    ) -> list[tuple[datetime, ResponseLogprobs | ResponseError]]:
+        """Get the latest `n` queries for this endpoint across all `prompt_paths`."""
+        latest_queries = []
+        for prompt_path in prompt_paths:
+            latest_queries.extend(self.get_prompt_latest_queries(prompt_path, n))
+        latest_queries.sort(key=lambda x: x[0], reverse=True)
+        return latest_queries[:n]
+
+    def is_stalled(self, endpoint: Endpoint) -> bool:
+        """Check if an endpoint is stalled by looking at the `config.abandon_after` latest queries.
+
+        An endpoint is stalled if it has at least `config.abandon_after` queries, and the latest `config.abandon_after` queries all resulted in errors."""
+        prompt_paths = list(self.data_dir.glob(f"{self._get_model_slug(endpoint)}/*"))
+        if not prompt_paths:
+            # No responses yet
+            return False
+        latest_queries = self.get_latest_queries(prompt_paths, config.api.abandon_after)
+        if len(latest_queries) < config.api.abandon_after:
+            # Not enough queries yet
+            return False
+        return all(isinstance(query[1], ResponseError) for query in latest_queries)

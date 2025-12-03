@@ -2,11 +2,13 @@ prompts = ["x", "Hi"]
 data_dir = "data"
 
 [api]
-max_retries = 15
+max_retries = 8
+max_cost_mtok = 30
 temperature = 1.0
 max_workers = 30
 top_logprobs_openrouter_default = 20
 timeout = 30
+abandon_after = 100
 
 [api.top_logprobs_openrouter]
 fireworks = 5
