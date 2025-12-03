@@ -6,6 +6,9 @@ on:
     - cron: '0 * * * *'
   workflow_dispatch:  # Allow manual triggering
 
+permissions:
+  contents: write  # Allow pushing commits
+
 jobs:
   run-main:
     runs-on: ubuntu-latest
