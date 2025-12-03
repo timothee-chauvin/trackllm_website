@@ -1,0 +1,13 @@
+{
+  "prompt": "Hi",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "minimax/minimax-m2",
+    "provider": "fireworks",
+    "cost": [
+      0.3,
+      1.2
+    ],
+    "max_logprobs": null
+  }
+}

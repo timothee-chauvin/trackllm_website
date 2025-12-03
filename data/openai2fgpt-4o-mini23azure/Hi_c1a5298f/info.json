@@ -1,0 +1,13 @@
+{
+  "prompt": "Hi",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "openai/gpt-4o-mini",
+    "provider": "azure",
+    "cost": [
+      0.15,
+      0.6
+    ],
+    "max_logprobs": null
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "neversleep/noromaid-20b",
+    "provider": "mancer/fp8",
+    "cost": [
+      1.0,
+      2.0
+    ],
+    "max_logprobs": null
+  }
+}

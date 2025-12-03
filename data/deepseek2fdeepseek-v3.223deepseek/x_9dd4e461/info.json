@@ -1,0 +1,13 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "deepseek/deepseek-v3.2",
+    "provider": "deepseek",
+    "cost": [
+      0.28,
+      0.42
+    ],
+    "max_logprobs": null
+  }
+}

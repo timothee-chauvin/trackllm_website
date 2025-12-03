@@ -1,0 +1,13 @@
+{
+  "prompt": "Hi",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "openai/gpt-oss-120b",
+    "provider": "crusoe/bf16",
+    "cost": [
+      0.15,
+      0.6
+    ],
+    "max_logprobs": null
+  }
+}

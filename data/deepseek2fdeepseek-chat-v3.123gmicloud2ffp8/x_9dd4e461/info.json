@@ -1,0 +1,13 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "deepseek/deepseek-chat-v3.1",
+    "provider": "gmicloud/fp8",
+    "cost": [
+      0.27,
+      1.0
+    ],
+    "max_logprobs": null
+  }
+}

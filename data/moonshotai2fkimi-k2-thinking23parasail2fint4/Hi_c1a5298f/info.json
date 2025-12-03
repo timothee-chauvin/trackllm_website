@@ -1,0 +1,13 @@
+{
+  "prompt": "Hi",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "moonshotai/kimi-k2-thinking",
+    "provider": "parasail/int4",
+    "cost": [
+      0.5,
+      2.5
+    ],
+    "max_logprobs": null
+  }
+}

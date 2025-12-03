@@ -1,0 +1,13 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "openai/gpt-3.5-turbo-16k",
+    "provider": "azure",
+    "cost": [
+      3.0,
+      4.0
+    ],
+    "max_logprobs": null
+  }
+}

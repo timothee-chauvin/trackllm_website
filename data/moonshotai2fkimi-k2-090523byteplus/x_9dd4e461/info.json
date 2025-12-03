@@ -1,0 +1,13 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "moonshotai/kimi-k2-0905",
+    "provider": "byteplus",
+    "cost": [
+      0.6,
+      2.5
+    ],
+    "max_logprobs": null
+  }
+}

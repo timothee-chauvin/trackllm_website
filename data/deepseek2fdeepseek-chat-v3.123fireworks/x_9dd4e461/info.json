@@ -1,0 +1,13 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "deepseek/deepseek-chat-v3.1",
+    "provider": "fireworks",
+    "cost": [
+      0.56,
+      1.68
+    ],
+    "max_logprobs": null
+  }
+}

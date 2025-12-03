@@ -1,0 +1,13 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "alpindale/goliath-120b",
+    "provider": "mancer/int4",
+    "cost": [
+      6.0,
+      8.0
+    ],
+    "max_logprobs": null
+  }
+}

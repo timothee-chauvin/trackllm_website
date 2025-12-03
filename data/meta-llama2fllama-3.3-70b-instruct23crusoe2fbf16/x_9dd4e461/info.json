@@ -1,0 +1,13 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "meta-llama/llama-3.3-70b-instruct",
+    "provider": "crusoe/bf16",
+    "cost": [
+      0.25,
+      0.75
+    ],
+    "max_logprobs": null
+  }
+}

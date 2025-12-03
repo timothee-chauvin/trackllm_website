@@ -1,0 +1,13 @@
+{
+  "prompt": "Hi",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "deepseek/deepseek-chat-v3-0324",
+    "provider": "crusoe/fp8",
+    "cost": [
+      0.5,
+      1.5
+    ],
+    "max_logprobs": null
+  }
+}

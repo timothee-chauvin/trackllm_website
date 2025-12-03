@@ -1,0 +1,13 @@
+{
+  "prompt": "Hi",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "neversleep/llama-3.1-lumimaid-8b",
+    "provider": "mancer/fp16",
+    "cost": [
+      0.1,
+      0.5
+    ],
+    "max_logprobs": null
+  }
+}

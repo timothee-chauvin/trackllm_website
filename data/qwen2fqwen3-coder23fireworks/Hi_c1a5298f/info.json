@@ -1,0 +1,13 @@
+{
+  "prompt": "Hi",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "qwen/qwen3-coder",
+    "provider": "fireworks",
+    "cost": [
+      0.45,
+      1.8
+    ],
+    "max_logprobs": null
+  }
+}

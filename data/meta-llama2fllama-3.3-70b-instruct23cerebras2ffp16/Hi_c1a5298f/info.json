@@ -1,0 +1,13 @@
+{
+  "prompt": "Hi",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "meta-llama/llama-3.3-70b-instruct",
+    "provider": "cerebras/fp16",
+    "cost": [
+      0.85,
+      1.2
+    ],
+    "max_logprobs": null
+  }
+}

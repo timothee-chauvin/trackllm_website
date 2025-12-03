@@ -1,0 +1,13 @@
+{
+  "prompt": "Hi",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "moonshotai/kimi-linear-48b-a3b-instruct",
+    "provider": "parasail/bf16",
+    "cost": [
+      0.5,
+      0.6
+    ],
+    "max_logprobs": null
+  }
+}

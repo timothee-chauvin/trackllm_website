@@ -1,0 +1,13 @@
+{
+  "prompt": "Hi",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "mancer/weaver",
+    "provider": "mancer/fp8",
+    "cost": [
+      1.125,
+      1.125
+    ],
+    "max_logprobs": null
+  }
+}

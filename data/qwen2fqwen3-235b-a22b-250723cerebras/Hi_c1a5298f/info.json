@@ -1,0 +1,13 @@
+{
+  "prompt": "Hi",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "qwen/qwen3-235b-a22b-2507",
+    "provider": "cerebras",
+    "cost": [
+      0.6,
+      1.2
+    ],
+    "max_logprobs": null
+  }
+}
