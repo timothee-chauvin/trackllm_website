@@ -8,6 +8,7 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
+    "aiohttp>=3.13.2",
     "beartype>=0.22.4",
     "numpy>=2.3.4",
     "orjson>=3.11.4",

@@ -1,4 +1,9 @@
+[api]
+max_retries = 15
+top_logprobs_openrouter_default = 20
+
 [api.top_logprobs_openrouter]
 fireworks = 5
 azure = 5
+inference-net = 5
 xai = 8
