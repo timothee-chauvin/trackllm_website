@@ -1,4 +1,4 @@
-prompts = ["x"]
+prompts = ["x", "Hi"]
 data_dir = "data"
 
 [api]
