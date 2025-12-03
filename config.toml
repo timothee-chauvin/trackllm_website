@@ -3,6 +3,7 @@ data_dir = "data"
 
 [api]
 max_retries = 15
+temperature = 1.0
 max_workers = 30
 top_logprobs_openrouter_default = 20
 timeout = 30

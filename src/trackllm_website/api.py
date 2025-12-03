@@ -17,7 +17,10 @@ from trackllm_website.storage import (
 
 class OpenRouterClient:
     async def _make_request(
-        self, endpoint: Endpoint, prompt: str, temperature: float = 0.0
+        self,
+        endpoint: Endpoint,
+        prompt: str,
+        temperature: float = config.api.temperature,
     ) -> Response:
         request_data = {
             "model": endpoint.model,
@@ -93,7 +96,10 @@ class OpenRouterClient:
         )
 
     async def query(
-        self, endpoint: Endpoint, prompt: str, temperature: float = 0.0
+        self,
+        endpoint: Endpoint,
+        prompt: str,
+        temperature: float = config.api.temperature,
     ) -> Response:
         try:
             return await retry_with_exponential_backoff(

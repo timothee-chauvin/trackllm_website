@@ -52,6 +52,7 @@ class ApiConfig(BaseModel):
     # Default is 20, but some providers have a lower limit. See Endpoint.get_max_logprobs().
     top_logprobs_openrouter: dict[str, int]
     top_logprobs_openrouter_default: int
+    temperature: float
     max_retries: int
     max_workers: int
     timeout: float
