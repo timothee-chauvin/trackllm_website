@@ -1,6 +1,6 @@
 import asyncio
 import random
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Awaitable, Callable
 
 import aiohttp
@@ -8,25 +8,7 @@ import numpy as np
 from pydantic import BaseModel
 
 from trackllm_website.config import Endpoint, config, logger
-
-
-class LogprobVector(BaseModel, arbitrary_types_allowed=True):
-    """A vector of returned logprobs and the corresponding tokens. May be returned to multiple queries if non-determinism is low."""
-
-    tokens: list[str]
-    logprobs: list[np.float32]
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, LogprobVector):
-            return False
-        return self.tokens == other.tokens and self.logprobs == other.logprobs
-
-
-class LogprobResponse(BaseModel):
-    """A logprob vector returned to a specific query."""
-
-    date: datetime
-    logprob_vector: LogprobVector
+from trackllm_website.storage import LogprobResponse, LogprobVector
 
 
 class Response(BaseModel):
@@ -87,14 +69,15 @@ class OpenRouterClient:
 
         # Extract logprobs for the first token
         if response["choices"] and response["choices"][0]["logprobs"]:
-            logprobs_data = response["choices"][0]["logprobs"]["content"][0]["top_logprobs"]
+            logprobs_data = response["choices"][0]["logprobs"]["content"][0][
+                "top_logprobs"
+            ]
             tokens = [logprob["token"] for logprob in logprobs_data]
             probs = [np.float32(logprob["logprob"]) for logprob in logprobs_data]
 
             logprob_vector = LogprobVector(tokens=tokens, logprobs=probs)
             logprob_response = LogprobResponse(
-                date=datetime.now(),
-                logprob_vector=logprob_vector
+                date=datetime.now(tz=timezone.utc), logprob_vector=logprob_vector
             )
 
             return Response(
@@ -106,7 +89,13 @@ class OpenRouterClient:
             )
 
         logger.error(f"No logprobs returned for {endpoint}")
-        return Response(endpoint=endpoint, prompt=prompt, logprobs=None, cost=cost, error="No logprobs returned")
+        return Response(
+            endpoint=endpoint,
+            prompt=prompt,
+            logprobs=None,
+            cost=cost,
+            error="No logprobs returned",
+        )
 
     async def query(
         self, endpoint: Endpoint, prompt: str, temperature: float = 0.0
