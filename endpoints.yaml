@@ -1,10 +1,20 @@
 endpoints:
   - api: openrouter
     model: qwen/qwen3-32b
-    provider: chutes
+    provider: chutes/bf16
     cost: [0.017992692, 0.07200576]
 
   - api: openrouter
-    model: meta-llama/llama-3.2-11b-vision-instruct
-    provider: lambda/bf16
-    cost: [0.05, 0.05]
+    model: qwen/qwen3-coder
+    provider: hyperbolic/fp8
+    cost: [2.0, 2.0]
+
+  - api: openrouter
+    model: deepseek/deepseek-r1
+    provider: nebius/fast
+    cost: [2.0, 6.0]
+
+  - api: openrouter
+    model: openai/gpt-4.1
+    provider: openai
+    cost: [2.0, 8.0]
