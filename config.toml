@@ -1,3 +1,6 @@
+prompts = ["x"]
+data_dir = "data"
+
 [api]
 max_retries = 15
 top_logprobs_openrouter_default = 20

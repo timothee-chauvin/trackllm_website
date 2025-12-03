@@ -64,6 +64,8 @@ class Config(BaseSettings):
 
     # read from config.toml
     api: ApiConfig
+    prompts: list[str]
+    data_dir: Path
 
     # read from endpoints.yaml
     endpoints: list[Endpoint]
