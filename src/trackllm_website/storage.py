@@ -337,31 +337,3 @@ class ResultsStorage:
 
         # Serialize back to disk
         monthly_data.serialize(path=month_dir)
-
-    def get_summary(self, responses: list[Response]) -> dict:
-        """Generate a summary of responses grouped by endpoint.
-
-        Args:
-            responses: List of Response objects
-
-        Returns:
-            Dictionary mapping endpoint identifiers to summary statistics
-        """
-        summary = {}
-        for response in responses:
-            key = f"{response.endpoint.model}#{response.endpoint.provider}"
-            if key not in summary:
-                summary[key] = {
-                    "success": 0,
-                    "error": 0,
-                    "total_cost": 0.0,
-                }
-
-            if response.error:
-                summary[key]["error"] += 1
-            else:
-                summary[key]["success"] += 1
-
-            summary[key]["total_cost"] += response.cost
-
-        return summary
