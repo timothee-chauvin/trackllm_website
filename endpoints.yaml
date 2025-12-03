@@ -15,6 +15,6 @@ endpoints:
     cost: [2.0, 6.0]
 
   - api: openrouter
-    model: openai/gpt-4.1
+    model: openai/gpt-4o
     provider: openai
     cost: [2.0, 8.0]
