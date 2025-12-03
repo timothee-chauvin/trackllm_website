@@ -71,7 +71,7 @@ async def main():
         i += 1
 
     # Print summary
-    summary = storage.get_summary(all_responses)
+    summary = get_summary(all_responses)
     logger.info("\n" + "=" * 60)
     logger.info("SUMMARY")
     logger.info("=" * 60)
