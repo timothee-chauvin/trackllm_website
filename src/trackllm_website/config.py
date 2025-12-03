@@ -104,6 +104,7 @@ class Config(BaseSettings):
         file_secret_settings: PydanticBaseSettingsSource,
     ) -> tuple[PydanticBaseSettingsSource, ...]:
         return (
+            env_settings,  # Read from environment variables first
             dotenv_settings,
             YamlConfigSettingsSource(settings_cls),
             TomlConfigSettingsSource(settings_cls),
