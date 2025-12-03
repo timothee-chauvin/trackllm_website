@@ -139,61 +139,35 @@ async def retry_with_exponential_backoff(
     retryable_status_codes: tuple[int, ...] = (429, 500, 502, 503, 504),
     **kwargs,
 ) -> Any:
-    """
-    Retry an async function with exponential backoff.
+    """Retry an async function with exponential backoff."""
 
-    Args:
-        func: The async function to retry
-        *args: Positional arguments for the function
-        max_retries: Maximum number of retry attempts
-        base_delay: Base delay in seconds for exponential backoff
-        max_delay: Maximum delay between retries
-        jitter: Whether to add random jitter to delay
-        retryable_exceptions: Tuple of exception types that should trigger retries
-        retryable_status_codes: HTTP status codes that should trigger retries
-        **kwargs: Keyword arguments for the function
-    """
-    last_exception = None
+    def calc_delay(attempt: int) -> float:
+        delay = min(max_delay, base_delay * (2**attempt))
+        return delay * random.uniform(0.9, 1.1) if jitter else delay
 
+    def is_retryable(e: Exception) -> tuple[bool, str]:
+        if (
+            isinstance(e, aiohttp.ClientResponseError)
+            and e.status in retryable_status_codes
+        ):
+            return True, f"HTTP {e.status}"
+        if isinstance(e, retryable_exceptions):
+            return True, str(e)
+        return False, ""
+
+    last_exception: Exception | None = None
     for attempt in range(max_retries + 1):
         try:
-            result = await func(*args, **kwargs)
-            return result
-        except aiohttp.ClientResponseError as e:
-            # Check if this is a retryable HTTP status code
-            if e.status in retryable_status_codes and attempt < max_retries:
-                wait_time = min(max_delay, (base_delay * (2**attempt)))
-                if jitter:
-                    wait_time *= random.uniform(0.9, 1.1)
-
-                logger.warning(
-                    f"HTTP {e.status} error. Retrying in {wait_time:.2f}s (attempt {attempt + 1}/{max_retries + 1})"
-                )
-                await asyncio.sleep(wait_time)
-                last_exception = e
-                continue
-            else:
-                raise e
-        except retryable_exceptions as e:
-            if attempt < max_retries:
-                wait_time = min(max_delay, (base_delay * (2**attempt)))
-                if jitter:
-                    wait_time *= random.uniform(0.9, 1.1)
-
-                logger.warning(
-                    f"Retryable error: {e}. Retrying in {wait_time:.2f}s (attempt {attempt + 1}/{max_retries + 1})"
-                )
-                await asyncio.sleep(wait_time)
-                last_exception = e
-                continue
-            else:
-                raise e
+            return await func(*args, **kwargs)
         except Exception as e:
-            # Non-retryable exceptions are re-raised immediately
-            logger.error(f"Non-retryable error: {e}")
-            raise e
+            retryable, msg = is_retryable(e)
+            if not retryable or attempt >= max_retries:
+                raise
+            wait_time = calc_delay(attempt)
+            logger.warning(
+                f"{msg}. Retrying in {wait_time:.2f}s ({attempt + 1}/{max_retries + 1})"
+            )
+            await asyncio.sleep(wait_time)
+            last_exception = e
 
-    # This should never be reached, but just in case
-    if last_exception:
-        raise last_exception
-    raise RuntimeError("Unexpected end of retry loop")
+    raise last_exception or RuntimeError("Unexpected end of retry loop")
