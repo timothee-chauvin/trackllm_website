@@ -145,12 +145,6 @@ endpoints:
   - 1.75
 - api: openrouter
   model: deepseek/deepseek-chat-v3.1
-  provider: byteplus
-  cost:
-  - 0.56
-  - 1.68
-- api: openrouter
-  model: deepseek/deepseek-chat-v3.1
   provider: fireworks
   cost:
   - 0.56
@@ -185,12 +179,6 @@ endpoints:
   cost:
   - 1.0
   - 2.0
-- api: openrouter
-  model: moonshotai/kimi-k2-0905
-  provider: byteplus
-  cost:
-  - 0.6
-  - 2.5
 - api: openrouter
   model: moonshotai/kimi-k2-0905
   provider: fireworks/fp8
