@@ -1,1 +1,1 @@
-{"seen_errors":[]}
+{"seen_errors":[{"http_code":403,"message":"{\"message\":\"Provider returned error\",\"code\":403,\"metadata\":{\"raw\":\"{\\\"error\\\":{\\\"message\\\":\\\"Deployment parasail-kimi-linear-48b-a3b-instruct doesn't exist or isn't accessible.\\\",\\\"type\\\":\\\"invalid_request_error\\\",\\\"param\\\":null,\\\"code\\\":null}}\",\"provider_name\":\"Parasail\"}}"}]}
