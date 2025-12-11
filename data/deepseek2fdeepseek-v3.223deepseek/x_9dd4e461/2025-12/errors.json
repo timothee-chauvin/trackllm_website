@@ -1,1 +1,1 @@
-{"seen_errors":[]}
+{"seen_errors":[{"http_code":503,"message":"{\"message\":\"Provider returned error\",\"code\":503,\"metadata\":{\"raw\":\"{\\\"error\\\":{\\\"message\\\":\\\"Service is too busy. We advise users to temporarily switch to alternative LLM API service providers.\\\",\\\"type\\\":\\\"service_unavailable_error\\\",\\\"param\\\":null,\\\"code\\\":\\\"service_unavailable_error\\\"}}\",\"provider_name\":\"DeepSeek\"}}"}]}
