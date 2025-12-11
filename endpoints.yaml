@@ -111,13 +111,7 @@ endpoints:
   model: z-ai/glm-4.5
   provider: mancer/fp8
   cost:
-  - 0.375
-  - 1.5
-- api: openrouter
-  model: z-ai/glm-4.6
-  provider: mancer/fp8
-  cost:
-  - 0.45
+  - 0.4
   - 1.5
 - api: openrouter
   model: deepseek/deepseek-chat-v3-0324
@@ -128,6 +122,12 @@ endpoints:
 - api: openrouter
   model: openai/gpt-3.5-turbo
   provider: openai
+  cost:
+  - 0.5
+  - 1.5
+- api: openrouter
+  model: z-ai/glm-4.6
+  provider: mancer/fp8
   cost:
   - 0.5
   - 1.5
