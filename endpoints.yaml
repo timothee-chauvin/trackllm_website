@@ -108,12 +108,6 @@ endpoints:
   - 0.9000000000000001
   - 0.9000000000000001
 - api: openrouter
-  model: z-ai/glm-4.5
-  provider: mancer/fp8
-  cost:
-  - 0.4
-  - 1.5
-- api: openrouter
   model: deepseek/deepseek-chat-v3-0324
   provider: crusoe/fp8
   cost:
@@ -122,12 +116,6 @@ endpoints:
 - api: openrouter
   model: openai/gpt-3.5-turbo
   provider: openai
-  cost:
-  - 0.5
-  - 1.5
-- api: openrouter
-  model: z-ai/glm-4.6
-  provider: mancer/fp8
   cost:
   - 0.5
   - 1.5
@@ -161,6 +149,18 @@ endpoints:
   cost:
   - 0.45
   - 1.8
+- api: openrouter
+  model: z-ai/glm-4.5
+  provider: mancer/fp8
+  cost:
+  - 0.375
+  - 2.0
+- api: openrouter
+  model: z-ai/glm-4.6
+  provider: mancer/fp8
+  cost:
+  - 0.475
+  - 2.0
 - api: openrouter
   model: moonshotai/kimi-k2-thinking
   provider: parasail/int4
