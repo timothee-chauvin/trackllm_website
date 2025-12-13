@@ -72,6 +72,12 @@ endpoints:
   - 0.27
   - 1.0
 - api: openrouter
+  model: qwen/qwen3-next-80b-a3b-thinking
+  provider: nebius/fp8
+  cost:
+  - 0.15
+  - 1.2
+- api: openrouter
   model: minimax/minimax-m2
   provider: fireworks
   cost:
@@ -125,12 +131,6 @@ endpoints:
   cost:
   - 0.85
   - 1.2
-- api: openrouter
-  model: deepseek/deepseek-chat-v3.1
-  provider: parasail/fp8
-  cost:
-  - 0.45
-  - 1.75
 - api: openrouter
   model: deepseek/deepseek-chat-v3.1
   provider: fireworks
