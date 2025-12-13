@@ -1,0 +1,13 @@
+{
+  "prompt": "Hi",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "qwen/qwen3-next-80b-a3b-thinking",
+    "provider": "nebius/fp8",
+    "cost": [
+      0.15,
+      1.2
+    ],
+    "max_logprobs": null
+  }
+}
