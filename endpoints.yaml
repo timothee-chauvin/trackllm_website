@@ -84,12 +84,6 @@ endpoints:
   - 0.3
   - 1.2
 - api: openrouter
-  model: moonshotai/kimi-linear-48b-a3b-instruct
-  provider: parasail/bf16
-  cost:
-  - 0.7
-  - 0.9
-- api: openrouter
   model: qwen/qwen3-235b-a22b-2507
   provider: cerebras
   cost:
