@@ -1,0 +1,13 @@
+{
+  "prompt": "Hi",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "moonshotai/kimi-k2",
+    "provider": "nebius/fp4",
+    "cost": [
+      0.5,
+      2.4
+    ],
+    "max_logprobs": null
+  }
+}
