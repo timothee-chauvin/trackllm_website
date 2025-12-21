@@ -153,8 +153,14 @@ endpoints:
   model: z-ai/glm-4.6
   provider: mancer/fp8
   cost:
-  - 0.45
+  - 0.425
   - 2.0
+- api: openrouter
+  model: moonshotai/kimi-k2
+  provider: nebius/fp4
+  cost:
+  - 0.5
+  - 2.4
 - api: openrouter
   model: moonshotai/kimi-k2-thinking
   provider: parasail/int4
@@ -173,6 +179,12 @@ endpoints:
   cost:
   - 1.0
   - 2.0
+- api: openrouter
+  model: moonshotai/kimi-k2
+  provider: moonshotai/fp8
+  cost:
+  - 0.6
+  - 2.5
 - api: openrouter
   model: moonshotai/kimi-k2-0905
   provider: fireworks/fp8
