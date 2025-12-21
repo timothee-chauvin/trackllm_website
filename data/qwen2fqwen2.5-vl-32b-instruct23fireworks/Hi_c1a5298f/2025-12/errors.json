@@ -1,1 +1,1 @@
-{"seen_errors":[{"http_code":503,"message":"{\"message\":\"Provider returned error\",\"code\":503,\"metadata\":{\"raw\":\"no healthy upstream\",\"provider_name\":\"Fireworks\"}}"}]}
+{"seen_errors":[{"http_code":503,"message":"{\"message\":\"Provider returned error\",\"code\":503,\"metadata\":{\"raw\":\"no healthy upstream\",\"provider_name\":\"Fireworks\"}}"},{"http_code":402,"message":"{\"message\":\"Insufficient credits. Add more using https://openrouter.ai/settings/credits\",\"code\":402}"}]}

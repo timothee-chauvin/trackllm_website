@@ -1,1 +1,1 @@
-{"seen_errors":[{"http_code":200,"message":"No logprobs returned"}]}
+{"seen_errors":[{"http_code":200,"message":"No logprobs returned"},{"http_code":402,"message":"{\"message\":\"Insufficient credits. Add more using https://openrouter.ai/settings/credits\",\"code\":402}"}]}
