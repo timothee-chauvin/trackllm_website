@@ -1,6 +1,12 @@
 name: Deploy to GitHub Pages
 
 on:
+  # Trigger after run-main.yml completes
+  workflow_run:
+    workflows: ["Run Main Script"]
+    types: [completed]
+    branches: [main]
+  # Also trigger on direct pushes to relevant files
   push:
     branches: [main]
     paths:
@@ -21,9 +27,14 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Only run if triggered by push/dispatch, or if workflow_run succeeded
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Use the commit from workflow_run if triggered that way
+          ref: ${{ github.event.workflow_run.head_sha || github.ref }}
 
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
