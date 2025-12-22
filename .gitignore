@@ -1,2 +1,5 @@
 /.env
 __pycache__
+/website/js/
+/website/index.html
+/website/endpoints/

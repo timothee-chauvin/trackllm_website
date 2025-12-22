@@ -1,0 +1,48 @@
+{% extends "base.html.j2" %}
+
+{% block title %}{{ endpoint.model }} @ {{ endpoint.provider }} | TrackLLM{% endblock %}
+
+{% block content %}
+        <a href="../index.html" class="back">← all endpoints</a>
+        <h1>{{ endpoint.model }}</h1>
+        <p class="provider">@ {{ endpoint.provider }}</p>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="total-count">...</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value success" id="success-count">...</div>
+                <div class="stat-label">Success</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value error" id="error-count">...</div>
+                <div class="stat-label">Errors</div>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Prompt</th>
+                    <th class="num">Total</th>
+                    <th class="num">Success</th>
+                    <th class="num">Errors</th>
+                </tr>
+            </thead>
+            <tbody id="prompts-table">
+                <tr><td colspan="4" class="loading">Loading data...</td></tr>
+            </tbody>
+        </table>
+{% endblock %}
+
+{% block footer %}
+            <a href="../index.html">← back to all endpoints</a>
+{% endblock %}
+
+{% block scripts %}
+    <script type="application/json" id="manifest">{{ manifest_json | safe }}</script>
+    <script src="../js/endpoint.js"></script>
+{% endblock %}
+

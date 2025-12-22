@@ -1,0 +1,11 @@
+{
+  "name": "trackllm-website",
+  "private": true,
+  "scripts": {
+    "build": "bun build src/endpoint.ts --outdir=js --minify",
+    "watch": "bun build src/endpoint.ts --outdir=js --watch"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}
