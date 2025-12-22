@@ -3,3 +3,4 @@ __pycache__
 /website/js/
 /website/index.html
 /website/endpoints/
+/website/node_modules/

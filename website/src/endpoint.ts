@@ -1,3 +1,5 @@
+import Plotly from "plotly.js-dist-min";
+
 interface PromptManifest {
   slug: string;
   prompt: string;
@@ -33,14 +35,6 @@ interface LogprobsData {
   seen_logprobs: { tokens: number[]; logprobs: number[] }[];
 }
 
-declare const Plotly: {
-  newPlot: (
-    el: HTMLElement,
-    data: object[],
-    layout: object,
-    config?: object
-  ) => void;
-};
 
 async function fetchQueries(
   endpointSlug: string,
