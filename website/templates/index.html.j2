@@ -1,0 +1,26 @@
+{% extends "base.html.j2" %}
+
+{% block title %}TrackLLM{% endblock %}
+
+{% block content %}
+        <h1>TrackLLM</h1>
+        <p class="subtitle">Tracking LLM API logprob responses across {{ endpoints | length }} endpoints</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Model</th>
+                    <th>Provider</th>
+                </tr>
+            </thead>
+            <tbody>
+{% for ep in endpoints %}
+                <tr>
+                    <td><a href="endpoints/{{ ep.slug }}.html">{{ ep.model }}</a></td>
+                    <td>{{ ep.provider }}</td>
+                </tr>
+{% endfor %}
+            </tbody>
+        </table>
+{% endblock %}
+
