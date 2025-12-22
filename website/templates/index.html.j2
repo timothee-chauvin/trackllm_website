@@ -4,23 +4,49 @@
 
 {% block content %}
         <h1>TrackLLM</h1>
-        <p class="subtitle">Tracking LLM API logprob responses across {{ endpoints | length }} endpoints</p>
+        <p class="subtitle">Tracking LLM API logprob responses</p>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Model</th>
-                    <th>Provider</th>
-                </tr>
-            </thead>
-            <tbody>
-{% for ep in endpoints %}
-                <tr>
-                    <td><a href="endpoints/{{ ep.slug }}.html">{{ ep.model }}</a></td>
-                    <td>{{ ep.provider }}</td>
-                </tr>
+        <section class="endpoints-section">
+            <h2>Currently Tracked <span class="count">({{ active_endpoints | length }})</span></h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Provider</th>
+                    </tr>
+                </thead>
+                <tbody>
+{% for ep in active_endpoints %}
+                    <tr>
+                        <td><a href="endpoints/{{ ep.slug }}.html">{{ ep.model }}</a></td>
+                        <td>{{ ep.provider }}</td>
+                    </tr>
 {% endfor %}
-            </tbody>
-        </table>
-{% endblock %}
+                </tbody>
+            </table>
+        </section>
 
+{% if inactive_endpoints %}
+        <section class="endpoints-section inactive">
+            <h2>Previously Tracked <span class="count">({{ inactive_endpoints | length }})</span></h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Provider</th>
+                        <th>Last Query</th>
+                    </tr>
+                </thead>
+                <tbody>
+{% for ep in inactive_endpoints %}
+                    <tr>
+                        <td><a href="endpoints/{{ ep.slug }}.html">{{ ep.model }}</a></td>
+                        <td>{{ ep.provider }}</td>
+                        <td class="date">{{ ep.last_query_str }}</td>
+                    </tr>
+{% endfor %}
+                </tbody>
+            </table>
+        </section>
+{% endif %}
+{% endblock %}
