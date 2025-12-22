@@ -113,6 +113,38 @@ tr:hover {
   font-variant-numeric: tabular-nums;
 }
 
+.date {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sections */
+.endpoints-section {
+  margin-bottom: 3rem;
+}
+
+.endpoints-section h2 {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.endpoints-section h2 .count {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.endpoints-section.inactive {
+  opacity: 0.7;
+}
+
+.endpoints-section.inactive h2 {
+  color: var(--text-muted);
+}
+
 /* Stats */
 .stats {
   display: flex;
