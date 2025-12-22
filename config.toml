@@ -1,5 +1,5 @@
 prompts = ["x", "Hi"]
-data_dir = "data"
+data_dir = "website/data"
 
 [api]
 max_retries = 8
