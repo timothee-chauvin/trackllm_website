@@ -37,6 +37,6 @@ jobs:
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-        git add data/
+        git add .
         git diff --staged --quiet || git commit -m "[bot] add new responses"
         git push
