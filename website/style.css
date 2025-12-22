@@ -162,6 +162,23 @@ tr:hover {
   font-style: italic;
 }
 
+/* Chart */
+.chart {
+  background: var(--surface);
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 2rem;
+  min-height: 300px;
+}
+
+.chart .loading,
+.chart .no-data {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 280px;
+}
+
 /* Footer */
 footer {
   margin-top: 3rem;

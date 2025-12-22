@@ -7,6 +7,8 @@
         <h1>{{ endpoint.model }}</h1>
         <p class="provider">@ {{ endpoint.provider }}</p>
 
+        <div id="charts-container"></div>
+
         <div class="stats">
             <div class="stat">
                 <div class="stat-value" id="total-count">...</div>
@@ -43,6 +45,7 @@
 
 {% block scripts %}
     <script type="application/json" id="manifest">{{ manifest_json | safe }}</script>
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
     <script src="../js/endpoint.js"></script>
 {% endblock %}
 
