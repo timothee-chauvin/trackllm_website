@@ -30,7 +30,9 @@ jobs:
 
       - name: Build TypeScript
         working-directory: website
-        run: bun run build
+        run: |
+          bun install
+          bun run build
 
       - name: Set up Python
         uses: actions/setup-python@v5
