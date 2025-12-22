@@ -1,0 +1,13 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "moonshotai/kimi-vl-a3b-thinking",
+    "provider": "chutes",
+    "cost": [
+      -1,
+      -1
+    ],
+    "max_logprobs": null
+  }
+}

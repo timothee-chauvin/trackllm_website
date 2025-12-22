@@ -1,0 +1,13 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "nvidia/llama-3.3-nemotron-super-49b-v1",
+    "provider": "nebius/fp8",
+    "cost": [
+      -1,
+      -1
+    ],
+    "max_logprobs": null
+  }
+}

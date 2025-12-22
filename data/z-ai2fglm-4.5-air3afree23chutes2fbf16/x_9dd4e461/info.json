@@ -1,0 +1,13 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "z-ai/glm-4.5-air:free",
+    "provider": "chutes/bf16",
+    "cost": [
+      -1,
+      -1
+    ],
+    "max_logprobs": null
+  }
+}

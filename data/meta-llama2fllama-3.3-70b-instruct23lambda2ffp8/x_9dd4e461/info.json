@@ -1,0 +1,13 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "meta-llama/llama-3.3-70b-instruct",
+    "provider": "lambda/fp8",
+    "cost": [
+      -1,
+      -1
+    ],
+    "max_logprobs": null
+  }
+}

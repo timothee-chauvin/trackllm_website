@@ -1,0 +1,13 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "meta-llama/llama-guard-3-8b",
+    "provider": "fireworks",
+    "cost": [
+      -1,
+      -1
+    ],
+    "max_logprobs": null
+  }
+}
