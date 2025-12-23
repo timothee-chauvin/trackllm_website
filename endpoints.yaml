@@ -54,12 +54,6 @@ endpoints:
   - 0.5
   - 0.75
 - api: openrouter
-  model: neversleep/llama-3.1-lumimaid-8b
-  provider: mancer/fp16
-  cost:
-  - 0.25
-  - 1.0
-- api: openrouter
   model: undi95/remm-slerp-l2-13b
   provider: mancer/fp8
   cost:
@@ -137,12 +131,6 @@ endpoints:
   cost:
   - 0.45
   - 1.8
-- api: openrouter
-  model: z-ai/glm-4.5
-  provider: mancer/fp8
-  cost:
-  - 0.425
-  - 2.0
 - api: openrouter
   model: z-ai/glm-4.6
   provider: mancer/fp8
