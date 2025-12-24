@@ -42,6 +42,12 @@ endpoints:
   - 0.25
   - 0.75
 - api: openrouter
+  model: deepseek/deepseek-chat-v3.1
+  provider: gmicloud/fp8
+  cost:
+  - 0.216
+  - 0.8
+- api: openrouter
   model: qwen/qwen3-32b
   provider: cerebras
   cost:
@@ -59,12 +65,6 @@ endpoints:
   cost:
   - 0.5
   - 0.75
-- api: openrouter
-  model: deepseek/deepseek-chat-v3.1
-  provider: gmicloud/fp8
-  cost:
-  - 0.27
-  - 1.0
 - api: openrouter
   model: qwen/qwen3-next-80b-a3b-thinking
   provider: nebius/fp8
