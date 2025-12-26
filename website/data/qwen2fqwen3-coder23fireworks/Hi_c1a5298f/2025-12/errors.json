@@ -1,1 +1,1 @@
-{"seen_errors":[{"http_code":402,"message":"{\"message\":\"Insufficient credits. Add more using https://openrouter.ai/settings/credits\",\"code\":402}"}]}
+{"seen_errors":[{"http_code":402,"message":"{\"message\":\"Insufficient credits. Add more using https://openrouter.ai/settings/credits\",\"code\":402}"},{"http_code":0,"message":"Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"}]}
