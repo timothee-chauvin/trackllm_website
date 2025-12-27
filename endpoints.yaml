@@ -135,7 +135,7 @@ endpoints:
   model: z-ai/glm-4.6
   provider: mancer/fp8
   cost:
-  - 0.425
+  - 0.45
   - 2.0
 - api: openrouter
   model: moonshotai/kimi-k2
