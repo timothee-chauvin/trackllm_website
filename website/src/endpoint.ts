@@ -27,6 +27,7 @@ interface PromptData {
 
 interface LogprobQuery {
   date: Date;
+  tokens: string[];
   logprobs: number[];
 }
 
@@ -34,7 +35,6 @@ interface LogprobsData {
   seen_tokens: string[];
   seen_logprobs: { tokens: number[]; logprobs: number[] }[];
 }
-
 
 async function fetchQueries(
   endpointSlug: string,
@@ -94,7 +94,10 @@ async function fetchLogprobsForMonth(
       const logprobVec = logprobsData.seen_logprobs[idx];
       if (!logprobVec || logprobVec.logprobs.length === 0) continue;
 
-      entries.push({ date, logprobs: logprobVec.logprobs });
+      // Decode tokens using seen_tokens
+      const tokens = logprobVec.tokens.map((i) => logprobsData.seen_tokens[i]);
+
+      entries.push({ date, tokens, logprobs: logprobVec.logprobs });
     }
 
     return entries;
@@ -130,6 +133,14 @@ async function fetchLogprobsForPrompt(
   return allEntries.slice(0, limit);
 }
 
+function reprToken(token: string): string {
+  // Use JSON.stringify to escape special chars, then remove surrounding quotes
+  const escaped = JSON.stringify(token).slice(1, -1);
+  // Truncate long tokens
+  if (escaped.length > 15) return `'${escaped.slice(0, 12)}…'`;
+  return `'${escaped}'`;
+}
+
 function renderPromptChart(
   container: HTMLElement,
   promptName: string,
@@ -145,31 +156,57 @@ function renderPromptChart(
     (a, b) => a.date.getTime() - b.date.getTime()
   );
 
-  // Find max number of logprobs
+  // Find max number of logprobs and collect unique tokens per position
   const maxLogprobs = Math.max(...sorted.map((e) => e.logprobs.length));
+
+  // Get the most common token at each position for the legend
+  const tokenAtPosition: string[] = [];
+  for (let i = 0; i < maxLogprobs; i++) {
+    const tokenCounts = new Map<string, number>();
+    for (const entry of sorted) {
+      if (i < entry.tokens.length) {
+        const token = entry.tokens[i];
+        tokenCounts.set(token, (tokenCounts.get(token) || 0) + 1);
+      }
+    }
+    // Get most common token
+    let mostCommon = `pos ${i + 1}`;
+    let maxCount = 0;
+    for (const [token, count] of tokenCounts) {
+      if (count > maxCount) {
+        maxCount = count;
+        mostCommon = token;
+      }
+    }
+    tokenAtPosition.push(mostCommon);
+  }
 
   // Create a trace for each logprob position
   const traces = [];
   for (let i = 0; i < maxLogprobs; i++) {
     const x: Date[] = [];
     const y: number[] = [];
+    const hoverTokens: string[] = [];
 
     for (const entry of sorted) {
       if (i < entry.logprobs.length) {
         x.push(entry.date);
         y.push(entry.logprobs[i]);
+        hoverTokens.push(reprToken(entry.tokens[i] || "?"));
       }
     }
 
     if (x.length > 0) {
+      const label = reprToken(tokenAtPosition[i]);
       traces.push({
         x,
         y,
         type: "scatter",
         mode: "lines",
-        name: `Token ${i + 1}`,
+        name: label,
         line: { width: 1 },
-        hovertemplate: `Token ${i + 1}<br>%{x}<br>Logprob: %{y:.4f}<extra></extra>`,
+        text: hoverTokens,
+        hovertemplate: `<b>%{text}</b><br>%{x}<br>Logprob: %{y:.4f}<extra></extra>`,
       });
     }
   }
