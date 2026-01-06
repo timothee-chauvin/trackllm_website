@@ -203,14 +203,14 @@ def main() -> None:
             logger.info(f"  - {m}")
 
 
-def load_tokenizer_vocab(tokenizer_hash: str) -> set[str]:
-    """Load a tokenizer's vocabulary as a set of strings."""
+def load_tokenizer_vocab(tokenizer_hash: str) -> list[str]:
+    """Load a tokenizer's vocabulary in order."""
     path = tokenizers_dir / f"{tokenizer_hash}.csv"
-    strings: set[str] = set()
+    strings: list[str] = []
     with open(path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            strings.add(row["token_string"])
+            strings.append(row["token_string"])
     return strings
 
 
@@ -225,13 +225,14 @@ def get_best_single_token_strings() -> list[str]:
 
     string_counts: Counter[str] = Counter()
     for tok_hash in unique_hashes:
-        vocab = load_tokenizer_vocab(tok_hash)
+        vocab = set(load_tokenizer_vocab(tok_hash))
         string_counts.update(vocab)
 
-    # Sort by count descending, then by byte length ascending (smaller strings first)
+    # Sort by count descending, then by byte length ascending, then alphabetically
+    # The alphabetical sort is to make this function deterministic.
     items = string_counts.most_common()
-    items.sort(key=lambda x: (-x[1], len(x[0].encode("utf-8"))))
-    return items
+    items.sort(key=lambda x: (-x[1], len(x[0].encode("utf-8")), x[0]))
+    return [item[0] for item in items]
 
 
 if __name__ == "__main__":

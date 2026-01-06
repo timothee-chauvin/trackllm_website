@@ -20,19 +20,41 @@ async def gather_with_concurrency(
 async def gather_with_concurrency_streaming(
     n: int, *coros: Coroutine[Any, Any, Any]
 ) -> AsyncIterator[Any]:
-    """Run coroutines with limited concurrency, yielding results as they complete."""
-    semaphore = asyncio.Semaphore(n)
+    """Run coroutines with limited concurrency, yielding results as they complete.
 
-    async def sem_coro(coro: Coroutine[Any, Any, Any]) -> Any:
-        async with semaphore:
-            return await coro
+    Tasks are started in order as slots become available, preserving submission order.
+    """
+    queue: asyncio.Queue[Any] = asyncio.Queue()
+    coro_iter = iter(coros)
+    active_tasks: set[asyncio.Task[None]] = set()
+    done_count = 0
+    total = len(coros)
 
-    # Create the semaphore-wrapped coroutines
-    sem_coros = [sem_coro(c) for c in coros]
+    async def worker(coro: Coroutine[Any, Any, Any]) -> None:
+        result = await coro
+        await queue.put(result)
 
-    # Use as_completed to get results as they finish
-    for coro in asyncio.as_completed(sem_coros):
-        yield await coro
+    def start_next() -> bool:
+        """Start the next coroutine if available. Returns True if one was started."""
+        try:
+            coro = next(coro_iter)
+            task = asyncio.create_task(worker(coro))
+            active_tasks.add(task)
+            task.add_done_callback(active_tasks.discard)
+            return True
+        except StopIteration:
+            return False
+
+    # Start initial batch
+    for _ in range(min(n, total)):
+        start_next()
+
+    # Yield results and start new tasks as slots free up
+    while done_count < total:
+        result = await queue.get()
+        done_count += 1
+        start_next()
+        yield result
 
 
 def trim_to_length(s: str, length: int) -> str:

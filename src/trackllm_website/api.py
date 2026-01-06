@@ -20,20 +20,22 @@ class OpenRouterClient:
         self,
         endpoint: Endpoint,
         prompt: str,
-        temperature: float = config.api.temperature,
+        temperature: float | int = config.api.temperature,
+        logprobs: bool = True,
     ) -> Response:
         request_data = {
             "model": endpoint.model,
             "messages": [{"role": "user", "content": prompt}],
             "max_completion_tokens": 1,
-            "logprobs": True,
-            "top_logprobs": endpoint.get_max_logprobs(cfg=config),
             "temperature": temperature,
             "provider": {
                 "allow_fallbacks": False,
                 "require_parameters": True,
             },
         }
+        if logprobs:
+            request_data["logprobs"] = True
+            request_data["top_logprobs"] = endpoint.get_max_logprobs(cfg=config)
         if endpoint.provider:
             request_data["provider"]["only"] = [endpoint.provider]
 
@@ -64,42 +66,51 @@ class OpenRouterClient:
 
         cost = compute_cost(response["usage"], endpoint)
 
-        # Extract logprobs for the first token
-        if response["choices"] and response["choices"][0]["logprobs"]:
+        # Extract content
+        content = None
+        if response["choices"]:
+            content = response["choices"][0].get("message", {}).get("content")
+
+        # Extract logprobs for the first token (if requested)
+        response_logprobs = None
+        if logprobs and response["choices"] and response["choices"][0].get("logprobs"):
             logprobs_data = response["choices"][0]["logprobs"]["content"][0][
                 "top_logprobs"
             ]
             tokens = [logprob["token"] for logprob in logprobs_data]
             probs = [np.float32(logprob["logprob"]) for logprob in logprobs_data]
+            response_logprobs = ResponseLogprobs(tokens=tokens, logprobs=probs)
 
-            logprobs = ResponseLogprobs(tokens=tokens, logprobs=probs)
-
+        if logprobs and response_logprobs is None:
             return Response(
                 date=datetime.now(tz=timezone.utc),
                 endpoint=endpoint,
                 prompt=prompt,
-                logprobs=logprobs,
+                content=content,
+                logprobs=None,
                 cost=cost,
-                error=None,
+                error=ResponseError(
+                    http_code=resp.status,
+                    message="No logprobs returned",
+                ),
             )
 
         return Response(
             date=datetime.now(tz=timezone.utc),
             endpoint=endpoint,
             prompt=prompt,
-            logprobs=None,
+            content=content,
+            logprobs=response_logprobs,
             cost=cost,
-            error=ResponseError(
-                http_code=resp.status,
-                message="No logprobs returned",
-            ),
+            error=None,
         )
 
     async def query(
         self,
         endpoint: Endpoint,
         prompt: str,
-        temperature: float = config.api.temperature,
+        temperature: float | int = config.api.temperature,
+        logprobs: bool = True,
     ) -> Response:
         try:
             return await retry_with_exponential_backoff(
@@ -107,6 +118,7 @@ class OpenRouterClient:
                 endpoint,
                 prompt,
                 temperature,
+                logprobs,
                 max_retries=config.api.max_retries,
             )
         except Exception as e:

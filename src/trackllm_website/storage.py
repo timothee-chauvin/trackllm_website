@@ -46,7 +46,8 @@ class Response(BaseModel):
     date: datetime
     endpoint: Endpoint
     prompt: str
-    logprobs: ResponseLogprobs | None
+    content: str | None = None
+    logprobs: ResponseLogprobs | None = None
     error: ResponseError | None = None
     cost: float | int
 

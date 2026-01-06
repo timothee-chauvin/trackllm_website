@@ -62,13 +62,29 @@ class Endpoint(BaseModel):
         # Third case: openrouter default
         return cfg.api.top_logprobs_openrouter_default
 
+    @property
+    def provider_without_suffix(self) -> str:
+        return self.provider.split("/")[0]
+
+
+class Phase1Config(BaseModel):
+    queries_per_token: int
+    requests_per_second_per_endpoint: float
+    tokens_per_endpoint: int
+    chunk_size: int
+
 
 class BIConfig(BaseModel):
     data_dir: Path
+    phase_1: Phase1Config
 
     @property
     def tokenizers_dir(self) -> Path:
         return self.data_dir / "tokenizers"
+
+    @property
+    def phase_1_dir(self) -> Path:
+        return self.data_dir / "phase_1"
 
 
 class ApiConfig(BaseModel):
