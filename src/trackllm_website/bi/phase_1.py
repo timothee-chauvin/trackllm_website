@@ -1,7 +1,6 @@
 """Phase 1: Identify border inputs by querying endpoints with single-token inputs."""
 
 import asyncio
-import sys
 import time
 from collections import deque
 from dataclasses import dataclass, field
@@ -9,6 +8,7 @@ from pathlib import Path
 
 import orjson
 from aiolimiter import AsyncLimiter
+from tqdm import tqdm
 
 from trackllm_website.api import OpenRouterClient
 from trackllm_website.bi.download_tokenizers import (
@@ -18,8 +18,6 @@ from trackllm_website.bi.download_tokenizers import (
 )
 from trackllm_website.config import Endpoint, config, logger
 from trackllm_website.util import gather_with_concurrency_streaming, slugify
-
-IS_TTY = sys.stdout.isatty()
 
 
 def get_endpoints() -> list[Endpoint]:
@@ -82,6 +80,7 @@ class EndpointState:
     )
     completed_queries: int = 0
     total_queries: int = 0
+    got_404: bool = False
 
     def __post_init__(self) -> None:
         self.results = load_existing_results(self.output_path)
@@ -156,7 +155,14 @@ async def query_and_record(
     token: str,
 ) -> None:
     """Query endpoint and record result, respecting per-endpoint rate limit."""
+    if state.got_404:
+        return
+
     await state.rate_limiter.acquire()
+
+    if state.got_404:
+        return
+
     state.request_timestamps.append(time.monotonic())
 
     def on_retry(status: int) -> None:
@@ -168,6 +174,11 @@ async def query_and_record(
     )
     state.completed_queries += 1
     if response.error:
+        if response.error.http_code == 404:
+            if not state.got_404:
+                state.got_404 = True
+                logger.warning(f"Got 404 for {state.endpoint}, abandoning endpoint")
+            return
         logger.warning(
             f"Error for {state.endpoint}: {token!r}: {response.error.message}"
         )
@@ -175,44 +186,19 @@ async def query_and_record(
     state.record_result(token, response.content)
 
 
-def print_status(states: list[EndpointState], num_lines_to_clear: int = 0) -> int:
-    """Print live status for each endpoint. Returns number of lines printed."""
-    if num_lines_to_clear > 0:
-        # Move cursor up and clear lines
-        sys.stdout.write(f"\033[{num_lines_to_clear}A\033[J")
-
-    lines = []
+def log_status(states: list[EndpointState]) -> None:
+    """Log status for each endpoint."""
     for state in states:
-        rps = state.get_requests_per_second()
-        rate_limits = state.get_recent_rate_limits()
         completed_tokens = state.get_completed_tokens()
         border_tokens = state.get_border_tokens()
         total_tokens = len(state.input_tokens)
-        pct = 100 * completed_tokens / total_tokens if total_tokens else 0
-        lines.append(
-            f"  {str(state.endpoint):100} {rps:5.2f} req/s  {rate_limits:2} 429s  "
-            f"{state.completed_queries:5}/{state.total_queries} reqs  "
-            f"{completed_tokens:4}/{total_tokens} tokens ({pct:5.1f}%) "
-            f"{border_tokens:4} ({border_tokens / completed_tokens:5.1%}) BI"
+        rate_limits = state.get_recent_rate_limits()
+        rps = state.get_requests_per_second()
+        bi_pct = border_tokens / completed_tokens if completed_tokens else 0
+        logger.info(
+            f"{state.endpoint}: {completed_tokens}/{total_tokens} tokens, "
+            f"{border_tokens} ({bi_pct:.1%}) BI, {rps:.1f} rps, {rate_limits} recent 429s"
         )
-
-    output = "\n".join(lines)
-    sys.stdout.write(output + "\n")
-    sys.stdout.flush()
-    return len(lines)
-
-
-async def live_status_updater(
-    states: list[EndpointState], stop_event: asyncio.Event
-) -> None:
-    """Background task that updates status display every second."""
-    num_lines = 0
-    while not stop_event.is_set():
-        num_lines = print_status(states, num_lines)
-        try:
-            await asyncio.wait_for(stop_event.wait(), timeout=1.0)
-        except asyncio.TimeoutError:
-            pass
 
 
 async def main() -> None:
@@ -225,7 +211,7 @@ async def main() -> None:
         f"Loaded {len(tokenizer_index)} tokenizers, {len(fallback_tokens)} fallback tokens"
     )
 
-    endpoints = get_endpoints()[:4]
+    endpoints = get_endpoints()[20:22]
     logger.info(f"Running phase 1 for {len(endpoints)} endpoints")
 
     requests_per_second = config.bi.phase_1.requests_per_second_per_endpoint
@@ -263,24 +249,17 @@ async def main() -> None:
 
     logger.info(f"Total tasks to process: {len(coros)}")
 
-    # Start live status updater if in TTY
-    stop_event = asyncio.Event()
-    status_task = None
-    if IS_TTY:
-        print()  # Blank line before status
-        status_task = asyncio.create_task(live_status_updater(states, stop_event))
+    # Concurrency per endpoint limited by rate limiter
+    total_concurrency = 50
+    completed = 0
+    with tqdm(total=len(coros), desc="Requests") as pbar:
+        async for _ in gather_with_concurrency_streaming(total_concurrency, *coros):
+            completed += 1
+            pbar.update(1)
+            if completed % 50 == 0:
+                log_status(states)
 
-    # Concurrency per endpoint limited by rate limiter; global concurrency just needs headroom
-    total_concurrency = len(endpoints) * 50
-    async for _ in gather_with_concurrency_streaming(total_concurrency, *coros):
-        pass
-
-    # Stop status updater
-    if status_task:
-        stop_event.set()
-        await status_task
-        print_status(states, len(states))  # Final update
-
+    log_status(states)
     logger.info("Phase 1 complete")
 
 
