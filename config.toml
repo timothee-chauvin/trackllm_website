@@ -16,3 +16,6 @@ fireworks = 5
 azure = 5
 inference-net = 5
 xai = 8
+
+[bi]
+data_dir = "data_bi"

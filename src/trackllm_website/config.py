@@ -63,6 +63,14 @@ class Endpoint(BaseModel):
         return cfg.api.top_logprobs_openrouter_default
 
 
+class BIConfig(BaseModel):
+    data_dir: Path
+
+    @property
+    def tokenizers_dir(self) -> Path:
+        return self.data_dir / "tokenizers"
+
+
 class ApiConfig(BaseModel):
     # Default is 20, but some providers have a lower limit. See Endpoint.get_max_logprobs().
     top_logprobs_openrouter: dict[str, int]
@@ -87,6 +95,7 @@ class Config(BaseSettings):
 
     # read from config.toml
     api: ApiConfig
+    bi: BIConfig
     prompts: list[str]
     data_dir: Path
 
@@ -96,6 +105,7 @@ class Config(BaseSettings):
 
     # read from .env
     openrouter_api_key: str
+    hf_token: str | None = None
 
     @classmethod
     def settings_customise_sources(
