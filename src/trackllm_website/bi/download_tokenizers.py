@@ -13,6 +13,37 @@ tokenizers_dir = config.bi.tokenizers_dir
 index_path = tokenizers_dir / "index.csv"
 
 
+def openrouter_to_hf(model: str) -> str | None:
+    """Convert OpenRouter model ID to HuggingFace repo path.
+
+    Returns None if no mapping is known.
+    """
+    parts = model.split("/", 1)
+    if len(parts) != 2:
+        return None
+
+    provider, model_name = parts
+
+    if provider == "deepseek":
+        # deepseek/deepseek-v3 -> deepseek-ai/deepseek-v3
+        return f"deepseek-ai/{model_name}"
+
+    if provider == "meta-llama":
+        # meta-llama/llama-3-70b-instruct -> meta-llama/meta-llama-3-70b-instruct
+        if model_name.startswith("llama-3-"):
+            return f"meta-llama/meta-{model_name}"
+        return model  # already correct format
+
+    if provider == "qwen":
+        # qwen/qwen-2.5-72b-instruct -> qwen/qwen2.5-72b-instruct
+        # Remove dash between qwen and version number
+        if model_name.startswith("qwen-"):
+            return f"qwen/{model_name.replace('qwen-', 'qwen', 1)}"
+        return model
+
+    return None
+
+
 def setup_hf_auth() -> None:
     """Login to HuggingFace using token from environment."""
     token = config.hf_token
@@ -128,7 +159,15 @@ def main() -> None:
                 continue
 
         logger.info(f"Trying tokenizer: {model}")
-        vocab = download_tokenizer(model)
+
+        # Try HuggingFace-mapped name first, then fall back to original
+        hf_repo = openrouter_to_hf(model)
+        vocab = None
+        if hf_repo:
+            logger.info(f"  -> Mapped to HF repo: {hf_repo}")
+            vocab = download_tokenizer(hf_repo)
+        if vocab is None:
+            vocab = download_tokenizer(model)
         if vocab is None:
             failed_models.append(model)
             continue
