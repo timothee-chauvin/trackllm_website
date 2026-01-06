@@ -2,6 +2,7 @@
 
 import csv
 import hashlib
+from collections import Counter
 from pathlib import Path
 
 from huggingface_hub import login
@@ -200,6 +201,37 @@ def main() -> None:
         logger.info("Models without tokenizers found:")
         for m in failed_models:
             logger.info(f"  - {m}")
+
+
+def load_tokenizer_vocab(tokenizer_hash: str) -> set[str]:
+    """Load a tokenizer's vocabulary as a set of strings."""
+    path = tokenizers_dir / f"{tokenizer_hash}.csv"
+    strings: set[str] = set()
+    with open(path, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            strings.add(row["token_string"])
+    return strings
+
+
+def get_best_single_token_strings() -> list[str]:
+    """Return strings sorted by frequency across known tokenizers (descending).
+
+    Strings that appear as single tokens in more tokenizers are ranked higher,
+    as they're more likely to be single tokens in unknown tokenizers.
+    """
+    index = load_existing_index()
+    unique_hashes = set(index.values())
+
+    string_counts: Counter[str] = Counter()
+    for tok_hash in unique_hashes:
+        vocab = load_tokenizer_vocab(tok_hash)
+        string_counts.update(vocab)
+
+    # Sort by count descending, then by byte length ascending (smaller strings first)
+    items = string_counts.most_common()
+    items.sort(key=lambda x: (-x[1], len(x[0].encode("utf-8"))))
+    return items
 
 
 if __name__ == "__main__":
