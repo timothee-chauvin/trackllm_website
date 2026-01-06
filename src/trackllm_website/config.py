@@ -73,6 +73,7 @@ class ApiConfig(BaseModel):
     max_workers: int
     timeout: float
     abandon_after: int
+    openrouter_avoid_free_endpoints: bool
 
 
 class Config(BaseSettings):
