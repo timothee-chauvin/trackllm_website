@@ -77,6 +77,9 @@ class EndpointState:
     rate_limiter: AsyncLimiter
     results: dict[str, dict[str, int]] = field(default_factory=dict)
     request_timestamps: deque[float] = field(default_factory=lambda: deque(maxlen=100))
+    rate_limit_timestamps: deque[float] = field(
+        default_factory=lambda: deque(maxlen=100)
+    )
     completed_queries: int = 0
     total_queries: int = 0
 
@@ -93,6 +96,12 @@ class EndpointState:
         if len(recent) < 2:
             return 0.0
         return len(recent) / (now - recent[0])
+
+    def get_recent_rate_limits(self) -> int:
+        """Count 429 errors in the last 5 seconds."""
+        now = time.monotonic()
+        cutoff = now - 5.0
+        return sum(1 for t in self.rate_limit_timestamps if t > cutoff)
 
     def get_completed_tokens(self) -> int:
         """Count tokens that have all queries completed."""
@@ -145,7 +154,14 @@ async def query_and_record(
     """Query endpoint and record result, respecting per-endpoint rate limit."""
     await state.rate_limiter.acquire()
     state.request_timestamps.append(time.monotonic())
-    response = await client.query(state.endpoint, token, temperature=0, logprobs=False)
+
+    def on_retry(status: int) -> None:
+        if status == 429:
+            state.rate_limit_timestamps.append(time.monotonic())
+
+    response = await client.query(
+        state.endpoint, token, temperature=0, logprobs=False, on_retry=on_retry
+    )
     state.completed_queries += 1
     if response.error:
         logger.warning(
@@ -164,12 +180,12 @@ def print_status(states: list[EndpointState], num_lines_to_clear: int = 0) -> in
     lines = []
     for state in states:
         rps = state.get_requests_per_second()
+        rate_limits = state.get_recent_rate_limits()
         completed_tokens = state.get_completed_tokens()
         total_tokens = len(state.input_tokens)
         pct = 100 * completed_tokens / total_tokens if total_tokens else 0
-        provider = state.endpoint.provider_without_suffix
         lines.append(
-            f"  {provider:20} {rps:5.2f} req/s  "
+            f"  {str(state.endpoint):100} {rps:5.2f} req/s  {rate_limits:2} 429s  "
             f"{state.completed_queries:5}/{state.total_queries} reqs  "
             f"{completed_tokens:4}/{total_tokens} tokens ({pct:5.1f}%)"
         )

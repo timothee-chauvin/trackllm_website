@@ -111,6 +111,7 @@ class OpenRouterClient:
         prompt: str,
         temperature: float | int = config.api.temperature,
         logprobs: bool = True,
+        on_retry: Callable[[int], None] | None = None,
     ) -> Response:
         try:
             return await retry_with_exponential_backoff(
@@ -120,6 +121,7 @@ class OpenRouterClient:
                 temperature,
                 logprobs,
                 max_retries=config.api.max_retries,
+                on_retry=on_retry,
             )
         except Exception as e:
             if isinstance(e, aiohttp.ClientResponseError):
@@ -159,32 +161,39 @@ async def retry_with_exponential_backoff(
     max_delay: float = 60.0,
     jitter: bool = True,
     retryable_status_codes: tuple[int, ...] = (429, 500, 502, 503, 504),
+    on_retry: Callable[[int], None] | None = None,
     **kwargs,
 ) -> Any:
-    """Retry an async function with exponential backoff."""
+    """Retry an async function with exponential backoff.
+
+    Args:
+        on_retry: Optional callback called with HTTP status code when retrying.
+    """
 
     def calc_delay(attempt: int) -> float:
         delay = min(max_delay, base_delay * (2**attempt))
         return delay * random.uniform(0.9, 1.1) if jitter else delay
 
-    def is_retryable(e: Exception) -> tuple[bool, str]:
+    def is_retryable(e: Exception) -> tuple[bool, int | None, str]:
         if (
             isinstance(e, aiohttp.ClientResponseError)
             and e.status in retryable_status_codes
         ):
-            return True, f"HTTP {e.status}"
+            return True, e.status, f"HTTP {e.status}"
         elif isinstance(e, asyncio.TimeoutError):
-            return True, f"Timeout after {config.api.timeout}s"
-        return False, ""
+            return True, None, f"Timeout after {config.api.timeout}s"
+        return False, None, ""
 
     last_exception: Exception | None = None
     for attempt in range(max_retries + 1):
         try:
             return await func(*args, **kwargs)
         except Exception as e:
-            retryable, msg = is_retryable(e)
+            retryable, status, msg = is_retryable(e)
             if not retryable or attempt >= max_retries:
                 raise
+            if on_retry and status:
+                on_retry(status)
             wait_time = calc_delay(attempt)
             logger.debug(
                 f"{msg}. Retrying in {wait_time:.2f}s ({attempt + 1}/{max_retries + 1})"
