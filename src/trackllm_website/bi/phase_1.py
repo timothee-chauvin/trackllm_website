@@ -112,6 +112,10 @@ class EndpointState:
             if sum(self.results.get(token, {}).values()) >= queries_needed
         )
 
+    def get_border_tokens(self) -> int:
+        """Count tokens that have at least two different outputs."""
+        return sum(1 for token, outputs in self.results.items() if len(outputs) >= 2)
+
     def get_pending_queries(self, token: str) -> int:
         """Return number of queries still needed for this token."""
         existing = sum(self.results.get(token, {}).values())
@@ -182,12 +186,14 @@ def print_status(states: list[EndpointState], num_lines_to_clear: int = 0) -> in
         rps = state.get_requests_per_second()
         rate_limits = state.get_recent_rate_limits()
         completed_tokens = state.get_completed_tokens()
+        border_tokens = state.get_border_tokens()
         total_tokens = len(state.input_tokens)
         pct = 100 * completed_tokens / total_tokens if total_tokens else 0
         lines.append(
             f"  {str(state.endpoint):100} {rps:5.2f} req/s  {rate_limits:2} 429s  "
             f"{state.completed_queries:5}/{state.total_queries} reqs  "
-            f"{completed_tokens:4}/{total_tokens} tokens ({pct:5.1f}%)"
+            f"{completed_tokens:4}/{total_tokens} tokens ({pct:5.1f}%) "
+            f"{border_tokens:4} ({border_tokens / completed_tokens:5.1%}) BI"
         )
 
     output = "\n".join(lines)
