@@ -45,7 +45,7 @@ async def main():
     # Create all tasks upfront for concurrent execution
     tasks = [
         openrouter_client.query(endpoint=endpoint, prompt=prompt)
-        for endpoint in config.endpoints
+        for endpoint in config.endpoints_lt
         for prompt in config.prompts
     ]
 
