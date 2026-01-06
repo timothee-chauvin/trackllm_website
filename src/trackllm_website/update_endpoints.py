@@ -15,16 +15,24 @@ from trackllm_website.util import (
 )
 
 
-async def get_model_endpoints(session, model_id) -> list[Endpoint]:
-    """Fetch endpoints for a model and return a list of endpoints that claim to support logprobs"""
+async def get_model_endpoints(
+    session, model_id, logprob_filter: bool = False
+) -> list[Endpoint]:
+    """Fetch endpoints for a model.
+
+    Args:
+        session: aiohttp session
+        model_id: OpenRouter model ID
+        logprob_filter: If True, only return endpoints that claim to support logprobs
+    """
     url = f"https://openrouter.ai/api/v1/models/{model_id}/endpoints"
     try:
         async with session.get(url) as response:
             data = await response.json()
             model_endpoints = data["data"]["endpoints"]
-            model_endpoints_with_logprobs = []
+            filtered_endpoints = []
             for endpoint in model_endpoints:
-                if not (
+                if logprob_filter and not (
                     "logprobs" in endpoint["supported_parameters"]
                     and "top_logprobs" in endpoint["supported_parameters"]
                 ):
@@ -46,25 +54,42 @@ async def get_model_endpoints(session, model_id) -> list[Endpoint]:
                         ),
                     ),
                 )
-                model_endpoints_with_logprobs.append(endpoint_data)
-            return model_endpoints_with_logprobs
+                filtered_endpoints.append(endpoint_data)
+            return filtered_endpoints
     except Exception as e:
         logger.error(f"Error fetching endpoints for {model_id}: {e}")
         return []
 
 
-async def get_endpoints_claiming_logprobs() -> list[Endpoint]:
-    """Get all endpoints that claim to support logprobs"""
+async def get_endpoints(logprob_filter: bool = False) -> list[Endpoint]:
+    """Get all endpoints for all models.
+
+    Args:
+        logprob_filter: If True, only return endpoints that claim to support logprobs
+    """
     response = requests.get("https://openrouter.ai/api/v1/models")
     model_ids = [model["id"] for model in response.json()["data"]]
-    endpoints_claiming_logprobs = []
+    all_endpoints = []
     async with aiohttp.ClientSession() as session:
-        tasks = [get_model_endpoints(session, model_id) for model_id in model_ids]
+        tasks = [
+            get_model_endpoints(session, model_id, logprob_filter=logprob_filter)
+            for model_id in model_ids
+        ]
         async for result in gather_with_concurrency_streaming(
             config.api.max_workers, *tasks
         ):
-            endpoints_claiming_logprobs.extend(result)
-    return endpoints_claiming_logprobs
+            all_endpoints.extend(result)
+
+    filtered_endpoints = [
+        e for e in all_endpoints if e.cost[0] + e.cost[1] < config.api.max_cost_mtok
+    ]
+
+    logger.info(
+        f"Found {len(all_endpoints)} {'endpoints claiming logprobs support' if logprob_filter else 'total endpoints'}, "
+        f"keeping {len(filtered_endpoints)} within max cost of ${config.api.max_cost_mtok}/Mtok"
+    )
+
+    return filtered_endpoints
 
 
 async def test_endpoint_logprobs(endpoint: Endpoint) -> Endpoint | None:
@@ -97,23 +122,15 @@ async def test_endpoints_logprobs(endpoints: Iterable[Endpoint]) -> list[Endpoin
     ]
 
 
-async def update_endpoints_yaml():
-    """Update endpoints.yaml by removing stalled endpoints and adding new ones."""
+async def update_endpoints_lt():
+    """Update the LT endpoints by removing stalled endpoints and adding new ones."""
     storage = ResultsStorage(config.data_dir)
-    current_endpoints = config.endpoints
+    current_endpoints = config.endpoints_lt
     endpoints_to_keep = set([e for e in current_endpoints if not storage.is_stalled(e)])
     logger.info(
         f"Keeping {len(endpoints_to_keep)}/{len(current_endpoints)} non-stalled endpoints"
     )
-    endpoints_claiming_logprobs_unfiltered = await get_endpoints_claiming_logprobs()
-    endpoints_claiming_logprobs = [
-        e
-        for e in endpoints_claiming_logprobs_unfiltered
-        if e.cost[0] + e.cost[1] < config.api.max_cost_mtok
-    ]
-    logger.info(
-        f"Found {len(endpoints_claiming_logprobs_unfiltered)} endpoints claiming logprobs support, keeping {len(endpoints_claiming_logprobs)} within max cost of ${config.api.max_cost_mtok}/Mtok"
-    )
+    endpoints_claiming_logprobs = await get_endpoints(logprob_filter=True)
 
     # Update costs with latest values
     for endpoint in endpoints_to_keep:
@@ -136,7 +153,7 @@ async def update_endpoints_yaml():
         final_endpoints, key=lambda e: (sum(e.cost), e.api, e.model, e.provider)
     )
 
-    output_data = {"endpoints": []}
+    output_data = {"endpoints_lt": []}
     for e in sorted_endpoints:
         e_data = {
             "api": e.api,
@@ -144,16 +161,42 @@ async def update_endpoints_yaml():
             "provider": e.provider,
             "cost": list(e.cost),
         }
-        output_data["endpoints"].append(e_data)
+        output_data["endpoints_lt"].append(e_data)
 
-    with open(config.endpoints_yaml_path, "w") as f:
+    with open(config.endpoints_yaml_path_lt, "w") as f:
         yaml.dump(output_data, f, default_flow_style=False, sort_keys=False)
 
-    logger.info(f"Updated {config.endpoints_yaml_path}")
+    logger.info(f"Updated {config.endpoints_yaml_path_lt}")
+
+
+async def update_endpoints_bi():
+    """Update the BI endpoints with all providers for all models."""
+    all_endpoints = await get_endpoints(logprob_filter=False)
+
+    # Sort endpoints by total cost, then api, model and provider
+    sorted_endpoints = sorted(
+        all_endpoints, key=lambda e: (sum(e.cost), e.api, e.model, e.provider)
+    )
+
+    output_data = {"endpoints_bi": []}
+    for e in sorted_endpoints:
+        e_data = {
+            "api": e.api,
+            "model": e.model,
+            "provider": e.provider,
+            "cost": list(e.cost),
+        }
+        output_data["endpoints_bi"].append(e_data)
+
+    with open(config.endpoints_yaml_path_bi, "w") as f:
+        yaml.dump(output_data, f, default_flow_style=False, sort_keys=False)
+
+    logger.info(f"Updated {config.endpoints_yaml_path_bi}")
 
 
 async def main():
-    await update_endpoints_yaml()
+    await update_endpoints_lt()
+    await update_endpoints_bi()
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-endpoints:
+endpoints_lt:
 - api: openrouter
   model: meta-llama/llama-3.1-8b-instruct
   provider: cerebras/fp16

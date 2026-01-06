@@ -76,9 +76,10 @@ class ApiConfig(BaseModel):
 
 
 class Config(BaseSettings):
-    endpoints_yaml_path: Path = root / "endpoints.yaml"
+    endpoints_yaml_path_lt: Path = root / "endpoints_lt.yaml"
+    endpoints_yaml_path_bi: Path = root / "endpoints_bi.yaml"
     model_config = SettingsConfigDict(
-        yaml_file=endpoints_yaml_path,
+        yaml_file=[endpoints_yaml_path_lt, endpoints_yaml_path_bi],
         toml_file=root / "config.toml",
         env_file=root / ".env",
     )
@@ -88,8 +89,9 @@ class Config(BaseSettings):
     prompts: list[str]
     data_dir: Path
 
-    # read from endpoints.yaml
-    endpoints: list[Endpoint]
+    # read from endpoints_[lt|bi].yaml
+    endpoints_lt: list[Endpoint]
+    endpoints_bi: list[Endpoint]
 
     # read from .env
     openrouter_api_key: str
