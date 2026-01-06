@@ -84,10 +84,18 @@ async def get_endpoints(logprob_filter: bool = False) -> list[Endpoint]:
         e for e in all_endpoints if e.cost[0] + e.cost[1] < config.api.max_cost_mtok
     ]
 
-    logger.info(
+    if config.api.openrouter_avoid_free_endpoints:
+        filtered_endpoints = [
+            e for e in filtered_endpoints if e.cost[0] + e.cost[1] > 0
+        ]
+
+    log_msg = (
         f"Found {len(all_endpoints)} {'endpoints claiming logprobs support' if logprob_filter else 'total endpoints'}, "
         f"keeping {len(filtered_endpoints)} within max cost of ${config.api.max_cost_mtok}/Mtok"
     )
+    if config.api.openrouter_avoid_free_endpoints:
+        log_msg += " and excluding free endpoints"
+    logger.info(log_msg)
 
     return filtered_endpoints
 
