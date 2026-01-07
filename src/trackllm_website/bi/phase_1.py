@@ -17,7 +17,7 @@ from trackllm_website.bi.download_tokenizers import (
     load_tokenizer_vocab,
 )
 from trackllm_website.config import Endpoint, config, logger
-from trackllm_website.util import gather_with_concurrency_streaming, slugify
+from trackllm_website.util import slugify
 
 
 def get_first_endpoint_per_provider() -> list[Endpoint]:
@@ -76,6 +76,7 @@ class EndpointState:
     input_tokens: list[str]
     output_path: Path
     rate_limiter: AsyncLimiter
+    concurrency_semaphore: asyncio.Semaphore
     results: dict[int, dict[str, dict[str, int]]] = field(default_factory=dict)
     request_timestamps: deque[float] = field(default_factory=lambda: deque(maxlen=100))
     rate_limit_timestamps: deque[float] = field(
@@ -181,37 +182,44 @@ async def query_and_record(
     state: EndpointState,
     token: str,
 ) -> None:
-    """Query endpoint and record result, respecting per-endpoint rate limit."""
+    """Query endpoint and record result, respecting per-endpoint rate and concurrency limits."""
     if state.got_404:
         return
 
-    await state.rate_limiter.acquire()
-
-    if state.got_404:
-        return
-
-    state.request_timestamps.append(time.monotonic())
-
-    def on_retry(status: int) -> None:
-        if status == 429:
-            state.rate_limit_timestamps.append(time.monotonic())
-
-    response = await client.query(
-        state.endpoint, token, temperature=0, logprobs=False, on_retry=on_retry
-    )
-    state.completed_queries += 1
-    if response.error:
-        if response.error.http_code == 404:
-            if not state.got_404:
-                state.got_404 = True
-                logger.warning(f"Got 404 for {state.endpoint}, abandoning endpoint")
+    # We have two semaphores: a concurrency limit and a requests per second limit.
+    # The concurrency is set high enough not to be a bottleneck when the API is responding well,
+    # but it's needed to limit the number of in-flight requests when the API is unresponsive (e.g. 429 errors).
+    async with state.concurrency_semaphore:
+        if state.got_404:
             return
-        logger.warning(
-            f"Error for {state.endpoint}: {token!r}: {response.error.message}"
+
+        await state.rate_limiter.acquire()
+
+        if state.got_404:
+            return
+
+        state.request_timestamps.append(time.monotonic())
+
+        def on_retry(status: int) -> None:
+            if status == 429:
+                state.rate_limit_timestamps.append(time.monotonic())
+
+        response = await client.query(
+            state.endpoint, token, temperature=0, logprobs=False, on_retry=on_retry
         )
-        return
-    state.recent_costs.append(response.cost)
-    state.record_result(token, response.content, response.input_tokens)
+        state.completed_queries += 1
+        if response.error:
+            if response.error.http_code == 404:
+                if not state.got_404:
+                    state.got_404 = True
+                    logger.warning(f"Got 404 for {state.endpoint}, abandoning endpoint")
+                return
+            logger.warning(
+                f"Error for {state.endpoint}: {token!r}: {response.error.message}"
+            )
+            return
+        state.recent_costs.append(response.cost)
+        state.record_result(token, response.content, response.input_tokens)
 
 
 def log_status(states: list[EndpointState]) -> None:
@@ -253,8 +261,9 @@ async def main() -> None:
     logger.info(f"Running phase 1 for {len(endpoints)} endpoints")
 
     requests_per_second = config.bi.phase_1.requests_per_second_per_endpoint
+    max_concurrent = config.bi.phase_1.max_concurrent_per_endpoint
 
-    # Create state for each endpoint with its own rate limiter
+    # Create state for each endpoint with its own rate limiter and concurrency semaphore
     states = [
         EndpointState(
             endpoint=ep,
@@ -263,35 +272,36 @@ async def main() -> None:
             ),
             output_path=get_output_path(ep),
             rate_limiter=AsyncLimiter(requests_per_second, 1),
+            concurrency_semaphore=asyncio.Semaphore(max_concurrent),
         )
         for ep in endpoints
     ]
 
-    # Build all tasks across all endpoints, interleaved
+    # Build task list for each endpoint
     task_lists = [s.build_task_list() for s in states]
-    max_tasks = max(len(t) for t in task_lists) if task_lists else 0
 
     # Set total_queries for each state
     for state, tasks in zip(states, task_lists):
         state.total_queries = len(tasks)
 
     client = OpenRouterClient()
+    total_tasks = sum(len(tasks) for tasks in task_lists)
+    logger.info(f"Total tasks to process: {total_tasks}")
+
     coros = []
 
-    # Interleave tasks from all endpoints (order preserved by gather_with_concurrency_streaming)
+    # Interleave tasks from all endpoints
+    max_tasks = max(len(tasks) for tasks in task_lists) if task_lists else 0
     for i in range(max_tasks):
         for state, tasks in zip(states, task_lists):
             if i < len(tasks):
                 token, _ = tasks[i]
                 coros.append(query_and_record(client, state, token))
 
-    logger.info(f"Total tasks to process: {len(coros)}")
-
-    # Concurrency per endpoint limited by rate limiter − leave enough headroom in total concurrency
-    total_concurrency = len(endpoints) * 20
     last_status_time = time.monotonic()
     with tqdm(total=len(coros), desc="Requests") as pbar:
-        async for _ in gather_with_concurrency_streaming(total_concurrency, *coros):
+        for future in asyncio.as_completed(coros):
+            await future
             pbar.update(1)
             now = time.monotonic()
             if now - last_status_time >= 5.0:
