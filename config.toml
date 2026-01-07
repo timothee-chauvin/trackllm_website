@@ -22,6 +22,6 @@ data_dir = "data_bi"
 
 [bi.phase_1]
 queries_per_token = 5
-requests_per_second_per_endpoint = 10
-tokens_per_endpoint = 200
+requests_per_second_per_endpoint = 5
+tokens_per_endpoint = 400
 chunk_size = 50

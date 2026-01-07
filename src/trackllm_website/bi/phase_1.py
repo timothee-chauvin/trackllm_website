@@ -20,7 +20,7 @@ from trackllm_website.config import Endpoint, config, logger
 from trackllm_website.util import gather_with_concurrency_streaming, slugify
 
 
-def get_endpoints() -> list[Endpoint]:
+def get_first_endpoint_per_provider() -> list[Endpoint]:
     """Get first endpoint for each provider."""
     provider_to_first: dict[str, Endpoint] = {}
     for endpoint in config.endpoints_bi:
@@ -81,6 +81,7 @@ class EndpointState:
     completed_queries: int = 0
     total_queries: int = 0
     got_404: bool = False
+    last_cost: float = 0.0
 
     def __post_init__(self) -> None:
         self.results = load_existing_results(self.output_path)
@@ -119,6 +120,10 @@ class EndpointState:
         """Return number of queries still needed for this token."""
         existing = sum(self.results.get(token, {}).values())
         return max(0, config.bi.phase_1.queries_per_token - existing)
+
+    def get_missing_responses(self) -> int:
+        """Count total missing responses across all tokens."""
+        return sum(self.get_pending_queries(token) for token in self.input_tokens)
 
     def build_task_list(self) -> list[tuple[str, int]]:
         """Build list of (token, query_index) pairs ordered by chunks then rounds.
@@ -183,11 +188,13 @@ async def query_and_record(
             f"Error for {state.endpoint}: {token!r}: {response.error.message}"
         )
         return
+    state.last_cost = response.cost
     state.record_result(token, response.content)
 
 
 def log_status(states: list[EndpointState]) -> None:
     """Log status for each endpoint."""
+    total_estimated_cost = 0.0
     for state in states:
         completed_tokens = state.get_completed_tokens()
         border_tokens = state.get_border_tokens()
@@ -195,10 +202,14 @@ def log_status(states: list[EndpointState]) -> None:
         rate_limits = state.get_recent_rate_limits()
         rps = state.get_requests_per_second()
         bi_pct = border_tokens / completed_tokens if completed_tokens else 0
+        estimated_cost = state.last_cost * state.total_queries
+        total_estimated_cost += estimated_cost
         logger.info(
             f"{state.endpoint}: {completed_tokens}/{total_tokens} tokens, "
-            f"{border_tokens} ({bi_pct:.1%}) BI, {rps:.1f} rps, {rate_limits} recent 429s"
+            f"{border_tokens} ({bi_pct:.1%}) BI, {rps:.1f} rps, {rate_limits} recent 429s, "
+            f"est. ${estimated_cost:.4f}"
         )
+    logger.info(f"Total estimated cost: ${total_estimated_cost:.4f}")
 
 
 async def main() -> None:
@@ -211,7 +222,7 @@ async def main() -> None:
         f"Loaded {len(tokenizer_index)} tokenizers, {len(fallback_tokens)} fallback tokens"
     )
 
-    endpoints = get_endpoints()[20:22]
+    endpoints = get_first_endpoint_per_provider()
     logger.info(f"Running phase 1 for {len(endpoints)} endpoints")
 
     requests_per_second = config.bi.phase_1.requests_per_second_per_endpoint
@@ -249,8 +260,8 @@ async def main() -> None:
 
     logger.info(f"Total tasks to process: {len(coros)}")
 
-    # Concurrency per endpoint limited by rate limiter
-    total_concurrency = 50
+    # Concurrency per endpoint limited by rate limiter − leave enough headroom in total concurrency
+    total_concurrency = len(endpoints) * 20
     completed = 0
     with tqdm(total=len(coros), desc="Requests") as pbar:
         async for _ in gather_with_concurrency_streaming(total_concurrency, *coros):
