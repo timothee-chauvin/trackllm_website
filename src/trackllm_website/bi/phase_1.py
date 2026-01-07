@@ -289,13 +289,14 @@ async def main() -> None:
 
     # Concurrency per endpoint limited by rate limiter − leave enough headroom in total concurrency
     total_concurrency = len(endpoints) * 20
-    completed = 0
+    last_status_time = time.monotonic()
     with tqdm(total=len(coros), desc="Requests") as pbar:
         async for _ in gather_with_concurrency_streaming(total_concurrency, *coros):
-            completed += 1
             pbar.update(1)
-            if completed % 50 == 0:
+            now = time.monotonic()
+            if now - last_status_time >= 5.0:
                 log_status(states)
+                last_status_time = now
 
     log_status(states)
 
