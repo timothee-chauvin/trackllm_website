@@ -81,7 +81,7 @@ class EndpointState:
     completed_queries: int = 0
     total_queries: int = 0
     got_404: bool = False
-    last_cost: float = 0.0
+    recent_costs: deque[float] = field(default_factory=lambda: deque(maxlen=20))
 
     def __post_init__(self) -> None:
         self.results = load_existing_results(self.output_path)
@@ -188,7 +188,7 @@ async def query_and_record(
             f"Error for {state.endpoint}: {token!r}: {response.error.message}"
         )
         return
-    state.last_cost = response.cost
+    state.recent_costs.append(response.cost)
     state.record_result(token, response.content)
 
 
@@ -202,7 +202,12 @@ def log_status(states: list[EndpointState]) -> None:
         rate_limits = state.get_recent_rate_limits()
         rps = state.get_requests_per_second()
         bi_pct = border_tokens / completed_tokens if completed_tokens else 0
-        estimated_cost = state.last_cost * state.total_queries
+        avg_cost = (
+            sum(state.recent_costs) / len(state.recent_costs)
+            if state.recent_costs
+            else 0
+        )
+        estimated_cost = avg_cost * state.total_queries
         total_estimated_cost += estimated_cost
         logger.info(
             f"{state.endpoint}: {completed_tokens}/{total_tokens} tokens, "
