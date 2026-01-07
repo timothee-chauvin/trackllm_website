@@ -26,3 +26,8 @@ trackllm-website = "trackllm_website:main"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.5.1",
+]
