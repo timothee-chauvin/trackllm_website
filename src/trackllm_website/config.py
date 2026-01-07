@@ -12,12 +12,6 @@ from pydantic_settings import (
     YamlConfigSettingsSource,
 )
 
-logging.basicConfig(
-    level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-# logging.getLogger("httpx").setLevel(logging.WARNING)
-logger = logging.getLogger("trackllm-website")
-
 root = Path(__file__).parent.parent.parent
 
 assert "src" in os.listdir(root)
@@ -114,6 +108,7 @@ class Config(BaseSettings):
     bi: BIConfig
     prompts: list[str]
     data_dir: Path
+    log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 
     # read from endpoints_[lt|bi].yaml
     endpoints_lt: list[Endpoint]
@@ -141,3 +136,10 @@ class Config(BaseSettings):
 
 
 config = Config()
+
+logging.basicConfig(
+    level=config.log_level,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+# logging.getLogger("httpx").setLevel(logging.WARNING)
+logger = logging.getLogger("trackllm-website")

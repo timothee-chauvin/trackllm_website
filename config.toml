@@ -1,5 +1,6 @@
 prompts = ["x", "Hi"]
 data_dir = "website/data"
+log_level = "INFO"
 
 [api]
 max_retries = 8
