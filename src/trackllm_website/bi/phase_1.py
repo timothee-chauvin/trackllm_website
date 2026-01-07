@@ -50,19 +50,22 @@ def get_output_path(endpoint: Endpoint) -> Path:
     )
 
 
-def load_existing_results(path: Path) -> dict[str, dict[str, int]]:
+def load_existing_results(path: Path) -> dict[int, dict[str, dict[str, int]]]:
     """Load existing results from JSON file."""
     if not path.exists():
         return {}
     with open(path, "rb") as f:
-        return orjson.loads(f.read())
+        data = orjson.loads(f.read())
+    # Convert string keys to int (JSON only supports string keys)
+    return {int(k): v for k, v in data.items()}
 
 
-def save_results(path: Path, results: dict[str, dict[str, int]]) -> None:
+def save_results(path: Path, results: dict[int, dict[str, dict[str, int]]]) -> None:
     """Save results to JSON file."""
     path.parent.mkdir(parents=True, exist_ok=True)
+    results_serializable = {str(k): v for k, v in results.items()}
     with open(path, "wb") as f:
-        f.write(orjson.dumps(results))
+        f.write(orjson.dumps(results_serializable))
 
 
 @dataclass
@@ -73,7 +76,7 @@ class EndpointState:
     input_tokens: list[str]
     output_path: Path
     rate_limiter: AsyncLimiter
-    results: dict[str, dict[str, int]] = field(default_factory=dict)
+    results: dict[int, dict[str, dict[str, int]]] = field(default_factory=dict)
     request_timestamps: deque[float] = field(default_factory=lambda: deque(maxlen=100))
     rate_limit_timestamps: deque[float] = field(
         default_factory=lambda: deque(maxlen=100)
@@ -103,22 +106,36 @@ class EndpointState:
         cutoff = now - 5.0
         return sum(1 for t in self.rate_limit_timestamps if t > cutoff)
 
+    def _get_all_token_results(self) -> dict[str, dict[str, int]]:
+        """Get merged results across all input token counts."""
+        merged: dict[str, dict[str, int]] = {}
+        for token_results in self.results.values():
+            for token, outputs in token_results.items():
+                if token not in merged:
+                    merged[token] = {}
+                for output, count in outputs.items():
+                    merged[token][output] = merged[token].get(output, 0) + count
+        return merged
+
     def get_completed_tokens(self) -> int:
         """Count tokens that have all queries completed."""
         queries_needed = config.bi.phase_1.queries_per_token
+        results = self._get_all_token_results()
         return sum(
             1
             for token in self.input_tokens
-            if sum(self.results.get(token, {}).values()) >= queries_needed
+            if sum(results.get(token, {}).values()) >= queries_needed
         )
 
     def get_border_tokens(self) -> int:
         """Count tokens that have at least two different outputs."""
-        return sum(1 for token, outputs in self.results.items() if len(outputs) >= 2)
+        results = self._get_all_token_results()
+        return sum(1 for token, outputs in results.items() if len(outputs) >= 2)
 
     def get_pending_queries(self, token: str) -> int:
         """Return number of queries still needed for this token."""
-        existing = sum(self.results.get(token, {}).values())
+        results = self._get_all_token_results()
+        existing = sum(results.get(token, {}).values())
         return max(0, config.bi.phase_1.queries_per_token - existing)
 
     def get_missing_responses(self) -> int:
@@ -145,12 +162,17 @@ class EndpointState:
 
         return tasks
 
-    def record_result(self, token: str, content: str | None) -> None:
+    def record_result(
+        self, token: str, content: str | None, num_input_tokens: int
+    ) -> None:
         """Record a query result and save."""
         if content is not None:
-            if token not in self.results:
-                self.results[token] = {}
-            self.results[token][content] = self.results[token].get(content, 0) + 1
+            if num_input_tokens not in self.results:
+                self.results[num_input_tokens] = {}
+            results = self.results[num_input_tokens]
+            if token not in results:
+                results[token] = {}
+            results[token][content] = results[token].get(content, 0) + 1
             save_results(self.output_path, self.results)
 
 
@@ -189,7 +211,7 @@ async def query_and_record(
         )
         return
     state.recent_costs.append(response.cost)
-    state.record_result(token, response.content)
+    state.record_result(token, response.content, response.input_tokens)
 
 
 def log_status(states: list[EndpointState]) -> None:
