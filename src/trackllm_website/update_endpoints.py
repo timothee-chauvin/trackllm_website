@@ -1,18 +1,89 @@
 import asyncio
 from collections.abc import Iterable
 from decimal import Decimal
+from typing import Literal
 
 import aiohttp
 import requests
 import yaml
+from pydantic import BaseModel
 
 from trackllm_website.api import OpenRouterClient
-from trackllm_website.config import Endpoint, config, logger
+from trackllm_website.config import Endpoint, config, logger, root
 from trackllm_website.storage import ResultsStorage
 from trackllm_website.util import (
     gather_with_concurrency,
     gather_with_concurrency_streaming,
 )
+
+BAD_ENDPOINTS_BI_PATH = root / "bad_endpoints_bi.yaml"
+
+
+class BadEndpointReason(BaseModel):
+    token_usage: list[int] | None = None
+
+
+class BadEndpoint(BaseModel):
+    api: Literal["openrouter"]
+    model: str
+    provider: str | None = None
+    reason: BadEndpointReason
+
+    @classmethod
+    def from_endpoint(
+        cls, endpoint: Endpoint, reason: BadEndpointReason
+    ) -> "BadEndpoint":
+        return cls(
+            api=endpoint.api,
+            model=endpoint.model,
+            provider=endpoint.provider,
+            reason=reason,
+        )
+
+    def matches(self, endpoint: Endpoint) -> bool:
+        return (
+            self.api == endpoint.api
+            and self.model == endpoint.model
+            and self.provider == endpoint.provider
+        )
+
+
+def load_bad_endpoints_bi() -> list[BadEndpoint]:
+    """Load the set of known bad BI endpoints from disk."""
+    if not BAD_ENDPOINTS_BI_PATH.exists():
+        return []
+    with open(BAD_ENDPOINTS_BI_PATH) as f:
+        data = yaml.safe_load(f) or {}
+    return [
+        BadEndpoint(
+            api=e["api"],
+            model=e["model"],
+            provider=e.get("provider"),
+            reason=BadEndpointReason(**e.get("reason", {})),
+        )
+        for e in data.get("bad_endpoints_bi", [])
+    ]
+
+
+def save_bad_endpoints_bi(bad_endpoints: Iterable[BadEndpoint]) -> None:
+    """Save the list of bad BI endpoints to disk."""
+    sorted_bad = sorted(
+        bad_endpoints,
+        key=lambda b: (b.api, b.model, b.provider or ""),
+    )
+    output_data = {
+        "bad_endpoints_bi": [
+            {
+                "api": b.api,
+                "model": b.model,
+                "provider": b.provider,
+                "reason": b.reason.model_dump(exclude_none=True),
+            }
+            for b in sorted_bad
+        ]
+    }
+    with open(BAD_ENDPOINTS_BI_PATH, "w") as f:
+        yaml.dump(output_data, f, sort_keys=False)
 
 
 async def get_model_endpoints(
@@ -100,6 +171,45 @@ async def get_endpoints(logprob_filter: bool = False) -> list[Endpoint]:
     return filtered_endpoints
 
 
+async def test_endpoint_token_usage(
+    endpoint: Endpoint, max_input_tokens: int = 10, max_output_tokens: int = 1
+) -> tuple[Endpoint | None, BadEndpoint | None]:
+    """Test if an endpoint uses acceptable token counts.
+
+    Returns:
+        (valid_endpoint, bad_endpoint) - at least one will be None.
+    """
+    client = OpenRouterClient()
+    try:
+        response = await client.query(endpoint, "a", logprobs=False, temperature=0)
+        if response.error:
+            logger.info(f"{endpoint} token test: ❌ (error: {response.error.message})")
+            return None, None  # Don't mark as bad on error, might be transient
+        if (
+            response.input_tokens > max_input_tokens
+            or response.output_tokens > max_output_tokens
+        ):
+            logger.info(
+                f"{endpoint} token test: ❌ "
+                f"(input={response.input_tokens}, output={response.output_tokens})"
+            )
+            bad = BadEndpoint.from_endpoint(
+                endpoint,
+                BadEndpointReason(
+                    token_usage=(response.input_tokens, response.output_tokens)
+                ),
+            )
+            return None, bad
+        logger.info(
+            f"{endpoint} token test: ✅ "
+            f"(input={response.input_tokens}, output={response.output_tokens})"
+        )
+        return endpoint, None
+    except Exception:
+        logger.exception(f"Error testing token usage for {endpoint}")
+        return None, None  # Don't mark as bad on exception, might be transient
+
+
 async def test_endpoint_logprobs(endpoint: Endpoint) -> Endpoint | None:
     """Test if an endpoint actually returns logprobs when queried with 'x'"""
     client = OpenRouterClient()
@@ -178,28 +288,63 @@ async def update_endpoints_lt():
 
 
 async def update_endpoints_bi():
-    """Update the BI endpoints with all providers for all models."""
-    all_endpoints = await get_endpoints(logprob_filter=False)
+    """Update the BI endpoints with all providers for all models.
 
-    # Sort endpoints by total cost, then api, model and provider
+    Filters out endpoints that use too many tokens (>10 input or >1 output).
+    Bad endpoints are stored separately to avoid re-testing them.
+    """
+    all_endpoints = await get_endpoints(logprob_filter=False)
+    known_bad = load_bad_endpoints_bi()
+    logger.info(f"Loaded {len(known_bad)} known bad endpoints")
+
+    # Filter out known bad endpoints
+    endpoints_to_test = [
+        e for e in all_endpoints if not any(b.matches(e) for b in known_bad)
+    ]
+    logger.info(
+        f"Testing {len(endpoints_to_test)} endpoints "
+        f"(skipping {len(all_endpoints) - len(endpoints_to_test)} known bad)"
+    )
+
+    # Test token usage for each endpoint
+    tasks = [test_endpoint_token_usage(e) for e in endpoints_to_test]
+    results = await gather_with_concurrency(config.api.max_workers, *tasks)
+
+    valid_endpoints = [r[0] for r in results if r[0] is not None]
+    new_bad = [r[1] for r in results if r[1] is not None]
+
+    logger.info(
+        f"Token test results: {len(valid_endpoints)} valid, "
+        f"{len(new_bad)} new bad endpoints"
+    )
+
+    # Update bad endpoints list
+    all_bad = known_bad + new_bad
+    save_bad_endpoints_bi(all_bad)
+    logger.info(f"Saved {len(all_bad)} total bad endpoints to {BAD_ENDPOINTS_BI_PATH}")
+
+    # Sort and save valid endpoints
     sorted_endpoints = sorted(
-        all_endpoints, key=lambda e: (sum(e.cost), e.api, e.model, e.provider)
+        valid_endpoints, key=lambda e: (sum(e.cost), e.api, e.model, e.provider)
     )
 
     output_data = {"endpoints_bi": []}
     for e in sorted_endpoints:
-        e_data = {
-            "api": e.api,
-            "model": e.model,
-            "provider": e.provider,
-            "cost": list(e.cost),
-        }
-        output_data["endpoints_bi"].append(e_data)
+        output_data["endpoints_bi"].append(
+            {
+                "api": e.api,
+                "model": e.model,
+                "provider": e.provider,
+                "cost": list(e.cost),
+            }
+        )
 
     with open(config.endpoints_yaml_path_bi, "w") as f:
         yaml.dump(output_data, f, default_flow_style=False, sort_keys=False)
 
-    logger.info(f"Updated {config.endpoints_yaml_path_bi}")
+    logger.info(
+        f"Updated {config.endpoints_yaml_path_bi} with {len(sorted_endpoints)} endpoints"
+    )
 
 
 async def main():

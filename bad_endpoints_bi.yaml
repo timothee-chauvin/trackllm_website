@@ -1,0 +1,2129 @@
+bad_endpoints_bi:
+- api: openrouter
+  model: aion-labs/aion-1.0
+  provider: aion-labs
+  reason:
+    token_usage:
+    - 2
+    - 84
+- api: openrouter
+  model: aion-labs/aion-1.0-mini
+  provider: aion-labs/bf16
+  reason:
+    token_usage:
+    - 2
+    - 269
+- api: openrouter
+  model: aion-labs/aion-rp-llama-3.1-8b
+  provider: aion-labs
+  reason:
+    token_usage:
+    - 5
+    - 6
+- api: openrouter
+  model: alfredpros/codellama-7b-instruct-solidity
+  provider: featherless
+  reason:
+    token_usage:
+    - 26
+    - 1
+- api: openrouter
+  model: allenai/olmo-3-32b-think
+  provider: parasail/bf16
+  reason:
+    token_usage:
+    - 52
+    - 1
+- api: openrouter
+  model: allenai/olmo-3-7b-instruct
+  provider: parasail/bf16
+  reason:
+    token_usage:
+    - 62
+    - 1
+- api: openrouter
+  model: allenai/olmo-3-7b-think
+  provider: parasail/bf16
+  reason:
+    token_usage:
+    - 52
+    - 1
+- api: openrouter
+  model: allenai/olmo-3.1-32b-think
+  provider: parasail/bf16
+  reason:
+    token_usage:
+    - 52
+    - 1
+- api: openrouter
+  model: alpindale/goliath-120b
+  provider: mancer/int4
+  reason:
+    token_usage:
+    - 38
+    - 1
+- api: openrouter
+  model: amazon/nova-2-lite-v1
+  provider: amazon-bedrock
+  reason:
+    token_usage:
+    - 47
+    - 2
+- api: openrouter
+  model: amazon/nova-premier-v1
+  provider: amazon-bedrock
+  reason:
+    token_usage:
+    - 35
+    - 1
+- api: openrouter
+  model: arcee-ai/trinity-mini
+  provider: clarifai/bf16
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: arcee-ai/trinity-mini
+  provider: together/bf16
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: baidu/ernie-4.5-21b-a3b-thinking
+  provider: novita/fp8
+  reason:
+    token_usage:
+    - 27
+    - 1
+- api: openrouter
+  model: baidu/ernie-4.5-300b-a47b
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 8
+    - 103
+- api: openrouter
+  model: bytedance-seed/seed-1.6
+  provider: seed
+  reason:
+    token_usage:
+    - 81
+    - 349
+- api: openrouter
+  model: bytedance-seed/seed-1.6-flash
+  provider: seed
+  reason:
+    token_usage:
+    - 83
+    - 57
+- api: openrouter
+  model: bytedance/ui-tars-1.5-7b
+  provider: parasail/bf16
+  reason:
+    token_usage:
+    - 20
+    - 1
+- api: openrouter
+  model: deepcogito/cogito-v2-preview-llama-109b-moe
+  provider: together
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: deepcogito/cogito-v2-preview-llama-405b
+  provider: together
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: deepcogito/cogito-v2-preview-llama-70b
+  provider: together
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: deepcogito/cogito-v2.1-671b
+  provider: together
+  reason:
+    token_usage:
+    - 29
+    - 1
+- api: openrouter
+  model: deepseek/deepseek-chat-v3-0324
+  provider: deepinfra/fp4
+  reason:
+    token_usage:
+    - 1
+    - 2
+- api: openrouter
+  model: deepseek/deepseek-chat-v3-0324
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 4
+    - 72
+- api: openrouter
+  model: deepseek/deepseek-chat-v3.1
+  provider: deepinfra/fp4
+  reason:
+    token_usage:
+    - 19
+    - 2
+- api: openrouter
+  model: deepseek/deepseek-chat-v3.1
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 8
+    - 144
+- api: openrouter
+  model: deepseek/deepseek-prover-v2
+  provider: deepinfra/fp8
+  reason:
+    token_usage:
+    - 1
+    - 2
+- api: openrouter
+  model: deepseek/deepseek-r1
+  provider: deepinfra/base
+  reason:
+    token_usage:
+    - 20
+    - 1
+- api: openrouter
+  model: deepseek/deepseek-r1
+  provider: deepinfra/turbo
+  reason:
+    token_usage:
+    - 20
+    - 1
+- api: openrouter
+  model: deepseek/deepseek-r1
+  provider: novita/fp8
+  reason:
+    token_usage:
+    - 6
+    - 226
+- api: openrouter
+  model: deepseek/deepseek-r1-0528
+  provider: deepinfra/fp4
+  reason:
+    token_usage:
+    - 20
+    - 1
+- api: openrouter
+  model: deepseek/deepseek-r1-0528
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 6
+    - 322
+- api: openrouter
+  model: deepseek/deepseek-v3.1-terminus
+  provider: deepinfra/fp4
+  reason:
+    token_usage:
+    - 19
+    - 2
+- api: openrouter
+  model: deepseek/deepseek-v3.1-terminus
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 8
+    - 72
+- api: openrouter
+  model: deepseek/deepseek-v3.1-terminus:exacto
+  provider: deepinfra/fp4
+  reason:
+    token_usage:
+    - 19
+    - 2
+- api: openrouter
+  model: deepseek/deepseek-v3.2
+  provider: deepinfra/fp4
+  reason:
+    token_usage:
+    - 1
+    - 2
+- api: openrouter
+  model: deepseek/deepseek-v3.2
+  provider: google-vertex
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: deepseek/deepseek-v3.2
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 5
+    - 198
+- api: openrouter
+  model: deepseek/deepseek-v3.2-exp
+  provider: deepinfra/fp4
+  reason:
+    token_usage:
+    - 19
+    - 2
+- api: openrouter
+  model: deepseek/deepseek-v3.2-exp
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 5
+    - 186
+- api: openrouter
+  model: deepseek/deepseek-v3.2-speciale
+  provider: atlas-cloud/fp8
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: eleutherai/llemma_7b
+  provider: featherless
+  reason:
+    token_usage:
+    - 52
+    - 1
+- api: openrouter
+  model: essentialai/rnj-1-instruct
+  provider: together
+  reason:
+    token_usage:
+    - 37
+    - 1
+- api: openrouter
+  model: google/gemini-2.5-flash-image
+  provider: google-vertex
+  reason:
+    token_usage:
+    - 1
+    - 1290
+- api: openrouter
+  model: google/gemini-2.5-flash-image-preview
+  provider: google-vertex
+  reason:
+    token_usage:
+    - 1
+    - 1290
+- api: openrouter
+  model: google/gemini-3-pro-image-preview
+  provider: google-vertex
+  reason:
+    token_usage:
+    - 1
+    - 1396
+- api: openrouter
+  model: google/gemma-3n-e4b-it
+  provider: together
+  reason:
+    token_usage:
+    - 17
+    - 1
+- api: openrouter
+  model: gryphe/mythomax-l2-13b
+  provider: deepinfra/fp16
+  reason:
+    token_usage:
+    - 36
+    - 1
+- api: openrouter
+  model: gryphe/mythomax-l2-13b
+  provider: mancer/fp8
+  reason:
+    token_usage:
+    - 37
+    - 1
+- api: openrouter
+  model: gryphe/mythomax-l2-13b
+  provider: nextbit/int4
+  reason:
+    token_usage:
+    - 37
+    - 1
+- api: openrouter
+  model: gryphe/mythomax-l2-13b
+  provider: novita/fp16
+  reason:
+    token_usage:
+    - 37
+    - 1
+- api: openrouter
+  model: ibm-granite/granite-4.0-h-micro
+  provider: cloudflare
+  reason:
+    token_usage:
+    - 31
+    - 1
+- api: openrouter
+  model: inception/mercury
+  provider: inception
+  reason:
+    token_usage:
+    - 355
+    - 1
+- api: openrouter
+  model: inception/mercury-coder
+  provider: inception
+  reason:
+    token_usage:
+    - 332
+    - 2
+- api: openrouter
+  model: mancer/weaver
+  provider: mancer/fp8
+  reason:
+    token_usage:
+    - 89
+    - 1
+- api: openrouter
+  model: meituan/longcat-flash-chat
+  provider: atlas-cloud/fp8
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3-70b-instruct
+  provider: deepinfra/bf16
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3-70b-instruct
+  provider: hyperbolic
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3-70b-instruct
+  provider: novita/fp8
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3-8b-instruct
+  provider: cloudflare
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3-8b-instruct
+  provider: deepinfra/bf16
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3-8b-instruct
+  provider: novita/bf16
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3-8b-instruct
+  provider: together/int4
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.1-405b-instruct
+  provider: google-vertex
+  reason:
+    token_usage:
+    - 37
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.1-405b-instruct
+  provider: hyperbolic/bf16
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.1-405b-instruct
+  provider: together/fp8
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.1-70b-instruct
+  provider: deepinfra/base
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.1-70b-instruct
+  provider: deepinfra/turbo
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.1-70b-instruct
+  provider: hyperbolic/fp8
+  reason:
+    token_usage:
+    - 36
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.1-70b-instruct
+  provider: together/fp8
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.1-8b-instruct
+  provider: cerebras/fp16
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.1-8b-instruct
+  provider: cloudflare/fp8
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.1-8b-instruct
+  provider: deepinfra/bf16
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.1-8b-instruct
+  provider: friendli
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.1-8b-instruct
+  provider: groq
+  reason:
+    token_usage:
+    - 36
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.1-8b-instruct
+  provider: hyperbolic/fp8
+  reason:
+    token_usage:
+    - 36
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.1-8b-instruct
+  provider: nebius/fast
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.1-8b-instruct
+  provider: nebius/fp8
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.1-8b-instruct
+  provider: novita/fp8
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.1-8b-instruct
+  provider: sambanova/bf16
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.1-8b-instruct
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 36
+    - 41
+- api: openrouter
+  model: meta-llama/llama-3.2-11b-vision-instruct
+  provider: cloudflare
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.2-11b-vision-instruct
+  provider: deepinfra/fp8
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.2-11b-vision-instruct
+  provider: together/turbo
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.2-1b-instruct
+  provider: cloudflare
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.2-3b-instruct
+  provider: cloudflare
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.2-3b-instruct
+  provider: deepinfra/bf16
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.2-3b-instruct
+  provider: hyperbolic/fp8
+  reason:
+    token_usage:
+    - 36
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.2-3b-instruct
+  provider: novita/bf16
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.2-3b-instruct
+  provider: together/fp8
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.2-90b-vision-instruct
+  provider: deepinfra/bf16
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.3-70b-instruct
+  provider: cerebras/fp16
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.3-70b-instruct
+  provider: cloudflare/fp8
+  reason:
+    token_usage:
+    - 36
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.3-70b-instruct
+  provider: crusoe/bf16
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.3-70b-instruct
+  provider: fireworks/fp16
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.3-70b-instruct
+  provider: friendli
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.3-70b-instruct
+  provider: google-vertex
+  reason:
+    token_usage:
+    - 36
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.3-70b-instruct
+  provider: google-vertex
+  reason:
+    token_usage:
+    - 36
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.3-70b-instruct
+  provider: groq
+  reason:
+    token_usage:
+    - 36
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.3-70b-instruct
+  provider: hyperbolic/fp8
+  reason:
+    token_usage:
+    - 36
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.3-70b-instruct
+  provider: nebius/fast
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.3-70b-instruct
+  provider: nebius/fp8
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.3-70b-instruct
+  provider: novita/bf16
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.3-70b-instruct
+  provider: parasail/int8
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.3-70b-instruct
+  provider: sambanova-turbo
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.3-70b-instruct
+  provider: sambanova/bf16
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.3-70b-instruct
+  provider: together/fp8
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.3-70b-instruct
+  provider: wandb/fp16
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: meta-llama/llama-4-maverick
+  provider: deepinfra/base
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-4-maverick
+  provider: friendli
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-4-maverick
+  provider: google-vertex
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: meta-llama/llama-4-maverick
+  provider: google-vertex
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: meta-llama/llama-4-maverick
+  provider: groq
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-4-maverick
+  provider: novita/fp8
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: meta-llama/llama-4-maverick
+  provider: parasail/fp8
+  reason:
+    token_usage:
+    - 80
+    - 1
+- api: openrouter
+  model: meta-llama/llama-4-maverick
+  provider: sambanova
+  reason:
+    token_usage:
+    - 13
+    - 1
+- api: openrouter
+  model: meta-llama/llama-4-maverick
+  provider: together/fp8
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: meta-llama/llama-4-scout
+  provider: deepinfra/fp8
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-4-scout
+  provider: friendli
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-4-scout
+  provider: google-vertex
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: meta-llama/llama-4-scout
+  provider: groq
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: meta-llama/llama-4-scout
+  provider: novita/bf16
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: meta-llama/llama-4-scout
+  provider: together
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: meta-llama/llama-guard-4-12b
+  provider: deepinfra/bf16
+  reason:
+    token_usage:
+    - 205
+    - 1
+- api: openrouter
+  model: meta-llama/llama-guard-4-12b
+  provider: groq
+  reason:
+    token_usage:
+    - 201
+    - 1
+- api: openrouter
+  model: microsoft/wizardlm-2-8x22b
+  provider: deepinfra/bf16
+  reason:
+    token_usage:
+    - 38
+    - 1
+- api: openrouter
+  model: microsoft/wizardlm-2-8x22b
+  provider: novita/bf16
+  reason:
+    token_usage:
+    - 38
+    - 1
+- api: openrouter
+  model: minimax/minimax-01
+  provider: minimax
+  reason:
+    token_usage:
+    - 712
+    - 1
+- api: openrouter
+  model: minimax/minimax-m1
+  provider: minimax
+  reason:
+    token_usage:
+    - 447
+    - 3
+- api: openrouter
+  model: minimax/minimax-m1
+  provider: novita/bf16
+  reason:
+    token_usage:
+    - 447
+    - 3
+- api: openrouter
+  model: minimax/minimax-m1
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 18
+    - 80
+- api: openrouter
+  model: minimax/minimax-m2
+  provider: atlas-cloud/fp8
+  reason:
+    token_usage:
+    - 23
+    - 1
+- api: openrouter
+  model: minimax/minimax-m2
+  provider: deepinfra/fp8
+  reason:
+    token_usage:
+    - 23
+    - 1
+- api: openrouter
+  model: minimax/minimax-m2
+  provider: google-vertex
+  reason:
+    token_usage:
+    - 23
+    - 1
+- api: openrouter
+  model: minimax/minimax-m2
+  provider: minimax/fp8
+  reason:
+    token_usage:
+    - 40
+    - 3
+- api: openrouter
+  model: minimax/minimax-m2
+  provider: novita/fp8
+  reason:
+    token_usage:
+    - 40
+    - 3
+- api: openrouter
+  model: minimax/minimax-m2.1
+  provider: atlas-cloud/fp8
+  reason:
+    token_usage:
+    - 44
+    - 1
+- api: openrouter
+  model: minimax/minimax-m2.1
+  provider: chutes/fp8
+  reason:
+    token_usage:
+    - 44
+    - 1
+- api: openrouter
+  model: minimax/minimax-m2.1
+  provider: deepinfra/fp8
+  reason:
+    token_usage:
+    - 44
+    - 1
+- api: openrouter
+  model: minimax/minimax-m2.1
+  provider: fireworks
+  reason:
+    token_usage:
+    - 43
+    - 1
+- api: openrouter
+  model: minimax/minimax-m2.1
+  provider: gmicloud/fp8
+  reason:
+    token_usage:
+    - 44
+    - 1
+- api: openrouter
+  model: minimax/minimax-m2.1
+  provider: minimax/fp8
+  reason:
+    token_usage:
+    - 42
+    - 3
+- api: openrouter
+  model: minimax/minimax-m2.1
+  provider: minimax/lightning
+  reason:
+    token_usage:
+    - 42
+    - 3
+- api: openrouter
+  model: minimax/minimax-m2.1
+  provider: novita/fp8
+  reason:
+    token_usage:
+    - 42
+    - 3
+- api: openrouter
+  model: mistralai/ministral-14b-2512
+  provider: together
+  reason:
+    token_usage:
+    - 538
+    - 1
+- api: openrouter
+  model: mistralai/mistral-7b-instruct
+  provider: deepinfra/bf16
+  reason:
+    token_usage:
+    - 13
+    - 1
+- api: openrouter
+  model: mistralai/mistral-small-24b-instruct-2501
+  provider: chutes/bf16
+  reason:
+    token_usage:
+    - 178
+    - 1
+- api: openrouter
+  model: mistralai/mistral-small-24b-instruct-2501
+  provider: deepinfra/fp8
+  reason:
+    token_usage:
+    - 164
+    - 1
+- api: openrouter
+  model: mistralai/mistral-small-24b-instruct-2501
+  provider: together
+  reason:
+    token_usage:
+    - 178
+    - 1
+- api: openrouter
+  model: mistralai/mistral-small-3.1-24b-instruct
+  provider: chutes/bf16
+  reason:
+    token_usage:
+    - 179
+    - 1
+- api: openrouter
+  model: mistralai/mistral-small-3.2-24b-instruct
+  provider: chutes/bf16
+  reason:
+    token_usage:
+    - 559
+    - 1
+- api: openrouter
+  model: mistralai/pixtral-12b
+  provider: hyperbolic/bf16
+  reason:
+    token_usage:
+    - 4
+    - 2
+- api: openrouter
+  model: moonshotai/kimi-dev-72b
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 33
+    - 365
+- api: openrouter
+  model: moonshotai/kimi-k2
+  provider: atlas-cloud/fp8
+  reason:
+    token_usage:
+    - 27
+    - 2
+- api: openrouter
+  model: moonshotai/kimi-k2
+  provider: nebius/fp4
+  reason:
+    token_usage:
+    - 17
+    - 1
+- api: openrouter
+  model: moonshotai/kimi-k2
+  provider: novita/fp8
+  reason:
+    token_usage:
+    - 26
+    - 1
+- api: openrouter
+  model: moonshotai/kimi-k2-0905
+  provider: atlas-cloud/fp8
+  reason:
+    token_usage:
+    - 26
+    - 1
+- api: openrouter
+  model: moonshotai/kimi-k2-0905
+  provider: baseten/fp4
+  reason:
+    token_usage:
+    - 27
+    - 1
+- api: openrouter
+  model: moonshotai/kimi-k2-0905
+  provider: fireworks/fp8
+  reason:
+    token_usage:
+    - 17
+    - 1
+- api: openrouter
+  model: moonshotai/kimi-k2-0905
+  provider: groq
+  reason:
+    token_usage:
+    - 27
+    - 1
+- api: openrouter
+  model: moonshotai/kimi-k2-0905
+  provider: parasail/fp8
+  reason:
+    token_usage:
+    - 27
+    - 1
+- api: openrouter
+  model: moonshotai/kimi-k2-0905
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 27
+    - 29
+- api: openrouter
+  model: moonshotai/kimi-k2-0905
+  provider: together
+  reason:
+    token_usage:
+    - 27
+    - 1
+- api: openrouter
+  model: moonshotai/kimi-k2-0905:exacto
+  provider: groq
+  reason:
+    token_usage:
+    - 27
+    - 1
+- api: openrouter
+  model: moonshotai/kimi-k2-thinking
+  provider: atlas-cloud/int4
+  reason:
+    token_usage:
+    - 8
+    - 214
+- api: openrouter
+  model: moonshotai/kimi-k2-thinking
+  provider: baseten/fp4
+  reason:
+    token_usage:
+    - 26
+    - 1
+- api: openrouter
+  model: moonshotai/kimi-k2-thinking
+  provider: chutes/int4
+  reason:
+    token_usage:
+    - 26
+    - 1
+- api: openrouter
+  model: moonshotai/kimi-k2-thinking
+  provider: gmicloud/int4
+  reason:
+    token_usage:
+    - 26
+    - 1
+- api: openrouter
+  model: moonshotai/kimi-k2-thinking
+  provider: google-vertex
+  reason:
+    token_usage:
+    - 26
+    - 1
+- api: openrouter
+  model: moonshotai/kimi-k2-thinking
+  provider: nebius/fp8
+  reason:
+    token_usage:
+    - 26
+    - 1
+- api: openrouter
+  model: moonshotai/kimi-k2-thinking
+  provider: parasail/int4
+  reason:
+    token_usage:
+    - 26
+    - 1
+- api: openrouter
+  model: moonshotai/kimi-k2-thinking
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 26
+    - 331
+- api: openrouter
+  model: moonshotai/kimi-k2-thinking
+  provider: together
+  reason:
+    token_usage:
+    - 26
+    - 1
+- api: openrouter
+  model: morph/morph-v3-fast
+  provider: morph
+  reason:
+    token_usage:
+    - 89
+    - 45
+- api: openrouter
+  model: morph/morph-v3-large
+  provider: morph
+  reason:
+    token_usage:
+    - 89
+    - 2
+- api: openrouter
+  model: neversleep/llama-3.1-lumimaid-8b
+  provider: nextbit/int4
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: neversleep/noromaid-20b
+  provider: mancer/fp8
+  reason:
+    token_usage:
+    - 37
+    - 1
+- api: openrouter
+  model: neversleep/noromaid-20b
+  provider: nextbit/int4
+  reason:
+    token_usage:
+    - 37
+    - 1
+- api: openrouter
+  model: nousresearch/deephermes-3-mistral-24b-preview
+  provider: chutes/bf16
+  reason:
+    token_usage:
+    - 34
+    - 1
+- api: openrouter
+  model: nousresearch/hermes-3-llama-3.1-405b
+  provider: deepinfra/fp8
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: nousresearch/hermes-4-405b
+  provider: nebius/fp8
+  reason:
+    token_usage:
+    - 25
+    - 1
+- api: openrouter
+  model: nousresearch/hermes-4-70b
+  provider: chutes/bf16
+  reason:
+    token_usage:
+    - 25
+    - 1
+- api: openrouter
+  model: nousresearch/hermes-4-70b
+  provider: nebius/fp8
+  reason:
+    token_usage:
+    - 25
+    - 1
+- api: openrouter
+  model: nvidia/llama-3.1-nemotron-70b-instruct
+  provider: deepinfra/fp8
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: nvidia/llama-3.1-nemotron-ultra-253b-v1
+  provider: nebius/fp8
+  reason:
+    token_usage:
+    - 16
+    - 1
+- api: openrouter
+  model: nvidia/llama-3.3-nemotron-super-49b-v1.5
+  provider: deepinfra/fp8
+  reason:
+    token_usage:
+    - 20
+    - 1
+- api: openrouter
+  model: nvidia/nemotron-3-nano-30b-a3b
+  provider: chutes/bf16
+  reason:
+    token_usage:
+    - 17
+    - 1
+- api: openrouter
+  model: nvidia/nemotron-3-nano-30b-a3b
+  provider: deepinfra/bf16
+  reason:
+    token_usage:
+    - 17
+    - 1
+- api: openrouter
+  model: nvidia/nemotron-nano-12b-v2-vl
+  provider: deepinfra/fp8
+  reason:
+    token_usage:
+    - 14
+    - 1
+- api: openrouter
+  model: nvidia/nemotron-nano-9b-v2
+  provider: deepinfra/bf16
+  reason:
+    token_usage:
+    - 14
+    - 1
+- api: openrouter
+  model: nvidia/nemotron-nano-9b-v2
+  provider: together
+  reason:
+    token_usage:
+    - 14
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: atlas-cloud/fp8
+  reason:
+    token_usage:
+    - 68
+    - 43
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: baseten/fp4
+  reason:
+    token_usage:
+    - 79
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: cerebras
+  reason:
+    token_usage:
+    - 68
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: chutes/bf16
+  reason:
+    token_usage:
+    - 66
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: clarifai/fp4
+  reason:
+    token_usage:
+    - 68
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: crusoe/bf16
+  reason:
+    token_usage:
+    - 70
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: deepinfra/fp4
+  reason:
+    token_usage:
+    - 55
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: deepinfra/turbo
+  reason:
+    token_usage:
+    - 55
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: fireworks
+  reason:
+    token_usage:
+    - 73
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: gmicloud/fp4
+  reason:
+    token_usage:
+    - 68
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: google-vertex
+  reason:
+    token_usage:
+    - 68
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: groq
+  reason:
+    token_usage:
+    - 72
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: ncompass
+  reason:
+    token_usage:
+    - 70
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: nebius/fp4
+  reason:
+    token_usage:
+    - 70
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: novita/fp4
+  reason:
+    token_usage:
+    - 68
+    - 48
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: parasail/fp4
+  reason:
+    token_usage:
+    - 68
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: phala
+  reason:
+    token_usage:
+    - 70
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: sambanova
+  reason:
+    token_usage:
+    - 68
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 68
+    - 84
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: together
+  reason:
+    token_usage:
+    - 68
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: wandb/fp4
+  reason:
+    token_usage:
+    - 70
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-120b:exacto
+  provider: deepinfra/fp4
+  reason:
+    token_usage:
+    - 55
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-120b:exacto
+  provider: groq
+  reason:
+    token_usage:
+    - 72
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-120b:exacto
+  provider: novita/fp4
+  reason:
+    token_usage:
+    - 68
+    - 62
+- api: openrouter
+  model: openai/gpt-oss-20b
+  provider: chutes/bf16
+  reason:
+    token_usage:
+    - 66
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-20b
+  provider: clarifai/fp4
+  reason:
+    token_usage:
+    - 68
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-20b
+  provider: deepinfra/fp4
+  reason:
+    token_usage:
+    - 55
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-20b
+  provider: fireworks
+  reason:
+    token_usage:
+    - 73
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-20b
+  provider: gmicloud/fp4
+  reason:
+    token_usage:
+    - 68
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-20b
+  provider: google-vertex
+  reason:
+    token_usage:
+    - 68
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-20b
+  provider: groq
+  reason:
+    token_usage:
+    - 72
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-20b
+  provider: hyperbolic
+  reason:
+    token_usage:
+    - 68
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-20b
+  provider: ncompass
+  reason:
+    token_usage:
+    - 70
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-20b
+  provider: nebius/fp4
+  reason:
+    token_usage:
+    - 70
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-20b
+  provider: nextbit/fp8
+  reason:
+    token_usage:
+    - 72
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-20b
+  provider: novita/fp4
+  reason:
+    token_usage:
+    - 68
+    - 350
+- api: openrouter
+  model: openai/gpt-oss-20b
+  provider: parasail/fp4
+  reason:
+    token_usage:
+    - 68
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-20b
+  provider: phala
+  reason:
+    token_usage:
+    - 70
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-20b
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 68
+    - 310
+- api: openrouter
+  model: openai/gpt-oss-20b
+  provider: together
+  reason:
+    token_usage:
+    - 68
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-20b
+  provider: wandb/fp4
+  reason:
+    token_usage:
+    - 70
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-safeguard-20b
+  provider: groq
+  reason:
+    token_usage:
+    - 72
+    - 1
+- api: openrouter
+  model: opengvlab/internvl3-78b
+  provider: chutes/bf16
+  reason:
+    token_usage:
+    - 46
+    - 1
+- api: openrouter
+  model: perplexity/sonar-deep-research
+  provider: perplexity
+  reason:
+    token_usage:
+    - 1
+    - 10248
+- api: openrouter
+  model: qwen/qwen-2.5-7b-instruct
+  provider: phala
+  reason:
+    token_usage:
+    - 30
+    - 1
+- api: openrouter
+  model: qwen/qwen-2.5-coder-32b-instruct
+  provider: cloudflare
+  reason:
+    token_usage:
+    - 30
+    - 1
+- api: openrouter
+  model: qwen/qwen-2.5-coder-32b-instruct
+  provider: hyperbolic/fp8
+  reason:
+    token_usage:
+    - 30
+    - 1
+- api: openrouter
+  model: qwen/qwen-2.5-vl-7b-instruct
+  provider: hyperbolic/bf16
+  reason:
+    token_usage:
+    - 20
+    - 2
+- api: openrouter
+  model: qwen/qwen-plus-2025-07-28:thinking
+  provider: alibaba
+  reason:
+    token_usage:
+    - 9
+    - 113
+- api: openrouter
+  model: qwen/qwen-turbo
+  provider: alibaba
+  reason:
+    token_usage:
+    - 13
+    - 1
+- api: openrouter
+  model: qwen/qwen-vl-plus
+  provider: alibaba
+  reason:
+    token_usage:
+    - 1
+    - 2
+- api: openrouter
+  model: qwen/qwen2.5-coder-7b-instruct
+  provider: nebius/fast
+  reason:
+    token_usage:
+    - 30
+    - 1
+- api: openrouter
+  model: qwen/qwen2.5-vl-32b-instruct
+  provider: chutes/bf16
+  reason:
+    token_usage:
+    - 20
+    - 1
+- api: openrouter
+  model: qwen/qwen2.5-vl-32b-instruct
+  provider: deepinfra/bf16
+  reason:
+    token_usage:
+    - 20
+    - 1
+- api: openrouter
+  model: qwen/qwen2.5-vl-32b-instruct
+  provider: fireworks
+  reason:
+    token_usage:
+    - 20
+    - 1
+- api: openrouter
+  model: qwen/qwen2.5-vl-72b-instruct
+  provider: chutes/bf16
+  reason:
+    token_usage:
+    - 20
+    - 1
+- api: openrouter
+  model: qwen/qwen2.5-vl-72b-instruct
+  provider: hyperbolic
+  reason:
+    token_usage:
+    - 20
+    - 2
+- api: openrouter
+  model: qwen/qwen2.5-vl-72b-instruct
+  provider: novita/bf16
+  reason:
+    token_usage:
+    - 20
+    - 1
+- api: openrouter
+  model: qwen/qwen2.5-vl-72b-instruct
+  provider: parasail/fp8
+  reason:
+    token_usage:
+    - 15
+    - 1
+- api: openrouter
+  model: qwen/qwen2.5-vl-72b-instruct
+  provider: phala
+  reason:
+    token_usage:
+    - 20
+    - 1
+- api: openrouter
+  model: qwen/qwen3-235b-a22b-2507
+  provider: hyperbolic
+  reason:
+    token_usage:
+    - 9
+    - 30
+- api: openrouter
+  model: qwen/qwen3-235b-a22b-2507
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 9
+    - 39
+- api: openrouter
+  model: qwen/qwen3-235b-a22b-thinking-2507
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 11
+    - 142
+- api: openrouter
+  model: qwen/qwen3-30b-a3b
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 13
+    - 30
+- api: openrouter
+  model: qwen/qwen3-30b-a3b-instruct-2507
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 9
+    - 33
+- api: openrouter
+  model: qwen/qwen3-30b-a3b-thinking-2507
+  provider: alibaba
+  reason:
+    token_usage:
+    - 9
+    - 215
+- api: openrouter
+  model: qwen/qwen3-30b-a3b-thinking-2507
+  provider: atlas-cloud/fp8
+  reason:
+    token_usage:
+    - 9
+    - 247
+- api: openrouter
+  model: qwen/qwen3-30b-a3b-thinking-2507
+  provider: nebius/fp8
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: qwen/qwen3-32b
+  provider: atlas-cloud/fp8
+  reason:
+    token_usage:
+    - 9
+    - 184
+- api: openrouter
+  model: qwen/qwen3-32b
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 9
+    - 195
+- api: openrouter
+  model: qwen/qwen3-coder
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 9
+    - 41
+- api: openrouter
+  model: qwen/qwen3-coder-30b-a3b-instruct
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 9
+    - 38
+- api: openrouter
+  model: qwen/qwen3-next-80b-a3b-thinking
+  provider: alibaba
+  reason:
+    token_usage:
+    - 9
+    - 382
+- api: openrouter
+  model: qwen/qwen3-next-80b-a3b-thinking
+  provider: atlas-cloud/fp8
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: qwen/qwen3-next-80b-a3b-thinking
+  provider: google-vertex
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: qwen/qwen3-next-80b-a3b-thinking
+  provider: hyperbolic/bf16
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: qwen/qwen3-next-80b-a3b-thinking
+  provider: nebius/fp8
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: qwen/qwen3-next-80b-a3b-thinking
+  provider: novita/bf16
+  reason:
+    token_usage:
+    - 9
+    - 116
+- api: openrouter
+  model: qwen/qwen3-next-80b-a3b-thinking
+  provider: together
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: qwen/qwen3-vl-235b-a22b-instruct
+  provider: alibaba
+  reason:
+    token_usage:
+    - 1
+    - 2
+- api: openrouter
+  model: qwen/qwen3-vl-235b-a22b-thinking
+  provider: novita/bf16
+  reason:
+    token_usage:
+    - 11
+    - 154
+- api: openrouter
+  model: qwen/qwen3-vl-30b-a3b-instruct
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 9
+    - 26
+- api: openrouter
+  model: qwen/qwen3-vl-30b-a3b-thinking
+  provider: novita/fp16
+  reason:
+    token_usage:
+    - 11
+    - 290
+- api: openrouter
+  model: qwen/qwen3-vl-30b-a3b-thinking
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 11
+    - 342
+- api: openrouter
+  model: qwen/qwen3-vl-8b-instruct
+  provider: alibaba
+  reason:
+    token_usage:
+    - 1
+    - 2
+- api: openrouter
+  model: qwen/qwen3-vl-8b-thinking
+  provider: alibaba
+  reason:
+    token_usage:
+    - 1
+    - 428
+- api: openrouter
+  model: qwen/qwq-32b
+  provider: hyperbolic/bf16
+  reason:
+    token_usage:
+    - 11
+    - 124
+- api: openrouter
+  model: qwen/qwq-32b
+  provider: nextbit/int4
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: qwen/qwq-32b
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 11
+    - 169
+- api: openrouter
+  model: raifle/sorcererlm-8x22b
+  provider: infermatic
+  reason:
+    token_usage:
+    - 39
+    - 1
+- api: openrouter
+  model: sao10k/l3-euryale-70b
+  provider: novita/bf16
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: sao10k/l3-lunaris-8b
+  provider: deepinfra/turbo
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: sao10k/l3-lunaris-8b
+  provider: novita/bf16
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: sao10k/l3.1-70b-hanami-x1
+  provider: infermatic/bf16
+  reason:
+    token_usage:
+    - 36
+    - 1
+- api: openrouter
+  model: sao10k/l3.1-euryale-70b
+  provider: deepinfra/fp8
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: sao10k/l3.1-euryale-70b
+  provider: nextbit/fp8
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: sao10k/l3.1-euryale-70b
+  provider: novita/fp8
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: sao10k/l3.3-euryale-70b
+  provider: deepinfra/fp8
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: sao10k/l3.3-euryale-70b
+  provider: nextbit/bf16
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: switchpoint/router
+  provider: switchpoint
+  reason:
+    token_usage:
+    - 1
+    - 2
+- api: openrouter
+  model: tencent/hunyuan-a13b-instruct
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 9
+    - 26
+- api: openrouter
+  model: thedrummer/cydonia-24b-v4.1
+  provider: nextbit/bf16
+  reason:
+    token_usage:
+    - 178
+    - 1
+- api: openrouter
+  model: thedrummer/cydonia-24b-v4.1
+  provider: parasail/bf16
+  reason:
+    token_usage:
+    - 178
+    - 1
+- api: openrouter
+  model: thedrummer/rocinante-12b
+  provider: infermatic/bf16
+  reason:
+    token_usage:
+    - 25
+    - 1
+- api: openrouter
+  model: thedrummer/rocinante-12b
+  provider: nextbit/bf16
+  reason:
+    token_usage:
+    - 25
+    - 1
+- api: openrouter
+  model: thedrummer/skyfall-36b-v2
+  provider: parasail/fp8
+  reason:
+    token_usage:
+    - 178
+    - 1
+- api: openrouter
+  model: undi95/remm-slerp-l2-13b
+  provider: mancer/fp8
+  reason:
+    token_usage:
+    - 37
+    - 1
+- api: openrouter
+  model: undi95/remm-slerp-l2-13b
+  provider: nextbit/bf16
+  reason:
+    token_usage:
+    - 37
+    - 1
+- api: openrouter
+  model: z-ai/glm-4.5-air
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 10
+    - 64
+- api: openrouter
+  model: z-ai/glm-4.5v
+  provider: novita/fp8
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: z-ai/glm-4.6
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 10
+    - 232
+- api: openrouter
+  model: z-ai/glm-4.6v
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 7
+    - 149
+- api: openrouter
+  model: z-ai/glm-4.7
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 6
+    - 346
