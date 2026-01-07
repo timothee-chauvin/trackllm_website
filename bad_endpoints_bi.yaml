@@ -1107,6 +1107,13 @@ bad_endpoints_bi:
     - 1
 - api: openrouter
   model: moonshotai/kimi-k2-0905
+  provider: chutes/fp8
+  reason:
+    token_usage:
+    - 27
+    - 1
+- api: openrouter
+  model: moonshotai/kimi-k2-0905
   provider: fireworks/fp8
   reason:
     token_usage:
@@ -1645,12 +1652,32 @@ bad_endpoints_bi:
     - 46
     - 1
 - api: openrouter
+  model: perplexity/sonar
+  provider: perplexity
+  reason:
+    price_mismatch: '2501.00'
+- api: openrouter
   model: perplexity/sonar-deep-research
   provider: perplexity
   reason:
     token_usage:
     - 1
     - 10248
+- api: openrouter
+  model: perplexity/sonar-pro
+  provider: perplexity
+  reason:
+    price_mismatch: '334.33'
+- api: openrouter
+  model: perplexity/sonar-pro-search
+  provider: perplexity
+  reason:
+    price_mismatch: '1001.00'
+- api: openrouter
+  model: perplexity/sonar-reasoning-pro
+  provider: perplexity
+  reason:
+    price_mismatch: '601.00'
 - api: openrouter
   model: qwen/qwen-2.5-7b-instruct
   provider: phala
@@ -1820,6 +1847,13 @@ bad_endpoints_bi:
     - 11
     - 1
 - api: openrouter
+  model: qwen/qwen3-30b-a3b-thinking-2507
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 11
+    - 214
+- api: openrouter
   model: qwen/qwen3-32b
   provider: atlas-cloud/fp8
   reason:
@@ -1833,6 +1867,13 @@ bad_endpoints_bi:
     token_usage:
     - 9
     - 195
+- api: openrouter
+  model: qwen/qwen3-coder
+  provider: hyperbolic/fp8
+  reason:
+    token_usage:
+    - 9
+    - 41
 - api: openrouter
   model: qwen/qwen3-coder
   provider: siliconflow/fp8
@@ -1924,6 +1965,13 @@ bad_endpoints_bi:
     token_usage:
     - 11
     - 154
+- api: openrouter
+  model: qwen/qwen3-vl-235b-a22b-thinking
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 11
+    - 142
 - api: openrouter
   model: qwen/qwen3-vl-30b-a3b-instruct
   provider: siliconflow/fp8
@@ -2113,6 +2161,56 @@ bad_endpoints_bi:
     token_usage:
     - 37
     - 1
+- api: openrouter
+  model: x-ai/grok-3
+  provider: xai
+  reason:
+    price_mismatch: '10.50'
+- api: openrouter
+  model: x-ai/grok-3-beta
+  provider: xai
+  reason:
+    price_mismatch: '10.50'
+- api: openrouter
+  model: x-ai/grok-3-mini
+  provider: xai
+  reason:
+    price_mismatch: '606.50'
+- api: openrouter
+  model: x-ai/grok-3-mini
+  provider: xai/fast
+  reason:
+    price_mismatch: '313.04'
+- api: openrouter
+  model: x-ai/grok-3-mini-beta
+  provider: xai
+  reason:
+    price_mismatch: '606.50'
+- api: openrouter
+  model: x-ai/grok-3-mini-beta
+  provider: xai/fast
+  reason:
+    price_mismatch: '230.75'
+- api: openrouter
+  model: x-ai/grok-4
+  provider: xai
+  reason:
+    price_mismatch: '1082.00'
+- api: openrouter
+  model: x-ai/grok-4-fast
+  provider: xai
+  reason:
+    price_mismatch: '578.75'
+- api: openrouter
+  model: x-ai/grok-4.1-fast
+  provider: xai
+  reason:
+    price_mismatch: '756.25'
+- api: openrouter
+  model: x-ai/grok-code-fast-1
+  provider: xai
+  reason:
+    price_mismatch: '1712.20'
 - api: openrouter
   model: z-ai/glm-4.5-air
   provider: siliconflow/fp8

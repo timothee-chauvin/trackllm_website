@@ -16,6 +16,29 @@ from trackllm_website.storage import (
 
 
 class OpenRouterClient:
+    async def get_generation_cost(
+        self, generation_id: str, session: aiohttp.ClientSession | None = None
+    ) -> float | int | None:
+        """Fetch actual cost from OpenRouter generation endpoint."""
+        should_close = session is None
+        # give the metadata item some time to be created
+        await asyncio.sleep(5)
+        session = session or aiohttp.ClientSession()
+        try:
+            async with session.get(
+                url="https://openrouter.ai/api/v1/generation",
+                headers={"Authorization": f"Bearer {config.openrouter_api_key}"},
+                params={"id": generation_id},
+                timeout=aiohttp.ClientTimeout(total=10),
+            ) as resp:
+                if not resp.ok:
+                    return None
+                data = await resp.json()
+                return data.get("data", {}).get("total_cost")
+        finally:
+            if should_close:
+                await session.close()
+
     async def _make_request(
         self,
         endpoint: Endpoint,
@@ -64,7 +87,11 @@ class OpenRouterClient:
                         message=response["error"]["message"],
                     )
 
-        cost = compute_cost(response["usage"], endpoint)
+        usage = response["usage"]
+        input_tokens = usage["prompt_tokens"]
+        output_tokens = usage["completion_tokens"]
+        cost = compute_cost(usage, endpoint)
+        generation_id = response.get("id")
 
         # Extract content
         content = None
@@ -89,6 +116,9 @@ class OpenRouterClient:
                 content=content,
                 logprobs=None,
                 cost=cost,
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+                generation_id=generation_id,
                 error=ResponseError(
                     http_code=resp.status,
                     message="No logprobs returned",
@@ -102,6 +132,9 @@ class OpenRouterClient:
             content=content,
             logprobs=response_logprobs,
             cost=cost,
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+            generation_id=generation_id,
             error=None,
         )
 

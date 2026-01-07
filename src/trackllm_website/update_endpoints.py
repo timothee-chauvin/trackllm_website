@@ -21,6 +21,7 @@ BAD_ENDPOINTS_BI_PATH = root / "bad_endpoints_bi.yaml"
 
 class BadEndpointReason(BaseModel):
     token_usage: list[int] | None = None
+    price_mismatch: str | None = None
 
 
 class BadEndpoint(BaseModel):
@@ -172,10 +173,21 @@ async def get_endpoints(logprob_filter: bool = False) -> list[Endpoint]:
     return filtered_endpoints
 
 
+def compute_expected_cost(
+    input_tokens: int, output_tokens: int, endpoint: Endpoint
+) -> float:
+    return (
+        input_tokens * endpoint.cost[0] / 1e6 + output_tokens * endpoint.cost[1] / 1e6
+    )
+
+
 async def test_endpoint_token_usage(
-    endpoint: Endpoint, max_input_tokens: int = 10, max_output_tokens: int = 1
+    endpoint: Endpoint,
+    max_input_tokens: int = 10,
+    max_output_tokens: int = 1,
+    price_tolerance: float = 0.01,
 ) -> tuple[Endpoint | None, BadEndpoint | None]:
-    """Test if an endpoint uses acceptable token counts.
+    """Test if an endpoint uses acceptable token counts and correct pricing.
 
     Returns:
         (valid_endpoint, bad_endpoint) - at least one will be None.
@@ -197,10 +209,37 @@ async def test_endpoint_token_usage(
             bad = BadEndpoint.from_endpoint(
                 endpoint,
                 BadEndpointReason(
-                    token_usage=(response.input_tokens, response.output_tokens)
+                    token_usage=[response.input_tokens, response.output_tokens]
                 ),
             )
             return None, bad
+
+        # Verify pricing matches advertised cost using the generation endpoint
+        expected_cost = compute_expected_cost(
+            response.input_tokens, response.output_tokens, endpoint
+        )
+        if expected_cost > 0:
+            if not response.generation_id:
+                logger.info(f"{endpoint} price test: ⏭️ (no generation_id)")
+                return None, None
+            actual_cost = await client.get_generation_cost(response.generation_id)
+            if actual_cost is None:
+                logger.info(
+                    f"{endpoint} price test: ⏭️ (couldn't fetch generation cost for id {response.generation_id})"
+                )
+                return None, None
+            if actual_cost > expected_cost * (1 + price_tolerance):
+                ratio = actual_cost / expected_cost
+                logger.info(
+                    f"{endpoint} price test: ❌ "
+                    f"(actual={actual_cost:.8f}, expected={expected_cost:.8f}, ratio={ratio:.2f})"
+                )
+                bad = BadEndpoint.from_endpoint(
+                    endpoint,
+                    BadEndpointReason(price_mismatch=f"{ratio:.2f}"),
+                )
+                return None, bad
+
         logger.info(
             f"{endpoint} token test: ✅ "
             f"(input={response.input_tokens}, output={response.output_tokens})"

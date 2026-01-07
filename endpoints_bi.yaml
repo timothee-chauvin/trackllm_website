@@ -690,18 +690,6 @@ endpoints_bi:
   - 0.28
   - 0.42
 - api: openrouter
-  model: x-ai/grok-4-fast
-  provider: xai
-  cost:
-  - 0.2
-  - 0.5
-- api: openrouter
-  model: x-ai/grok-4.1-fast
-  provider: xai
-  cost:
-  - 0.2
-  - 0.5
-- api: openrouter
   model: qwen/qwen3-235b-a22b-thinking-2507
   provider: chutes/bf16
   cost:
@@ -821,18 +809,6 @@ endpoints_bi:
   cost:
   - 0.4
   - 0.4
-- api: openrouter
-  model: x-ai/grok-3-mini
-  provider: xai
-  cost:
-  - 0.3
-  - 0.5
-- api: openrouter
-  model: x-ai/grok-3-mini-beta
-  provider: xai
-  cost:
-  - 0.3
-  - 0.5
 - api: openrouter
   model: qwen/qwen3-vl-8b-instruct
   provider: together
@@ -1284,12 +1260,6 @@ endpoints_bi:
   - 0.42
   - 1.25
 - api: openrouter
-  model: x-ai/grok-code-fast-1
-  provider: xai
-  cost:
-  - 0.2
-  - 1.5
-- api: openrouter
   model: deepseek/deepseek-chat
   provider: novita/fp8
   cost:
@@ -1391,12 +1361,6 @@ endpoints_bi:
   cost:
   - 0.5
   - 1.5
-- api: openrouter
-  model: perplexity/sonar
-  provider: perplexity
-  cost:
-  - 1.0
-  - 1.0
 - api: openrouter
   model: qwen/qwen3-coder
   provider: deepinfra/fp8
@@ -1543,6 +1507,12 @@ endpoints_bi:
   - 1.8
 - api: openrouter
   model: z-ai/glm-4.6
+  provider: mancer/fp8
+  cost:
+  - 0.45
+  - 2.0
+- api: openrouter
+  model: z-ai/glm-4.7
   provider: mancer/fp8
   cost:
   - 0.45
@@ -1848,18 +1818,6 @@ endpoints_bi:
   - 0.75
   - 3.75
 - api: openrouter
-  model: x-ai/grok-3-mini
-  provider: xai/fast
-  cost:
-  - 0.6
-  - 4.0
-- api: openrouter
-  model: x-ai/grok-3-mini-beta
-  provider: xai/fast
-  cost:
-  - 0.6
-  - 4.0
-- api: openrouter
   model: anthropic/claude-3.5-haiku
   provider: amazon-bedrock
   cost:
@@ -2039,12 +1997,6 @@ endpoints_bi:
   cost:
   - 3.0
   - 7.0
-- api: openrouter
-  model: perplexity/sonar-reasoning-pro
-  provider: perplexity
-  cost:
-  - 2.0
-  - 8.0
 - api: openrouter
   model: google/gemini-2.5-pro
   provider: google-ai-studio
@@ -2258,36 +2210,6 @@ endpoints_bi:
 - api: openrouter
   model: anthropic/claude-sonnet-4.5
   provider: google-vertex/global
-  cost:
-  - 3.0
-  - 15.0
-- api: openrouter
-  model: perplexity/sonar-pro
-  provider: perplexity
-  cost:
-  - 3.0
-  - 15.0
-- api: openrouter
-  model: perplexity/sonar-pro-search
-  provider: perplexity
-  cost:
-  - 3.0
-  - 15.0
-- api: openrouter
-  model: x-ai/grok-3
-  provider: xai
-  cost:
-  - 3.0
-  - 15.0
-- api: openrouter
-  model: x-ai/grok-3-beta
-  provider: xai
-  cost:
-  - 3.0
-  - 15.0
-- api: openrouter
-  model: x-ai/grok-4
-  provider: xai
   cost:
   - 3.0
   - 15.0
