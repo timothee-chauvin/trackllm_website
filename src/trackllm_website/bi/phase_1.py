@@ -271,6 +271,13 @@ async def main() -> None:
                 log_status(states)
 
     log_status(states)
+
+    # Print missing responses per model
+    for state in states:
+        missing = state.get_missing_responses()
+        if missing > 0:
+            logger.info(f"{state.endpoint}: {missing} missing responses")
+
     logger.info("Phase 1 complete")
 
 
