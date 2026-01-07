@@ -324,6 +324,12 @@ endpoints_bi:
   - 0.07
   - 0.28
 - api: openrouter
+  model: qwen/qwen3-30b-a3b
+  provider: ncompass/fp8
+  cost:
+  - 0.08
+  - 0.28
+- api: openrouter
   model: qwen/qwen3-32b
   provider: deepinfra/fp8
   cost:
@@ -1116,12 +1122,6 @@ endpoints_bi:
   - 0.32
   - 0.89
 - api: openrouter
-  model: qwen/qwen3-235b-a22b-2507
-  provider: google-vertex
-  cost:
-  - 0.25
-  - 1.0
-- api: openrouter
   model: deepseek/deepseek-chat-v3.1
   provider: novita/fp8
   cost:
@@ -1337,6 +1337,12 @@ endpoints_bi:
   cost:
   - 0.35
   - 1.5
+- api: openrouter
+  model: z-ai/glm-4.5
+  provider: chutes/bf16
+  cost:
+  - 0.35
+  - 1.55
 - api: openrouter
   model: z-ai/glm-4.7
   provider: chutes/bf16
@@ -1752,12 +1758,6 @@ endpoints_bi:
   - 0.6
   - 2.5
 - api: openrouter
-  model: moonshotai/kimi-k2-thinking
-  provider: novita/bf16
-  cost:
-  - 0.6
-  - 2.5
-- api: openrouter
   model: deepseek/deepseek-r1-0528
   provider: nebius/fp8
   cost:
@@ -1858,12 +1858,6 @@ endpoints_bi:
   provider: xai/fast
   cost:
   - 0.6
-  - 4.0
-- api: openrouter
-  model: anthropic/claude-3.5-haiku
-  provider: amazon-bedrock
-  cost:
-  - 0.8
   - 4.0
 - api: openrouter
   model: anthropic/claude-3.5-haiku

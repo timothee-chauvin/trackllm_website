@@ -83,7 +83,8 @@ def save_bad_endpoints_bi(bad_endpoints: Iterable[BadEndpoint]) -> None:
         ]
     }
     with open(BAD_ENDPOINTS_BI_PATH, "w") as f:
-        yaml.dump(output_data, f, sort_keys=False)
+        # default_flow_style=False for consistent dumping
+        yaml.dump(output_data, f, default_flow_style=False, sort_keys=False)
 
 
 async def get_model_endpoints(
@@ -291,30 +292,54 @@ async def update_endpoints_bi():
     """Update the BI endpoints with all providers for all models.
 
     Filters out endpoints that use too many tokens (>10 input or >1 output).
-    Bad endpoints are stored separately to avoid re-testing them.
+    Bad endpoints are stored in bad_endpoints_bi.yaml to avoid re-testing.
+    Good endpoints are stored in endpoints_bi.yaml and also skipped on re-runs.
+    Only new endpoints (not in good or bad lists) are tested.
     """
     all_endpoints = await get_endpoints(logprob_filter=False)
-    known_bad = load_bad_endpoints_bi()
-    logger.info(f"Loaded {len(known_bad)} known bad endpoints")
+    all_endpoints_set = set(all_endpoints)
 
-    # Filter out known bad endpoints
-    endpoints_to_test = [
-        e for e in all_endpoints if not any(b.matches(e) for b in known_bad)
-    ]
+    known_bad = load_bad_endpoints_bi()
+    known_good = set(config.endpoints_bi)
     logger.info(
-        f"Testing {len(endpoints_to_test)} endpoints "
-        f"(skipping {len(all_endpoints) - len(endpoints_to_test)} known bad)"
+        f"Loaded {len(known_good)} known good endpoints, "
+        f"{len(known_bad)} known bad endpoints"
     )
 
-    # Test token usage for each endpoint
+    # Update costs for known good endpoints if they're still in the API response
+    still_good = []
+    for good_endpoint in known_good:
+        if good_endpoint in all_endpoints_set:
+            updated = next(e for e in all_endpoints if e == good_endpoint)
+            still_good.append(updated)
+        else:
+            still_good.append(good_endpoint)
+    logger.info(f"Keeping all {len(still_good)} known good endpoints")
+
+    # Filter out known bad and known good endpoints - only test new ones
+    endpoints_to_test = [
+        e
+        for e in all_endpoints
+        if not any(b.matches(e) for b in known_bad) and e not in known_good
+    ]
+    skipped_bad = len(
+        [e for e in all_endpoints if any(b.matches(e) for b in known_bad)]
+    )
+    skipped_good = len([e for e in all_endpoints if e in known_good])
+    logger.info(
+        f"Testing {len(endpoints_to_test)} new endpoints "
+        f"(skipping {skipped_bad} known bad, {skipped_good} known good)"
+    )
+
+    # Test token usage for each new endpoint
     tasks = [test_endpoint_token_usage(e) for e in endpoints_to_test]
     results = await gather_with_concurrency(config.api.max_workers, *tasks)
 
-    valid_endpoints = [r[0] for r in results if r[0] is not None]
+    newly_valid = [r[0] for r in results if r[0] is not None]
     new_bad = [r[1] for r in results if r[1] is not None]
 
     logger.info(
-        f"Token test results: {len(valid_endpoints)} valid, "
+        f"Token test results: {len(newly_valid)} valid, "
         f"{len(new_bad)} new bad endpoints"
     )
 
@@ -323,9 +348,12 @@ async def update_endpoints_bi():
     save_bad_endpoints_bi(all_bad)
     logger.info(f"Saved {len(all_bad)} total bad endpoints to {BAD_ENDPOINTS_BI_PATH}")
 
-    # Sort and save valid endpoints
+    # Combine still-good and newly-valid endpoints
+    all_good = still_good + newly_valid
+
+    # Sort and save valid endpoints to endpoints_bi.yaml
     sorted_endpoints = sorted(
-        valid_endpoints, key=lambda e: (sum(e.cost), e.api, e.model, e.provider)
+        all_good, key=lambda e: (sum(e.cost), e.api, e.model, e.provider)
     )
 
     output_data = {"endpoints_bi": []}

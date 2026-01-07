@@ -1191,6 +1191,13 @@ bad_endpoints_bi:
     - 1
 - api: openrouter
   model: moonshotai/kimi-k2-thinking
+  provider: novita/bf16
+  reason:
+    token_usage:
+    - 28
+    - 1
+- api: openrouter
+  model: moonshotai/kimi-k2-thinking
   provider: parasail/int4
   reason:
     token_usage:
@@ -1841,6 +1848,13 @@ bad_endpoints_bi:
     - 9
     - 38
 - api: openrouter
+  model: qwen/qwen3-next-80b-a3b-instruct
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 9
+    - 39
+- api: openrouter
   model: qwen/qwen3-next-80b-a3b-thinking
   provider: alibaba
   reason:
@@ -1896,6 +1910,13 @@ bad_endpoints_bi:
     token_usage:
     - 1
     - 2
+- api: openrouter
+  model: qwen/qwen3-vl-235b-a22b-instruct
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 9
+    - 57
 - api: openrouter
   model: qwen/qwen3-vl-235b-a22b-thinking
   provider: novita/bf16
