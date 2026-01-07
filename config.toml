@@ -7,7 +7,7 @@ max_cost_mtok = 30
 temperature = 1.0
 max_workers = 30
 top_logprobs_openrouter_default = 20
-timeout = 30
+timeout = 10
 abandon_after = 100
 openrouter_avoid_free_endpoints = true
 
