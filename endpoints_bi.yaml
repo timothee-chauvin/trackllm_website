@@ -396,18 +396,6 @@ endpoints_bi:
   - 0.1
   - 0.1
 - api: openrouter
-  model: microsoft/phi-3-mini-128k-instruct
-  provider: azure
-  cost:
-  - 0.1
-  - 0.1
-- api: openrouter
-  model: microsoft/phi-3.5-mini-128k-instruct
-  provider: azure
-  cost:
-  - 0.1
-  - 0.1
-- api: openrouter
   model: microsoft/phi-4
   provider: nextbit/int4
   cost:
@@ -2281,6 +2269,12 @@ endpoints_bi:
   - 0.9
 - api: openrouter
   model: z-ai/glm-4.6v
+  provider: siliconflow/fp8
+  cost:
+  - 0.3
+  - 0.9
+- api: openrouter
+  model: z-ai/glm-4.6v
   provider: z-ai/fp8
   cost:
   - 0.3
@@ -2940,12 +2934,6 @@ endpoints_bi:
   - 0.8
   - 1.2
 - api: openrouter
-  model: microsoft/phi-3-medium-128k-instruct
-  provider: azure
-  cost:
-  - 1.0
-  - 1.0
-- api: openrouter
   model: mistralai/mistral-large-2512
   provider: mistral
   cost:
@@ -3288,6 +3276,12 @@ endpoints_bi:
   - 1.0
   - 1.5
 - api: openrouter
+  model: z-ai/glm-4.7
+  provider: novita/bf16
+  cost:
+  - 0.54
+  - 1.98
+- api: openrouter
   model: meta-llama/llama-3.3-70b-instruct
   provider: cloudflare/fp8
   cost:
@@ -3493,7 +3487,7 @@ endpoints_bi:
   - 2.2
 - api: openrouter
   model: z-ai/glm-4.7
-  provider: novita/bf16
+  provider: siliconflow/fp8
   cost:
   - 0.6
   - 2.2
@@ -4123,18 +4117,6 @@ endpoints_bi:
   - 8.0
 - api: openrouter
   model: deepseek/deepseek-r1-0528
-  provider: friendli
-  cost:
-  - 3.0
-  - 7.0
-- api: openrouter
-  model: deepseek/deepseek-r1-0528
-  provider: friendli
-  cost:
-  - 3.0
-  - 7.0
-- api: openrouter
-  model: deepseek/deepseek-r1-0528
   provider: together/fp8
   cost:
   - 3.0
@@ -4289,12 +4271,6 @@ endpoints_bi:
   cost:
   - 5.0
   - 7.0
-- api: openrouter
-  model: mistralai/mistral-large
-  provider: azure
-  cost:
-  - 3.0
-  - 9.0
 - api: openrouter
   model: cohere/command-a
   provider: cohere
