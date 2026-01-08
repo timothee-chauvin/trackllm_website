@@ -3246,6 +3246,12 @@ endpoints_bi:
   - 0.45
   - 2.0
 - api: openrouter
+  model: z-ai/glm-4.7
+  provider: mancer/fp8
+  cost:
+  - 0.45
+  - 2.0
+- api: openrouter
   model: moonshotai/kimi-k2-thinking
   provider: deepinfra/fp4
   cost:
@@ -3317,6 +3323,12 @@ endpoints_bi:
   cost:
   - 0.23
   - 2.39
+- api: openrouter
+  model: z-ai/glm-4.7
+  provider: siliconflow/fp8
+  cost:
+  - 0.42
+  - 2.2
 - api: openrouter
   model: deepseek/deepseek-r1-0528
   provider: deepinfra/fp4
@@ -3482,12 +3494,6 @@ endpoints_bi:
 - api: openrouter
   model: z-ai/glm-4.6:exacto
   provider: z-ai
-  cost:
-  - 0.6
-  - 2.2
-- api: openrouter
-  model: z-ai/glm-4.7
-  provider: siliconflow/fp8
   cost:
   - 0.6
   - 2.2

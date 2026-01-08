@@ -60,12 +60,6 @@ endpoints_lt:
   - 0.5
   - 0.75
 - api: openrouter
-  model: qwen/qwen3-next-80b-a3b-thinking
-  provider: nebius/fp8
-  cost:
-  - 0.15
-  - 1.2
-- api: openrouter
   model: minimax/minimax-m2.1
   provider: fireworks
   cost:
@@ -138,11 +132,11 @@ endpoints_lt:
   - 0.45
   - 2.0
 - api: openrouter
-  model: moonshotai/kimi-k2
-  provider: nebius/fp4
+  model: z-ai/glm-4.7
+  provider: mancer/fp8
   cost:
-  - 0.5
-  - 2.4
+  - 0.45
+  - 2.0
 - api: openrouter
   model: moonshotai/kimi-k2-thinking
   provider: parasail/int4
@@ -170,12 +164,6 @@ endpoints_lt:
 - api: openrouter
   model: moonshotai/kimi-k2-0905
   provider: fireworks/fp8
-  cost:
-  - 0.6
-  - 2.5
-- api: openrouter
-  model: moonshotai/kimi-k2-thinking
-  provider: nebius/fp8
   cost:
   - 0.6
   - 2.5
