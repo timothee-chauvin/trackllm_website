@@ -1,6 +1,7 @@
 """Collect logprob statistics by querying LT endpoints with single-token inputs."""
 
 import asyncio
+import math
 import time
 from collections import deque
 from dataclasses import dataclass, field
@@ -242,5 +243,71 @@ async def main() -> None:
     logger.info("Logprob stats collection complete")
 
 
+def analyze() -> None:
+    """Analyze logprob distributions: differences between top tokens."""
+    all_diff_1_2: list[float] = []
+    all_diff_2_3: list[float] = []
+
+    model_stats: dict[str, tuple[list[float], list[float]]] = {}
+
+    for path in sorted(DATA_DIR.glob("*.json")):
+        results = load_existing_results(path)
+
+        model_name = path.stem
+        diff_1_2: list[float] = []
+        diff_2_3: list[float] = []
+
+        for _, logprobs in results.items():
+            # Sort by logprob descending (highest probability first)
+            sorted_lps = sorted(
+                [lp["logprob"] for lp in logprobs if lp["logprob"] > -100],
+                reverse=True,
+            )
+            if len(sorted_lps) < 3:
+                continue
+            diff_1_2.append(sorted_lps[0] - sorted_lps[1])
+            diff_2_3.append(sorted_lps[1] - sorted_lps[2])
+
+        if diff_1_2:
+            model_stats[model_name] = (diff_1_2, diff_2_3)
+            all_diff_1_2.extend(diff_1_2)
+            all_diff_2_3.extend(diff_2_3)
+
+    def compute_stats(values: list[float]) -> tuple[float, float]:
+        if not values:
+            return 0.0, 0.0
+        mean = sum(values) / len(values)
+        variance = sum((x - mean) ** 2 for x in values) / len(values)
+        std = math.sqrt(variance)
+        return mean, std
+
+    print("\n=== Logprob Difference Statistics ===\n")
+    print("Difference = logprob(rank_i) - logprob(rank_i+1)")
+    print("Higher values = larger gap between tokens\n")
+
+    print(f"{'Model':<60} {'n':>6}  {'diff_1_2':>20}  {'diff_2_3':>20}")
+    print("-" * 112)
+
+    for model_name in sorted(model_stats.keys()):
+        diff_1_2, diff_2_3 = model_stats[model_name]
+        mean_12, std_12 = compute_stats(diff_1_2)
+        mean_23, std_23 = compute_stats(diff_2_3)
+        print(
+            f"{model_name:<60} {len(diff_1_2):>6}  "
+            f"{mean_12:>8.4f} ± {std_12:<8.4f}  "
+            f"{mean_23:>8.4f} ± {std_23:<8.4f}"
+        )
+
+    print("-" * 112)
+    mean_12, std_12 = compute_stats(all_diff_1_2)
+    mean_23, std_23 = compute_stats(all_diff_2_3)
+    print(
+        f"{'AGGREGATED':<60} {len(all_diff_1_2):>6}  "
+        f"{mean_12:>8.4f} ± {std_12:<8.4f}  "
+        f"{mean_23:>8.4f} ± {std_23:<8.4f}"
+    )
+
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    # asyncio.run(main())
+    analyze()
