@@ -29,17 +29,31 @@ def get_first_endpoint_per_provider() -> list[Endpoint]:
     return list(provider_to_first.values())
 
 
+def get_input_tokens(
+    endpoint: Endpoint,
+    tokenizer_index: dict[str, str],
+    fallback_tokens: list[str],
+    num_tokens: int,
+) -> list[str]:
+    """Get input tokens for an endpoint, using its tokenizer if known."""
+    if endpoint.model in tokenizer_index:
+        vocab = load_tokenizer_vocab(tokenizer_index[endpoint.model])
+        return vocab[:num_tokens]
+    return fallback_tokens[:num_tokens]
+
+
 def get_input_tokens_for_endpoint(
     endpoint: Endpoint,
     tokenizer_index: dict[str, str],
     fallback_tokens: list[str],
 ) -> list[str]:
-    """Get input tokens for an endpoint, using its tokenizer if known."""
-    num_tokens = config.bi.phase_1.tokens_per_endpoint
-    if endpoint.model in tokenizer_index:
-        vocab = load_tokenizer_vocab(tokenizer_index[endpoint.model])
-        return vocab[:num_tokens]
-    return fallback_tokens[:num_tokens]
+    """Get input tokens for an endpoint using phase_1 config."""
+    return get_input_tokens(
+        endpoint,
+        tokenizer_index,
+        fallback_tokens,
+        config.bi.phase_1.tokens_per_endpoint,
+    )
 
 
 def get_output_path(endpoint: Endpoint) -> Path:
