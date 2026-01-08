@@ -8,7 +8,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import orjson
+import plotly.graph_objects as go
 from aiolimiter import AsyncLimiter
+from plotly.subplots import make_subplots
 from scipy import stats
 from tqdm import tqdm
 
@@ -244,7 +246,7 @@ async def main() -> None:
     logger.info("Logprob stats collection complete")
 
 
-def analyze() -> None:
+def print_logprob_stats() -> None:
     """Analyze logprob distributions: differences between top tokens."""
     all_diff_1_2: list[float] = []
     all_diff_2_3: list[float] = []
@@ -331,6 +333,187 @@ def analyze() -> None:
     print(f"Kendall's tau:        τ = {kendall_tau:.4f}, p = {kendall_p:.2e}")
 
 
+def plot_logprob_stats(output_path: Path | None = None) -> None:
+    """Plot logprob difference statistics and correlation tests."""
+    model_stats: dict[str, tuple[list[float], list[float]]] = {}
+
+    for path in sorted(DATA_DIR.glob("*.json")):
+        results = load_existing_results(path)
+        model_name = path.stem
+        diff_1_2: list[float] = []
+        diff_2_3: list[float] = []
+
+        for _, logprobs in results.items():
+            sorted_lps = sorted(
+                [lp["logprob"] for lp in logprobs if lp["logprob"] > -100],
+                reverse=True,
+            )
+            if len(sorted_lps) < 3:
+                continue
+            diff_1_2.append(sorted_lps[0] - sorted_lps[1])
+            diff_2_3.append(sorted_lps[1] - sorted_lps[2])
+
+        if diff_1_2:
+            model_stats[model_name] = (diff_1_2, diff_2_3)
+
+    def compute_mean_std(values: list[float]) -> tuple[float, float]:
+        if not values:
+            return 0.0, 0.0
+        mean = sum(values) / len(values)
+        variance = sum((x - mean) ** 2 for x in values) / len(values)
+        std = math.sqrt(variance)
+        return mean, std
+
+    # Sort models alphabetically
+    sorted_models = sorted(model_stats.keys())
+
+    labels = [slugify(m, max_length=20, hash_length=4) for m in sorted_models]
+    mean_12 = [compute_mean_std(model_stats[m][0])[0] for m in sorted_models]
+    std_12 = [compute_mean_std(model_stats[m][0])[1] for m in sorted_models]
+    mean_23 = [compute_mean_std(model_stats[m][1])[0] for m in sorted_models]
+    std_23 = [compute_mean_std(model_stats[m][1])[1] for m in sorted_models]
+
+    pearson_rs = [
+        stats.pearsonr(model_stats[m][0], model_stats[m][1])[0] for m in sorted_models
+    ]
+    spearman_rs = [
+        stats.spearmanr(model_stats[m][0], model_stats[m][1])[0] for m in sorted_models
+    ]
+    kendall_taus = [
+        stats.kendalltau(model_stats[m][0], model_stats[m][1])[0] for m in sorted_models
+    ]
+
+    fig = make_subplots(
+        rows=2,
+        cols=1,
+        subplot_titles=[
+            "Logprob Differences (mean ± std)",
+            "Correlation: diff_1_2 vs diff_2_3",
+        ],
+        vertical_spacing=0.15,
+    )
+
+    # Subplot 1: diff_1_2 and diff_2_3 with error bars
+    fig.add_trace(
+        go.Scatter(
+            x=labels,
+            y=mean_12,
+            error_y={"type": "data", "array": std_12, "visible": True},
+            mode="lines+markers",
+            name="diff_1_2",
+            marker={"color": "steelblue", "size": 8},
+            line={"color": "steelblue"},
+        ),
+        row=1,
+        col=1,
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=labels,
+            y=mean_23,
+            error_y={"type": "data", "array": std_23, "visible": True},
+            mode="lines+markers",
+            name="diff_2_3",
+            marker={"color": "coral", "size": 8},
+            line={"color": "coral"},
+        ),
+        row=1,
+        col=1,
+    )
+
+    # Subplot 2: Correlation coefficients
+    fig.add_trace(
+        go.Scatter(
+            x=labels,
+            y=pearson_rs,
+            mode="markers",
+            name="Pearson r",
+            marker={"color": "green", "size": 10, "symbol": "circle"},
+        ),
+        row=2,
+        col=1,
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=labels,
+            y=spearman_rs,
+            mode="markers",
+            name="Spearman ρ",
+            marker={"color": "purple", "size": 10, "symbol": "diamond"},
+        ),
+        row=2,
+        col=1,
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=labels,
+            y=kendall_taus,
+            mode="markers",
+            name="Kendall τ",
+            marker={"color": "orange", "size": 10, "symbol": "square"},
+        ),
+        row=2,
+        col=1,
+    )
+
+    # Add horizontal line at y=0 for correlation subplot
+    fig.add_hline(y=0, line_dash="dash", line_color="gray", row=2, col=1)
+
+    fig.update_yaxes(title_text="Logprob difference", row=1, col=1)
+    fig.update_yaxes(title_text="Correlation coefficient", row=2, col=1)
+    fig.update_xaxes(showticklabels=False, row=1, col=1)
+    fig.update_xaxes(tickangle=45, row=2, col=1)
+
+    fig.update_layout(
+        title="Logprob Statistics by Endpoint",
+        height=900,
+        width=max(1000, len(labels) * 40),
+        showlegend=True,
+        legend={
+            "orientation": "h",
+            "yanchor": "bottom",
+            "y": 1.02,
+            "xanchor": "center",
+            "x": 0.5,
+        },
+    )
+
+    if output_path:
+        fig.write_image(output_path)
+        print(f"Saved figure to {output_path}")
+    else:
+        fig.show()
+
+
+FILTER_ENDPOINTS = {
+    ("meta-llama/llama-3.1-8b-instruct", "cerebras/fp16"),
+    ("deepseek/deepseek-v3.2", "deepseek"),
+    ("openai/gpt-4o-mini-2024-07-18", "openai"),
+    ("openai/gpt-oss-120b", "crusoe/bf16"),
+    ("meta-llama/llama-3.3-70b-instruct", "crusoe/bf16"),
+    ("qwen/qwen3-32b", "cerebras"),
+    ("gryphe/mythomax-l2-13b", "mancer/fp8"),
+    ("undi95/remm-slerp-l2-13b", "mancer/fp8"),
+    ("minimax/minimax-m2.1", "fireworks"),
+    ("mancer/weaver", "mancer/fp8"),
+    ("qwen/qwen3-235b-a22b-2507", "cerebras"),
+    ("deepseek/deepseek-chat-v3-0324", "fireworks"),
+    ("qwen/qwen2.5-vl-32b-instruct", "fireworks"),
+    ("openai/gpt-3.5-turbo", "openai"),
+    ("qwen/qwen3-coder", "fireworks"),
+    ("z-ai/glm-4.6", "mancer/fp8"),
+    ("moonshotai/kimi-k2-thinking", "parasail/int4"),
+    ("openai/gpt-3.5-turbo-0613", "azure"),
+    ("moonshotai/kimi-k2-0905", "fireworks/fp8"),
+    ("deepseek/deepseek-r1-0528", "crusoe/fp8"),
+    ("anthracite-org/magnum-v4-72b", "mancer/fp8"),
+    ("openai/gpt-4o-2024-08-06", "azure"),
+    ("openai/gpt-4o-2024-11-20", "openai"),
+    ("openai/chatgpt-4o-latest", "openai"),
+}
+
+
 if __name__ == "__main__":
     # asyncio.run(main())
-    analyze()
+    # print_logprob_stats()
+    plot_logprob_stats(output_path=Path("logprob_stats.pdf"))
