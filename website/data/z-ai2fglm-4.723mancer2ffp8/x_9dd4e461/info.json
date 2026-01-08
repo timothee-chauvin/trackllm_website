@@ -1,0 +1,13 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "z-ai/glm-4.7",
+    "provider": "mancer/fp8",
+    "cost": [
+      0.45,
+      2.0
+    ],
+    "max_logprobs": null
+  }
+}
