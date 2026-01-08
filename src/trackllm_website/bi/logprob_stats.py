@@ -9,6 +9,7 @@ from pathlib import Path
 
 import orjson
 from aiolimiter import AsyncLimiter
+from scipy import stats
 from tqdm import tqdm
 
 from trackllm_website.api import OpenRouterClient
@@ -285,27 +286,49 @@ def analyze() -> None:
     print("Difference = logprob(rank_i) - logprob(rank_i+1)")
     print("Higher values = larger gap between tokens\n")
 
-    print(f"{'Model':<60} {'n':>6}  {'diff_1_2':>20}  {'diff_2_3':>20}")
-    print("-" * 112)
+    print(
+        f"{'Model':<60} {'n':>6}  {'diff_1_2':>20}  {'diff_2_3':>20}  "
+        f"{'Pearson r':>12}  {'Spearman ρ':>12}  {'Kendall τ':>12}"
+    )
+    print("-" * 172)
 
     for model_name in sorted(model_stats.keys()):
         diff_1_2, diff_2_3 = model_stats[model_name]
         mean_12, std_12 = compute_stats(diff_1_2)
         mean_23, std_23 = compute_stats(diff_2_3)
+        pearson_r, _ = stats.pearsonr(diff_1_2, diff_2_3)
+        spearman_r, _ = stats.spearmanr(diff_1_2, diff_2_3)
+        kendall_tau, _ = stats.kendalltau(diff_1_2, diff_2_3)
         print(
             f"{model_name:<60} {len(diff_1_2):>6}  "
             f"{mean_12:>8.4f} ± {std_12:<8.4f}  "
-            f"{mean_23:>8.4f} ± {std_23:<8.4f}"
+            f"{mean_23:>8.4f} ± {std_23:<8.4f}  "
+            f"{pearson_r:>12.4f}  {spearman_r:>12.4f}  {kendall_tau:>12.4f}"
         )
 
-    print("-" * 112)
+    print("-" * 172)
     mean_12, std_12 = compute_stats(all_diff_1_2)
     mean_23, std_23 = compute_stats(all_diff_2_3)
+    agg_pearson_r, _ = stats.pearsonr(all_diff_1_2, all_diff_2_3)
+    agg_spearman_r, _ = stats.spearmanr(all_diff_1_2, all_diff_2_3)
+    agg_kendall_tau, _ = stats.kendalltau(all_diff_1_2, all_diff_2_3)
     print(
         f"{'AGGREGATED':<60} {len(all_diff_1_2):>6}  "
         f"{mean_12:>8.4f} ± {std_12:<8.4f}  "
-        f"{mean_23:>8.4f} ± {std_23:<8.4f}"
+        f"{mean_23:>8.4f} ± {std_23:<8.4f}  "
+        f"{agg_pearson_r:>12.4f}  {agg_spearman_r:>12.4f}  {agg_kendall_tau:>12.4f}"
     )
+
+    print("\n=== Independence Test: diff_1_2 vs diff_2_3 ===\n")
+
+    pearson_r, pearson_p = stats.pearsonr(all_diff_1_2, all_diff_2_3)
+    print(f"Pearson correlation:  r = {pearson_r:.4f}, p = {pearson_p:.2e}")
+
+    spearman_r, spearman_p = stats.spearmanr(all_diff_1_2, all_diff_2_3)
+    print(f"Spearman correlation: ρ = {spearman_r:.4f}, p = {spearman_p:.2e}")
+
+    kendall_tau, kendall_p = stats.kendalltau(all_diff_1_2, all_diff_2_3)
+    print(f"Kendall's tau:        τ = {kendall_tau:.4f}, p = {kendall_p:.2e}")
 
 
 if __name__ == "__main__":
