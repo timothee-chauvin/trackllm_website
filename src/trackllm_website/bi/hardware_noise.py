@@ -265,7 +265,7 @@ def _load_hardware_noise_stats() -> dict[str, dict[int, list[float]]]:
         model_stats[model_name] = {1: [], 2: [], 3: [], 4: [], 5: []}
 
         for _, queries in results.items():
-            if len(queries) < 2:
+            if len(queries) < QUERIES_PER_PROMPT:
                 continue
 
             top_logprobs_by_query = []
@@ -277,7 +277,7 @@ def _load_hardware_noise_stats() -> dict[str, dict[int, list[float]]]:
                 if len(sorted_lps) >= 5:
                     top_logprobs_by_query.append(sorted_lps)
 
-            if len(top_logprobs_by_query) < 2:
+            if len(top_logprobs_by_query) < QUERIES_PER_PROMPT:
                 continue
 
             for rank in [1, 2, 3, 4, 5]:
@@ -285,6 +285,12 @@ def _load_hardware_noise_stats() -> dict[str, dict[int, list[float]]]:
                 _, std = _compute_stats(values)
                 model_stats[model_name][rank].append(std)
 
+    # Filter out models which returned fewer than NUM_PROMPTS/2 responses
+    model_stats = {
+        model_name: stats
+        for model_name, stats in model_stats.items()
+        if len(stats[1]) >= NUM_PROMPTS / 2
+    }
     return model_stats
 
 
@@ -325,7 +331,7 @@ def print_hardware_noise_stats() -> None:
     print("-" * 136)
     agg_means = [_compute_stats(all_stds[r])[0] for r in [1, 2, 3, 4, 5]]
     print(
-        f"{'AGGREGATED':<60} {len(all_stds[1]):>6}  "
+        f"{'AVERAGE':<60} {len(all_stds[1]):>6}  "
         f"{agg_means[0]:>12.6f}  {agg_means[1]:>12.6f}  {agg_means[2]:>12.6f}  "
         f"{agg_means[3]:>12.6f}  {agg_means[4]:>12.6f}"
     )
