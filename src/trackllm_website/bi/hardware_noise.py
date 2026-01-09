@@ -36,11 +36,20 @@ def get_output_path(endpoint: Endpoint) -> Path:
 
 
 def load_existing_results(path: Path) -> dict[str, list[list[dict]]]:
-    """Load existing results. Structure: {prompt: [[{token, logprob}, ...], ...]}"""
+    """Load existing results. Structure: {prompt: [[{token, logprob}, ...], ...]}.
+    Each logprob vector is sorted by logprob descending.
+    """
     if not path.exists():
         return {}
     with open(path, "rb") as f:
-        return orjson.loads(f.read())
+        data = orjson.loads(f.read())
+        # Sort each logprob vector by logprob descending
+        for prompt, lp_vec_list in data.items():
+            for i, lp_vec in enumerate(lp_vec_list):
+                data[prompt][i] = sorted(
+                    lp_vec, key=lambda x: x["logprob"], reverse=True
+                )
+        return data
 
 
 def save_results(path: Path, results: dict[str, list[list[dict]]]) -> None:
