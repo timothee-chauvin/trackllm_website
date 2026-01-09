@@ -283,6 +283,13 @@ def filter_results(results: dict[str, list[list[dict]]]) -> dict[str, list[list[
     return filtered_results
 
 
+def _get_logprob_for_token(query: list[dict], token: str) -> float:
+    """Impute to the minimum logprob if the token is absent"""
+    query_map = {item["token"]: item["logprob"] for item in query}
+    min_logprob = query[-1]["logprob"]
+    return query_map.get(token, min_logprob)
+
+
 def _load_hardware_noise_stats() -> dict[str, dict[int, list[float]]]:
     """Load and compute hardware noise stats: {model: {rank: [stds per prompt]}}."""
     model_stats: dict[str, dict[int, list[float]]] = {}
@@ -293,26 +300,19 @@ def _load_hardware_noise_stats() -> dict[str, dict[int, list[float]]]:
         model_name = path.stem
         model_stats[model_name] = {1: [], 2: [], 3: [], 4: [], 5: []}
 
-        for _, queries in results.items():
-            if len(queries) < QUERIES_PER_PROMPT:
-                continue
-
-            top_logprobs_by_query = []
-            for query_result in queries:
-                sorted_lps = sorted(
-                    [lp["logprob"] for lp in query_result if lp["logprob"] > -100],
-                    reverse=True,
-                )[:5]
-                if len(sorted_lps) >= 5:
-                    top_logprobs_by_query.append(sorted_lps)
-
-            if len(top_logprobs_by_query) < QUERIES_PER_PROMPT:
-                continue
-
-            for rank in [1, 2, 3, 4, 5]:
-                values = [q[rank - 1] for q in top_logprobs_by_query]
-                _, std = _compute_stats(values)
-                model_stats[model_name][rank].append(std)
+        for _, query_group in results.items():
+            # Get the top-1, ..., tokens from the first request, and look for them in other requests
+            first_query = query_group[0]
+            target_tokens = [item["token"] for item in first_query[:5]]
+            target_tokens_logprobs: list[list[float]] = [[], [], [], [], []]
+            for query in query_group:
+                for rank_idx, token_str in enumerate(target_tokens):
+                    lp = _get_logprob_for_token(query, token_str)
+                    target_tokens_logprobs[rank_idx].append(lp)
+            for rank_idx in range(5):
+                vals = target_tokens_logprobs[rank_idx]
+                _, std = _compute_stats(vals)
+                model_stats[model_name][rank_idx + 1].append(std)
 
     # Filter out models which returned fewer than NUM_PROMPTS/2 responses
     model_stats = {
