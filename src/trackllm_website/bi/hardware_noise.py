@@ -264,12 +264,32 @@ def _compute_stats(values: list[float]) -> tuple[float, float]:
     return mean, math.sqrt(variance)
 
 
+def filter_results(results: dict[str, list[list[dict]]]) -> dict[str, list[list[dict]]]:
+    filtered_results: dict[str, list[list[dict]]] = {}
+    for prompt, lp_vec_list in results.items():
+        filtered_queries = []
+        for lp_vec in lp_vec_list:
+            # Only keep logprob vectors where all logprobs are above -100
+            if any(lp["logprob"] <= -100 for lp in lp_vec):
+                continue
+            # Only keep logprob vectors with at least 5 values
+            if len(lp_vec) < 5:
+                continue
+            filtered_queries.append(lp_vec)
+        # Only keep prompts with the full number of responses
+        if len(filtered_queries) != QUERIES_PER_PROMPT:
+            continue
+        filtered_results[prompt] = filtered_queries
+    return filtered_results
+
+
 def _load_hardware_noise_stats() -> dict[str, dict[int, list[float]]]:
     """Load and compute hardware noise stats: {model: {rank: [stds per prompt]}}."""
     model_stats: dict[str, dict[int, list[float]]] = {}
 
     for path in sorted(DATA_DIR.glob("*.json")):
         results = load_existing_results(path)
+        results = filter_results(results)
         model_name = path.stem
         model_stats[model_name] = {1: [], 2: [], 3: [], 4: [], 5: []}
 
