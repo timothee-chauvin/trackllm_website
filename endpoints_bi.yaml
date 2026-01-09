@@ -1,5 +1,17 @@
 endpoints_bi:
 - api: openrouter
+  model: liquid/lfm-2.2-6b
+  provider: liquid
+  cost:
+  - 0.01
+  - 0.02
+- api: openrouter
+  model: liquid/lfm2-8b-a1b
+  provider: liquid
+  cost:
+  - 0.01
+  - 0.02
+- api: openrouter
   model: meta-llama/llama-3.2-3b-instruct
   provider: deepinfra/bf16
   cost:
@@ -29,12 +41,6 @@ endpoints_bi:
   cost:
   - 0.02
   - 0.05
-- api: openrouter
-  model: openai/gpt-oss-20b
-  provider: gmicloud/fp4
-  cost:
-  - 0.016
-  - 0.06
 - api: openrouter
   model: meta-llama/llama-3-8b-instruct
   provider: novita/bf16
@@ -108,12 +114,6 @@ endpoints_bi:
   - 0.049
   - 0.049
 - api: openrouter
-  model: google/gemma-3-27b-it
-  provider: gmicloud/bf16
-  cost:
-  - 0.036
-  - 0.064
-- api: openrouter
   model: sao10k/l3-lunaris-8b
   provider: novita/bf16
   cost:
@@ -180,12 +180,6 @@ endpoints_bi:
   - 0.02
   - 0.1
 - api: openrouter
-  model: openai/gpt-oss-120b
-  provider: gmicloud/fp4
-  cost:
-  - 0.02
-  - 0.1
-- api: openrouter
   model: openai/gpt-oss-20b
   provider: chutes/bf16
   cost:
@@ -235,6 +229,12 @@ endpoints_bi:
   - 0.11
 - api: openrouter
   model: qwen/qwen-2.5-7b-instruct
+  provider: atlas-cloud/fp8
+  cost:
+  - 0.04
+  - 0.1
+- api: openrouter
+  model: qwen/qwen-2.5-7b-instruct
   provider: phala
   cost:
   - 0.04
@@ -254,18 +254,6 @@ endpoints_bi:
 - api: openrouter
   model: google/gemma-3-12b-it
   provider: novita/bf16
-  cost:
-  - 0.05
-  - 0.1
-- api: openrouter
-  model: liquid/lfm-2.2-6b
-  provider: liquid
-  cost:
-  - 0.05
-  - 0.1
-- api: openrouter
-  model: liquid/lfm2-8b-a1b
-  provider: liquid
   cost:
   - 0.05
   - 0.1
@@ -332,6 +320,12 @@ endpoints_bi:
 - api: openrouter
   model: google/gemma-3-27b-it
   provider: chutes/bf16
+  cost:
+  - 0.04
+  - 0.15
+- api: openrouter
+  model: openai/gpt-oss-20b
+  provider: gmicloud/fp4
   cost:
   - 0.04
   - 0.15
@@ -529,6 +523,12 @@ endpoints_bi:
   - 0.16
 - api: openrouter
   model: google/gemma-3-27b-it
+  provider: gmicloud/bf16
+  cost:
+  - 0.09
+  - 0.16
+- api: openrouter
+  model: google/gemma-3-27b-it
   provider: ncompass/fp8
   cost:
   - 0.09
@@ -655,6 +655,12 @@ endpoints_bi:
   - 0.24
 - api: openrouter
   model: openai/gpt-oss-120b
+  provider: gmicloud/fp4
+  cost:
+  - 0.05
+  - 0.25
+- api: openrouter
+  model: openai/gpt-oss-120b
   provider: novita/fp4
   cost:
   - 0.05
@@ -665,6 +671,12 @@ endpoints_bi:
   cost:
   - 0.06
   - 0.24
+- api: openrouter
+  model: qwen/qwen3-8b
+  provider: atlas-cloud/fp8
+  cost:
+  - 0.05
+  - 0.25
 - api: openrouter
   model: allenai/olmo-3-7b-instruct
   provider: parasail/bf16
@@ -1194,6 +1206,12 @@ endpoints_bi:
   - 0.13
   - 0.4
 - api: openrouter
+  model: qwen/qwen3-30b-a3b
+  provider: atlas-cloud/fp8
+  cost:
+  - 0.08
+  - 0.45
+- api: openrouter
   model: qwen/qwen3-235b-a22b-2507
   provider: deepinfra/fp8
   cost:
@@ -1277,12 +1295,6 @@ endpoints_bi:
   cost:
   - 0.3
   - 0.3
-- api: openrouter
-  model: minimax/minimax-m2.1
-  provider: gmicloud/fp8
-  cost:
-  - 0.12
-  - 0.48
 - api: openrouter
   model: mistralai/mistral-nemo
   provider: azure
@@ -1386,12 +1398,6 @@ endpoints_bi:
   - 0.15
   - 0.5
 - api: openrouter
-  model: qwen/qwen3-next-80b-a3b-instruct
-  provider: gmicloud/fp8
-  cost:
-  - 0.06
-  - 0.6
-- api: openrouter
   model: deepseek/deepseek-v3.2
   provider: novita/fp8
   cost:
@@ -1433,12 +1439,6 @@ endpoints_bi:
   cost:
   - 0.28
   - 0.4
-- api: openrouter
-  model: qwen/qwen3-vl-235b-a22b-instruct
-  provider: gmicloud/fp8
-  cost:
-  - 0.12
-  - 0.56
 - api: openrouter
   model: deepseek/deepseek-v3.2
   provider: siliconflow/fp8
@@ -1728,6 +1728,12 @@ endpoints_bi:
   - 0.38
   - 0.4
 - api: openrouter
+  model: allenai/olmo-3.1-32b-instruct
+  provider: deepinfra
+  cost:
+  - 0.2
+  - 0.6
+- api: openrouter
   model: meta-llama/llama-3-70b-instruct
   provider: hyperbolic
   cost:
@@ -1775,12 +1781,6 @@ endpoints_bi:
   cost:
   - 0.2
   - 0.6
-- api: openrouter
-  model: moonshotai/kimi-k2-thinking
-  provider: gmicloud/int4
-  cost:
-  - 0.32
-  - 0.48
 - api: openrouter
   model: nvidia/nemotron-nano-12b-v2-vl
   provider: deepinfra/fp8
@@ -1943,12 +1943,6 @@ endpoints_bi:
   cost:
   - 0.48
   - 0.48
-- api: openrouter
-  model: z-ai/glm-4.7
-  provider: gmicloud/fp8
-  cost:
-  - 0.16
-  - 0.8
 - api: openrouter
   model: z-ai/glm-4.5-air
   provider: novita/bf16
@@ -2629,6 +2623,12 @@ endpoints_bi:
   - 1.2
 - api: openrouter
   model: minimax/minimax-m2.1
+  provider: gmicloud/fp8
+  cost:
+  - 0.3
+  - 1.2
+- api: openrouter
+  model: minimax/minimax-m2.1
   provider: minimax/fp8
   cost:
   - 0.3
@@ -2713,6 +2713,12 @@ endpoints_bi:
   - 1.5
 - api: openrouter
   model: qwen/qwen3-next-80b-a3b-instruct
+  provider: gmicloud/fp8
+  cost:
+  - 0.15
+  - 1.5
+- api: openrouter
+  model: qwen/qwen3-next-80b-a3b-instruct
   provider: novita/bf16
   cost:
   - 0.15
@@ -2747,6 +2753,12 @@ endpoints_bi:
   cost:
   - 0.42
   - 1.25
+- api: openrouter
+  model: qwen/qwen3-vl-235b-a22b-instruct
+  provider: gmicloud/fp8
+  cost:
+  - 0.3
+  - 1.4
 - api: openrouter
   model: sao10k/l3.1-euryale-70b
   provider: deepinfra/fp8
@@ -2939,6 +2951,12 @@ endpoints_bi:
   cost:
   - 0.5
   - 1.5
+- api: openrouter
+  model: moonshotai/kimi-k2-thinking
+  provider: gmicloud/int4
+  cost:
+  - 0.8
+  - 1.2
 - api: openrouter
   model: morph/morph-v3-fast
   provider: morph
@@ -3228,6 +3246,12 @@ endpoints_bi:
   - 0.6
   - 1.8
 - api: openrouter
+  model: z-ai/glm-4.7
+  provider: gmicloud/fp8
+  cost:
+  - 0.4
+  - 2.0
+- api: openrouter
   model: aion-labs/aion-rp-llama-3.1-8b
   provider: aion-labs
   cost:
@@ -3276,6 +3300,12 @@ endpoints_bi:
   - 1.25
   - 1.25
 - api: openrouter
+  model: qwen/qwen3-235b-a22b-thinking-2507
+  provider: atlas-cloud/fp8
+  cost:
+  - 0.2
+  - 2.3
+- api: openrouter
   model: qwen/qwen3-coder
   provider: wandb/bf16
   cost:
@@ -3305,6 +3335,12 @@ endpoints_bi:
   cost:
   - 0.45
   - 2.1
+- api: openrouter
+  model: deepseek/deepseek-r1-0528
+  provider: atlas-cloud/fp8
+  cost:
+  - 0.45
+  - 2.15
 - api: openrouter
   model: minimax/minimax-m1
   provider: minimax
