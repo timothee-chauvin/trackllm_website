@@ -5,12 +5,14 @@ helping identify hardware-induced noise in logprob values.
 """
 
 import asyncio
+import math
 import time
 from collections import deque
 from dataclasses import dataclass, field
 from pathlib import Path
 
 import orjson
+import plotly.graph_objects as go
 from aiolimiter import AsyncLimiter
 from tqdm import tqdm
 
@@ -245,19 +247,16 @@ async def main() -> None:
     logger.info("Hardware noise collection complete")
 
 
-def print_hardware_noise_stats() -> None:
-    """Analyze hardware noise: std of top logprobs across repeated queries."""
-    import math
+def _compute_stats(values: list[float]) -> tuple[float, float]:
+    if not values:
+        return 0.0, 0.0
+    mean = sum(values) / len(values)
+    variance = sum((x - mean) ** 2 for x in values) / len(values)
+    return mean, math.sqrt(variance)
 
-    def compute_stats(values: list[float]) -> tuple[float, float]:
-        if not values:
-            return 0.0, 0.0
-        mean = sum(values) / len(values)
-        variance = sum((x - mean) ** 2 for x in values) / len(values)
-        std = math.sqrt(variance)
-        return mean, std
 
-    # {model: {rank: [stds per prompt]}}
+def _load_hardware_noise_stats() -> dict[str, dict[int, list[float]]]:
+    """Load and compute hardware noise stats: {model: {rank: [stds per prompt]}}."""
     model_stats: dict[str, dict[int, list[float]]] = {}
 
     for path in sorted(DATA_DIR.glob("*.json")):
@@ -269,7 +268,6 @@ def print_hardware_noise_stats() -> None:
             if len(queries) < 2:
                 continue
 
-            # For each query, get top 5 logprobs (sorted descending)
             top_logprobs_by_query = []
             for query_result in queries:
                 sorted_lps = sorted(
@@ -282,11 +280,17 @@ def print_hardware_noise_stats() -> None:
             if len(top_logprobs_by_query) < 2:
                 continue
 
-            # Compute std across queries for each rank position
             for rank in [1, 2, 3, 4, 5]:
                 values = [q[rank - 1] for q in top_logprobs_by_query]
-                _, std = compute_stats(values)
+                _, std = _compute_stats(values)
                 model_stats[model_name][rank].append(std)
+
+    return model_stats
+
+
+def print_hardware_noise_stats() -> None:
+    """Analyze hardware noise: std of top logprobs across repeated queries."""
+    model_stats = _load_hardware_noise_stats()
 
     print("\n=== Hardware Noise: Standard Deviation of Top Logprobs ===\n")
     print("std = standard deviation across repeated queries for the same prompt")
@@ -307,7 +311,7 @@ def print_hardware_noise_stats() -> None:
         if n == 0:
             continue
 
-        mean_stds = [compute_stats(stats[r])[0] for r in [1, 2, 3, 4, 5]]
+        mean_stds = [_compute_stats(stats[r])[0] for r in [1, 2, 3, 4, 5]]
 
         for r in [1, 2, 3, 4, 5]:
             all_stds[r].extend(stats[r])
@@ -319,7 +323,7 @@ def print_hardware_noise_stats() -> None:
         )
 
     print("-" * 136)
-    agg_means = [compute_stats(all_stds[r])[0] for r in [1, 2, 3, 4, 5]]
+    agg_means = [_compute_stats(all_stds[r])[0] for r in [1, 2, 3, 4, 5]]
     print(
         f"{'AGGREGATED':<60} {len(all_stds[1]):>6}  "
         f"{agg_means[0]:>12.6f}  {agg_means[1]:>12.6f}  {agg_means[2]:>12.6f}  "
@@ -327,6 +331,54 @@ def print_hardware_noise_stats() -> None:
     )
 
 
+def plot_hardware_noise(output_path: Path | None = None) -> None:
+    """Plot hardware noise: std of top logprobs across repeated queries."""
+    model_stats = _load_hardware_noise_stats()
+    sorted_models = sorted(model_stats.keys())
+    labels = [slugify(m, max_length=20, hash_length=4) for m in sorted_models]
+
+    colors = ["steelblue", "coral", "green", "purple", "orange"]
+
+    fig = go.Figure()
+
+    for rank in [1, 2, 3, 4, 5]:
+        mean_stds = [_compute_stats(model_stats[m][rank])[0] for m in sorted_models]
+        fig.add_trace(
+            go.Scatter(
+                x=labels,
+                y=mean_stds,
+                mode="lines+markers",
+                name=f"std(top{rank})",
+                marker={"color": colors[rank - 1], "size": 8},
+                line={"color": colors[rank - 1]},
+            )
+        )
+
+    fig.update_layout(
+        title="Hardware Noise: Std of Top Logprobs Across Repeated Queries",
+        xaxis_title="Model",
+        yaxis_title="Standard deviation",
+        height=600,
+        width=max(1000, len(labels) * 40),
+        showlegend=True,
+        legend={
+            "orientation": "h",
+            "yanchor": "bottom",
+            "y": 1.02,
+            "xanchor": "center",
+            "x": 0.5,
+        },
+    )
+    fig.update_xaxes(tickangle=45)
+
+    if output_path:
+        fig.write_image(output_path)
+        print(f"Saved figure to {output_path}")
+    else:
+        fig.show()
+
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    # asyncio.run(main())
     # print_hardware_noise_stats()
+    plot_hardware_noise(output_path=Path("hardware_noise.pdf"))
