@@ -25,6 +25,7 @@ from trackllm_website.util import slugify
 
 NUM_PROMPTS = 1000
 DATA_DIR = config.bi.data_dir / "logprob_stats"
+BORDER_THRESHOLD = 1e-5
 
 
 def get_output_path(endpoint: Endpoint) -> Path:
@@ -333,8 +334,12 @@ def print_logprob_stats() -> None:
     print(f"Kendall's tau:        τ = {kendall_tau:.4f}, p = {kendall_p:.2e}")
 
 
-def plot_logprob_stats(output_path: Path | None = None) -> None:
-    """Plot logprob difference statistics and correlation tests."""
+def _collect_border_stats(
+    threshold: float = BORDER_THRESHOLD,
+) -> tuple[dict[str, tuple[list[float], list[float]]], list[float], list[float]]:
+    """Collect stats for requests where diff_1_2 < threshold (border inputs)."""
+    all_diff_1_2: list[float] = []
+    all_diff_2_3: list[float] = []
     model_stats: dict[str, tuple[list[float], list[float]]] = {}
 
     for path in sorted(DATA_DIR.glob("*.json")):
@@ -350,11 +355,26 @@ def plot_logprob_stats(output_path: Path | None = None) -> None:
             )
             if len(sorted_lps) < 3:
                 continue
-            diff_1_2.append(sorted_lps[0] - sorted_lps[1])
+            d12 = sorted_lps[0] - sorted_lps[1]
+            if d12 >= threshold:
+                continue
+            diff_1_2.append(d12)
             diff_2_3.append(sorted_lps[1] - sorted_lps[2])
 
         if diff_1_2:
             model_stats[model_name] = (diff_1_2, diff_2_3)
+            all_diff_1_2.extend(diff_1_2)
+            all_diff_2_3.extend(diff_2_3)
+
+    return model_stats, all_diff_1_2, all_diff_2_3
+
+
+def plot_logprob_stats(
+    output_path: Path | None = None, border_threshold: float = BORDER_THRESHOLD
+) -> None:
+    """Plot logprob difference statistics and correlation tests."""
+    model_stats, _, _ = _collect_border_stats(float("inf"))
+    border_stats, _, _ = _collect_border_stats(border_threshold)
 
     def compute_mean_std(values: list[float]) -> tuple[float, float]:
         if not values:
@@ -373,6 +393,18 @@ def plot_logprob_stats(output_path: Path | None = None) -> None:
     mean_23 = [compute_mean_std(model_stats[m][1])[0] for m in sorted_models]
     std_23 = [compute_mean_std(model_stats[m][1])[1] for m in sorted_models]
 
+    # Border inputs: diff_2_3 stats (only for models that have border inputs)
+    border_mean_23 = []
+    border_std_23 = []
+    for m in sorted_models:
+        if m in border_stats:
+            mean, std = compute_mean_std(border_stats[m][1])
+            border_mean_23.append(mean)
+            border_std_23.append(std)
+        else:
+            border_mean_23.append(None)
+            border_std_23.append(None)
+
     pearson_rs = [
         stats.pearsonr(model_stats[m][0], model_stats[m][1])[0] for m in sorted_models
     ]
@@ -384,13 +416,14 @@ def plot_logprob_stats(output_path: Path | None = None) -> None:
     ]
 
     fig = make_subplots(
-        rows=2,
+        rows=3,
         cols=1,
         subplot_titles=[
             "Logprob Differences (mean ± std)",
             "Correlation: diff_1_2 vs diff_2_3",
+            f"diff_2_3: All inputs vs Border inputs (diff_1_2 < {border_threshold})",
         ],
-        vertical_spacing=0.15,
+        vertical_spacing=0.1,
     )
 
     # Subplot 1: diff_1_2 and diff_2_3 with error bars
@@ -456,17 +489,49 @@ def plot_logprob_stats(output_path: Path | None = None) -> None:
         col=1,
     )
 
+    # Subplot 3: diff_2_3 comparison (all vs border)
+    fig.add_trace(
+        go.Scatter(
+            x=labels,
+            y=mean_23,
+            error_y={"type": "data", "array": std_23, "visible": True},
+            mode="lines+markers",
+            name="diff_2_3 (all)",
+            marker={"color": "coral", "size": 8},
+            line={"color": "coral"},
+            legendgroup="subplot3",
+        ),
+        row=3,
+        col=1,
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=labels,
+            y=border_mean_23,
+            error_y={"type": "data", "array": border_std_23, "visible": True},
+            mode="lines+markers",
+            name="diff_2_3 (border)",
+            marker={"color": "darkgreen", "size": 8},
+            line={"color": "darkgreen"},
+            legendgroup="subplot3",
+        ),
+        row=3,
+        col=1,
+    )
+
     # Add horizontal line at y=0 for correlation subplot
     fig.add_hline(y=0, line_dash="dash", line_color="gray", row=2, col=1)
 
     fig.update_yaxes(title_text="Logprob difference", row=1, col=1)
     fig.update_yaxes(title_text="Correlation coefficient", row=2, col=1)
+    fig.update_yaxes(title_text="Logprob difference", row=3, col=1)
     fig.update_xaxes(showticklabels=False, row=1, col=1)
-    fig.update_xaxes(tickangle=45, row=2, col=1)
+    fig.update_xaxes(showticklabels=False, row=2, col=1)
+    fig.update_xaxes(tickangle=45, row=3, col=1)
 
     fig.update_layout(
         title="Logprob Statistics by Endpoint",
-        height=900,
+        height=1200,
         width=max(1000, len(labels) * 40),
         showlegend=True,
         legend={
