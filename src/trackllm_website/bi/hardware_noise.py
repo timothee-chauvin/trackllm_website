@@ -24,8 +24,8 @@ from trackllm_website.bi.phase_1 import get_input_tokens
 from trackllm_website.config import Endpoint, config, logger
 from trackllm_website.util import slugify
 
-NUM_PROMPTS = 10
-QUERIES_PER_PROMPT = 10
+NUM_PROMPTS = 100
+QUERIES_PER_PROMPT = 20
 DATA_DIR = config.bi.data_dir / "logprob_stats_noise"
 
 
@@ -245,5 +245,88 @@ async def main() -> None:
     logger.info("Hardware noise collection complete")
 
 
+def print_hardware_noise_stats() -> None:
+    """Analyze hardware noise: std of top logprobs across repeated queries."""
+    import math
+
+    def compute_stats(values: list[float]) -> tuple[float, float]:
+        if not values:
+            return 0.0, 0.0
+        mean = sum(values) / len(values)
+        variance = sum((x - mean) ** 2 for x in values) / len(values)
+        std = math.sqrt(variance)
+        return mean, std
+
+    # {model: {rank: [stds per prompt]}}
+    model_stats: dict[str, dict[int, list[float]]] = {}
+
+    for path in sorted(DATA_DIR.glob("*.json")):
+        results = load_existing_results(path)
+        model_name = path.stem
+        model_stats[model_name] = {1: [], 2: [], 3: [], 4: [], 5: []}
+
+        for _, queries in results.items():
+            if len(queries) < 2:
+                continue
+
+            # For each query, get top 5 logprobs (sorted descending)
+            top_logprobs_by_query = []
+            for query_result in queries:
+                sorted_lps = sorted(
+                    [lp["logprob"] for lp in query_result if lp["logprob"] > -100],
+                    reverse=True,
+                )[:5]
+                if len(sorted_lps) >= 5:
+                    top_logprobs_by_query.append(sorted_lps)
+
+            if len(top_logprobs_by_query) < 2:
+                continue
+
+            # Compute std across queries for each rank position
+            for rank in [1, 2, 3, 4, 5]:
+                values = [q[rank - 1] for q in top_logprobs_by_query]
+                _, std = compute_stats(values)
+                model_stats[model_name][rank].append(std)
+
+    print("\n=== Hardware Noise: Standard Deviation of Top Logprobs ===\n")
+    print("std = standard deviation across repeated queries for the same prompt")
+    print("Lower values = more deterministic logprobs\n")
+
+    print(
+        f"{'Model':<60} {'n':>6}  "
+        f"{'std(top1)':>12}  {'std(top2)':>12}  {'std(top3)':>12}  "
+        f"{'std(top4)':>12}  {'std(top5)':>12}"
+    )
+    print("-" * 136)
+
+    all_stds: dict[int, list[float]] = {1: [], 2: [], 3: [], 4: [], 5: []}
+
+    for model_name in sorted(model_stats.keys()):
+        stats = model_stats[model_name]
+        n = len(stats[1])
+        if n == 0:
+            continue
+
+        mean_stds = [compute_stats(stats[r])[0] for r in [1, 2, 3, 4, 5]]
+
+        for r in [1, 2, 3, 4, 5]:
+            all_stds[r].extend(stats[r])
+
+        print(
+            f"{model_name:<60} {n:>6}  "
+            f"{mean_stds[0]:>12.6f}  {mean_stds[1]:>12.6f}  {mean_stds[2]:>12.6f}  "
+            f"{mean_stds[3]:>12.6f}  {mean_stds[4]:>12.6f}"
+        )
+
+    print("-" * 136)
+    agg_means = [compute_stats(all_stds[r])[0] for r in [1, 2, 3, 4, 5]]
+    print(
+        f"{'AGGREGATED':<60} {len(all_stds[1]):>6}  "
+        f"{agg_means[0]:>12.6f}  {agg_means[1]:>12.6f}  {agg_means[2]:>12.6f}  "
+        f"{agg_means[3]:>12.6f}  {agg_means[4]:>12.6f}"
+    )
+
+
 if __name__ == "__main__":
     asyncio.run(main())
+    # print_hardware_noise_stats()
