@@ -2376,6 +2376,12 @@ endpoints_bi:
   - 0.27
   - 1.0
 - api: openrouter
+  model: nex-agi/deepseek-v3.1-nex-n1
+  provider: siliconflow/fp8
+  cost:
+  - 0.27
+  - 1.0
+- api: openrouter
   model: minimax/minimax-m2
   provider: deepinfra/fp8
   cost:
@@ -3313,7 +3319,7 @@ endpoints_bi:
   - 1.5
 - api: openrouter
   model: z-ai/glm-4.7
-  provider: novita/bf16
+  provider: novita/fp8
   cost:
   - 0.54
   - 1.98
