@@ -242,15 +242,41 @@ async def query_and_record(
 
 
 def log_status(states: list[EndpointState]) -> None:
-    """Log status for each endpoint."""
+    """Log status for each endpoint in a dynamic table format."""
     total_estimated_cost = 0.0
+
+    # 1. Calculate dynamic width for the Endpoint column
+    # We default to 20 if the list is empty or names are short to keep a minimum width
+    if states:
+        max_name_len = max(len(str(s.endpoint)) for s in states)
+        col_width = max(max_name_len + 2, 20)  # +2 for padding
+    else:
+        col_width = 20
+
+    # 2. Define Dynamic Format String
+    # {col_width} injects the calculated width into the format string
+    fmt = f"{{:<{col_width}}} {{:>20}} {{:>18}} {{:>10}} {{:>10}} {{:>12}}"
+
+    # 3. Print Header
+    headers = ["Endpoint", "Tokens", "Border (BI%)", "RPS", "429s", "Est. Cost"]
+
+    # Calculate separator length based on the sum of fixed columns (approx 70) + dynamic col_width
+    separator_len = col_width + 75
+    separator = "-" * separator_len
+
+    logger.info(separator)
+    logger.info(fmt.format(*headers))
+    logger.info(separator)
+
     for state in states:
         completed_tokens = state.get_completed_tokens()
         border_tokens = state.get_border_tokens()
         total_tokens = len(state.input_tokens)
         rate_limits = state.get_recent_rate_limits()
         rps = state.get_requests_per_second()
+
         bi_pct = border_tokens / completed_tokens if completed_tokens else 0
+
         avg_cost = (
             sum(state.recent_costs) / len(state.recent_costs)
             if state.recent_costs
@@ -258,11 +284,27 @@ def log_status(states: list[EndpointState]) -> None:
         )
         estimated_cost = avg_cost * state.total_queries
         total_estimated_cost += estimated_cost
+
+        # --- Formatting Data Fields ---
+        token_str = f"{completed_tokens}/{total_tokens}"
+        border_str = f"{border_tokens} ({bi_pct:.1%})"
+        rps_str = f"{rps:.1f}"
+        cost_str = f"${estimated_cost:.4f}"
+
+        # --- Log the Row ---
         logger.info(
-            f"{state.endpoint}: {completed_tokens}/{total_tokens} tokens, "
-            f"{border_tokens} ({bi_pct:.1%}) BI, {rps:.1f} rps, {rate_limits} recent 429s, "
-            f"est. ${estimated_cost:.4f}"
+            fmt.format(
+                str(state.endpoint),
+                token_str,
+                border_str,
+                rps_str,
+                rate_limits,
+                cost_str,
+            )
         )
+
+    # 4. Footer
+    logger.info(separator)
     logger.info(f"Total estimated cost: ${total_estimated_cost:.4f}")
 
 
