@@ -29,14 +29,14 @@ def load_all_phase1_results(
 
 
 def compute_stats(
-    results: dict[int, dict[str, dict[str, int]]],
+    endpoint_results: dict[int, dict[str, dict[str, int]]],
 ) -> tuple[int, int, int]:
     """Compute stats for an endpoint's results.
 
     Returns (total_samples, total_tokens, border_tokens).
     """
     merged: dict[str, dict[str, int]] = {}
-    for token_results in results.values():
+    for token_results in endpoint_results.values():
         for token, outputs in token_results.items():
             if token not in merged:
                 merged[token] = {}
