@@ -99,8 +99,11 @@ def plot_border_input_fractions(
         ]
     )
 
+    endpoints_above_threshold = sum(1 for f in fractions if f >= 0.5)
+    above_threshold_frac = endpoints_above_threshold / len(labels)
+    above_threshold_str = f"{above_threshold_frac:.1%} ({endpoints_above_threshold}/{len(labels)}) endpoints with ≥0.5% border inputs"
     fig.update_layout(
-        title=f"Fraction of Border Inputs by Endpoint (T={temperature:g}, min {min_samples} samples)",
+        title=f"Fraction of Border Inputs by Endpoint (T={temperature:g}, min {min_samples} samples)<br><sup>{above_threshold_str}</sup>",
         xaxis_title="Endpoint",
         yaxis_title="Border Inputs (%)",
         yaxis_range=[0, 100],
