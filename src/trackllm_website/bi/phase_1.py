@@ -20,15 +20,6 @@ from trackllm_website.config import Endpoint, config, logger
 from trackllm_website.util import slugify
 
 
-def get_first_endpoint_per_provider() -> list[Endpoint]:
-    """Get first endpoint for each provider."""
-    provider_to_first: dict[str, Endpoint] = {}
-    for endpoint in config.endpoints_bi:
-        if endpoint.provider_without_suffix not in provider_to_first:
-            provider_to_first[endpoint.provider_without_suffix] = endpoint
-    return list(provider_to_first.values())
-
-
 def get_input_tokens(
     endpoint: Endpoint,
     tokenizer_index: dict[str, str],
@@ -320,7 +311,7 @@ async def main(temperature: float) -> None:
         f"Loaded {len(tokenizer_index)} tokenizers, {len(fallback_tokens)} fallback tokens"
     )
 
-    endpoints = get_first_endpoint_per_provider()
+    endpoints = config.endpoints_bi_phase_1
     logger.info(f"Running phase 1 for {len(endpoints)} endpoints")
 
     requests_per_second = config.bi.phase_1.requests_per_second_per_endpoint

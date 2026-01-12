@@ -99,8 +99,13 @@ class ApiConfig(BaseModel):
 class Config(BaseSettings):
     endpoints_yaml_path_lt: Path = root / "endpoints_lt.yaml"
     endpoints_yaml_path_bi: Path = root / "endpoints_bi.yaml"
+    endpoints_yaml_path_bi_phase_1: Path = root / "endpoints_bi_phase_1.yaml"
     model_config = SettingsConfigDict(
-        yaml_file=[endpoints_yaml_path_lt, endpoints_yaml_path_bi],
+        yaml_file=[
+            endpoints_yaml_path_lt,
+            endpoints_yaml_path_bi,
+            endpoints_yaml_path_bi_phase_1,
+        ],
         toml_file=root / "config.toml",
         env_file=root / ".env",
     )
@@ -112,9 +117,10 @@ class Config(BaseSettings):
     data_dir: Path
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 
-    # read from endpoints_[lt|bi].yaml
+    # read from endpoints_....yaml
     endpoints_lt: list[Endpoint]
     endpoints_bi: list[Endpoint]
+    endpoints_bi_phase_1: list[Endpoint]
 
     # read from .env
     openrouter_api_key: str
