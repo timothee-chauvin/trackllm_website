@@ -56,10 +56,10 @@ def get_input_tokens_for_endpoint(
     )
 
 
-def get_output_path(endpoint: Endpoint) -> Path:
+def get_output_path(endpoint: Endpoint, temperature: float) -> Path:
     """Get the output JSON path for an endpoint."""
     return (
-        config.bi.phase_1_dir
+        config.bi.get_phase_1_dir(temperature)
         / f"{slugify(f'{endpoint.model}#{endpoint.provider}')}.json"
     )
 
@@ -91,6 +91,7 @@ class EndpointState:
     output_path: Path
     rate_limiter: AsyncLimiter
     concurrency_semaphore: asyncio.Semaphore
+    temperature: float
     results: dict[int, dict[str, dict[str, int]]] = field(default_factory=dict)
     request_timestamps: deque[float] = field(default_factory=lambda: deque(maxlen=100))
     rate_limit_timestamps: deque[float] = field(
@@ -219,7 +220,11 @@ async def query_and_record(
                 state.rate_limit_timestamps.append(time.monotonic())
 
         response = await client.query(
-            state.endpoint, token, temperature=0, logprobs=False, on_retry=on_retry
+            state.endpoint,
+            token,
+            temperature=state.temperature,
+            logprobs=False,
+            on_retry=on_retry,
         )
         state.completed_queries += 1
         if response.error:
@@ -261,9 +266,11 @@ def log_status(states: list[EndpointState]) -> None:
     logger.info(f"Total estimated cost: ${total_estimated_cost:.4f}")
 
 
-async def main() -> None:
-    config.bi.phase_1_dir.mkdir(parents=True, exist_ok=True)
+async def main(temperature: float) -> None:
+    phase_1_dir = config.bi.get_phase_1_dir(temperature)
+    phase_1_dir.mkdir(parents=True, exist_ok=True)
 
+    logger.info(f"Running phase 1 with temperature={temperature:g}")
     logger.info("Loading tokenizer index and computing fallback tokens...")
     tokenizer_index = load_existing_index()
     fallback_tokens = get_best_single_token_strings()
@@ -284,9 +291,10 @@ async def main() -> None:
             input_tokens=get_input_tokens_for_endpoint(
                 ep, tokenizer_index, fallback_tokens
             ),
-            output_path=get_output_path(ep),
+            output_path=get_output_path(ep, temperature),
             rate_limiter=AsyncLimiter(requests_per_second, 1),
             concurrency_semaphore=asyncio.Semaphore(max_concurrent),
+            temperature=temperature,
         )
         for ep in endpoints
     ]
@@ -334,4 +342,5 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    TEMPERATURE = 0.0
+    asyncio.run(main(TEMPERATURE))

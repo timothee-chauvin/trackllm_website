@@ -77,9 +77,10 @@ class BIConfig(BaseModel):
     def tokenizers_dir(self) -> Path:
         return self.data_dir / "tokenizers"
 
-    @property
-    def phase_1_dir(self) -> Path:
-        return self.data_dir / "phase_1"
+    def get_phase_1_dir(self, temperature: float | int) -> Path:
+        if temperature == 0:
+            return self.data_dir / "phase_1" / "T=0"
+        return self.data_dir / "phase_1" / f"T={temperature:g}"
 
 
 class ApiConfig(BaseModel):
