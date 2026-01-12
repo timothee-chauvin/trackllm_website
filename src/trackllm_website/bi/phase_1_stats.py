@@ -119,7 +119,91 @@ def plot_border_input_fractions(
     print(f"Saved figure to {output_path}")
 
 
+def get_border_inputs(
+    endpoint_results: dict[int, dict[str, dict[str, int]]],
+) -> list[tuple[int, str]]:
+    """Get all border inputs (token_count, input_token) for an endpoint."""
+    merged: dict[tuple[int, str], dict[str, int]] = {}
+    for token_count, token_results in endpoint_results.items():
+        for token, outputs in token_results.items():
+            key = (token_count, token)
+            if key not in merged:
+                merged[key] = {}
+            for output, count in outputs.items():
+                merged[key][output] = merged[key].get(output, 0) + count
+
+    return [(tc, tok) for (tc, tok), outputs in merged.items() if len(outputs) >= 2]
+
+
+def phase_2_est_cost(
+    temperature: float | int = 0,
+    samples_per_day: int = 100,
+    min_samples: int = MIN_SAMPLES,
+) -> None:
+    """Estimate cost for phase 2 based on phase 1 border inputs.
+
+    Args:
+        temperature: Temperature used in phase 1.
+        samples_per_day: Number of times to sample each border input per day.
+        min_samples: Minimum samples required to include an endpoint.
+    """
+    all_results = load_all_phase1_results(temperature)
+
+    endpoint_costs: dict[str, tuple[float, float]] = {}
+    for endpoint in config.endpoints_bi:
+        slug = slugify(f"{endpoint.model}#{endpoint.provider}")
+        endpoint_costs[slug] = endpoint.cost
+
+    total_cost_per_day = 0.0
+    endpoint_details: list[tuple[str, int, float]] = []
+
+    for endpoint_slug, results in all_results.items():
+        total_samples, total_tokens, border_tokens = compute_stats(results)
+        if total_samples < min_samples:
+            continue
+
+        if endpoint_slug not in endpoint_costs:
+            print(f"Warning: {endpoint_slug} not found in endpoints_bi.yaml")
+            continue
+
+        border_inputs = get_border_inputs(results)
+        if not border_inputs:
+            continue
+
+        input_cost_per_mtok, output_cost_per_mtok = endpoint_costs[endpoint_slug]
+
+        # Each border input: input tokens from token_count, output is 1 token
+        total_input_tokens = sum(tc for tc, _ in border_inputs)
+        total_output_tokens = len(border_inputs)
+
+        daily_input_tokens = total_input_tokens * samples_per_day
+        daily_output_tokens = total_output_tokens * samples_per_day
+
+        daily_cost = (
+            daily_input_tokens * input_cost_per_mtok / 1_000_000
+            + daily_output_tokens * output_cost_per_mtok / 1_000_000
+        )
+        total_cost_per_day += daily_cost
+        endpoint_details.append((endpoint_slug, len(border_inputs), daily_cost))
+
+    endpoint_details.sort(key=lambda x: x[2], reverse=True)
+
+    print(f"Phase 2 cost estimate (T={temperature}, {samples_per_day} samples/day)")
+    print(f"{'Endpoint':<60} {'BIs':>6} {'$/day':>10} {'$/month':>12}")
+    print("-" * 90)
+    for slug, bi_count, daily in endpoint_details:
+        monthly = daily * 30
+        print(f"{slug:<60} {bi_count:>6} {daily:>10.4f} {monthly:>12.2f}")
+    print("-" * 90)
+    monthly_total = total_cost_per_day * 30
+    print(f"{'TOTAL':<60} {'':<6} {total_cost_per_day:>10.4f} {monthly_total:>12.2f}")
+    print(f"\nTotal endpoints: {len(endpoint_details)}")
+    print(f"Total border inputs: {sum(e[1] for e in endpoint_details)}")
+
+
 if __name__ == "__main__":
+    phase_2_est_cost(temperature=0)
+    print()
     for temperature in [0, 1e-10, 1e-5, 1e-2, 1]:
         output_path = Path(f"plots/bi_prevalence/T={temperature}.pdf")
         output_path.parent.mkdir(parents=True, exist_ok=True)
