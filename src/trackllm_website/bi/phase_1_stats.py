@@ -120,11 +120,11 @@ def plot_border_input_fractions(
 
 
 if __name__ == "__main__":
-    TEMPERATURE = 1e-10
-    output_path = Path(f"plots/bi_prevalence/T={TEMPERATURE}.pdf")
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    plot_border_input_fractions(
-        min_samples=MIN_SAMPLES,
-        output_path=output_path,
-        temperature=TEMPERATURE,
-    )
+    for temperature in [0, 1e-10, 1e-5, 1e-2, 1]:
+        output_path = Path(f"plots/bi_prevalence/T={temperature}.pdf")
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        plot_border_input_fractions(
+            min_samples=MIN_SAMPLES,
+            output_path=output_path,
+            temperature=temperature,
+        )
