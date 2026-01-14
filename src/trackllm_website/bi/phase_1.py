@@ -96,6 +96,7 @@ class EndpointState:
     completed_queries: int = 0
     total_queries: int = 0
     got_404: bool = False
+    reached_target: bool = False
     recent_costs: deque[float] = field(default_factory=lambda: deque(maxlen=20))
 
     def __post_init__(self) -> None:
@@ -178,6 +179,9 @@ async def query_single(
     token: str,
 ) -> bool:
     """Execute a single query. Returns False if a 404 error is encountered."""
+    if state.reached_target:
+        return False
+
     if state.got_404:
         return False
 
@@ -212,6 +216,14 @@ async def query_single(
         return True
     state.recent_costs.append(response.cost)
     state.record_result(token, response.content, response.input_tokens)
+    if (
+        state.get_border_tokens()
+        >= config.bi.phase_1.border_input_candidate_ratio
+        * config.bi.phase_1.target_border_inputs
+    ):
+        if state.reached_target is False:
+            logger.info(f"Reached target border inputs for {state.endpoint}")
+        state.reached_target = True
     return True
 
 
@@ -224,6 +236,9 @@ async def query_all_for_token(
 ) -> None:
     """Query endpoint for all pending queries for a single token, with delays between requests."""
     delay = config.bi.phase_1.request_delay_seconds
+    if state.reached_target:
+        pbar.update(pending)
+        return
 
     async with state.pending_before_new_semaphore:
         for i in range(pending):
@@ -317,7 +332,7 @@ async def main(temperature: float) -> None:
         f"Loaded {len(tokenizer_index)} tokenizers, {len(fallback_tokens)} fallback tokens"
     )
 
-    endpoints = config.endpoints_bi_phase_1[:10]
+    endpoints = config.endpoints_bi_phase_1
     logger.info(f"Running phase 1 for {len(endpoints)} endpoints")
 
     requests_per_second = config.bi.phase_1.requests_per_second_per_endpoint
@@ -366,7 +381,7 @@ async def main(temperature: float) -> None:
         for future in asyncio.as_completed(coros):
             await future
             now = time.monotonic()
-            if now - last_status_time >= 1.0:
+            if now - last_status_time >= 5.0:
                 log_status(states)
                 last_status_time = now
 

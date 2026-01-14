@@ -68,6 +68,8 @@ class Phase1Config(BaseModel):
     max_concurrent_requests_per_endpoint: int
     max_concurrent_tokens_per_endpoint: int
     request_delay_seconds: float
+    border_input_candidate_ratio: float
+    target_border_inputs: int
 
 
 class BIConfig(BaseModel):
