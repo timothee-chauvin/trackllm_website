@@ -102,6 +102,18 @@ def download_tokenizer(repo: str) -> list[str] | None:
         # make sure we don't have too much weird stuff in there
         assert token_str.encode("utf-8").decode("utf-8") == token_str
 
+        if token_str.startswith("Ġ") or token_str.startswith("▁"):
+            token_str = " " + token_str[1:]
+
+        # make sure the strings get encoded as a single token
+        tokenized = tokenizer.encode(token_str)
+        if (
+            len(tokenized) == 0
+            or len(tokenized) > 2
+            or (len(tokenized) == 2 and tokenized[0] not in special_ids)
+        ):
+            continue
+
         vocab_set.add(token_str)
 
     # Return sorted list for deterministic hashing
