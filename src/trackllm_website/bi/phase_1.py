@@ -109,6 +109,7 @@ class EndpointState:
     def __post_init__(self) -> None:
         self.results = load_existing_results(self.output_path)
         self._rebuild_cache()
+        self.update_reached_target()
 
     def _rebuild_cache(self) -> None:
         """Rebuild cached state from results."""
@@ -168,6 +169,16 @@ class EndpointState:
             for t in self.input_tokens
             if (pending := self.get_pending_queries(t)) > 0
         ]
+
+    def update_reached_target(self) -> None:
+        if (
+            self.get_border_tokens()
+            >= config.bi.phase_1.border_input_candidate_ratio
+            * config.bi.phase_1.target_border_inputs
+        ):
+            if self.reached_target is False:
+                logger.info(f"Reached target border inputs for {self.endpoint}")
+            self.reached_target = True
 
     def record_result(
         self, token: str, content: str | None, num_input_tokens: int
@@ -242,14 +253,7 @@ async def query_single(
         return True
     state.recent_costs.append(response.cost)
     state.record_result(token, response.content, response.input_tokens)
-    if (
-        state.get_border_tokens()
-        >= config.bi.phase_1.border_input_candidate_ratio
-        * config.bi.phase_1.target_border_inputs
-    ):
-        if state.reached_target is False:
-            logger.info(f"Reached target border inputs for {state.endpoint}")
-        state.reached_target = True
+    state.update_reached_target()
     return True
 
 
@@ -346,11 +350,12 @@ def log_status(states: list[EndpointState]) -> None:
     logger.info(f"Total estimated cost: ${total_estimated_cost:.4f}")
 
 
-async def main(temperature: float) -> None:
+async def phase_1a(temperature: float) -> None:
+    """Phase 1a: Identify candidate border inputs."""
     phase_1_dir = config.bi.get_phase_1_dir(temperature)
     phase_1_dir.mkdir(parents=True, exist_ok=True)
 
-    logger.info(f"Running phase 1 with temperature={temperature:g}")
+    logger.info(f"Running phase 1a with temperature={temperature:g}")
     logger.info("Loading tokenizer index and computing fallback tokens...")
     tokenizer_index = load_existing_index()
     fallback_tokens = get_best_single_token_strings()
@@ -359,7 +364,7 @@ async def main(temperature: float) -> None:
     )
 
     endpoints = config.endpoints_bi_phase_1
-    logger.info(f"Running phase 1 for {len(endpoints)} endpoints")
+    logger.info(f"Running phase 1a for {len(endpoints)} endpoints")
 
     requests_per_second = config.bi.phase_1.requests_per_second_per_endpoint
     max_concurrent_requests = config.bi.phase_1.max_concurrent_requests_per_endpoint
@@ -430,9 +435,9 @@ async def main(temperature: float) -> None:
         if incomplete > 0:
             logger.info(f"{state.endpoint}: {incomplete} incomplete tokens")
 
-    logger.info("Phase 1 complete")
+    logger.info("Phase 1a complete")
 
 
 if __name__ == "__main__":
     TEMPERATURE = 0.0
-    asyncio.run(main(TEMPERATURE))
+    asyncio.run(phase_1a(TEMPERATURE))
