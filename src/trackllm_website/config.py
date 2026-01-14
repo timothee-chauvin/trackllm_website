@@ -65,7 +65,8 @@ class Phase1Config(BaseModel):
     queries_per_token: int
     requests_per_second_per_endpoint: float
     tokens_per_endpoint: int
-    max_concurrent_per_endpoint: int
+    max_concurrent_requests_per_endpoint: int
+    max_concurrent_tokens_per_endpoint: int
     request_delay_seconds: float
 
 

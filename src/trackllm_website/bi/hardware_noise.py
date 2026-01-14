@@ -202,7 +202,7 @@ async def main() -> None:
     )
 
     requests_per_second = config.bi.phase_1.requests_per_second_per_endpoint
-    max_concurrent = config.bi.phase_1.max_concurrent_per_endpoint
+    max_concurrent = config.bi.phase_1.max_concurrent_requests_per_endpoint
 
     states = [
         EndpointState(

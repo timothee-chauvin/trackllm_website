@@ -82,6 +82,7 @@ class EndpointState:
     output_path: Path
     rate_limiter: AsyncLimiter
     concurrency_semaphore: asyncio.Semaphore
+    pending_before_new_semaphore: asyncio.Semaphore
     temperature: float
     results: dict[int, dict[str, dict[str, int]]] = field(default_factory=dict)
     request_timestamps: deque[float] = field(default_factory=lambda: deque(maxlen=100))
@@ -220,16 +221,17 @@ async def query_all_for_token(
     """Query endpoint for all pending queries for a single token, with delays between requests."""
     delay = config.bi.phase_1.request_delay_seconds
 
-    for i in range(pending):
-        if state.got_404:
-            return
-        async with state.concurrency_semaphore:
-            success = await query_single(client, state, token)
-        pbar.update(1)
-        if not success:
-            return
-        if i < pending - 1:
-            await asyncio.sleep(delay)
+    async with state.pending_before_new_semaphore:
+        for i in range(pending):
+            if state.got_404:
+                return
+            async with state.concurrency_semaphore:
+                success = await query_single(client, state, token)
+            pbar.update(1)
+            if not success:
+                return
+            if i < pending - 1:
+                await asyncio.sleep(delay)
 
 
 def log_status(states: list[EndpointState]) -> None:
@@ -315,7 +317,8 @@ async def main(temperature: float) -> None:
     logger.info(f"Running phase 1 for {len(endpoints)} endpoints")
 
     requests_per_second = config.bi.phase_1.requests_per_second_per_endpoint
-    max_concurrent = config.bi.phase_1.max_concurrent_per_endpoint
+    max_concurrent_requests = config.bi.phase_1.max_concurrent_requests_per_endpoint
+    max_concurrent_tokens = config.bi.phase_1.max_concurrent_tokens_per_endpoint
 
     # Create state for each endpoint with its own rate limiter and concurrency semaphore
     states = [
@@ -326,7 +329,8 @@ async def main(temperature: float) -> None:
             ),
             output_path=get_output_path(ep, temperature),
             rate_limiter=AsyncLimiter(requests_per_second, 1),
-            concurrency_semaphore=asyncio.Semaphore(max_concurrent),
+            concurrency_semaphore=asyncio.Semaphore(max_concurrent_requests),
+            pending_before_new_semaphore=asyncio.Semaphore(max_concurrent_tokens),
             temperature=temperature,
         )
         for ep in endpoints
