@@ -29,4 +29,4 @@ max_concurrent_tokens_per_endpoint = 100
 tokens_per_endpoint = 5000
 request_delay_seconds = 5.0
 border_input_candidate_ratio = 2
-target_border_inputs = 2
+target_border_inputs = 30
