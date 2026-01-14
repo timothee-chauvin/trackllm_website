@@ -70,11 +70,20 @@ class Phase1Config(BaseModel):
     request_delay_seconds: float
     border_input_candidate_ratio: float
     target_border_inputs: int
+    queries_per_candidate: int
+
+
+class Phase2Config(BaseModel):
+    queries_per_token: int
+    requests_per_second_per_endpoint: float
+    max_concurrent_requests_per_endpoint: int
+    request_delay_seconds: float
 
 
 class BIConfig(BaseModel):
     data_dir: Path
     phase_1: Phase1Config
+    phase_2: Phase2Config
 
     @property
     def tokenizers_dir(self) -> Path:
@@ -84,6 +93,10 @@ class BIConfig(BaseModel):
         if temperature == 0:
             return self.data_dir / "phase_1" / "T=0"
         return self.data_dir / "phase_1" / f"T={temperature:g}"
+
+    @property
+    def phase_2_dir(self) -> Path:
+        return self.data_dir / "phase_2"
 
 
 class ApiConfig(BaseModel):

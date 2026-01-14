@@ -171,6 +171,19 @@ class EndpointState:
             if (pending := self.get_pending_queries(t)) > 0
         ]
 
+    def get_unfinished_border_inputs(self) -> list[tuple[str, int]]:
+        """Get list of (prompt, pending_count) for border inputs that still need queries."""
+        border_inputs = self.get_border_tokens()
+        results = []
+        for token in border_inputs:
+            pending = (
+                config.bi.phase_1.queries_per_candidate
+                - self._prompt_query_counts[token]
+            )
+            if pending > 0:
+                results.append((token, pending))
+        return results
+
     def update_reached_target(self) -> None:
         if (
             self.get_border_tokens_count()
@@ -437,6 +450,50 @@ async def phase_1a(temperature: float) -> None:
             logger.info(f"{state.endpoint}: {incomplete} incomplete tokens")
 
     logger.info("Phase 1a complete")
+
+
+async def phase_1b(temperature: float) -> None:
+    """Phase 1b: Perform additional sampling of the candidate border inputs and select the best ones."""
+    phase_1_dir = config.bi.get_phase_1_dir(temperature)
+    logger.info(f"Running phase 1b with temperature={temperature:g}")
+    logger.info("Loading tokenizer index and computing fallback tokens...")
+    tokenizer_index = load_existing_index()
+    fallback_tokens = get_best_single_token_strings()
+    logger.info(
+        f"Loaded {len(tokenizer_index)} tokenizers, {len(fallback_tokens)} fallback tokens"
+    )
+
+    endpoints = config.endpoints_bi_phase_1
+    logger.info(f"Running phase 1a for {len(endpoints)} endpoints")
+
+    requests_per_second = config.bi.phase_1.requests_per_second_per_endpoint
+    max_concurrent_requests = config.bi.phase_1.max_concurrent_requests_per_endpoint
+    max_concurrent_tokens = config.bi.phase_1.max_concurrent_tokens_per_endpoint
+
+    states = [
+        EndpointState(
+            endpoint=ep,
+            input_tokens=get_input_tokens_for_endpoint(
+                ep, tokenizer_index, fallback_tokens
+            ),
+            output_path=get_output_path(ep, temperature),
+            rate_limiter=AsyncLimiter(requests_per_second, 1),
+            concurrency_semaphore=asyncio.Semaphore(max_concurrent_requests),
+            pending_before_new_semaphore=asyncio.Semaphore(max_concurrent_tokens),
+            temperature=temperature,
+        )
+        for ep in endpoints
+    ]
+
+    # Create tasks only for the border inputs
+    results = {}
+    for state in states:
+        # TODO do the additional sampling, this is just a mock
+        border_inputs = state.get_border_tokens()
+        results[str(state.endpoint)] = border_inputs
+
+    with open(phase_1_dir / "border_inputs.json", "wb") as f:
+        f.write(orjson.dumps(results))
 
 
 if __name__ == "__main__":
