@@ -384,12 +384,6 @@ endpoints_bi_phase_1:
   - 0.29
   - 0.59
 - api: openrouter
-  model: qwen/qwen3-30b-a3b-instruct-2507
-  provider: alibaba
-  cost:
-  - 0.2
-  - 0.8
-- api: openrouter
   model: qwen/qwen3-235b-a22b-2507
   provider: crusoe/bf16
   cost:
@@ -443,12 +437,6 @@ endpoints_bi_phase_1:
   cost:
   - 0.6
   - 1.2
-- api: openrouter
-  model: qwen/qwen3-coder-flash
-  provider: alibaba
-  cost:
-  - 0.3
-  - 1.5
 - api: openrouter
   model: deepseek/deepseek-chat-v3-0324
   provider: fireworks
