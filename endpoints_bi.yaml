@@ -1458,12 +1458,6 @@ endpoints_bi:
   - 0.09
   - 0.6
 - api: openrouter
-  model: qwen/qwen3-235b-a22b-2507
-  provider: siliconflow/fp8
-  cost:
-  - 0.09
-  - 0.6
-- api: openrouter
   model: qwen/qwen3-30b-a3b
   provider: nextbit/fp8
   cost:
@@ -1907,12 +1901,6 @@ endpoints_bi:
   cost:
   - 0.15
   - 0.75
-- api: openrouter
-  model: deepseek/deepseek-v3.2-speciale
-  provider: parasail/fp8
-  cost:
-  - 0.4
-  - 0.5
 - api: openrouter
   model: qwen/qwen3-next-80b-a3b-instruct
   provider: chutes/bf16
@@ -2629,12 +2617,6 @@ endpoints_bi:
   - 1.2
 - api: openrouter
   model: minimax/minimax-m2.1
-  provider: gmicloud/fp8
-  cost:
-  - 0.3
-  - 1.2
-- api: openrouter
-  model: minimax/minimax-m2.1
   provider: minimax/fp8
   cost:
   - 0.3
@@ -2687,6 +2669,12 @@ endpoints_bi:
   cost:
   - 0.8
   - 0.8
+- api: openrouter
+  model: deepseek/deepseek-v3.2-speciale
+  provider: parasail/fp8
+  cost:
+  - 0.4
+  - 1.2
 - api: openrouter
   model: qwen/qwen-plus
   provider: alibaba
