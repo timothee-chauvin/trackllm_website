@@ -201,8 +201,8 @@ class EndpointState:
     def flush(self) -> None:
         """Save results to disk if there are unsaved changes."""
         if self._unsaved_count > 0:
-            save_results(self.output_path, self.results)
             self._unsaved_count = 0
+            save_results(self.output_path, self.results)
 
 
 async def query_single(
