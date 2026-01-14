@@ -77,6 +77,9 @@ def save_results(path: Path, results: dict[int, dict[str, dict[str, int]]]) -> N
         f.write(orjson.dumps(results_serializable))
 
 
+SAVE_INTERVAL = 20  # Save results to disk every N requests
+
+
 @dataclass
 class EndpointState:
     """Tracks state for a single endpoint."""
@@ -98,9 +101,28 @@ class EndpointState:
     got_404: bool = False
     reached_target: bool = False
     recent_costs: deque[float] = field(default_factory=lambda: deque(maxlen=20))
+    # Cached state to avoid recomputing from results
+    _prompt_query_counts: dict[str, int] = field(default_factory=dict)
+    _prompt_unique_outputs: dict[str, set[str]] = field(default_factory=dict)
+    _unsaved_count: int = 0
 
     def __post_init__(self) -> None:
         self.results = load_existing_results(self.output_path)
+        self._rebuild_cache()
+
+    def _rebuild_cache(self) -> None:
+        """Rebuild cached state from results."""
+        self._prompt_query_counts = {}
+        self._prompt_unique_outputs = {}
+        for token_results in self.results.values():
+            for token, outputs in token_results.items():
+                total = sum(outputs.values())
+                self._prompt_query_counts[token] = (
+                    self._prompt_query_counts.get(token, 0) + total
+                )
+                if token not in self._prompt_unique_outputs:
+                    self._prompt_unique_outputs[token] = set()
+                self._prompt_unique_outputs[token].update(outputs.keys())
 
     def get_requests_per_second(self) -> float:
         """Calculate actual requests per second over the last few seconds."""
@@ -119,36 +141,24 @@ class EndpointState:
         cutoff = now - 5.0
         return sum(1 for t in self.rate_limit_timestamps if t > cutoff)
 
-    def _get_all_prompt_results(self) -> dict[str, dict[str, int]]:
-        """Get merged results across all input token counts."""
-        merged: dict[str, dict[str, int]] = {}
-        for token_results in self.results.values():
-            for token, outputs in token_results.items():
-                if token not in merged:
-                    merged[token] = {}
-                for output, count in outputs.items():
-                    merged[token][output] = merged[token].get(output, 0) + count
-        return merged
-
     def get_completed_tokens(self) -> int:
         """Count tokens that have all queries completed."""
         queries_needed = config.bi.phase_1.queries_per_token
-        results = self._get_all_prompt_results()
         return sum(
             1
             for token in self.input_tokens
-            if sum(results.get(token, {}).values()) >= queries_needed
+            if self._prompt_query_counts.get(token, 0) >= queries_needed
         )
 
     def get_border_tokens(self) -> int:
         """Count tokens that have at least two different outputs."""
-        results = self._get_all_prompt_results()
-        return sum(1 for token, outputs in results.items() if len(outputs) >= 2)
+        return sum(
+            1 for outputs in self._prompt_unique_outputs.values() if len(outputs) >= 2
+        )
 
     def get_pending_queries(self, prompt: str) -> int:
         """Return number of queries still needed for this prompt."""
-        results = self._get_all_prompt_results()
-        existing = sum(results.get(prompt, {}).values())
+        existing = self._prompt_query_counts.get(prompt, 0)
         return max(0, config.bi.phase_1.queries_per_token - existing)
 
     def get_unfinished_prompts(self) -> list[tuple[str, int]]:
@@ -162,7 +172,7 @@ class EndpointState:
     def record_result(
         self, token: str, content: str | None, num_input_tokens: int
     ) -> None:
-        """Record a query result and save."""
+        """Record a query result and update cache. Saves periodically."""
         if content is not None:
             if num_input_tokens not in self.results:
                 self.results[num_input_tokens] = {}
@@ -170,7 +180,23 @@ class EndpointState:
             if token not in results:
                 results[token] = {}
             results[token][content] = results[token].get(content, 0) + 1
+            # Update cache
+            self._prompt_query_counts[token] = (
+                self._prompt_query_counts.get(token, 0) + 1
+            )
+            if token not in self._prompt_unique_outputs:
+                self._prompt_unique_outputs[token] = set()
+            self._prompt_unique_outputs[token].add(content)
+            # Save periodically
+            self._unsaved_count += 1
+            if self._unsaved_count >= SAVE_INTERVAL:
+                self.flush()
+
+    def flush(self) -> None:
+        """Save results to disk if there are unsaved changes."""
+        if self._unsaved_count > 0:
             save_results(self.output_path, self.results)
+            self._unsaved_count = 0
 
 
 async def query_single(
@@ -391,6 +417,9 @@ async def main(temperature: float) -> None:
         with tqdm(total=total_requests, desc="Requests") as pbar:
             await run_with_status(pbar)
     finally:
+        # Flush any remaining unsaved results
+        for state in states:
+            state.flush()
         await client.close()
 
     log_status(states)
