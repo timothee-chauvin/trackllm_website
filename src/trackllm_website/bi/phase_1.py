@@ -146,11 +146,17 @@ class EndpointState:
             if self._prompt_query_counts.get(token, 0) >= queries_needed
         )
 
-    def get_border_tokens(self) -> int:
+    def get_border_tokens_count(self) -> int:
         """Count tokens that have at least two different outputs."""
-        return sum(
-            1 for outputs in self._prompt_unique_outputs.values() if len(outputs) >= 2
-        )
+        return len(self.get_border_tokens())
+
+    def get_border_tokens(self) -> list[str]:
+        """Get list of border inputs."""
+        return [
+            token
+            for token, outputs in self._prompt_unique_outputs.items()
+            if len(outputs) >= 2
+        ]
 
     def get_pending_queries(self, prompt: str) -> int:
         """Return number of queries still needed for this prompt."""
@@ -167,7 +173,7 @@ class EndpointState:
 
     def update_reached_target(self) -> None:
         if (
-            self.get_border_tokens()
+            self.get_border_tokens_count()
             >= config.bi.phase_1.border_input_candidate_ratio
             * config.bi.phase_1.target_border_inputs
         ):
@@ -307,7 +313,7 @@ def log_status(states: list[EndpointState]) -> None:
 
     for state in states:
         completed_tokens = state.get_completed_tokens()
-        border_tokens = state.get_border_tokens()
+        border_tokens = state.get_border_tokens_count()
         total_tokens = len(state.input_tokens)
         rate_limits = state.get_recent_rate_limits()
         rps = state.get_requests_per_second()
