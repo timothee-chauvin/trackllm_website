@@ -3,6 +3,7 @@
 import csv
 import hashlib
 from collections import Counter
+from functools import lru_cache
 from pathlib import Path
 
 from huggingface_hub import login
@@ -203,6 +204,7 @@ def main() -> None:
             logger.info(f"  - {m}")
 
 
+@lru_cache(maxsize=None)
 def load_tokenizer_vocab(tokenizer_hash: str) -> list[str]:
     """Load a tokenizer's vocabulary in order."""
     path = tokenizers_dir / f"{tokenizer_hash}.csv"
