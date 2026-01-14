@@ -1,18 +1,19 @@
-"""Download tokenizers from HuggingFace and save token ID to UTF-8 string mappings."""
+"""Download tokenizers from HuggingFace and save unique token strings."""
 
-import csv
+import base64
 import hashlib
 from collections import Counter
 from functools import lru_cache
 from pathlib import Path
 
+import orjson
 from huggingface_hub import login
 from transformers import AutoTokenizer
 
 from trackllm_website.config import config, logger
 
 tokenizers_dir = config.bi.tokenizers_dir
-index_path = tokenizers_dir / "index.csv"
+index_path = tokenizers_dir / "index.json"
 
 
 def openrouter_to_hf(model: str) -> str | None:
@@ -55,25 +56,26 @@ def setup_hf_auth() -> None:
     logger.info("Logged in to HuggingFace")
 
 
-def get_tokenizer_hash(vocab: dict[int, str]) -> str:
-    """Get a hash of the vocabulary to identify unique tokenizers."""
-    items = sorted(vocab.items())
-    content = "\n".join(f"{k}\t{v}" for k, v in items)
+def get_tokenizer_hash(vocab: list[str]) -> str:
+    """Get a hash of the vocabulary list to identify unique tokenizers."""
+    # Vocab is expected to be a sorted list of strings here
+    content = "\n".join(vocab)
     return hashlib.sha256(content.encode()).hexdigest()[:16]
 
 
-def download_tokenizer(repo: str) -> dict[int, str] | None:
-    """Download tokenizer and extract token ID to string mapping."""
+def download_tokenizer(repo: str) -> list[str] | None:
+    """Download tokenizer and extract unique token strings.
+
+    Returns a sorted list of unique strings found in the vocabulary.
+    """
     try:
         tokenizer = AutoTokenizer.from_pretrained(repo, trust_remote_code=False)
     except Exception as e:
         logger.warning(f"Failed to load tokenizer from {repo}: {e}")
         return None
 
-    vocab: dict[int, str] = {}
-
     try:
-        token_to_id = tokenizer.get_vocab()
+        token_map = tokenizer.get_vocab()
     except Exception as e:
         logger.warning(f"Failed to get vocab from {repo}: {e}")
         return None
@@ -89,53 +91,43 @@ def download_tokenizer(repo: str) -> dict[int, str] | None:
     if hasattr(tokenizer, "all_special_ids"):
         special_ids.update(tokenizer.all_special_ids)
 
-    for token_str, token_id in token_to_id.items():
+    vocab_set: set[str] = set()
+    for token_str, token_id in token_map.items():
         if token_str in special_tokens or token_id in special_ids:
             continue
-
         # Skip tokens that look like special tokens (e.g., <|endoftext|>, <pad>)
         if token_str.startswith("<") and token_str.endswith(">"):
             continue
 
-        try:
-            decoded = tokenizer.convert_tokens_to_string([token_str])
-            vocab[token_id] = decoded
-        except Exception:
-            vocab[token_id] = token_str
+        # make sure we don't have too much weird stuff in there
+        assert token_str.encode("utf-8").decode("utf-8") == token_str
 
-    return vocab
+        vocab_set.add(token_str)
+
+    # Return sorted list for deterministic hashing
+    return sorted(list(vocab_set))
 
 
-def save_tokenizer_csv(vocab: dict[int, str], path: Path) -> None:
-    """Save vocabulary as CSV with token ID and UTF-8 string columns."""
+def save_tokenizer_json(vocab: list[str], path: Path) -> None:
+    """Save vocabulary list as JSON with base64 encoded strings."""
     path.parent.mkdir(parents=True, exist_ok=True)
-
-    with open(path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow(["token_id", "token_string"])
-        for token_id in sorted(vocab.keys()):
-            writer.writerow([token_id, vocab[token_id]])
+    vocab_b64 = [base64.b64encode(token.encode()).decode() for token in vocab]
+    with open(path, "wb") as f:
+        f.write(orjson.dumps(vocab_b64))
 
 
 def load_existing_index() -> dict[str, str]:
-    """Load existing index.csv if it exists."""
+    """Load existing index.json if it exists."""
     if not index_path.exists():
         return {}
-    existing: dict[str, str] = {}
-    with open(index_path, newline="", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            existing[row["model"]] = row["tokenizer_hash"]
-    return existing
+    with open(index_path, "rb") as f:
+        return orjson.loads(f.read())
 
 
 def save_index(model_to_hash: dict[str, str]) -> None:
-    """Save index.csv with current model to hash mappings."""
-    with open(index_path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow(["model", "tokenizer_hash"])
-        for model in sorted(model_to_hash.keys()):
-            writer.writerow([model, model_to_hash[model]])
+    """Save index.json with current model to hash mappings."""
+    with open(index_path, "wb") as f:
+        f.write(orjson.dumps(model_to_hash, option=orjson.OPT_SORT_KEYS))
 
 
 def main() -> None:
@@ -155,7 +147,7 @@ def main() -> None:
 
     for model in models:
         if model in existing_index:
-            tokenizer_path = tokenizers_dir / f"{existing_index[model]}.csv"
+            tokenizer_path = tokenizers_dir / f"{existing_index[model]}.json"
             if tokenizer_path.exists():
                 logger.info(f"Skipping {model} (already downloaded)")
                 continue
@@ -179,21 +171,22 @@ def main() -> None:
         if vocab_hash in saved_hashes:
             logger.info(f"  -> Same as existing tokenizer (hash: {vocab_hash})")
         else:
-            existing_path = tokenizers_dir / f"{vocab_hash}.csv"
+            existing_path = tokenizers_dir / f"{vocab_hash}.json"
             if existing_path.exists():
                 logger.info(f"  -> Tokenizer already on disk (hash: {vocab_hash})")
             else:
                 logger.info(
-                    f"  -> New tokenizer with {len(vocab)} tokens (hash: {vocab_hash})"
+                    f"  -> New tokenizer with {len(vocab)} unique strings (hash: {vocab_hash})"
                 )
-                save_tokenizer_csv(vocab, existing_path)
+                save_tokenizer_json(vocab, existing_path)
+                assert load_tokenizer_vocab(vocab_hash) == vocab
                 logger.info(f"  Saved {existing_path.name}")
             saved_hashes.add(vocab_hash)
 
         model_to_hash[model] = vocab_hash
         save_index(model_to_hash)
 
-    logger.info(f"Saved index to {tokenizers_dir / 'index.csv'}")
+    logger.info(f"Saved index to {tokenizers_dir / 'index.json'}")
 
     logger.info(f"\n{'=' * 60}")
     logger.info(f"SUMMARY: {len(model_to_hash)} succeeded, {len(failed_models)} failed")
@@ -206,14 +199,11 @@ def main() -> None:
 
 @lru_cache(maxsize=None)
 def load_tokenizer_vocab(tokenizer_hash: str) -> list[str]:
-    """Load a tokenizer's vocabulary in order."""
-    path = tokenizers_dir / f"{tokenizer_hash}.csv"
-    strings: list[str] = []
-    with open(path, newline="", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            strings.append(row["token_string"])
-    return strings
+    """Load a tokenizer's vocabulary list."""
+    path = tokenizers_dir / f"{tokenizer_hash}.json"
+    with open(path, "rb") as f:
+        vocab_b64 = orjson.loads(f.read())
+        return [base64.b64decode(token).decode() for token in vocab_b64]
 
 
 def get_best_single_token_strings() -> list[str]:
@@ -227,7 +217,7 @@ def get_best_single_token_strings() -> list[str]:
 
     string_counts: Counter[str] = Counter()
     for tok_hash in unique_hashes:
-        vocab = set(load_tokenizer_vocab(tok_hash))
+        vocab = load_tokenizer_vocab(tok_hash)
         string_counts.update(vocab)
 
     # Sort by count descending, then by byte length ascending, then alphabetically
