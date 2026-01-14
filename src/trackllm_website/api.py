@@ -163,7 +163,9 @@ class OpenRouterClient:
                     message = orjson.dumps(
                         orjson.loads(message_json.encode()).get("error", e)
                     ).decode()
-                except orjson.JSONDecodeError | orjson.JSONEncodeError:
+                # For some reason, orjson.JSONDecodeError | orjson.JSONEncodeError fails with:
+                # "catching classes that do not inherit from BaseException is not allowed"
+                except (orjson.JSONDecodeError, orjson.JSONEncodeError):
                     message = str(e)
             elif isinstance(e, asyncio.TimeoutError):
                 http_code, message = 0, f"Timeout after {config.api.timeout}s"
