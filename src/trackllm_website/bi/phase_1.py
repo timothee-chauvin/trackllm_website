@@ -1,6 +1,7 @@
 """Phase 1: Identify border inputs by querying endpoints with single-token inputs."""
 
 import asyncio
+import random
 import time
 from collections import deque
 from dataclasses import dataclass, field
@@ -26,11 +27,14 @@ def get_input_tokens(
     fallback_tokens: list[str],
     num_tokens: int,
 ) -> list[str]:
-    """Get input tokens for an endpoint, using its tokenizer if known."""
+    """Get input tokens for an endpoint, using its tokenizer if known, in a fixed random order."""
     if endpoint.model in tokenizer_index:
         vocab = load_tokenizer_vocab(tokenizer_index[endpoint.model])
+        random.Random(0).shuffle(vocab)
         return vocab[:num_tokens]
-    return fallback_tokens[:num_tokens]
+    else:
+        random.Random(0).shuffle(fallback_tokens)
+        return fallback_tokens[:num_tokens]
 
 
 def get_input_tokens_for_endpoint(
