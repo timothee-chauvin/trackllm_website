@@ -59,7 +59,7 @@ def get_output_path(endpoint: Endpoint, temperature: float) -> Path:
     )
 
 
-def load_existing_results(path: Path) -> dict[int, dict[str, dict[str, int]]]:
+def load_existing_results(path: Path) -> dict[int, dict[str, list[str]]]:
     """Load existing results from JSON file."""
     if not path.exists():
         return {}
@@ -69,7 +69,7 @@ def load_existing_results(path: Path) -> dict[int, dict[str, dict[str, int]]]:
     return {int(k): v for k, v in data.items()}
 
 
-def save_results(path: Path, results: dict[int, dict[str, dict[str, int]]]) -> None:
+def save_results(path: Path, results: dict[int, dict[str, list[str]]]) -> None:
     """Save results to JSON file."""
     path.parent.mkdir(parents=True, exist_ok=True)
     results_serializable = {str(k): v for k, v in results.items()}
@@ -91,7 +91,7 @@ class EndpointState:
     concurrency_semaphore: asyncio.Semaphore
     pending_before_new_semaphore: asyncio.Semaphore
     temperature: float
-    results: dict[int, dict[str, dict[str, int]]] = field(default_factory=dict)
+    results: dict[int, dict[str, list[str]]] = field(default_factory=dict)
     request_timestamps: deque[float] = field(default_factory=lambda: deque(maxlen=100))
     rate_limit_timestamps: deque[float] = field(
         default_factory=lambda: deque(maxlen=100)
@@ -117,13 +117,8 @@ class EndpointState:
         self._prompt_unique_outputs = {}
         for token_results in self.results.values():
             for token, outputs in token_results.items():
-                total = sum(outputs.values())
-                self._prompt_query_counts[token] = (
-                    self._prompt_query_counts.get(token, 0) + total
-                )
-                if token not in self._prompt_unique_outputs:
-                    self._prompt_unique_outputs[token] = set()
-                self._prompt_unique_outputs[token].update(outputs.keys())
+                self._prompt_query_counts[token] = len(outputs)
+                self._prompt_unique_outputs[token] = set(outputs)
 
     def get_requests_per_second(self) -> float:
         """Calculate actual requests per second over the last few seconds."""
@@ -189,8 +184,8 @@ class EndpointState:
                 self.results[num_input_tokens] = {}
             results = self.results[num_input_tokens]
             if token not in results:
-                results[token] = {}
-            results[token][content] = results[token].get(content, 0) + 1
+                results[token] = []
+            results[token].append(content)
             # Update cache
             self._prompt_query_counts[token] = (
                 self._prompt_query_counts.get(token, 0) + 1
