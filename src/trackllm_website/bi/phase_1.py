@@ -366,27 +366,32 @@ async def main(temperature: float) -> None:
     total_requests = sum(s.total_queries for s in states)
     logger.info(f"Total requests to process: {total_requests}")
 
-    # Create one task per token (each task handles all pending queries for that token)
-    async def run_with_status(pbar: tqdm) -> None:
-        coros = []
-        # Interleave tokens from all endpoints
-        max_tokens = max(len(p) for p in pending_lists) if pending_lists else 0
-        for i in range(max_tokens):
-            for state, pending in zip(states, pending_lists):
-                if i < len(pending):
-                    token, count = pending[i]
-                    coros.append(query_all_for_token(client, state, token, count, pbar))
+    try:
+        # Create one task per token (each task handles all pending queries for that token)
+        async def run_with_status(pbar: tqdm) -> None:
+            coros = []
+            # Interleave tokens from all endpoints
+            max_tokens = max(len(p) for p in pending_lists) if pending_lists else 0
+            for i in range(max_tokens):
+                for state, pending in zip(states, pending_lists):
+                    if i < len(pending):
+                        token, count = pending[i]
+                        coros.append(
+                            query_all_for_token(client, state, token, count, pbar)
+                        )
 
-        last_status_time = time.monotonic()
-        for future in asyncio.as_completed(coros):
-            await future
-            now = time.monotonic()
-            if now - last_status_time >= 5.0:
-                log_status(states)
-                last_status_time = now
+            last_status_time = time.monotonic()
+            for future in asyncio.as_completed(coros):
+                await future
+                now = time.monotonic()
+                if now - last_status_time >= 5.0:
+                    log_status(states)
+                    last_status_time = now
 
-    with tqdm(total=total_requests, desc="Requests") as pbar:
-        await run_with_status(pbar)
+        with tqdm(total=total_requests, desc="Requests") as pbar:
+            await run_with_status(pbar)
+    finally:
+        await client.close()
 
     log_status(states)
 

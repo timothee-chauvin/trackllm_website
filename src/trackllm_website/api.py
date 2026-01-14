@@ -16,6 +16,18 @@ from trackllm_website.storage import (
 
 
 class OpenRouterClient:
+    def __init__(self):
+        self.connector = aiohttp.TCPConnector(limit=1000)
+        self.session = aiohttp.ClientSession(
+            connector=self.connector,
+            headers={"Authorization": f"Bearer {config.openrouter_api_key}"},
+            timeout=aiohttp.ClientTimeout(total=config.api.timeout),
+        )
+
+    async def close(self):
+        """Must be called when the client is done."""
+        await self.session.close()
+
     async def get_generation_cost(
         self, generation_id: str, session: aiohttp.ClientSession | None = None
     ) -> float | int | None:
@@ -62,30 +74,27 @@ class OpenRouterClient:
         if endpoint.provider:
             request_data["provider"]["only"] = [endpoint.provider]
 
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                url="https://openrouter.ai/api/v1/chat/completions",
-                headers={"Authorization": f"Bearer {config.openrouter_api_key}"},
-                json=request_data,
-                timeout=aiohttp.ClientTimeout(total=config.api.timeout),
-            ) as resp:
-                if not resp.ok:
-                    error_text = await resp.text()
-                    raise aiohttp.ClientResponseError(
-                        request_info=resp.request_info,
-                        history=resp.history,
-                        status=resp.status,
-                        message=error_text,
-                    )
-                response = await resp.json()
-                # Sometimes we get a 200 OK response with a JSON that says "Internal Server Error" 500...
-                if set(response.keys()) == {"error", "user_id"}:
-                    raise aiohttp.ClientResponseError(
-                        request_info=resp.request_info,
-                        history=resp.history,
-                        status=int(response["error"]["code"]),
-                        message=response["error"]["message"],
-                    )
+        async with self.session.post(
+            url="https://openrouter.ai/api/v1/chat/completions",
+            json=request_data,
+        ) as resp:
+            if not resp.ok:
+                error_text = await resp.text()
+                raise aiohttp.ClientResponseError(
+                    request_info=resp.request_info,
+                    history=resp.history,
+                    status=resp.status,
+                    message=error_text,
+                )
+            response = await resp.json()
+            # Sometimes we get a 200 OK response with a JSON that says "Internal Server Error" 500...
+            if set(response.keys()) == {"error", "user_id"}:
+                raise aiohttp.ClientResponseError(
+                    request_info=resp.request_info,
+                    history=resp.history,
+                    status=int(response["error"]["code"]),
+                    message=response["error"]["message"],
+                )
 
         usage = response["usage"]
         input_tokens = usage["prompt_tokens"]
