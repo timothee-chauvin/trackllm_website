@@ -113,7 +113,7 @@ class EndpointState:
         cutoff = now - 5.0
         return sum(1 for t in self.rate_limit_timestamps if t > cutoff)
 
-    def _get_all_token_results(self) -> dict[str, dict[str, int]]:
+    def _get_all_prompt_results(self) -> dict[str, dict[str, int]]:
         """Get merged results across all input token counts."""
         merged: dict[str, dict[str, int]] = {}
         for token_results in self.results.values():
@@ -127,7 +127,7 @@ class EndpointState:
     def get_completed_tokens(self) -> int:
         """Count tokens that have all queries completed."""
         queries_needed = config.bi.phase_1.queries_per_token
-        results = self._get_all_token_results()
+        results = self._get_all_prompt_results()
         return sum(
             1
             for token in self.input_tokens
@@ -136,38 +136,22 @@ class EndpointState:
 
     def get_border_tokens(self) -> int:
         """Count tokens that have at least two different outputs."""
-        results = self._get_all_token_results()
+        results = self._get_all_prompt_results()
         return sum(1 for token, outputs in results.items() if len(outputs) >= 2)
 
-    def get_pending_queries(self, token: str) -> int:
-        """Return number of queries still needed for this token."""
-        results = self._get_all_token_results()
-        existing = sum(results.get(token, {}).values())
+    def get_pending_queries(self, prompt: str) -> int:
+        """Return number of queries still needed for this prompt."""
+        results = self._get_all_prompt_results()
+        existing = sum(results.get(prompt, {}).values())
         return max(0, config.bi.phase_1.queries_per_token - existing)
 
-    def get_missing_responses(self) -> int:
-        """Count total missing responses across all tokens."""
-        return sum(self.get_pending_queries(token) for token in self.input_tokens)
-
-    def build_task_list(self) -> list[tuple[str, int]]:
-        """Build list of (token, query_index) pairs ordered by chunks then rounds.
-
-        Processes tokens in chunks: for each chunk, does all queries in round-robin
-        (round 0 for all tokens in chunk, then round 1, etc.) before moving to next chunk.
-        """
-        queries_per_token = config.bi.phase_1.queries_per_token
-        chunk_size = config.bi.phase_1.chunk_size
-        tasks: list[tuple[str, int]] = []
-
-        for chunk_start in range(0, len(self.input_tokens), chunk_size):
-            chunk_tokens = self.input_tokens[chunk_start : chunk_start + chunk_size]
-            for query_idx in range(queries_per_token):
-                for token in chunk_tokens:
-                    pending = self.get_pending_queries(token)
-                    if query_idx < pending:
-                        tasks.append((token, query_idx))
-
-        return tasks
+    def get_unfinished_prompts(self) -> list[tuple[str, int]]:
+        """Get list of (prompt, pending_count) for prompts that still need queries."""
+        return [
+            (t, pending)
+            for t in self.input_tokens
+            if (pending := self.get_pending_queries(t)) > 0
+        ]
 
     def record_result(
         self, token: str, content: str | None, num_input_tokens: int
@@ -183,53 +167,69 @@ class EndpointState:
             save_results(self.output_path, self.results)
 
 
-async def query_and_record(
+async def query_single(
     client: OpenRouterClient,
     state: EndpointState,
     token: str,
-) -> None:
-    """Query endpoint and record result, respecting per-endpoint rate and concurrency limits."""
+) -> bool:
+    """Execute a single query. Returns False if a 404 error is encountered."""
     if state.got_404:
-        return
+        return False
 
-    # We have two semaphores: a concurrency limit and a requests per second limit.
-    # The concurrency is set high enough not to be a bottleneck when the API is responding well,
-    # but it's needed to limit the number of in-flight requests when the API is unresponsive (e.g. 429 errors).
-    async with state.concurrency_semaphore:
-        if state.got_404:
-            return
+    await state.rate_limiter.acquire()
 
-        await state.rate_limiter.acquire()
+    if state.got_404:
+        return False
 
-        if state.got_404:
-            return
+    state.request_timestamps.append(time.monotonic())
 
-        state.request_timestamps.append(time.monotonic())
+    def on_retry(status: int) -> None:
+        if status == 429:
+            state.rate_limit_timestamps.append(time.monotonic())
 
-        def on_retry(status: int) -> None:
-            if status == 429:
-                state.rate_limit_timestamps.append(time.monotonic())
-
-        response = await client.query(
-            state.endpoint,
-            token,
-            temperature=state.temperature,
-            logprobs=False,
-            on_retry=on_retry,
+    response = await client.query(
+        state.endpoint,
+        token,
+        temperature=state.temperature,
+        logprobs=False,
+        on_retry=on_retry,
+    )
+    state.completed_queries += 1
+    if response.error:
+        if response.error.http_code == 404:
+            if not state.got_404:
+                state.got_404 = True
+                logger.warning(f"Got 404 for {state.endpoint}, abandoning endpoint")
+            return False
+        logger.warning(
+            f"Error for {state.endpoint}: {token!r}: {response.error.message}"
         )
-        state.completed_queries += 1
-        if response.error:
-            if response.error.http_code == 404:
-                if not state.got_404:
-                    state.got_404 = True
-                    logger.warning(f"Got 404 for {state.endpoint}, abandoning endpoint")
-                return
-            logger.warning(
-                f"Error for {state.endpoint}: {token!r}: {response.error.message}"
-            )
+        return True
+    state.recent_costs.append(response.cost)
+    state.record_result(token, response.content, response.input_tokens)
+    return True
+
+
+async def query_all_for_token(
+    client: OpenRouterClient,
+    state: EndpointState,
+    token: str,
+    pending: int,
+    pbar: tqdm,
+) -> None:
+    """Query endpoint for all pending queries for a single token, with delays between requests."""
+    delay = config.bi.phase_1.request_delay_seconds
+
+    for i in range(pending):
+        if state.got_404:
             return
-        state.recent_costs.append(response.cost)
-        state.record_result(token, response.content, response.input_tokens)
+        async with state.concurrency_semaphore:
+            success = await query_single(client, state, token)
+        pbar.update(1)
+        if not success:
+            return
+        if i < pending - 1:
+            await asyncio.sleep(delay)
 
 
 def log_status(states: list[EndpointState]) -> None:
@@ -311,7 +311,7 @@ async def main(temperature: float) -> None:
         f"Loaded {len(tokenizer_index)} tokenizers, {len(fallback_tokens)} fallback tokens"
     )
 
-    endpoints = config.endpoints_bi_phase_1
+    endpoints = config.endpoints_bi_phase_1[:10]
     logger.info(f"Running phase 1 for {len(endpoints)} endpoints")
 
     requests_per_second = config.bi.phase_1.requests_per_second_per_endpoint
@@ -332,44 +332,46 @@ async def main(temperature: float) -> None:
         for ep in endpoints
     ]
 
-    # Build task list for each endpoint
-    task_lists = [s.build_task_list() for s in states]
+    # Get pending tokens (with their pending counts) for each endpoint
+    pending_lists = [s.get_unfinished_prompts() for s in states]
 
     # Set total_queries for each state
-    for state, tasks in zip(states, task_lists):
-        state.total_queries = len(tasks)
+    for state, pending in zip(states, pending_lists):
+        state.total_queries = sum(count for _, count in pending)
 
     client = OpenRouterClient()
-    total_tasks = sum(len(tasks) for tasks in task_lists)
-    logger.info(f"Total tasks to process: {total_tasks}")
+    total_requests = sum(s.total_queries for s in states)
+    logger.info(f"Total requests to process: {total_requests}")
 
-    coros = []
+    # Create one task per token (each task handles all pending queries for that token)
+    async def run_with_status(pbar: tqdm) -> None:
+        coros = []
+        # Interleave tokens from all endpoints
+        max_tokens = max(len(p) for p in pending_lists) if pending_lists else 0
+        for i in range(max_tokens):
+            for state, pending in zip(states, pending_lists):
+                if i < len(pending):
+                    token, count = pending[i]
+                    coros.append(query_all_for_token(client, state, token, count, pbar))
 
-    # Interleave tasks from all endpoints
-    max_tasks = max(len(tasks) for tasks in task_lists) if task_lists else 0
-    for i in range(max_tasks):
-        for state, tasks in zip(states, task_lists):
-            if i < len(tasks):
-                token, _ = tasks[i]
-                coros.append(query_and_record(client, state, token))
-
-    last_status_time = time.monotonic()
-    with tqdm(total=len(coros), desc="Requests") as pbar:
+        last_status_time = time.monotonic()
         for future in asyncio.as_completed(coros):
             await future
-            pbar.update(1)
             now = time.monotonic()
-            if now - last_status_time >= 5.0:
+            if now - last_status_time >= 1.0:
                 log_status(states)
                 last_status_time = now
 
+    with tqdm(total=total_requests, desc="Requests") as pbar:
+        await run_with_status(pbar)
+
     log_status(states)
 
-    # Print missing responses per model
+    # Print incomplete tokens per model (due to errors like 404)
     for state in states:
-        missing = state.get_missing_responses()
-        if missing > 0:
-            logger.info(f"{state.endpoint}: {missing} missing responses")
+        incomplete = len(state.input_tokens) - state.get_completed_tokens()
+        if incomplete > 0:
+            logger.info(f"{state.endpoint}: {incomplete} incomplete tokens")
 
     logger.info("Phase 1 complete")
 

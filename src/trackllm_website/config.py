@@ -65,8 +65,8 @@ class Phase1Config(BaseModel):
     queries_per_token: int
     requests_per_second_per_endpoint: float
     tokens_per_endpoint: int
-    chunk_size: int
     max_concurrent_per_endpoint: int
+    request_delay_seconds: float
 
 
 class BIConfig(BaseModel):

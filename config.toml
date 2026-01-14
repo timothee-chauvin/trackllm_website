@@ -26,4 +26,4 @@ queries_per_token = 5
 requests_per_second_per_endpoint = 5
 max_concurrent_per_endpoint = 10
 tokens_per_endpoint = 3000
-chunk_size = 50
+request_delay_seconds = 5.0
