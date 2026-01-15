@@ -1,0 +1,44 @@
+name: Run BI Phase 2
+
+on:
+  schedule:
+    # Run every 24 hours at 21:01 UTC
+    - cron: '01 21 * * *'
+  workflow_dispatch:  # Allow manual triggering
+
+permissions:
+  contents: write  # Allow pushing commits
+
+jobs:
+  bi-phase-2:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        ref: feature/bi-experiments
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v4
+
+    - name: Install dependencies
+      run: uv sync
+
+    - name: Run phase_2.py
+      env:
+        OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      run: uv run python src/trackllm_website/bi/phase_2.py
+
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add .
+        git diff --staged --quiet || git commit -m "[bot] Daily BI Phase 2 run"
+        git push origin HEAD:feature/bi-experiments
