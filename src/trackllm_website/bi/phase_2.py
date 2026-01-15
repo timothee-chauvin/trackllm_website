@@ -44,7 +44,7 @@ def save_results(
     """Save results to JSON file."""
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "wb") as f:
-        f.write(orjson.dumps(results, option=orjson.OPT_INDENT_2))
+        f.write(orjson.dumps(results))
 
 
 def load_border_inputs(temperature: float) -> dict[str, list[Prompt]]:
