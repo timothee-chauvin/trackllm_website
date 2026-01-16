@@ -66,6 +66,12 @@ endpoints_lt:
   - 0.3
   - 1.2
 - api: openrouter
+  model: minimax/minimax-m2.1
+  provider: nebius/fp8
+  cost:
+  - 0.3
+  - 1.2
+- api: openrouter
   model: mancer/weaver
   provider: mancer/fp8
   cost:
@@ -129,7 +135,7 @@ endpoints_lt:
   model: z-ai/glm-4.6
   provider: mancer/fp8
   cost:
-  - 0.45
+  - 0.4375
   - 2.0
 - api: openrouter
   model: z-ai/glm-4.7
