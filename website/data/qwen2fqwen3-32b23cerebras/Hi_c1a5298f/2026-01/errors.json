@@ -1,1 +1,1 @@
-{"seen_errors":[]}
+{"seen_errors":[{"http_code":401,"message":"{\"message\":\"Provider returned error\",\"code\":401,\"metadata\":{\"raw\":\"{\\\"message\\\":\\\"Wrong API Key\\\",\\\"type\\\":\\\"invalid_request_error\\\",\\\"param\\\":\\\"api_key\\\",\\\"code\\\":\\\"wrong_api_key\\\"}\",\"provider_name\":\"Cerebras\",\"is_byok\":false}}"}]}
