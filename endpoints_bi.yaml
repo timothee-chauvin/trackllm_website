@@ -943,6 +943,12 @@ endpoints_bi:
   - 0.3
 - api: openrouter
   model: xiaomi/mimo-v2-flash
+  provider: atlas-cloud/fp8
+  cost:
+  - 0.1
+  - 0.3
+- api: openrouter
+  model: xiaomi/mimo-v2-flash
   provider: novita
   cost:
   - 0.1
@@ -1022,6 +1028,12 @@ endpoints_bi:
 - api: openrouter
   model: google/gemini-2.0-flash-001
   provider: google-ai-studio
+  cost:
+  - 0.1
+  - 0.4
+- api: openrouter
+  model: google/gemini-2.0-flash-001
+  provider: google-vertex
   cost:
   - 0.1
   - 0.4
@@ -1457,12 +1469,6 @@ endpoints_bi:
   cost:
   - 0.3
   - 0.45
-- api: openrouter
-  model: google/gemini-2.0-flash-001
-  provider: google-vertex
-  cost:
-  - 0.15
-  - 0.6
 - api: openrouter
   model: meta-llama/llama-4-maverick
   provider: deepinfra/base
@@ -2951,6 +2957,12 @@ endpoints_bi:
   cost:
   - 0.65
   - 1.5
+- api: openrouter
+  model: deepseek/deepseek-r1-0528
+  provider: chutes/fp8
+  cost:
+  - 0.4
+  - 1.75
 - api: openrouter
   model: moonshotai/kimi-k2-thinking
   provider: chutes/int4
