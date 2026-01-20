@@ -144,6 +144,12 @@ endpoints_lt:
   - 0.475
   - 2.0
 - api: openrouter
+  model: z-ai/glm-4.6
+  provider: fireworks
+  cost:
+  - 0.55
+  - 2.19
+- api: openrouter
   model: moonshotai/kimi-k2-thinking
   provider: parasail/int4
   cost:

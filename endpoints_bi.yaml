@@ -1002,6 +1002,12 @@ endpoints_bi:
   - 0.05
   - 0.4
 - api: openrouter
+  model: z-ai/glm-4.7-flash
+  provider: z-ai
+  cost:
+  - 0.07
+  - 0.4
+- api: openrouter
   model: qwen/qwen3-30b-a3b-thinking-2507
   provider: atlas-cloud/fp8
   cost:
@@ -1092,6 +1098,12 @@ endpoints_bi:
   - 0.05
   - 0.45
 - api: openrouter
+  model: z-ai/glm-4.7-flash
+  provider: novita/bf16
+  cost:
+  - 0.07
+  - 0.43
+- api: openrouter
   model: google/gemma-3-27b-it
   provider: phala
   cost:
@@ -1133,12 +1145,6 @@ endpoints_bi:
   cost:
   - 0.13
   - 0.4
-- api: openrouter
-  model: qwen/qwen3-30b-a3b
-  provider: atlas-cloud/fp8
-  cost:
-  - 0.08
-  - 0.45
 - api: openrouter
   model: qwen/qwen3-235b-a22b-2507
   provider: deepinfra/fp8
@@ -1301,12 +1307,6 @@ endpoints_bi:
   cost:
   - 0.13
   - 0.52
-- api: openrouter
-  model: qwen/qwen3-32b
-  provider: friendli
-  cost:
-  - 0.15
-  - 0.5
 - api: openrouter
   model: deepseek/deepseek-v3.2
   provider: novita/fp8
@@ -1655,12 +1655,6 @@ endpoints_bi:
   cost:
   - 0.4
   - 0.4
-- api: openrouter
-  model: meta-llama/llama-4-maverick
-  provider: friendli
-  cost:
-  - 0.2
-  - 0.6
 - api: openrouter
   model: meta-llama/llama-4-maverick
   provider: groq
@@ -3474,6 +3468,12 @@ endpoints_bi:
   - 1.0
   - 2.0
 - api: openrouter
+  model: openai/gpt-audio-mini
+  provider: openai
+  cost:
+  - 0.6
+  - 2.4
+- api: openrouter
   model: qwen/qwen3-235b-a22b-thinking-2507
   provider: friendli
   cost:
@@ -3773,12 +3773,6 @@ endpoints_bi:
   cost:
   - 0.98
   - 3.95
-- api: openrouter
-  model: z-ai/glm-4.6
-  provider: cerebras
-  cost:
-  - 2.25
-  - 2.75
 - api: openrouter
   model: z-ai/glm-4.7
   provider: cerebras
@@ -4261,6 +4255,12 @@ endpoints_bi:
   - 10.0
 - api: openrouter
   model: openai/gpt-4o-search-preview
+  provider: openai
+  cost:
+  - 2.5
+  - 10.0
+- api: openrouter
+  model: openai/gpt-audio
   provider: openai
   cost:
   - 2.5
