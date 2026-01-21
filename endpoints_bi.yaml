@@ -30,6 +30,12 @@ endpoints_bi:
   - 0.02
   - 0.04
 - api: openrouter
+  model: mistralai/mistral-nemo
+  provider: deepinfra/fp8
+  cost:
+  - 0.02
+  - 0.04
+- api: openrouter
   model: meta-llama/llama-3.1-8b-instruct
   provider: novita/fp8
   cost:
@@ -101,12 +107,6 @@ endpoints_bi:
   cost:
   - 0.05
   - 0.05
-- api: openrouter
-  model: nousresearch/hermes-2-pro-llama-3-8b
-  provider: nextbit/int4
-  cost:
-  - 0.025
-  - 0.08
 - api: openrouter
   model: google/gemma-2-9b-it
   provider: nebius/fast
@@ -1003,6 +1003,12 @@ endpoints_bi:
   - 0.4
 - api: openrouter
   model: z-ai/glm-4.7-flash
+  provider: novita/bf16
+  cost:
+  - 0.07
+  - 0.4
+- api: openrouter
+  model: z-ai/glm-4.7-flash
   provider: z-ai
   cost:
   - 0.07
@@ -1097,12 +1103,6 @@ endpoints_bi:
   cost:
   - 0.05
   - 0.45
-- api: openrouter
-  model: z-ai/glm-4.7-flash
-  provider: novita/bf16
-  cost:
-  - 0.07
-  - 0.43
 - api: openrouter
   model: google/gemma-3-27b-it
   provider: phala
@@ -1561,12 +1561,6 @@ endpoints_bi:
   - 0.6
 - api: openrouter
   model: qwen/qwen3-30b-a3b
-  provider: fireworks
-  cost:
-  - 0.15
-  - 0.6
-- api: openrouter
-  model: qwen/qwen3-30b-a3b
   provider: friendli
   cost:
   - 0.15
@@ -1984,12 +1978,6 @@ endpoints_bi:
   provider: atlas-cloud/fp8
   cost:
   - 0.216
-  - 0.88
-- api: openrouter
-  model: meta-llama/llama-4-maverick
-  provider: fireworks
-  cost:
-  - 0.22
   - 0.88
 - api: openrouter
   model: openai/gpt-oss-120b
@@ -3635,6 +3623,12 @@ endpoints_bi:
   cost:
   - 1.14
   - 2.75
+- api: openrouter
+  model: qwen/qwen3-vl-235b-a22b-thinking
+  provider: siliconflow/fp8
+  cost:
+  - 0.45
+  - 3.5
 - api: openrouter
   model: amazon/nova-pro-v1
   provider: amazon-bedrock
