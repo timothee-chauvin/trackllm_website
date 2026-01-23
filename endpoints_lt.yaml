@@ -135,7 +135,7 @@ endpoints_lt:
   model: z-ai/glm-4.6
   provider: mancer/fp8
   cost:
-  - 0.475
+  - 0.425
   - 2.0
 - api: openrouter
   model: z-ai/glm-4.7
@@ -179,12 +179,6 @@ endpoints_lt:
   cost:
   - 0.6
   - 2.5
-- api: openrouter
-  model: z-ai/glm-4.6
-  provider: cerebras
-  cost:
-  - 2.25
-  - 2.75
 - api: openrouter
   model: z-ai/glm-4.7
   provider: cerebras
