@@ -1,0 +1,13 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "z-ai/glm-4.7",
+    "provider": "cerebras/fp16",
+    "cost": [
+      2.25,
+      2.75
+    ],
+    "max_logprobs": null
+  }
+}

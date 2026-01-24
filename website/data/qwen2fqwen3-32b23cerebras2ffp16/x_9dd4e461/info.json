@@ -1,0 +1,13 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "qwen/qwen3-32b",
+    "provider": "cerebras/fp16",
+    "cost": [
+      0.4,
+      0.8
+    ],
+    "max_logprobs": null
+  }
+}
