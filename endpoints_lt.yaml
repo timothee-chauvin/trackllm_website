@@ -48,6 +48,12 @@ endpoints_lt:
   - 0.4
   - 0.8
 - api: openrouter
+  model: qwen/qwen3-32b
+  provider: cerebras/fp16
+  cost:
+  - 0.4
+  - 0.8
+- api: openrouter
   model: gryphe/mythomax-l2-13b
   provider: mancer/fp8
   cost:
@@ -80,6 +86,12 @@ endpoints_lt:
 - api: openrouter
   model: qwen/qwen3-235b-a22b-2507
   provider: cerebras
+  cost:
+  - 0.6
+  - 1.2
+- api: openrouter
+  model: qwen/qwen3-235b-a22b-2507
+  provider: cerebras/fp16
   cost:
   - 0.6
   - 1.2
@@ -182,6 +194,12 @@ endpoints_lt:
 - api: openrouter
   model: z-ai/glm-4.7
   provider: cerebras
+  cost:
+  - 2.25
+  - 2.75
+- api: openrouter
+  model: z-ai/glm-4.7
+  provider: cerebras/fp16
   cost:
   - 2.25
   - 2.75

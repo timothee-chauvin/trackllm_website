@@ -72,12 +72,6 @@ endpoints_bi:
   - 0.04
   - 0.04
 - api: openrouter
-  model: openai/gpt-oss-20b
-  provider: hyperbolic
-  cost:
-  - 0.04
-  - 0.04
-- api: openrouter
   model: google/gemma-3-4b-it
   provider: chutes
   cost:
@@ -259,7 +253,7 @@ endpoints_bi:
   - 0.15
 - api: openrouter
   model: openai/gpt-oss-20b
-  provider: gmicloud/fp4
+  provider: ncompass
   cost:
   - 0.04
   - 0.15
@@ -446,6 +440,12 @@ endpoints_bi:
 - api: openrouter
   model: google/gemma-3-27b-it
   provider: gmicloud/bf16
+  cost:
+  - 0.09
+  - 0.16
+- api: openrouter
+  model: google/gemma-3-27b-it
+  provider: ncompass/fp8
   cost:
   - 0.09
   - 0.16
@@ -648,6 +648,12 @@ endpoints_bi:
   - 0.08
   - 0.24
 - api: openrouter
+  model: openai/gpt-oss-120b
+  provider: ncompass
+  cost:
+  - 0.05
+  - 0.28
+- api: openrouter
   model: qwen/qwen3-coder-30b-a3b-instruct
   provider: novita/fp8
   cost:
@@ -689,6 +695,12 @@ endpoints_bi:
   cost:
   - 0.18
   - 0.18
+- api: openrouter
+  model: qwen/qwen3-30b-a3b
+  provider: ncompass/fp8
+  cost:
+  - 0.08
+  - 0.28
 - api: openrouter
   model: qwen/qwen3-32b
   provider: deepinfra/fp8
@@ -749,6 +761,12 @@ endpoints_bi:
   cost:
   - 0.08
   - 0.3
+- api: openrouter
+  model: qwen/qwen3-32b
+  provider: ncompass/fp8
+  cost:
+  - 0.1
+  - 0.28
 - api: openrouter
   model: xiaomi/mimo-v2-flash
   provider: chutes
@@ -988,6 +1006,12 @@ endpoints_bi:
   provider: atlas-cloud/fp8
   cost:
   - 0.08
+  - 0.4
+- api: openrouter
+  model: alibaba/tongyi-deepresearch-30b-a3b
+  provider: ncompass/bf16
+  cost:
+  - 0.09
   - 0.4
 - api: openrouter
   model: nousresearch/hermes-4-70b
@@ -1969,7 +1993,7 @@ endpoints_bi:
   - 0.88
 - api: openrouter
   model: openai/gpt-oss-120b
-  provider: cerebras
+  provider: cerebras/fp16
   cost:
   - 0.35
   - 0.75
@@ -2131,7 +2155,7 @@ endpoints_bi:
   - 0.9
 - api: openrouter
   model: qwen/qwen3-32b
-  provider: cerebras
+  provider: cerebras/fp16
   cost:
   - 0.4
   - 0.8
@@ -2339,6 +2363,12 @@ endpoints_bi:
   cost:
   - 0.55
   - 0.8
+- api: openrouter
+  model: minimax/minimax-m2.1
+  provider: inceptron/fp8
+  cost:
+  - 0.27
+  - 1.1
 - api: openrouter
   model: meta-llama/llama-3.3-70b-instruct
   provider: groq
@@ -2701,7 +2731,7 @@ endpoints_bi:
   - 1.2
 - api: openrouter
   model: qwen/qwen3-235b-a22b-2507
-  provider: cerebras
+  provider: cerebras/fp16
   cost:
   - 0.6
   - 1.2
@@ -3763,7 +3793,7 @@ endpoints_bi:
   - 3.95
 - api: openrouter
   model: z-ai/glm-4.7
-  provider: cerebras
+  provider: cerebras/fp16
   cost:
   - 2.25
   - 2.75
