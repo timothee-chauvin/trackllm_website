@@ -439,12 +439,6 @@ endpoints_bi:
   - 0.16
 - api: openrouter
   model: google/gemma-3-27b-it
-  provider: gmicloud/bf16
-  cost:
-  - 0.09
-  - 0.16
-- api: openrouter
-  model: google/gemma-3-27b-it
   provider: ncompass/fp8
   cost:
   - 0.09
@@ -563,12 +557,6 @@ endpoints_bi:
   cost:
   - 0.06
   - 0.24
-- api: openrouter
-  model: openai/gpt-oss-120b
-  provider: gmicloud/fp4
-  cost:
-  - 0.05
-  - 0.25
 - api: openrouter
   model: openai/gpt-oss-120b
   provider: novita/fp4
@@ -1033,18 +1021,6 @@ endpoints_bi:
   - 0.4
 - api: openrouter
   model: google/gemini-2.0-flash-001
-  provider: google-vertex
-  cost:
-  - 0.1
-  - 0.4
-- api: openrouter
-  model: google/gemini-2.0-flash-exp:free
-  provider: google-ai-studio
-  cost:
-  - 0.1
-  - 0.4
-- api: openrouter
-  model: google/gemini-2.0-flash-exp:free
   provider: google-vertex
   cost:
   - 0.1
@@ -2070,12 +2046,6 @@ endpoints_bi:
   - 0.23
   - 0.92
 - api: openrouter
-  model: deepseek/deepseek-chat-v3-0324
-  provider: gmicloud/fp8
-  cost:
-  - 0.28
-  - 0.88
-- api: openrouter
   model: qwen/qwen3-coder
   provider: chutes/bf16
   cost:
@@ -2508,6 +2478,12 @@ endpoints_bi:
   - 0.3
   - 1.2
 - api: openrouter
+  model: minimax/minimax-m2-her
+  provider: minimax
+  cost:
+  - 0.3
+  - 1.2
+- api: openrouter
   model: minimax/minimax-m2.1
   provider: atlas-cloud/fp8
   cost:
@@ -2623,12 +2599,6 @@ endpoints_bi:
   - 1.5
 - api: openrouter
   model: qwen/qwen3-next-80b-a3b-instruct
-  provider: gmicloud/fp8
-  cost:
-  - 0.15
-  - 1.5
-- api: openrouter
-  model: qwen/qwen3-next-80b-a3b-instruct
   provider: novita/bf16
   cost:
   - 0.15
@@ -2663,12 +2633,6 @@ endpoints_bi:
   cost:
   - 0.42
   - 1.25
-- api: openrouter
-  model: qwen/qwen3-vl-235b-a22b-instruct
-  provider: gmicloud/fp8
-  cost:
-  - 0.3
-  - 1.4
 - api: openrouter
   model: sao10k/l3.1-euryale-70b
   provider: deepinfra/fp8
@@ -2855,12 +2819,6 @@ endpoints_bi:
   cost:
   - 0.5
   - 1.5
-- api: openrouter
-  model: moonshotai/kimi-k2-thinking
-  provider: gmicloud/int4
-  cost:
-  - 0.8
-  - 1.2
 - api: openrouter
   model: morph/morph-v3-fast
   provider: morph
@@ -3204,12 +3162,6 @@ endpoints_bi:
   - 1.25
   - 1.25
 - api: openrouter
-  model: deepseek/deepseek-chat-v3-0324
-  provider: together/fp8
-  cost:
-  - 1.25
-  - 1.25
-- api: openrouter
   model: qwen/qwen3-235b-a22b-thinking-2507
   provider: atlas-cloud/fp8
   cost:
@@ -3422,6 +3374,12 @@ endpoints_bi:
 - api: openrouter
   model: z-ai/glm-4.6:exacto
   provider: z-ai
+  cost:
+  - 0.6
+  - 2.2
+- api: openrouter
+  model: z-ai/glm-4.7
+  provider: google-vertex
   cost:
   - 0.6
   - 2.2
@@ -4080,6 +4038,12 @@ endpoints_bi:
   - 2.0
   - 8.0
 - api: openrouter
+  model: alpindale/goliath-120b
+  provider: mancer/int4
+  cost:
+  - 3.75
+  - 7.5
+- api: openrouter
   model: google/gemini-2.5-pro
   provider: google-ai-studio
   cost:
@@ -4289,12 +4253,6 @@ endpoints_bi:
   cost:
   - 2.5
   - 10.0
-- api: openrouter
-  model: alpindale/goliath-120b
-  provider: mancer/int4
-  cost:
-  - 6.0
-  - 8.0
 - api: openrouter
   model: google/gemini-3-pro-image-preview
   provider: google-ai-studio

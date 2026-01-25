@@ -228,6 +228,12 @@ endpoints_lt:
   - 3.0
   - 5.0
 - api: openrouter
+  model: alpindale/goliath-120b
+  provider: mancer/int4
+  cost:
+  - 3.75
+  - 7.5
+- api: openrouter
   model: openai/gpt-4o
   provider: azure
   cost:
@@ -257,12 +263,6 @@ endpoints_lt:
   cost:
   - 2.5
   - 10.0
-- api: openrouter
-  model: alpindale/goliath-120b
-  provider: mancer/int4
-  cost:
-  - 6.0
-  - 8.0
 - api: openrouter
   model: openai/chatgpt-4o-latest
   provider: openai
