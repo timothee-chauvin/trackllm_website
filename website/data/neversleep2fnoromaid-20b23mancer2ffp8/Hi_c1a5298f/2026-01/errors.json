@@ -1,1 +1,1 @@
-{"seen_errors":[]}
+{"seen_errors":[{"http_code":400,"message":"{\"message\":\"Provider returned error\",\"code\":400,\"metadata\":{\"raw\":\"{\\\"error\\\":{\\\"data\\\":null,\\\"message\\\":\\\"Unknown Model: 'noromaid'\\\",\\\"type\\\":\\\"MODEL_UNAVAILABLE\\\"}}\\n\",\"provider_name\":\"Mancer 2\",\"is_byok\":false}}"}]}
