@@ -1764,12 +1764,6 @@ endpoints_bi:
   - 0.2
   - 0.7
 - api: openrouter
-  model: qwen/qwen3-vl-30b-a3b-instruct
-  provider: phala
-  cost:
-  - 0.2
-  - 0.7
-- api: openrouter
   model: deepseek/deepseek-chat-v3.1
   provider: sambanova/high-throughput
   cost:
