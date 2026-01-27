@@ -151,6 +151,12 @@ endpoints_lt:
   - 2.0
 - api: openrouter
   model: z-ai/glm-4.7
+  provider: mancer/fp4
+  cost:
+  - 0.475
+  - 2.0
+- api: openrouter
+  model: z-ai/glm-4.7
   provider: mancer/fp8
   cost:
   - 0.475

@@ -439,6 +439,12 @@ endpoints_bi:
   - 0.16
 - api: openrouter
   model: google/gemma-3-27b-it
+  provider: gmicloud/bf16
+  cost:
+  - 0.09
+  - 0.16
+- api: openrouter
+  model: google/gemma-3-27b-it
   provider: ncompass/fp8
   cost:
   - 0.09
@@ -926,6 +932,12 @@ endpoints_bi:
 - api: openrouter
   model: xiaomi/mimo-v2-flash
   provider: novita
+  cost:
+  - 0.1
+  - 0.3
+- api: openrouter
+  model: xiaomi/mimo-v2-flash
+  provider: xiaomi/fp8
   cost:
   - 0.1
   - 0.3
@@ -2040,6 +2052,12 @@ endpoints_bi:
   - 0.23
   - 0.92
 - api: openrouter
+  model: deepseek/deepseek-chat-v3-0324
+  provider: gmicloud/fp8
+  cost:
+  - 0.28
+  - 0.88
+- api: openrouter
   model: qwen/qwen3-coder
   provider: chutes/bf16
   cost:
@@ -2593,6 +2611,12 @@ endpoints_bi:
   - 1.5
 - api: openrouter
   model: qwen/qwen3-next-80b-a3b-instruct
+  provider: gmicloud/fp8
+  cost:
+  - 0.15
+  - 1.5
+- api: openrouter
+  model: qwen/qwen3-next-80b-a3b-instruct
   provider: novita/bf16
   cost:
   - 0.15
@@ -2627,6 +2651,12 @@ endpoints_bi:
   cost:
   - 0.42
   - 1.25
+- api: openrouter
+  model: qwen/qwen3-vl-235b-a22b-instruct
+  provider: gmicloud/fp8
+  cost:
+  - 0.3
+  - 1.4
 - api: openrouter
   model: sao10k/l3.1-euryale-70b
   provider: deepinfra/fp8
@@ -2813,6 +2843,12 @@ endpoints_bi:
   cost:
   - 0.5
   - 1.5
+- api: openrouter
+  model: moonshotai/kimi-k2-thinking
+  provider: gmicloud/int4
+  cost:
+  - 0.8
+  - 1.2
 - api: openrouter
   model: morph/morph-v3-fast
   provider: morph
@@ -3102,6 +3138,12 @@ endpoints_bi:
   - 0.6
   - 1.8
 - api: openrouter
+  model: z-ai/glm-4.7
+  provider: nebius/fp8
+  cost:
+  - 0.4
+  - 2.0
+- api: openrouter
   model: aion-labs/aion-rp-llama-3.1-8b
   provider: aion-labs
   cost:
@@ -3139,7 +3181,7 @@ endpoints_bi:
   - 1.95
 - api: openrouter
   model: z-ai/glm-4.7
-  provider: mancer/fp8
+  provider: mancer/fp4
   cost:
   - 0.475
   - 2.0
