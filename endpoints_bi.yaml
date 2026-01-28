@@ -1332,12 +1332,6 @@ endpoints_bi:
   - 0.09
   - 0.58
 - api: openrouter
-  model: deepseek/deepseek-v3.2
-  provider: phala
-  cost:
-  - 0.27
-  - 0.4
-- api: openrouter
   model: deepseek/deepseek-v3.2-exp
   provider: novita/fp8
   cost:
@@ -1400,6 +1394,12 @@ endpoints_bi:
 - api: openrouter
   model: meta-llama/llama-4-scout
   provider: friendli
+  cost:
+  - 0.1
+  - 0.6
+- api: openrouter
+  model: qwen/qwen3-235b-a22b-2507
+  provider: parasail/fp8
   cost:
   - 0.1
   - 0.6
@@ -1626,12 +1626,6 @@ endpoints_bi:
   - 0.2
   - 0.6
 - api: openrouter
-  model: meta-llama/llama-3-70b-instruct
-  provider: hyperbolic
-  cost:
-  - 0.4
-  - 0.4
-- api: openrouter
   model: meta-llama/llama-3.1-70b-instruct
   provider: deepinfra/base
   cost:
@@ -1746,17 +1740,17 @@ endpoints_bi:
   - 0.21
   - 0.63
 - api: openrouter
+  model: openai/gpt-oss-120b
+  provider: parasail/fp4
+  cost:
+  - 0.1
+  - 0.75
+- api: openrouter
   model: qwen/qwen3-vl-8b-instruct
   provider: together
   cost:
   - 0.18
   - 0.68
-- api: openrouter
-  model: openai/gpt-oss-120b
-  provider: parasail/fp4
-  cost:
-  - 0.12
-  - 0.75
 - api: openrouter
   model: qwen/qwen3-32b
   provider: groq
@@ -2245,12 +2239,6 @@ endpoints_bi:
   - 1.0
 - api: openrouter
   model: minimax/minimax-m2
-  provider: deepinfra/fp8
-  cost:
-  - 0.254
-  - 1.02
-- api: openrouter
-  model: minimax/minimax-m2
   provider: minimax/fp8
   cost:
   - 0.255
@@ -2560,12 +2548,6 @@ endpoints_bi:
   provider: siliconflow/fp8
   cost:
   - 0.14
-  - 1.4
-- api: openrouter
-  model: qwen/qwen3-235b-a22b-2507
-  provider: parasail/fp8
-  cost:
-  - 0.19
   - 1.4
 - api: openrouter
   model: deepseek/deepseek-r1-distill-llama-70b
@@ -3078,6 +3060,12 @@ endpoints_bi:
   - 0.6
   - 1.7
 - api: openrouter
+  model: mistralai/devstral-2512
+  provider: mistral
+  cost:
+  - 0.4
+  - 2.0
+- api: openrouter
   model: mistralai/devstral-medium
   provider: mistral
   cost:
@@ -3107,6 +3095,12 @@ endpoints_bi:
   cost:
   - 0.4
   - 2.0
+- api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: fireworks
+  cost:
+  - 1.2
+  - 1.2
 - api: openrouter
   model: nvidia/llama-3.1-nemotron-70b-instruct
   provider: deepinfra/fp8
@@ -3354,12 +3348,6 @@ endpoints_bi:
   - 0.3
   - 2.5
 - api: openrouter
-  model: google/gemini-2.5-flash-preview-09-2025
-  provider: google-vertex/global
-  cost:
-  - 0.3
-  - 2.5
-- api: openrouter
   model: morph/morph-v3-large
   provider: morph
   cost:
@@ -3461,12 +3449,6 @@ endpoints_bi:
   cost:
   - 0.5
   - 2.5
-- api: openrouter
-  model: neversleep/noromaid-20b
-  provider: mancer/fp8
-  cost:
-  - 1.0
-  - 2.0
 - api: openrouter
   model: openai/gpt-3.5-turbo-0613
   provider: azure
@@ -3570,6 +3552,12 @@ endpoints_bi:
   - 0.6
   - 2.5
 - api: openrouter
+  model: z-ai/glm-4.7
+  provider: nextbit/fp4
+  cost:
+  - 0.6
+  - 2.5
+- api: openrouter
   model: deepseek/deepseek-r1
   provider: novita/fp8
   cost:
@@ -3635,6 +3623,30 @@ endpoints_bi:
   cost:
   - 0.59
   - 2.99
+- api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: chutes
+  cost:
+  - 0.6
+  - 3.0
+- api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: gmicloud/int4
+  cost:
+  - 0.6
+  - 3.0
+- api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: moonshotai
+  cost:
+  - 0.6
+  - 3.0
+- api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: novita
+  cost:
+  - 0.6
+  - 3.0
 - api: openrouter
   model: qwen/qwen3-235b-a22b-thinking-2507
   provider: together
