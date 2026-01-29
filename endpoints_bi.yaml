@@ -450,6 +450,12 @@ endpoints_bi:
   - 0.09
   - 0.16
 - api: openrouter
+  model: nvidia/nemotron-3-nano-30b-a3b
+  provider: deepinfra/fp4
+  cost:
+  - 0.05
+  - 0.2
+- api: openrouter
   model: openai/gpt-oss-20b
   provider: nebius/fp4
   cost:
@@ -554,12 +560,6 @@ endpoints_bi:
 - api: openrouter
   model: nvidia/nemotron-3-nano-30b-a3b
   provider: chutes/bf16
-  cost:
-  - 0.06
-  - 0.24
-- api: openrouter
-  model: nvidia/nemotron-3-nano-30b-a3b
-  provider: deepinfra/bf16
   cost:
   - 0.06
   - 0.24
@@ -1332,6 +1332,12 @@ endpoints_bi:
   - 0.09
   - 0.58
 - api: openrouter
+  model: deepseek/deepseek-v3.2
+  provider: phala
+  cost:
+  - 0.27
+  - 0.4
+- api: openrouter
   model: deepseek/deepseek-v3.2-exp
   provider: novita/fp8
   cost:
@@ -1766,6 +1772,12 @@ endpoints_bi:
 - api: openrouter
   model: qwen/qwen3-vl-30b-a3b-instruct
   provider: novita/bf16
+  cost:
+  - 0.2
+  - 0.7
+- api: openrouter
+  model: qwen/qwen3-vl-30b-a3b-instruct
+  provider: phala
   cost:
   - 0.2
   - 0.7
@@ -2820,6 +2832,12 @@ endpoints_bi:
   - 0.8
   - 1.2
 - api: openrouter
+  model: minimax/minimax-m2.1
+  provider: venice
+  cost:
+  - 0.4
+  - 1.6
+- api: openrouter
   model: mistralai/mistral-large-2512
   provider: mistral
   cost:
@@ -3096,12 +3114,6 @@ endpoints_bi:
   - 0.4
   - 2.0
 - api: openrouter
-  model: moonshotai/kimi-k2.5
-  provider: fireworks
-  cost:
-  - 1.2
-  - 1.2
-- api: openrouter
   model: nvidia/llama-3.1-nemotron-70b-instruct
   provider: deepinfra/fp8
   cost:
@@ -3144,17 +3156,17 @@ endpoints_bi:
   - 0.8
   - 1.6
 - api: openrouter
-  model: z-ai/glm-4.6
-  provider: mancer/fp8
-  cost:
-  - 0.425
-  - 2.0
-- api: openrouter
   model: meta-llama/llama-4-maverick
   provider: sambanova
   cost:
   - 0.63
   - 1.8
+- api: openrouter
+  model: z-ai/glm-4.6
+  provider: mancer/fp8
+  cost:
+  - 0.4375
+  - 2.0
 - api: openrouter
   model: z-ai/glm-4.7
   provider: together
@@ -3177,7 +3189,7 @@ endpoints_bi:
   model: z-ai/glm-4.7
   provider: mancer/fp4
   cost:
-  - 0.475
+  - 0.4875
   - 2.0
 - api: openrouter
   model: deepcogito/cogito-v2.1-671b
@@ -3600,6 +3612,18 @@ endpoints_bi:
   - 0.69
   - 2.7
 - api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: gmicloud/int4
+  cost:
+  - 0.57
+  - 2.85
+- api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: novita
+  cost:
+  - 0.57
+  - 2.85
+- api: openrouter
   model: google/gemini-3-flash-preview
   provider: google-ai-studio
   cost:
@@ -3631,19 +3655,13 @@ endpoints_bi:
   - 3.0
 - api: openrouter
   model: moonshotai/kimi-k2.5
-  provider: gmicloud/int4
+  provider: fireworks
   cost:
   - 0.6
   - 3.0
 - api: openrouter
   model: moonshotai/kimi-k2.5
   provider: moonshotai
-  cost:
-  - 0.6
-  - 3.0
-- api: openrouter
-  model: moonshotai/kimi-k2.5
-  provider: novita
   cost:
   - 0.6
   - 3.0
