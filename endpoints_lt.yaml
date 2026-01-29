@@ -147,19 +147,13 @@ endpoints_lt:
   model: z-ai/glm-4.6
   provider: mancer/fp8
   cost:
-  - 0.425
+  - 0.4375
   - 2.0
 - api: openrouter
   model: z-ai/glm-4.7
   provider: mancer/fp4
   cost:
-  - 0.475
-  - 2.0
-- api: openrouter
-  model: z-ai/glm-4.7
-  provider: mancer/fp8
-  cost:
-  - 0.475
+  - 0.4875
   - 2.0
 - api: openrouter
   model: z-ai/glm-4.6
@@ -173,12 +167,6 @@ endpoints_lt:
   cost:
   - 0.5
   - 2.5
-- api: openrouter
-  model: neversleep/noromaid-20b
-  provider: mancer/fp8
-  cost:
-  - 1.0
-  - 2.0
 - api: openrouter
   model: openai/gpt-3.5-turbo-0613
   provider: azure
