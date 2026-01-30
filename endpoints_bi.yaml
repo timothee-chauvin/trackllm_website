@@ -1296,6 +1296,12 @@ endpoints_bi:
   - 0.26
   - 0.38
 - api: openrouter
+  model: deepseek/deepseek-v3.2
+  provider: deepinfra/fp4
+  cost:
+  - 0.26
+  - 0.38
+- api: openrouter
   model: allenai/olmo-3-32b-think
   provider: parasail/bf16
   cost:
@@ -1307,12 +1313,6 @@ endpoints_bi:
   cost:
   - 0.15
   - 0.5
-- api: openrouter
-  model: deepseek/deepseek-v3.2
-  provider: deepinfra/fp4
-  cost:
-  - 0.26
-  - 0.39
 - api: openrouter
   model: qwen/qwen-2.5-72b-instruct
   provider: chutes/fp8
@@ -2976,12 +2976,6 @@ endpoints_bi:
   - 0.43
   - 1.75
 - api: openrouter
-  model: z-ai/glm-4.7
-  provider: deepinfra/fp4
-  cost:
-  - 0.43
-  - 1.75
-- api: openrouter
   model: deepseek/deepseek-chat-v3.1
   provider: wandb/fp8
   cost:
@@ -3077,6 +3071,12 @@ endpoints_bi:
   cost:
   - 0.6
   - 1.7
+- api: openrouter
+  model: z-ai/glm-4.7
+  provider: deepinfra/fp4
+  cost:
+  - 0.4
+  - 1.9
 - api: openrouter
   model: mistralai/devstral-2512
   provider: mistral
@@ -3600,11 +3600,29 @@ endpoints_bi:
   - 0.55
   - 2.65
 - api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: deepinfra
+  cost:
+  - 0.5
+  - 2.8
+- api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: together
+  cost:
+  - 0.5
+  - 2.8
+- api: openrouter
   model: qwen/qwen3-235b-a22b-thinking-2507
   provider: novita/fp8
   cost:
   - 0.3
   - 3.0
+- api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: atlas-cloud/int4
+  cost:
+  - 0.56
+  - 2.8
 - api: openrouter
   model: qwen/qwen3-coder
   provider: atlas-cloud/fp8
@@ -3671,6 +3689,12 @@ endpoints_bi:
   cost:
   - 0.65
   - 3.0
+- api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: parasail/bf16
+  cost:
+  - 0.6
+  - 3.2
 - api: openrouter
   model: deepseek/deepseek-chat-v3-0324
   provider: wandb/fp8
