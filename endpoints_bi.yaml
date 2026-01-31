@@ -3601,12 +3601,6 @@ endpoints_bi:
   - 2.65
 - api: openrouter
   model: moonshotai/kimi-k2.5
-  provider: deepinfra
-  cost:
-  - 0.5
-  - 2.8
-- api: openrouter
-  model: moonshotai/kimi-k2.5
   provider: together
   cost:
   - 0.5
@@ -3629,12 +3623,6 @@ endpoints_bi:
   cost:
   - 0.69
   - 2.7
-- api: openrouter
-  model: moonshotai/kimi-k2.5
-  provider: gmicloud/int4
-  cost:
-  - 0.57
-  - 2.85
 - api: openrouter
   model: moonshotai/kimi-k2.5
   provider: novita
@@ -3667,7 +3655,7 @@ endpoints_bi:
   - 2.99
 - api: openrouter
   model: moonshotai/kimi-k2.5
-  provider: chutes
+  provider: chutes/int4
   cost:
   - 0.6
   - 3.0
