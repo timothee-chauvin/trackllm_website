@@ -1,1 +1,1 @@
-{"seen_errors":[]}
+{"seen_errors":[{"http_code":404,"message":"{\"message\":\"Provider returned error\",\"code\":404,\"metadata\":{\"raw\":\"\",\"provider_name\":\"Fireworks\",\"is_byok\":false}}"}]}
