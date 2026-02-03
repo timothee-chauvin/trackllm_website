@@ -1,1 +1,1 @@
-{"seen_errors":[]}
+{"seen_errors":[{"http_code":412,"message":"{\"message\":\"Provider returned error\",\"code\":412,\"metadata\":{\"raw\":\"{\\\"code\\\":\\\"internal_error\\\",\\\"message\\\":\\\"an internal server error occurred, please contact customer support if this error persists\\\",\\\"error_id\\\":\\\"7de5681158cfb5f627c48d48db5be626\\\"}\\n\",\"provider_name\":\"Crusoe\",\"is_byok\":false}}"}]}
