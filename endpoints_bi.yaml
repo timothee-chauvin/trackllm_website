@@ -36,6 +36,18 @@ endpoints_bi:
   - 0.02
   - 0.04
 - api: openrouter
+  model: meta-llama/llama-3-8b-instruct
+  provider: deepinfra/bf16
+  cost:
+  - 0.03
+  - 0.04
+- api: openrouter
+  model: meta-llama/llama-3.1-8b-instruct
+  provider: deepinfra/bf16
+  cost:
+  - 0.02
+  - 0.05
+- api: openrouter
   model: meta-llama/llama-3.1-8b-instruct
   provider: novita/fp8
   cost:
@@ -47,12 +59,6 @@ endpoints_bi:
   cost:
   - 0.04
   - 0.04
-- api: openrouter
-  model: meta-llama/llama-3.1-8b-instruct
-  provider: deepinfra/bf16
-  cost:
-  - 0.03
-  - 0.05
 - api: openrouter
   model: meta-llama/llama-3.1-8b-instruct
   provider: nebius/fp8
@@ -77,12 +83,6 @@ endpoints_bi:
   cost:
   - 0.01703012
   - 0.0681536
-- api: openrouter
-  model: meta-llama/llama-3-8b-instruct
-  provider: deepinfra/bf16
-  cost:
-  - 0.03
-  - 0.06
 - api: openrouter
   model: sao10k/l3-lunaris-8b
   provider: deepinfra/turbo
@@ -2652,6 +2652,18 @@ endpoints_bi:
   - 0.42
   - 1.25
 - api: openrouter
+  model: qwen/qwen3-coder-next
+  provider: novita/fp8
+  cost:
+  - 0.2
+  - 1.5
+- api: openrouter
+  model: qwen/qwen3-coder-next
+  provider: together
+  cost:
+  - 0.5
+  - 1.2
+- api: openrouter
   model: qwen/qwen3-vl-235b-a22b-instruct
   provider: gmicloud/fp8
   cost:
@@ -3201,7 +3213,7 @@ endpoints_bi:
   model: z-ai/glm-4.7
   provider: mancer/fp4
   cost:
-  - 0.4875
+  - 0.475
   - 2.0
 - api: openrouter
   model: deepcogito/cogito-v2.1-671b
@@ -3450,6 +3462,12 @@ endpoints_bi:
   - 0.5
   - 2.4
 - api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: chutes/int4
+  cost:
+  - 0.45
+  - 2.5
+- api: openrouter
   model: sao10k/l3-euryale-70b
   provider: novita/bf16
   cost:
@@ -3630,12 +3648,6 @@ endpoints_bi:
   - 0.56
   - 2.8
 - api: openrouter
-  model: qwen/qwen3-coder
-  provider: atlas-cloud/fp8
-  cost:
-  - 0.69
-  - 2.7
-- api: openrouter
   model: moonshotai/kimi-k2.5
   provider: gmicloud/int4
   cost:
@@ -3666,17 +3678,17 @@ endpoints_bi:
   - 1.5
   - 2.0
 - api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: siliconflow/fp8
+  cost:
+  - 0.55
+  - 3.0
+- api: openrouter
   model: moonshotai/kimi-k2-0905
   provider: parasail/fp8
   cost:
   - 0.59
   - 2.99
-- api: openrouter
-  model: moonshotai/kimi-k2.5
-  provider: chutes/int4
-  cost:
-  - 0.6
-  - 3.0
 - api: openrouter
   model: moonshotai/kimi-k2.5
   provider: fireworks
@@ -3803,6 +3815,12 @@ endpoints_bi:
   cost:
   - 0.75
   - 3.75
+- api: openrouter
+  model: qwen/qwen3-coder
+  provider: atlas-cloud/fp8
+  cost:
+  - 0.78
+  - 3.8
 - api: openrouter
   model: x-ai/grok-3-mini
   provider: xai/fast
