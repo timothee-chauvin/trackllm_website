@@ -216,12 +216,6 @@ endpoints_bi:
   - 0.03
   - 0.11
 - api: openrouter
-  model: gryphe/mythomax-l2-13b
-  provider: deepinfra/fp16
-  cost:
-  - 0.08
-  - 0.08
-- api: openrouter
   model: google/gemma-3-12b-it
   provider: deepinfra/bf16
   cost:
@@ -259,19 +253,7 @@ endpoints_bi:
   - 0.15
 - api: openrouter
   model: openai/gpt-oss-20b
-  provider: ncompass
-  cost:
-  - 0.04
-  - 0.15
-- api: openrouter
-  model: openai/gpt-oss-20b
   provider: novita/fp4
-  cost:
-  - 0.04
-  - 0.15
-- api: openrouter
-  model: openai/gpt-oss-20b
-  provider: phala
   cost:
   - 0.04
   - 0.15
@@ -385,12 +367,6 @@ endpoints_bi:
   - 0.15
 - api: openrouter
   model: openai/gpt-oss-20b
-  provider: siliconflow/fp8
-  cost:
-  - 0.04
-  - 0.18
-- api: openrouter
-  model: openai/gpt-oss-20b
   provider: clarifai/fp4
   cost:
   - 0.045
@@ -446,12 +422,6 @@ endpoints_bi:
 - api: openrouter
   model: google/gemma-3-27b-it
   provider: gmicloud/bf16
-  cost:
-  - 0.09
-  - 0.16
-- api: openrouter
-  model: google/gemma-3-27b-it
-  provider: ncompass/fp8
   cost:
   - 0.09
   - 0.16
@@ -642,12 +612,6 @@ endpoints_bi:
   - 0.08
   - 0.24
 - api: openrouter
-  model: openai/gpt-oss-120b
-  provider: ncompass
-  cost:
-  - 0.05
-  - 0.28
-- api: openrouter
   model: qwen/qwen3-coder-30b-a3b-instruct
   provider: novita/fp8
   cost:
@@ -692,12 +656,6 @@ endpoints_bi:
 - api: openrouter
   model: qwen/qwen3-30b-a3b
   provider: deepinfra/fp8
-  cost:
-  - 0.08
-  - 0.28
-- api: openrouter
-  model: qwen/qwen3-30b-a3b
-  provider: ncompass/fp8
   cost:
   - 0.08
   - 0.28
@@ -761,12 +719,6 @@ endpoints_bi:
   cost:
   - 0.08
   - 0.3
-- api: openrouter
-  model: qwen/qwen3-32b
-  provider: ncompass/fp8
-  cost:
-  - 0.1
-  - 0.28
 - api: openrouter
   model: xiaomi/mimo-v2-flash
   provider: chutes
@@ -924,12 +876,6 @@ endpoints_bi:
   - 0.1
   - 0.3
 - api: openrouter
-  model: qwen/qwen3-8b
-  provider: fireworks
-  cost:
-  - 0.2
-  - 0.2
-- api: openrouter
   model: qwen/qwen3-coder-30b-a3b-instruct
   provider: nebius/fp8
   cost:
@@ -1009,6 +955,12 @@ endpoints_bi:
   - 0.4
 - api: openrouter
   model: z-ai/glm-4.7-flash
+  provider: deepinfra/bf16
+  cost:
+  - 0.06
+  - 0.4
+- api: openrouter
+  model: z-ai/glm-4.7-flash
   provider: novita/bf16
   cost:
   - 0.07
@@ -1024,12 +976,6 @@ endpoints_bi:
   provider: atlas-cloud/fp8
   cost:
   - 0.08
-  - 0.4
-- api: openrouter
-  model: alibaba/tongyi-deepresearch-30b-a3b
-  provider: ncompass/bf16
-  cost:
-  - 0.09
   - 0.4
 - api: openrouter
   model: nousresearch/hermes-4-70b
@@ -1608,12 +1554,6 @@ endpoints_bi:
   - 0.18
   - 0.59
 - api: openrouter
-  model: meta-llama/llama-4-scout
-  provider: together
-  cost:
-  - 0.18
-  - 0.59
-- api: openrouter
   model: qwen/qwen-2.5-72b-instruct
   provider: novita/bf16
   cost:
@@ -1625,6 +1565,12 @@ endpoints_bi:
   cost:
   - 0.2
   - 0.6
+- api: openrouter
+  model: gryphe/mythomax-l2-13b
+  provider: deepinfra/fp16
+  cost:
+  - 0.4
+  - 0.4
 - api: openrouter
   model: meta-llama/llama-3.1-70b-instruct
   provider: deepinfra/base
@@ -2057,12 +2003,6 @@ endpoints_bi:
   cost:
   - 0.28
   - 0.88
-- api: openrouter
-  model: qwen/qwen3-coder
-  provider: chutes/bf16
-  cost:
-  - 0.22
-  - 0.95
 - api: openrouter
   model: qwen/qwen3-next-80b-a3b-instruct
   provider: deepinfra/fp8
@@ -2814,12 +2754,6 @@ endpoints_bi:
   - 0.38
   - 1.53
 - api: openrouter
-  model: qwen/qwen3-coder:exacto
-  provider: baseten/fp8
-  cost:
-  - 0.38
-  - 1.53
-- api: openrouter
   model: arcee-ai/virtuoso-large
   provider: together
   cost:
@@ -2989,16 +2923,16 @@ endpoints_bi:
   - 1.75
 - api: openrouter
   model: z-ai/glm-4.6
+  provider: deepinfra/fp4
+  cost:
+  - 0.43
+  - 1.74
+- api: openrouter
+  model: z-ai/glm-4.6
   provider: atlas-cloud/fp8
   cost:
   - 0.44
   - 1.74
-- api: openrouter
-  model: z-ai/glm-4.6
-  provider: deepinfra/fp4
-  cost:
-  - 0.43
-  - 1.75
 - api: openrouter
   model: deepseek/deepseek-chat-v3.1
   provider: wandb/fp8
@@ -3240,6 +3174,12 @@ endpoints_bi:
   - 0.54
   - 1.98
 - api: openrouter
+  model: qwen/qwen3-235b-a22b-thinking-2507
+  provider: deepinfra/fp8
+  cost:
+  - 0.23
+  - 2.3
+- api: openrouter
   model: meta-llama/llama-3.3-70b-instruct
   provider: cloudflare/fp8
   cost:
@@ -3275,12 +3215,6 @@ endpoints_bi:
   cost:
   - 0.2
   - 2.4
-- api: openrouter
-  model: qwen/qwen3-235b-a22b-thinking-2507
-  provider: deepinfra/fp8
-  cost:
-  - 0.23
-  - 2.39
 - api: openrouter
   model: z-ai/glm-4.7
   provider: siliconflow/fp8
@@ -3810,6 +3744,12 @@ endpoints_bi:
   - 0.4
   - 4.0
 - api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: venice
+  cost:
+  - 0.75
+  - 3.75
+- api: openrouter
   model: openai/gpt-5-image-mini
   provider: openai
   cost:
@@ -3965,12 +3905,6 @@ endpoints_bi:
   cost:
   - 1.35
   - 5.4
-- api: openrouter
-  model: meta-llama/llama-3.1-405b-instruct
-  provider: together/fp8
-  cost:
-  - 3.5
-  - 3.5
 - api: openrouter
   model: openai/gpt-3.5-turbo-16k
   provider: azure
