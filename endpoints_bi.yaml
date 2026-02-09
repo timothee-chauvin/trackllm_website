@@ -414,12 +414,6 @@ endpoints_bi:
   - 0.05
   - 0.2
 - api: openrouter
-  model: google/gemma-3-27b-it
-  provider: gmicloud/bf16
-  cost:
-  - 0.09
-  - 0.16
-- api: openrouter
   model: nvidia/nemotron-3-nano-30b-a3b
   provider: deepinfra/fp4
   cost:
@@ -978,12 +972,6 @@ endpoints_bi:
   - 0.11
   - 0.38
 - api: openrouter
-  model: opengvlab/internvl3-78b
-  provider: chutes/bf16
-  cost:
-  - 0.1
-  - 0.39
-- api: openrouter
   model: google/gemini-2.0-flash-001
   provider: google-ai-studio
   cost:
@@ -1124,12 +1112,6 @@ endpoints_bi:
 - api: openrouter
   model: qwen/qwen3-30b-a3b
   provider: novita/fp8
-  cost:
-  - 0.09
-  - 0.45
-- api: openrouter
-  model: qwen/qwen3-30b-a3b
-  provider: siliconflow/fp8
   cost:
   - 0.09
   - 0.45
@@ -1496,6 +1478,12 @@ endpoints_bi:
 - api: openrouter
   model: openai/gpt-oss-120b:exacto
   provider: groq
+  cost:
+  - 0.15
+  - 0.6
+- api: openrouter
+  model: opengvlab/internvl3-78b
+  provider: chutes/bf16
   cost:
   - 0.15
   - 0.6
@@ -2388,12 +2376,6 @@ endpoints_bi:
   - 0.72
   - 0.72
 - api: openrouter
-  model: moonshotai/kimi-dev-72b
-  provider: siliconflow/fp8
-  cost:
-  - 0.29
-  - 1.15
-- api: openrouter
   model: minimax/minimax-m2.1
   provider: siliconflow/fp8
   cost:
@@ -2760,12 +2742,6 @@ endpoints_bi:
   - 0.75
   - 1.2
 - api: openrouter
-  model: stepfun-ai/step3
-  provider: siliconflow/fp8
-  cost:
-  - 0.57
-  - 1.42
-- api: openrouter
   model: alfredpros/codellama-7b-instruct-solidity
   provider: featherless
   cost:
@@ -3109,12 +3085,6 @@ endpoints_bi:
   - 1.8
 - api: openrouter
   model: z-ai/glm-4.7
-  provider: mancer/fp4
-  cost:
-  - 0.4
-  - 2.0
-- api: openrouter
-  model: z-ai/glm-4.7
   provider: nebius/fp8
   cost:
   - 0.4
@@ -3252,23 +3222,11 @@ endpoints_bi:
   - 0.45
   - 2.25
 - api: openrouter
-  model: moonshotai/kimi-k2.5
-  provider: fireworks
-  cost:
-  - 0.45
-  - 2.25
-- api: openrouter
   model: z-ai/glm-4.6
   provider: fireworks
   cost:
   - 0.55
   - 2.19
-- api: openrouter
-  model: minimax/minimax-m1
-  provider: siliconflow/fp8
-  cost:
-  - 0.55
-  - 2.2
 - api: openrouter
   model: moonshotai/kimi-k2
   provider: deepinfra/fp4
