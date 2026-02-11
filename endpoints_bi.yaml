@@ -1194,6 +1194,12 @@ endpoints_bi:
   - 0.17
   - 0.43
 - api: openrouter
+  model: z-ai/glm-4.7-flash
+  provider: venice/fp8
+  cost:
+  - 0.125
+  - 0.5
+- api: openrouter
   model: deepseek/deepseek-v3.2
   provider: chutes/fp8
   cost:
@@ -1598,12 +1604,6 @@ endpoints_bi:
 - api: openrouter
   model: qwen/qwen2.5-vl-32b-instruct
   provider: deepinfra/bf16
-  cost:
-  - 0.2
-  - 0.6
-- api: openrouter
-  model: qwen/qwen3-235b-a22b
-  provider: together/fp8
   cost:
   - 0.2
   - 0.6
@@ -2850,6 +2850,12 @@ endpoints_bi:
   - 0.85
   - 1.2
 - api: openrouter
+  model: z-ai/glm-4.6
+  provider: ambient/bf16
+  cost:
+  - 0.35
+  - 1.71
+- api: openrouter
   model: aion-labs/aion-1.0-mini
   provider: aion-labs/bf16
   cost:
@@ -3498,6 +3504,12 @@ endpoints_bi:
   - 0.6
   - 2.5
 - api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: atlas-cloud/int4
+  cost:
+  - 0.5
+  - 2.6
+- api: openrouter
   model: z-ai/glm-4.7
   provider: nextbit/fp4
   cost:
@@ -3547,12 +3559,6 @@ endpoints_bi:
   - 3.0
 - api: openrouter
   model: moonshotai/kimi-k2.5
-  provider: atlas-cloud/int4
-  cost:
-  - 0.56
-  - 2.8
-- api: openrouter
-  model: moonshotai/kimi-k2.5
   provider: parasail/int4
   cost:
   - 0.6
@@ -3588,12 +3594,6 @@ endpoints_bi:
   - 0.55
   - 3.0
 - api: openrouter
-  model: moonshotai/kimi-k2-0905
-  provider: parasail/fp8
-  cost:
-  - 0.59
-  - 2.99
-- api: openrouter
   model: moonshotai/kimi-k2.5
   provider: baseten/fp4
   cost:
@@ -3613,7 +3613,7 @@ endpoints_bi:
   - 3.0
 - api: openrouter
   model: moonshotai/kimi-k2.5
-  provider: moonshotai
+  provider: moonshotai/int4
   cost:
   - 0.6
   - 3.0
