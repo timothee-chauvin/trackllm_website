@@ -78,6 +78,7 @@ class Phase2Config(BaseModel):
     requests_per_second_per_endpoint: float
     max_concurrent_requests_per_endpoint: int
     request_delay_seconds: float
+    abandon_this_run_after: int
 
 
 class BIConfig(BaseModel):

@@ -76,21 +76,48 @@ class EndpointState:
     _current_batch: dict[Prompt, list[tuple[Timestamp, ResponseToken]]] = field(
         default_factory=dict
     )
-    _query_count: int = 0
+    _total_queries: int = 0
+    _error_count: int = 0
+    abandoned: bool = False
 
     def __post_init__(self) -> None:
         self.results = load_existing_results(self.output_path)
         self._current_batch = {prompt: [] for prompt in self.border_inputs}
 
-    def record_result(
+    def record_response(
+        self,
+        prompt: Prompt,
+        content: ResponseToken | None,
+        timestamp: Timestamp,
+        *,
+        error: bool,
+    ) -> None:
+        self._total_queries += 1
+        if error:
+            self._record_error()
+        else:
+            self._record_success(prompt, content, timestamp)
+        if self._total_queries % 20 == 0:
+            self.flush()
+
+    def _record_error(self) -> None:
+        self._error_count += 1
+        abandon_after = config.bi.phase_2.abandon_this_run_after
+        if (
+            not self.abandoned
+            and self._total_queries >= abandon_after
+            and self._error_count == self._total_queries
+        ):
+            self.abandoned = True
+            logger.warning(
+                f"Abandoning {self.endpoint}: all first {self._total_queries} queries were errors"
+            )
+
+    def _record_success(
         self, prompt: Prompt, content: ResponseToken | None, timestamp: Timestamp
     ) -> None:
-        """Record a query result into the current day's batch."""
         if content is not None:
             self._current_batch[prompt].append((timestamp, content))
-        self._query_count += 1
-        if self._query_count >= 20:
-            self.flush()
 
     def flush(self) -> None:
         """Merge current batch into results and save to disk."""
@@ -100,7 +127,6 @@ class EndpointState:
                 self.results[prompt] = {}
             self.results[prompt][batch_key] = timestamped_responses
         save_results(self.output_path, self.results)
-        self._query_count = 0
 
 
 async def query_single(
@@ -109,6 +135,8 @@ async def query_single(
     prompt: Prompt,
 ) -> None:
     """Execute a single query."""
+    if state.abandoned:
+        return
     await state.rate_limiter.acquire()
 
     now = datetime.now(tz=timezone.utc).replace(microsecond=0)
@@ -123,9 +151,10 @@ async def query_single(
         logger.warning(
             f"Error for {state.endpoint}: {prompt!r}: {response.error.message}"
         )
+        state.record_response(prompt, None, timestamp, error=True)
         return
     content = ResponseToken(response.content) if response.content else None
-    state.record_result(prompt, content, timestamp)
+    state.record_response(prompt, content, timestamp, error=False)
 
 
 async def query_all_for_prompt(
@@ -136,6 +165,8 @@ async def query_all_for_prompt(
     """Query endpoint for all pending queries for a single prompt, with delays between requests."""
     n_queries = config.bi.phase_2.queries_per_token
     for i in range(n_queries):
+        if state.abandoned:
+            return
         async with state.concurrency_semaphore:
             await query_single(client, state, prompt)
         if i < n_queries - 1:

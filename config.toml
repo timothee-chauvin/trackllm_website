@@ -37,3 +37,4 @@ queries_per_token = 20
 requests_per_second_per_endpoint = 5
 max_concurrent_requests_per_endpoint = 10
 request_delay_seconds = 5.0
+abandon_this_run_after = 100
