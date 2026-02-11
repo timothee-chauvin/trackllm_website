@@ -1,1 +1,1 @@
-{"seen_errors":[]}
+{"seen_errors":[{"http_code":404,"message":"{\"message\":\"No allowed providers are available for the selected model.\",\"code\":404,\"metadata\":{\"available_providers\":[\"deepinfra\",\"inceptron\",\"nebius\",\"novita\",\"parasail\",\"crusoe\",\"cloudflare\",\"hyperbolic\",\"sambanova-turbo\",\"groq\",\"friendli\",\"sambanova\",\"wandb\",\"google-vertex\",\"cerebras\",\"together\"],\"requested_providers\":[\"fireworks/fp16\"]}}"}]}
