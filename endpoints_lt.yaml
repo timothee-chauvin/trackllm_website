@@ -156,6 +156,12 @@ endpoints_lt:
   - 0.55
   - 2.19
 - api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: inceptron/int4
+  cost:
+  - 0.5
+  - 2.4
+- api: openrouter
   model: moonshotai/kimi-k2-thinking
   provider: parasail/int4
   cost:
