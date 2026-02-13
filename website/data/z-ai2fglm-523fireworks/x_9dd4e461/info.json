@@ -1,0 +1,13 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "z-ai/glm-5",
+    "provider": "fireworks",
+    "cost": [
+      1.0,
+      3.2
+    ],
+    "max_logprobs": null
+  }
+}
