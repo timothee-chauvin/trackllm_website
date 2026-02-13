@@ -162,12 +162,6 @@ endpoints_lt:
   - 0.5
   - 2.4
 - api: openrouter
-  model: moonshotai/kimi-k2-thinking
-  provider: parasail/int4
-  cost:
-  - 0.5
-  - 2.5
-- api: openrouter
   model: openai/gpt-3.5-turbo-0613
   provider: azure
   cost:
@@ -185,6 +179,12 @@ endpoints_lt:
   cost:
   - 0.6
   - 2.5
+- api: openrouter
+  model: z-ai/glm-5
+  provider: fireworks
+  cost:
+  - 1.0
+  - 3.2
 - api: openrouter
   model: z-ai/glm-4.7
   provider: cerebras
