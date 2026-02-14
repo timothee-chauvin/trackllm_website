@@ -102,18 +102,6 @@ endpoints_lt:
   - 0.9000000000000001
   - 0.9000000000000001
 - api: openrouter
-  model: meta-llama/llama-3.3-70b-instruct
-  provider: fireworks/fp16
-  cost:
-  - 0.9000000000000001
-  - 0.9000000000000001
-- api: openrouter
-  model: qwen/qwen2.5-vl-32b-instruct
-  provider: fireworks
-  cost:
-  - 0.9000000000000001
-  - 0.9000000000000001
-- api: openrouter
   model: deepseek/deepseek-chat-v3-0324
   provider: crusoe/fp8
   cost:
