@@ -564,6 +564,12 @@ endpoints_bi:
   - 0.07
   - 0.27
 - api: openrouter
+  model: qwen/qwen3-4b
+  provider: alibaba
+  cost:
+  - 0.0715
+  - 0.273
+- api: openrouter
   model: baidu/ernie-4.5-21b-a3b
   provider: novita/bf16
   cost:
@@ -1044,6 +1050,12 @@ endpoints_bi:
   - 0.12
   - 0.39
 - api: openrouter
+  model: qwen/qwen3-32b
+  provider: alibaba
+  cost:
+  - 0.104
+  - 0.416
+- api: openrouter
   model: qwen/qwen3-vl-32b-instruct
   provider: alibaba
   cost:
@@ -1109,6 +1121,12 @@ endpoints_bi:
   cost:
   - 0.15
   - 0.4
+- api: openrouter
+  model: qwen/qwen3-8b
+  provider: alibaba
+  cost:
+  - 0.117
+  - 0.455
 - api: openrouter
   model: qwen/qwen3-vl-8b-instruct
   provider: alibaba
@@ -1217,6 +1235,12 @@ endpoints_bi:
   cost:
   - 0.15
   - 0.5
+- api: openrouter
+  model: qwen/qwen3-30b-a3b
+  provider: alibaba
+  cost:
+  - 0.13
+  - 0.52
 - api: openrouter
   model: qwen/qwen3-30b-a3b-instruct-2507
   provider: alibaba
@@ -1937,6 +1961,12 @@ endpoints_bi:
   cost:
   - 0.23
   - 0.9
+- api: openrouter
+  model: qwen/qwen3-14b
+  provider: alibaba
+  cost:
+  - 0.2275
+  - 0.91
 - api: openrouter
   model: qwen/qwen3-next-80b-a3b-instruct
   provider: deepinfra/fp8
@@ -2934,6 +2964,12 @@ endpoints_bi:
   - 0.52
   - 1.75
 - api: openrouter
+  model: qwen/qwen3-235b-a22b
+  provider: alibaba
+  cost:
+  - 0.455
+  - 1.82
+- api: openrouter
   model: moonshotai/kimi-k2-0905
   provider: chutes/fp8
   cost:
@@ -3127,7 +3163,13 @@ endpoints_bi:
   - 2.18
 - api: openrouter
   model: minimax/minimax-m2.1
-  provider: minimax/lightning
+  provider: minimax/highspeed
+  cost:
+  - 0.3
+  - 2.4
+- api: openrouter
+  model: minimax/minimax-m2.5
+  provider: minimax/highspeed
   cost:
   - 0.3
   - 2.4
@@ -3414,12 +3456,6 @@ endpoints_bi:
   - 0.6
   - 2.5
 - api: openrouter
-  model: moonshotai/kimi-k2.5
-  provider: atlas-cloud/int4
-  cost:
-  - 0.5
-  - 2.6
-- api: openrouter
   model: z-ai/glm-4.7
   provider: nextbit/fp4
   cost:
@@ -3638,6 +3674,12 @@ endpoints_bi:
 - api: openrouter
   model: z-ai/glm-5
   provider: parasail/fp8
+  cost:
+  - 1.0
+  - 3.2
+- api: openrouter
+  model: z-ai/glm-5
+  provider: together
   cost:
   - 1.0
   - 3.2
