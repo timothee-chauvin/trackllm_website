@@ -1,13 +1,13 @@
 :root {
-  --bg: #0d1117;
-  --surface: #161b22;
-  --border: #30363d;
-  --text: #c9d1d9;
-  --text-muted: #8b949e;
-  --accent: #58a6ff;
-  --accent-hover: #79c0ff;
-  --success: #3fb950;
-  --error: #f85149;
+  --bg: #ffffff;
+  --surface: #f6f8fa;
+  --border: #d0d7de;
+  --text: #1f2328;
+  --text-muted: #57606a;
+  --accent: #0969da;
+  --accent-hover: #218bff;
+  --success: #1a7f37;
+  --error: #cf222e;
 }
 
 * {
@@ -221,11 +221,16 @@ tr:hover {
 .range-option.active {
   color: var(--accent);
   border-color: var(--accent);
-  background: rgba(88, 166, 255, 0.1);
+  background: rgba(9, 105, 218, 0.08);
 }
 
-.range-option input[type="radio"] {
+.range-option input[type="radio"],
+.range-option input[type="checkbox"] {
   display: none;
+}
+
+.token-toggle {
+  margin-left: auto;
 }
 
 /* Chart */
@@ -234,7 +239,6 @@ tr:hover {
   border-radius: 6px;
   padding: 1rem;
   margin-bottom: 2rem;
-  min-height: 300px;
 }
 
 .chart .loading,
@@ -242,7 +246,7 @@ tr:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 280px;
+  height: 200px;
 }
 
 /* Footer */

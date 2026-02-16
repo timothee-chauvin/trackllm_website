@@ -46,6 +46,7 @@ const TIME_RANGES: { value: TimeRange; label: string }[] = [
 ];
 
 let currentRange: TimeRange = "3m";
+let showTokens: boolean = false;
 const cachedData = new Map<string, LogprobQuery[]>();
 const chartElements: {
   plotDiv: HTMLElement;
@@ -53,6 +54,7 @@ const chartElements: {
   slug: string;
 }[] = [];
 const radioGroups: HTMLElement[] = [];
+const tokenToggleInputs: HTMLInputElement[] = [];
 
 async function fetchQueries(
   endpointSlug: string,
@@ -230,29 +232,30 @@ function renderPromptChart(
   const layout = {
     title: {
       text: `Logprobs for "${promptName}" (${sorted.length} Queries)`,
-      font: { color: "#c9d1d9", size: 14 },
+      font: { color: "#1f2328", size: 14 },
     },
     xaxis: {
-      title: { text: "Date", font: { color: "#8b949e" } },
-      gridcolor: "#30363d",
-      tickfont: { color: "#8b949e" },
+      title: { text: "Date", font: { color: "#57606a" } },
+      gridcolor: "#d0d7de",
+      tickfont: { color: "#57606a" },
     },
     yaxis: {
-      title: { text: "Log Probability", font: { color: "#8b949e" } },
-      gridcolor: "#30363d",
-      tickfont: { color: "#8b949e" },
+      title: { text: "Log Probability", font: { color: "#57606a" } },
+      gridcolor: "#d0d7de",
+      tickfont: { color: "#57606a" },
     },
-    paper_bgcolor: "#161b22",
-    plot_bgcolor: "#0d1117",
-    font: { color: "#c9d1d9" },
+    paper_bgcolor: "#f6f8fa",
+    plot_bgcolor: "#ffffff",
+    font: { color: "#1f2328" },
     legend: {
-      font: { color: "#c9d1d9", size: 10 },
+      font: { color: "#1f2328", size: 10 },
       bgcolor: "transparent",
       orientation: "h" as const,
       y: -0.2,
     },
+    height: 560,
     margin: { t: 40, r: 20, b: 80, l: 60 },
-    showlegend: maxLogprobs <= 25,
+    showlegend: showTokens && maxLogprobs <= 25,
   };
 
   const config = {
@@ -260,6 +263,7 @@ function renderPromptChart(
     displayModeBar: false,
   };
 
+  container.innerHTML = "";
   Plotly.newPlot(container, traces, layout, config);
 }
 
@@ -288,6 +292,24 @@ function createRangeSelector(): HTMLElement {
     container.appendChild(optLabel);
   }
 
+  const tokenLabel = document.createElement("label");
+  tokenLabel.className = "range-option token-toggle" + (showTokens ? " active" : "");
+
+  const tokenInput = document.createElement("input");
+  tokenInput.type = "checkbox";
+  tokenInput.checked = showTokens;
+  tokenInput.style.display = "none";
+  tokenInput.addEventListener("change", () => {
+    showTokens = tokenInput.checked;
+    syncAllTokenToggles();
+    rerenderAllCharts();
+  });
+
+  tokenLabel.appendChild(tokenInput);
+  tokenLabel.appendChild(document.createTextNode("show tokens"));
+  container.appendChild(tokenLabel);
+  tokenToggleInputs.push(tokenInput);
+
   radioGroups.push(container);
   return container;
 }
@@ -302,6 +324,14 @@ function syncAllRadios(): void {
         label.classList.toggle("active", input.value === currentRange);
       }
     }
+  }
+}
+
+function syncAllTokenToggles(): void {
+  for (const input of tokenToggleInputs) {
+    input.checked = showTokens;
+    const label = input.closest<HTMLLabelElement>("label");
+    if (label) label.classList.toggle("active", showTokens);
   }
 }
 
