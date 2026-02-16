@@ -36,6 +36,24 @@ interface LogprobsData {
   seen_logprobs: { tokens: number[]; logprobs: number[] }[];
 }
 
+type TimeRange = "5d" | "1m" | "3m" | "all";
+
+const TIME_RANGES: { value: TimeRange; label: string }[] = [
+  { value: "5d", label: "5 Days" },
+  { value: "1m", label: "1 Month" },
+  { value: "3m", label: "3 Months" },
+  { value: "all", label: "All" },
+];
+
+let currentRange: TimeRange = "3m";
+const cachedData = new Map<string, LogprobQuery[]>();
+const chartElements: {
+  plotDiv: HTMLElement;
+  promptName: string;
+  slug: string;
+}[] = [];
+const radioGroups: HTMLElement[] = [];
+
 async function fetchQueries(
   endpointSlug: string,
   promptSlug: string,
@@ -76,10 +94,8 @@ async function fetchLogprobsForMonth(
     const entries: LogprobQuery[] = [];
 
     for (const [dateStr, idx] of queries) {
-      // Skip errors
       if (typeof idx === "string") continue;
 
-      // Parse date "DD HH:MM:SS"
       const [day, time] = dateStr.split(" ");
       const [hour, minute, second] = time.split(":").map(Number);
       const date = new Date(
@@ -94,9 +110,7 @@ async function fetchLogprobsForMonth(
       const logprobVec = logprobsData.seen_logprobs[idx];
       if (!logprobVec || logprobVec.logprobs.length === 0) continue;
 
-      // Decode tokens using seen_tokens
       const tokens = logprobVec.tokens.map((i) => logprobsData.seen_tokens[i]);
-
       entries.push({ date, tokens, logprobs: logprobVec.logprobs });
     }
 
@@ -106,37 +120,44 @@ async function fetchLogprobsForMonth(
   }
 }
 
-async function fetchLogprobsForPrompt(
+async function fetchAllLogprobsForPrompt(
   manifest: EndpointManifest,
-  prompt: PromptManifest,
-  limit: number
+  prompt: PromptManifest
 ): Promise<LogprobQuery[]> {
-  const allEntries: LogprobQuery[] = [];
+  const allEntries = (
+    await Promise.all(
+      prompt.months.map((month) =>
+        fetchLogprobsForMonth(manifest.slug, prompt.slug, month)
+      )
+    )
+  ).flat();
+  allEntries.sort((a, b) => a.date.getTime() - b.date.getTime());
+  return allEntries;
+}
 
-  // Process months in reverse order (newest first)
-  const sortedMonths = [...prompt.months].sort().reverse();
-
-  for (const month of sortedMonths) {
-    const entries = await fetchLogprobsForMonth(
-      manifest.slug,
-      prompt.slug,
-      month
-    );
-    allEntries.push(...entries);
-
-    // Early exit if we have enough
-    if (allEntries.length >= limit) break;
+function filterByTimeRange(
+  entries: LogprobQuery[],
+  range: TimeRange
+): LogprobQuery[] {
+  if (range === "all") return entries;
+  const now = new Date();
+  let cutoff: Date;
+  switch (range) {
+    case "5d":
+      cutoff = new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000);
+      break;
+    case "1m":
+      cutoff = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+      break;
+    case "3m":
+      cutoff = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
+      break;
   }
-
-  // Sort by date descending and take latest
-  allEntries.sort((a, b) => b.date.getTime() - a.date.getTime());
-  return allEntries.slice(0, limit);
+  return entries.filter((e) => e.date >= cutoff);
 }
 
 function reprToken(token: string): string {
-  // Use JSON.stringify to escape special chars, then remove surrounding quotes
   const escaped = JSON.stringify(token).slice(1, -1);
-  // Truncate long tokens
   if (escaped.length > 15) return `'${escaped.slice(0, 12)}…'`;
   return `'${escaped}'`;
 }
@@ -151,15 +172,12 @@ function renderPromptChart(
     return;
   }
 
-  // Reverse to show oldest first (left to right)
   const sorted = [...entries].sort(
     (a, b) => a.date.getTime() - b.date.getTime()
   );
 
-  // Find max number of logprobs and collect unique tokens per position
   const maxLogprobs = Math.max(...sorted.map((e) => e.logprobs.length));
 
-  // Get the most common token at each position for the legend
   const tokenAtPosition: string[] = [];
   for (let i = 0; i < maxLogprobs; i++) {
     const tokenCounts = new Map<string, number>();
@@ -169,7 +187,6 @@ function renderPromptChart(
         tokenCounts.set(token, (tokenCounts.get(token) || 0) + 1);
       }
     }
-    // Get most common token
     let mostCommon = `pos ${i + 1}`;
     let maxCount = 0;
     for (const [token, count] of tokenCounts) {
@@ -181,7 +198,6 @@ function renderPromptChart(
     tokenAtPosition.push(mostCommon);
   }
 
-  // Create a trace for each logprob position
   const traces = [];
   for (let i = 0; i < maxLogprobs; i++) {
     const x: Date[] = [];
@@ -213,7 +229,7 @@ function renderPromptChart(
 
   const layout = {
     title: {
-      text: `Logprobs for "${promptName}" (Latest ${sorted.length} Queries)`,
+      text: `Logprobs for "${promptName}" (${sorted.length} Queries)`,
       font: { color: "#c9d1d9", size: 14 },
     },
     xaxis: {
@@ -247,6 +263,57 @@ function renderPromptChart(
   Plotly.newPlot(container, traces, layout, config);
 }
 
+function createRangeSelector(): HTMLElement {
+  const container = document.createElement("div");
+  container.className = "range-selector";
+
+  for (const { value, label } of TIME_RANGES) {
+    const optLabel = document.createElement("label");
+    optLabel.className =
+      "range-option" + (value === currentRange ? " active" : "");
+
+    const input = document.createElement("input");
+    input.type = "radio";
+    input.name = `range-${radioGroups.length}`;
+    input.value = value;
+    input.checked = value === currentRange;
+    input.addEventListener("change", () => {
+      currentRange = value;
+      syncAllRadios();
+      rerenderAllCharts();
+    });
+
+    optLabel.appendChild(input);
+    optLabel.appendChild(document.createTextNode(label));
+    container.appendChild(optLabel);
+  }
+
+  radioGroups.push(container);
+  return container;
+}
+
+function syncAllRadios(): void {
+  for (const group of radioGroups) {
+    const labels = group.querySelectorAll<HTMLLabelElement>(".range-option");
+    for (const label of labels) {
+      const input = label.querySelector<HTMLInputElement>("input[type=radio]");
+      if (input) {
+        input.checked = input.value === currentRange;
+        label.classList.toggle("active", input.value === currentRange);
+      }
+    }
+  }
+}
+
+function rerenderAllCharts(): void {
+  for (const { plotDiv, promptName, slug } of chartElements) {
+    const entries = cachedData.get(slug);
+    if (entries) {
+      renderPromptChart(plotDiv, promptName, filterByTimeRange(entries, currentRange));
+    }
+  }
+}
+
 async function renderCharts(manifest: EndpointManifest): Promise<void> {
   const chartsContainer = document.getElementById("charts-container");
   if (!chartsContainer) return;
@@ -254,15 +321,29 @@ async function renderCharts(manifest: EndpointManifest): Promise<void> {
   chartsContainer.innerHTML = "";
 
   for (const prompt of manifest.prompts) {
-    // Create chart container for this prompt
     const chartDiv = document.createElement("div");
     chartDiv.className = "chart";
-    chartDiv.innerHTML = '<div class="loading">Loading chart...</div>';
-    chartsContainer.appendChild(chartDiv);
 
-    // Fetch and render (don't await, let them load in parallel visually)
-    fetchLogprobsForPrompt(manifest, prompt, 100).then((entries) => {
-      renderPromptChart(chartDiv, prompt.prompt, entries);
+    chartDiv.appendChild(createRangeSelector());
+
+    const plotDiv = document.createElement("div");
+    plotDiv.innerHTML = '<div class="loading">Loading chart...</div>';
+    chartDiv.appendChild(plotDiv);
+
+    chartsContainer.appendChild(chartDiv);
+    chartElements.push({
+      plotDiv,
+      promptName: prompt.prompt,
+      slug: prompt.slug,
+    });
+
+    fetchAllLogprobsForPrompt(manifest, prompt).then((entries) => {
+      cachedData.set(prompt.slug, entries);
+      renderPromptChart(
+        plotDiv,
+        prompt.prompt,
+        filterByTimeRange(entries, currentRange)
+      );
     });
   }
 }
@@ -298,10 +379,8 @@ async function init(): Promise<void> {
 
   const manifest: EndpointManifest = JSON.parse(manifestEl.textContent || "{}");
 
-  // Start loading charts (async, will render as they complete)
   renderCharts(manifest);
 
-  // Load stats
   const promptData = await Promise.all(
     manifest.prompts.map((p) => loadPromptData(manifest, p))
   );
