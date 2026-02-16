@@ -8,35 +8,6 @@
         <p class="provider">@ {{ endpoint.provider }}</p>
 
         <div id="charts-container"></div>
-
-        <div class="stats">
-            <div class="stat">
-                <div class="stat-value" id="total-count">...</div>
-                <div class="stat-label">Total</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value success" id="success-count">...</div>
-                <div class="stat-label">Success</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value error" id="error-count">...</div>
-                <div class="stat-label">Errors</div>
-            </div>
-        </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Prompt</th>
-                    <th class="num">Total</th>
-                    <th class="num">Success</th>
-                    <th class="num">Errors</th>
-                </tr>
-            </thead>
-            <tbody id="prompts-table">
-                <tr><td colspan="4" class="loading">Loading data...</td></tr>
-            </tbody>
-        </table>
 {% endblock %}
 
 {% block footer %}
