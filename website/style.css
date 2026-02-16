@@ -194,6 +194,40 @@ tr:hover {
   font-style: italic;
 }
 
+/* Range selector */
+.range-selector {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.range-option {
+  cursor: pointer;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.range-option:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+.range-option.active {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: rgba(88, 166, 255, 0.1);
+}
+
+.range-option input[type="radio"] {
+  display: none;
+}
+
 /* Chart */
 .chart {
   background: var(--surface);
