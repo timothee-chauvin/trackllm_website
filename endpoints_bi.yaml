@@ -1704,6 +1704,12 @@ endpoints_bi:
   - 0.29
   - 0.59
 - api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: chutes/int4
+  cost:
+  - 0.45
+  - 0.44
+- api: openrouter
   model: qwen/qwen3-vl-30b-a3b-instruct
   provider: novita/bf16
   cost:
@@ -1979,6 +1985,12 @@ endpoints_bi:
   cost:
   - 0.6
   - 0.6
+- api: openrouter
+  model: minimax/minimax-m2.5
+  provider: siliconflow/fp8
+  cost:
+  - 0.2
+  - 1.0
 - api: openrouter
   model: mistralai/codestral-2508
   provider: mistral
@@ -2365,6 +2377,12 @@ endpoints_bi:
   - 1.2
 - api: openrouter
   model: anthropic/claude-3-haiku
+  provider: amazon-bedrock
+  cost:
+  - 0.25
+  - 1.25
+- api: openrouter
+  model: anthropic/claude-3-haiku
   provider: anthropic
   cost:
   - 0.25
@@ -2444,6 +2462,18 @@ endpoints_bi:
 - api: openrouter
   model: minimax/minimax-m2.1
   provider: novita/fp8
+  cost:
+  - 0.3
+  - 1.2
+- api: openrouter
+  model: minimax/minimax-m2.5
+  provider: atlas-cloud/fp8
+  cost:
+  - 0.3
+  - 1.2
+- api: openrouter
+  model: minimax/minimax-m2.5
+  provider: fireworks
   cost:
   - 0.3
   - 1.2
@@ -3168,12 +3198,6 @@ endpoints_bi:
   - 0.3
   - 2.4
 - api: openrouter
-  model: minimax/minimax-m2.5
-  provider: minimax/highspeed
-  cost:
-  - 0.3
-  - 2.4
-- api: openrouter
   model: deepseek/deepseek-r1-0528
   provider: atlas-cloud/fp8
   cost:
@@ -3330,12 +3354,6 @@ endpoints_bi:
   - 0.5
   - 2.4
 - api: openrouter
-  model: moonshotai/kimi-k2.5
-  provider: chutes/int4
-  cost:
-  - 0.45
-  - 2.5
-- api: openrouter
   model: sao10k/l3-euryale-70b
   provider: novita/bf16
   cost:
@@ -3353,6 +3371,12 @@ endpoints_bi:
   cost:
   - 0.75
   - 2.25
+- api: openrouter
+  model: minimax/minimax-m2.5
+  provider: minimax/highspeed
+  cost:
+  - 0.6
+  - 2.4
 - api: openrouter
   model: moonshotai/kimi-k2-thinking
   provider: parasail/int4
@@ -3456,6 +3480,12 @@ endpoints_bi:
   - 0.6
   - 2.5
 - api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: atlas-cloud/int4
+  cost:
+  - 0.5
+  - 2.6
+- api: openrouter
   model: z-ai/glm-4.7
   provider: nextbit/fp4
   cost:
@@ -3503,6 +3533,12 @@ endpoints_bi:
   cost:
   - 0.3
   - 3.0
+- api: openrouter
+  model: z-ai/glm-5
+  provider: siliconflow/fp8
+  cost:
+  - 0.75
+  - 2.55
 - api: openrouter
   model: z-ai/glm-5
   provider: atlas-cloud/fp8
