@@ -78,29 +78,17 @@ endpoints_lt:
   - 0.3
   - 1.2
 - api: openrouter
+  model: minimax/minimax-m2.5
+  provider: fireworks
+  cost:
+  - 0.3
+  - 1.2
+- api: openrouter
   model: mancer/weaver
   provider: mancer/fp8
   cost:
   - 0.75
   - 1.0
-- api: openrouter
-  model: qwen/qwen3-235b-a22b-2507
-  provider: cerebras
-  cost:
-  - 0.6
-  - 1.2
-- api: openrouter
-  model: qwen/qwen3-235b-a22b-2507
-  provider: cerebras/fp16
-  cost:
-  - 0.6
-  - 1.2
-- api: openrouter
-  model: deepseek/deepseek-chat-v3-0324
-  provider: fireworks
-  cost:
-  - 0.9000000000000001
-  - 0.9000000000000001
 - api: openrouter
   model: deepseek/deepseek-chat-v3-0324
   provider: crusoe/fp8
@@ -126,23 +114,11 @@ endpoints_lt:
   - 0.56
   - 1.68
 - api: openrouter
-  model: qwen/qwen3-coder
-  provider: fireworks
-  cost:
-  - 0.45
-  - 1.8
-- api: openrouter
   model: z-ai/glm-4.7
   provider: inceptron/fp8
   cost:
   - 0.4
   - 1.9
-- api: openrouter
-  model: z-ai/glm-4.6
-  provider: fireworks
-  cost:
-  - 0.55
-  - 2.19
 - api: openrouter
   model: moonshotai/kimi-k2.5
   provider: inceptron/int4
@@ -173,18 +149,6 @@ endpoints_lt:
   cost:
   - 1.0
   - 3.2
-- api: openrouter
-  model: z-ai/glm-4.7
-  provider: cerebras
-  cost:
-  - 2.25
-  - 2.75
-- api: openrouter
-  model: z-ai/glm-4.7
-  provider: cerebras/fp16
-  cost:
-  - 2.25
-  - 2.75
 - api: openrouter
   model: deepseek/deepseek-r1-0528
   provider: crusoe/fp8
