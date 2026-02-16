@@ -1,1 +1,1 @@
-{"seen_errors":[]}
+{"seen_errors":[{"http_code":404,"message":"{\"message\":\"No allowed providers are available for the selected model.\",\"code\":404,\"metadata\":{\"available_providers\":[\"chutes\",\"deepinfra\",\"nebius\",\"novita\",\"atlas-cloud\",\"alibaba\",\"siliconflow\",\"groq\",\"sambanova\"],\"requested_providers\":[\"cerebras\"]}}"}]}
