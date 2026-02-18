@@ -1,18 +1,91 @@
 import asyncio
 from collections.abc import Iterable
 from decimal import Decimal
+from typing import Literal
 
 import aiohttp
 import requests
 import yaml
+from pydantic import BaseModel
 
 from trackllm_website.api import OpenRouterClient
-from trackllm_website.config import Endpoint, config, logger
+from trackllm_website.config import Endpoint, config, logger, root
 from trackllm_website.storage import ResultsStorage
 from trackllm_website.util import (
     gather_with_concurrency,
     gather_with_concurrency_streaming,
 )
+
+BAD_ENDPOINTS_BI_PATH = root / "bad_endpoints_bi.yaml"
+
+
+class BadEndpointReason(BaseModel):
+    token_usage: list[int] | None = None
+    price_mismatch: str | None = None
+
+
+class BadEndpoint(BaseModel):
+    api: Literal["openrouter"]
+    model: str
+    provider: str | None = None
+    reason: BadEndpointReason
+
+    @classmethod
+    def from_endpoint(
+        cls, endpoint: Endpoint, reason: BadEndpointReason
+    ) -> "BadEndpoint":
+        return cls(
+            api=endpoint.api,
+            model=endpoint.model,
+            provider=endpoint.provider,
+            reason=reason,
+        )
+
+    def matches(self, endpoint: Endpoint) -> bool:
+        return (
+            self.api == endpoint.api
+            and self.model == endpoint.model
+            and self.provider == endpoint.provider
+        )
+
+
+def load_bad_endpoints_bi() -> list[BadEndpoint]:
+    """Load the set of known bad BI endpoints from disk."""
+    if not BAD_ENDPOINTS_BI_PATH.exists():
+        return []
+    with open(BAD_ENDPOINTS_BI_PATH) as f:
+        data = yaml.safe_load(f) or {}
+    return [
+        BadEndpoint(
+            api=e["api"],
+            model=e["model"],
+            provider=e.get("provider"),
+            reason=BadEndpointReason(**e.get("reason", {})),
+        )
+        for e in data.get("bad_endpoints_bi", [])
+    ]
+
+
+def save_bad_endpoints_bi(bad_endpoints: Iterable[BadEndpoint]) -> None:
+    """Save the list of bad BI endpoints to disk."""
+    sorted_bad = sorted(
+        bad_endpoints,
+        key=lambda b: (b.api, b.model, b.provider or ""),
+    )
+    output_data = {
+        "bad_endpoints_bi": [
+            {
+                "api": b.api,
+                "model": b.model,
+                "provider": b.provider,
+                "reason": b.reason.model_dump(exclude_none=True),
+            }
+            for b in sorted_bad
+        ]
+    }
+    with open(BAD_ENDPOINTS_BI_PATH, "w") as f:
+        # default_flow_style=False for consistent dumping
+        yaml.dump(output_data, f, default_flow_style=False, sort_keys=False)
 
 
 async def get_model_endpoints(
@@ -31,30 +104,34 @@ async def get_model_endpoints(
             data = await response.json()
             model_endpoints = data["data"]["endpoints"]
             filtered_endpoints = []
-            for endpoint in model_endpoints:
+            for endpoint_data in model_endpoints:
                 if logprob_filter and not (
-                    "logprobs" in endpoint["supported_parameters"]
-                    and "top_logprobs" in endpoint["supported_parameters"]
+                    "logprobs" in endpoint_data["supported_parameters"]
+                    and "top_logprobs" in endpoint_data["supported_parameters"]
                 ):
                     continue
-                endpoint_data = Endpoint(
+                if endpoint_data["tag"] in [e.provider for e in filtered_endpoints]:
+                    # Duplicate provider (it's happened).
+                    continue
+                endpoint = Endpoint(
                     api="openrouter",
                     model=model_id,
-                    provider=endpoint["tag"],
+                    provider=endpoint_data["tag"],
                     cost=(
                         float(
                             (
-                                Decimal(endpoint["pricing"]["prompt"]) * 1_000_000
+                                Decimal(endpoint_data["pricing"]["prompt"]) * 1_000_000
                             ).normalize()
                         ),
                         float(
                             (
-                                Decimal(endpoint["pricing"]["completion"]) * 1_000_000
+                                Decimal(endpoint_data["pricing"]["completion"])
+                                * 1_000_000
                             ).normalize()
                         ),
                     ),
                 )
-                filtered_endpoints.append(endpoint_data)
+                filtered_endpoints.append(endpoint)
             return filtered_endpoints
     except Exception as e:
         logger.error(f"Error fetching endpoints for {model_id}: {e}")
@@ -100,26 +177,97 @@ async def get_endpoints(logprob_filter: bool = False) -> list[Endpoint]:
     return filtered_endpoints
 
 
+def compute_expected_cost(
+    input_tokens: int, output_tokens: int, endpoint: Endpoint
+) -> float:
+    return (
+        input_tokens * endpoint.cost[0] / 1e6 + output_tokens * endpoint.cost[1] / 1e6
+    )
+
+
+async def test_endpoint_token_usage(
+    endpoint: Endpoint,
+    max_input_tokens: int = 10,
+    max_output_tokens: int = 1,
+    price_tolerance: float = 0.01,
+) -> tuple[Endpoint | None, BadEndpoint | None]:
+    """Test if an endpoint uses acceptable token counts and correct pricing.
+
+    Returns:
+        (valid_endpoint, bad_endpoint) - at least one will be None.
+    """
+    async with OpenRouterClient() as client:
+        try:
+            response = await client.query(endpoint, "a", logprobs=False, temperature=0)
+            if response.error:
+                logger.info(
+                    f"{endpoint} token test: ❌ (error: {response.error.message})"
+                )
+                return None, None  # Don't mark as bad on error, might be transient
+            if (
+                response.input_tokens > max_input_tokens
+                or response.output_tokens > max_output_tokens
+            ):
+                logger.info(
+                    f"{endpoint} token test: ❌ "
+                    f"(input={response.input_tokens}, output={response.output_tokens})"
+                )
+                bad = BadEndpoint.from_endpoint(
+                    endpoint,
+                    BadEndpointReason(
+                        token_usage=[response.input_tokens, response.output_tokens]
+                    ),
+                )
+                return None, bad
+
+            # Verify pricing matches advertised cost using the generation endpoint
+            expected_cost = compute_expected_cost(
+                response.input_tokens, response.output_tokens, endpoint
+            )
+            if expected_cost > 0:
+                actual_cost = await client.get_generation_cost(response.generation_id)
+                if actual_cost > expected_cost * (1 + price_tolerance):
+                    ratio = actual_cost / expected_cost
+                    logger.info(
+                        f"{endpoint} price test: ❌ "
+                        f"(actual={actual_cost:.8f}, expected={expected_cost:.8f}, ratio={ratio:.2f})"
+                    )
+                    bad = BadEndpoint.from_endpoint(
+                        endpoint,
+                        BadEndpointReason(price_mismatch=f"{ratio:.2f}"),
+                    )
+                    return None, bad
+
+            logger.info(
+                f"{endpoint} token test: ✅ "
+                f"(input={response.input_tokens}, output={response.output_tokens})"
+            )
+            return endpoint, None
+        except Exception:
+            logger.exception(f"Error testing token usage for {endpoint}")
+            return None, None  # Don't mark as bad on exception, might be transient
+
+
 async def test_endpoint_logprobs(endpoint: Endpoint) -> Endpoint | None:
     """Test if an endpoint actually returns logprobs when queried with 'x'"""
-    client = OpenRouterClient()
-    try:
-        response = await client.query(endpoint, "x")
-        if response.error or len(
-            response.logprobs.logprobs
-        ) != endpoint.get_max_logprobs(config):
-            log_msg = f"{endpoint} logprob support: ❌"
-            if response.error:
-                log_msg += f"\n{response.error}"
-            else:
-                log_msg += f"\n{len(response.logprobs.logprobs)} logprobs, expected {endpoint.get_max_logprobs(config)}"
-            logger.info(log_msg)
+    async with OpenRouterClient() as client:
+        try:
+            response = await client.query(endpoint, "x")
+            if response.error or len(
+                response.logprobs.logprobs
+            ) != endpoint.get_max_logprobs(config):
+                log_msg = f"{endpoint} logprob support: ❌"
+                if response.error:
+                    log_msg += f"\n{response.error}"
+                else:
+                    log_msg += f"\n{len(response.logprobs.logprobs)} logprobs, expected {endpoint.get_max_logprobs(config)}"
+                logger.info(log_msg)
+                return None
+            logger.info(f"{endpoint} logprob support: ✅")
+            return endpoint
+        except Exception:
+            logger.exception(f"Error testing logprobs for {endpoint}")
             return None
-        logger.info(f"{endpoint} logprob support: ✅")
-        return endpoint
-    except Exception:
-        logger.exception(f"Error testing logprobs for {endpoint}")
-        return None
 
 
 async def test_endpoints_logprobs(endpoints: Iterable[Endpoint]) -> list[Endpoint]:
@@ -178,32 +326,94 @@ async def update_endpoints_lt():
 
 
 async def update_endpoints_bi():
-    """Update the BI endpoints with all providers for all models."""
-    all_endpoints = await get_endpoints(logprob_filter=False)
+    """Update the BI endpoints with all providers for all models.
 
-    # Sort endpoints by total cost, then api, model and provider
+    Filters out endpoints that use too many tokens (>10 input or >1 output).
+    Bad endpoints are stored in bad_endpoints_bi.yaml to avoid re-testing.
+    Good endpoints are stored in endpoints_bi.yaml and also skipped on re-runs.
+    Only new endpoints (not in good or bad lists) are tested.
+    """
+    all_endpoints = await get_endpoints(logprob_filter=False)
+    all_endpoints_set = set(all_endpoints)
+
+    known_bad = load_bad_endpoints_bi()
+    known_good = set(config.endpoints_bi)
+    logger.info(
+        f"Loaded {len(known_good)} known good endpoints, "
+        f"{len(known_bad)} known bad endpoints"
+    )
+
+    # Update costs for known good endpoints if they're still in the API response
+    still_good = []
+    for good_endpoint in known_good:
+        if good_endpoint in all_endpoints_set:
+            updated = next(e for e in all_endpoints if e == good_endpoint)
+            still_good.append(updated)
+        else:
+            still_good.append(good_endpoint)
+    logger.info(f"Keeping all {len(still_good)} known good endpoints")
+
+    # Filter out known bad and known good endpoints - only test new ones
+    endpoints_to_test = [
+        e
+        for e in all_endpoints
+        if not any(b.matches(e) for b in known_bad) and e not in known_good
+    ]
+    skipped_bad = len(
+        [e for e in all_endpoints if any(b.matches(e) for b in known_bad)]
+    )
+    skipped_good = len([e for e in all_endpoints if e in known_good])
+    logger.info(
+        f"Testing {len(endpoints_to_test)} new endpoints "
+        f"(skipping {skipped_bad} known bad, {skipped_good} known good)"
+    )
+
+    # Test token usage for each new endpoint
+    tasks = [test_endpoint_token_usage(e) for e in endpoints_to_test]
+    results = await gather_with_concurrency(config.api.max_workers, *tasks)
+
+    newly_valid = [r[0] for r in results if r[0] is not None]
+    new_bad = [r[1] for r in results if r[1] is not None]
+
+    logger.info(
+        f"Token test results: {len(newly_valid)} valid, "
+        f"{len(new_bad)} new bad endpoints"
+    )
+
+    # Update bad endpoints list
+    all_bad = known_bad + new_bad
+    save_bad_endpoints_bi(all_bad)
+    logger.info(f"Saved {len(all_bad)} total bad endpoints to {BAD_ENDPOINTS_BI_PATH}")
+
+    # Combine still-good and newly-valid endpoints
+    all_good = still_good + newly_valid
+
+    # Sort and save valid endpoints to endpoints_bi.yaml
     sorted_endpoints = sorted(
-        all_endpoints, key=lambda e: (sum(e.cost), e.api, e.model, e.provider)
+        all_good, key=lambda e: (sum(e.cost), e.api, e.model, e.provider)
     )
 
     output_data = {"endpoints_bi": []}
     for e in sorted_endpoints:
-        e_data = {
-            "api": e.api,
-            "model": e.model,
-            "provider": e.provider,
-            "cost": list(e.cost),
-        }
-        output_data["endpoints_bi"].append(e_data)
+        output_data["endpoints_bi"].append(
+            {
+                "api": e.api,
+                "model": e.model,
+                "provider": e.provider,
+                "cost": list(e.cost),
+            }
+        )
 
     with open(config.endpoints_yaml_path_bi, "w") as f:
         yaml.dump(output_data, f, default_flow_style=False, sort_keys=False)
 
-    logger.info(f"Updated {config.endpoints_yaml_path_bi}")
+    logger.info(
+        f"Updated {config.endpoints_yaml_path_bi} with {len(sorted_endpoints)} endpoints"
+    )
 
 
 async def main():
-    await update_endpoints_lt()
+    # await update_endpoints_lt()
     await update_endpoints_bi()
 
 

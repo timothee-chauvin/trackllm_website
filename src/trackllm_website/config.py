@@ -12,12 +12,6 @@ from pydantic_settings import (
     YamlConfigSettingsSource,
 )
 
-logging.basicConfig(
-    level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-# logging.getLogger("httpx").setLevel(logging.WARNING)
-logger = logging.getLogger("trackllm-website")
-
 root = Path(__file__).parent.parent.parent
 
 assert "src" in os.listdir(root)
@@ -62,6 +56,51 @@ class Endpoint(BaseModel):
         # Third case: openrouter default
         return cfg.api.top_logprobs_openrouter_default
 
+    @property
+    def provider_without_suffix(self) -> str:
+        return self.provider.split("/")[0]
+
+
+class Phase1Config(BaseModel):
+    queries_per_token: int
+    requests_per_second_per_endpoint: float
+    tokens_per_endpoint: int
+    max_concurrent_requests_per_endpoint: int
+    max_concurrent_tokens_per_endpoint: int
+    request_delay_seconds: float
+    border_input_candidate_ratio: float
+    target_border_inputs: int
+    queries_per_candidate: int
+
+
+class Phase2Config(BaseModel):
+    queries_per_token: int
+    requests_per_second_per_endpoint: float
+    max_concurrent_requests_per_endpoint: int
+    request_delay_seconds: float
+    abandon_this_run_after: int
+
+
+class BIConfig(BaseModel):
+    data_dir: Path
+    phase_1: Phase1Config
+    phase_2: Phase2Config
+
+    @property
+    def tokenizers_dir(self) -> Path:
+        return self.data_dir / "tokenizers"
+
+    def get_phase_1_dir(
+        self, temperature: float | int, base_dir: Path | None = None
+    ) -> Path:
+        if base_dir is None:
+            base_dir = self.data_dir / "phase_1"
+        return base_dir / f"T={temperature:g}"
+
+    @property
+    def phase_2_dir(self) -> Path:
+        return self.data_dir / "phase_2"
+
 
 class ApiConfig(BaseModel):
     # Default is 20, but some providers have a lower limit. See Endpoint.get_max_logprobs().
@@ -79,23 +118,32 @@ class ApiConfig(BaseModel):
 class Config(BaseSettings):
     endpoints_yaml_path_lt: Path = root / "endpoints_lt.yaml"
     endpoints_yaml_path_bi: Path = root / "endpoints_bi.yaml"
+    endpoints_yaml_path_bi_phase_1: Path = root / "endpoints_bi_phase_1.yaml"
     model_config = SettingsConfigDict(
-        yaml_file=[endpoints_yaml_path_lt, endpoints_yaml_path_bi],
+        yaml_file=[
+            endpoints_yaml_path_lt,
+            endpoints_yaml_path_bi,
+            endpoints_yaml_path_bi_phase_1,
+        ],
         toml_file=root / "config.toml",
         env_file=root / ".env",
     )
 
     # read from config.toml
     api: ApiConfig
+    bi: BIConfig
     prompts: list[str]
     data_dir: Path
+    log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 
-    # read from endpoints_[lt|bi].yaml
-    endpoints_lt: list[Endpoint]
-    endpoints_bi: list[Endpoint]
+    # read from endpoints_....yaml
+    endpoints_lt: list[Endpoint] = []
+    endpoints_bi: list[Endpoint] = []
+    endpoints_bi_phase_1: list[Endpoint] = []
 
     # read from .env
     openrouter_api_key: str
+    hf_token: str | None = None
 
     @classmethod
     def settings_customise_sources(
@@ -115,3 +163,10 @@ class Config(BaseSettings):
 
 
 config = Config()
+
+logging.basicConfig(
+    level=config.log_level,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+# logging.getLogger("httpx").setLevel(logging.WARNING)
+logger = logging.getLogger("trackllm-website")

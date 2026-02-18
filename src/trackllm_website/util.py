@@ -3,6 +3,8 @@ import hashlib
 from collections.abc import AsyncIterator, Coroutine
 from typing import Any
 
+from trackllm_website.config import Endpoint
+
 
 async def gather_with_concurrency(
     n: int, *coros: Coroutine[Any, Any, Any]
@@ -72,3 +74,19 @@ def slugify(s: str, max_length: int = 1000, hash_length: int = 0) -> str:
         slug += "_" + string_hash
 
     return slug
+
+
+def endpoint_from_slug(slug: str) -> Endpoint:
+    """Find an Endpoint whose str representation slugifies to the given slug."""
+    from trackllm_website.config import config
+
+    all_endpoints = (
+        # config.endpoints_lt
+        config.endpoints_bi
+        # + config.endpoints_bi_phase_1
+        # + config.endpoints_bi_prevalence
+    )
+    for endpoint in all_endpoints:
+        if slugify(f"{endpoint.model}#{endpoint.provider}") == slug:
+            return endpoint
+    raise ValueError(f"No endpoint found for slug: {slug}")
