@@ -420,12 +420,6 @@ endpoints_bi:
   - 0.05
   - 0.2
 - api: openrouter
-  model: mistralai/devstral-2512
-  provider: chutes/fp8
-  cost:
-  - 0.05
-  - 0.22
-- api: openrouter
   model: qwen/qwen2.5-vl-32b-instruct
   provider: chutes/bf16
   cost:
@@ -632,12 +626,6 @@ endpoints_bi:
 - api: openrouter
   model: openai/gpt-oss-20b
   provider: fireworks
-  cost:
-  - 0.07
-  - 0.3
-- api: openrouter
-  model: qwen/qwen3-coder-next
-  provider: chutes/bf16
   cost:
   - 0.07
   - 0.3
@@ -1260,12 +1248,6 @@ endpoints_bi:
   - 0.09
   - 0.58
 - api: openrouter
-  model: deepseek/deepseek-v3.2
-  provider: phala
-  cost:
-  - 0.27
-  - 0.4
-- api: openrouter
   model: deepseek/deepseek-v3.2-exp
   provider: atlas-cloud/fp8
   cost:
@@ -1397,12 +1379,6 @@ endpoints_bi:
   cost:
   - 0.28
   - 0.45
-- api: openrouter
-  model: qwen/qwen3-235b-a22b-thinking-2507
-  provider: siliconflow/fp8
-  cost:
-  - 0.13
-  - 0.6
 - api: openrouter
   model: qwen/qwq-32b
   provider: siliconflow/fp8
@@ -1692,6 +1668,12 @@ endpoints_bi:
   - 0.18
   - 0.68
 - api: openrouter
+  model: qwen/qwen3-coder-next
+  provider: chutes/bf16
+  cost:
+  - 0.12
+  - 0.75
+- api: openrouter
   model: qwen/qwen3-next-80b-a3b-instruct
   provider: alibaba
   cost:
@@ -1967,6 +1949,12 @@ endpoints_bi:
   cost:
   - 0.2275
   - 0.91
+- api: openrouter
+  model: qwen/qwen3.5-397b-a17b
+  provider: atlas-cloud/fp8
+  cost:
+  - 0.15
+  - 1.0
 - api: openrouter
   model: qwen/qwen3-next-80b-a3b-instruct
   provider: deepinfra/fp8
@@ -2322,6 +2310,18 @@ endpoints_bi:
   - 0.2
   - 1.2
 - api: openrouter
+  model: minimax/minimax-m2.5
+  provider: chutes/fp8
+  cost:
+  - 0.3
+  - 1.1
+- api: openrouter
+  model: minimax/minimax-m2.5
+  provider: inceptron/fp8
+  cost:
+  - 0.3
+  - 1.1
+- api: openrouter
   model: meta-llama/llama-3.3-70b-instruct
   provider: wandb/fp16
   cost:
@@ -2461,13 +2461,25 @@ endpoints_bi:
   - 1.2
 - api: openrouter
   model: minimax/minimax-m2.5
-  provider: novita/bf16
+  provider: novita/fp8
+  cost:
+  - 0.3
+  - 1.2
+- api: openrouter
+  model: minimax/minimax-m2.5
+  provider: parasail/fp8
   cost:
   - 0.3
   - 1.2
 - api: openrouter
   model: minimax/minimax-m2.5
   provider: siliconflow/fp8
+  cost:
+  - 0.3
+  - 1.2
+- api: openrouter
+  model: minimax/minimax-m2.5
+  provider: together
   cost:
   - 0.3
   - 1.2
@@ -2706,23 +2718,11 @@ endpoints_bi:
   - 0.3
   - 1.5
 - api: openrouter
-  model: z-ai/glm-4.6
-  provider: chutes/bf16
-  cost:
-  - 0.35
-  - 1.5
-- api: openrouter
   model: z-ai/glm-4.5
   provider: chutes/bf16
   cost:
   - 0.35
   - 1.55
-- api: openrouter
-  model: z-ai/glm-4.7
-  provider: chutes/bf16
-  cost:
-  - 0.4
-  - 1.5
 - api: openrouter
   model: arcee-ai/virtuoso-large
   provider: together
@@ -2827,10 +2827,22 @@ endpoints_bi:
   - 1.8
 - api: openrouter
   model: z-ai/glm-4.6
+  provider: chutes/bf16
+  cost:
+  - 0.34
+  - 1.7
+- api: openrouter
+  model: z-ai/glm-4.6
   provider: ambient/bf16
   cost:
   - 0.35
   - 1.71
+- api: openrouter
+  model: z-ai/glm-4.7
+  provider: chutes/bf16
+  cost:
+  - 0.38
+  - 1.7
 - api: openrouter
   model: aion-labs/aion-1.0-mini
   provider: aion-labs/bf16
@@ -2903,6 +2915,12 @@ endpoints_bi:
   cost:
   - 0.44
   - 1.76
+- api: openrouter
+  model: minimax/minimax-m2.5
+  provider: nextbit/fp8
+  cost:
+  - 0.5
+  - 1.7
 - api: openrouter
   model: qwen/qwen3-coder
   provider: nebius/fp8
@@ -3662,6 +3680,12 @@ endpoints_bi:
 - api: openrouter
   model: qwen/qwen3.5-397b-a17b
   provider: alibaba
+  cost:
+  - 0.6
+  - 3.6
+- api: openrouter
+  model: qwen/qwen3.5-397b-a17b
+  provider: novita
   cost:
   - 0.6
   - 3.6
@@ -4434,6 +4458,18 @@ endpoints_bi:
   - 3.0
   - 15.0
 - api: openrouter
+  model: anthropic/claude-sonnet-4.6
+  provider: amazon-bedrock
+  cost:
+  - 3.0
+  - 15.0
+- api: openrouter
+  model: anthropic/claude-sonnet-4.6
+  provider: anthropic
+  cost:
+  - 3.0
+  - 15.0
+- api: openrouter
   model: perplexity/sonar-pro
   provider: perplexity
   cost:
@@ -4462,12 +4498,6 @@ endpoints_bi:
   provider: xai
   cost:
   - 3.0
-  - 15.0
-- api: openrouter
-  model: openai/chatgpt-4o-latest
-  provider: openai
-  cost:
-  - 5.0
   - 15.0
 - api: openrouter
   model: openai/gpt-4o-2024-05-13
