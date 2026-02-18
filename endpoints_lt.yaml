@@ -66,6 +66,12 @@ endpoints_lt:
   - 0.5
   - 0.75
 - api: openrouter
+  model: minimax/minimax-m2.5
+  provider: inceptron/fp8
+  cost:
+  - 0.3
+  - 1.1
+- api: openrouter
   model: minimax/minimax-m2.1
   provider: fireworks
   cost:
