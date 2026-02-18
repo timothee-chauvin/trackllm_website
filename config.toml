@@ -1,5 +1,6 @@
 prompts = ["x", "Hi"]
 data_dir = "website/data"
+log_level = "INFO"
 
 [api]
 max_retries = 8
@@ -7,7 +8,7 @@ max_cost_mtok = 30
 temperature = 1.0
 max_workers = 30
 top_logprobs_openrouter_default = 20
-timeout = 30
+timeout = 15
 abandon_after = 100
 openrouter_avoid_free_endpoints = true
 
@@ -16,3 +17,28 @@ fireworks = 5
 azure = 5
 inference-net = 5
 xai = 8
+
+[bi]
+data_dir = "data_bi"
+
+[bi.phase_1]
+queries_per_token = 3
+requests_per_second_per_endpoint = 5
+max_concurrent_requests_per_endpoint = 10
+max_concurrent_tokens_per_endpoint = 100
+tokens_per_endpoint = 5000
+request_delay_seconds = 5.0
+border_input_candidate_ratio = 2
+target_border_inputs = 30
+queries_per_candidate = 100
+
+[bi.prevalence]
+queries_per_token = 3
+tokens_per_endpoint = 1000
+
+[bi.phase_2]
+queries_per_token = 20
+requests_per_second_per_endpoint = 5
+max_concurrent_requests_per_endpoint = 10
+request_delay_seconds = 5.0
+abandon_this_run_after = 100

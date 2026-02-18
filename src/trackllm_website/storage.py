@@ -46,9 +46,13 @@ class Response(BaseModel):
     date: datetime
     endpoint: Endpoint
     prompt: str
-    logprobs: ResponseLogprobs | None
+    content: str | None = None
+    logprobs: ResponseLogprobs | None = None
     error: ResponseError | None = None
     cost: float | int
+    input_tokens: int = 0
+    output_tokens: int = 0
+    generation_id: str | None = None
 
 
 class PromptInfo(BaseModel):

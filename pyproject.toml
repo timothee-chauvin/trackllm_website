@@ -9,18 +9,23 @@ authors = [
 requires-python = ">=3.13"
 dependencies = [
     "aiohttp>=3.13.2",
+    "aiolimiter>=1.2.1",
     "beartype>=0.22.4",
     "jinja2>=3.1.6",
     "numpy>=2.3.4",
     "orjson>=3.11.4",
+    "plotly>=6.5.0",
     "pydantic>=2.12.3",
     "pydantic-settings[yaml]>=2.11.0",
     "requests>=2.32.5",
+    "transformers>=4.57.3",
 ]
-
-[project.scripts]
-trackllm-website = "trackllm_website:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.5.1",
+]
