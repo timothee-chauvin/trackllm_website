@@ -36,24 +36,6 @@ endpoints_lt:
   - 0.15
   - 0.6
 - api: openrouter
-  model: meta-llama/llama-3.3-70b-instruct
-  provider: crusoe/bf16
-  cost:
-  - 0.25
-  - 0.75
-- api: openrouter
-  model: qwen/qwen3-32b
-  provider: cerebras
-  cost:
-  - 0.4
-  - 0.8
-- api: openrouter
-  model: qwen/qwen3-32b
-  provider: cerebras/fp16
-  cost:
-  - 0.4
-  - 0.8
-- api: openrouter
   model: gryphe/mythomax-l2-13b
   provider: mancer/fp8
   cost:
@@ -107,12 +89,6 @@ endpoints_lt:
   cost:
   - 0.5
   - 1.5
-- api: openrouter
-  model: meta-llama/llama-3.3-70b-instruct
-  provider: cerebras/fp16
-  cost:
-  - 0.85
-  - 1.2
 - api: openrouter
   model: deepseek/deepseek-chat-v3.1
   provider: fireworks
