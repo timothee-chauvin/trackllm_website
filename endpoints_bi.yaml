@@ -378,6 +378,12 @@ endpoints_bi:
   - 0.05
   - 0.2
 - api: openrouter
+  model: nvidia/nemotron-nano-12b-v2-vl
+  provider: nebius/bf16
+  cost:
+  - 0.07
+  - 0.2
+- api: openrouter
   model: mistralai/mistral-small-3.2-24b-instruct
   provider: deepinfra/fp8
   cost:
@@ -595,7 +601,7 @@ endpoints_bi:
   - 0.3
 - api: openrouter
   model: xiaomi/mimo-v2-flash
-  provider: chutes
+  provider: chutes/fp8
   cost:
   - 0.09
   - 0.29
@@ -1500,12 +1506,6 @@ endpoints_bi:
   - 0.2
   - 0.6
 - api: openrouter
-  model: qwen/qwen3-32b
-  provider: nebius/fast
-  cost:
-  - 0.2
-  - 0.6
-- api: openrouter
   model: thedrummer/cydonia-24b-v4.1
   provider: nextbit/bf16
   cost:
@@ -2306,6 +2306,12 @@ endpoints_bi:
 - api: openrouter
   model: minimax/minimax-m2.5
   provider: fireworks
+  cost:
+  - 0.3
+  - 1.2
+- api: openrouter
+  model: minimax/minimax-m2.5
+  provider: friendli
   cost:
   - 0.3
   - 1.2
@@ -4117,6 +4123,18 @@ endpoints_bi:
   - 12.0
 - api: openrouter
   model: google/gemini-3-pro-preview
+  provider: google-vertex
+  cost:
+  - 2.0
+  - 12.0
+- api: openrouter
+  model: google/gemini-3.1-pro-preview
+  provider: google-ai-studio
+  cost:
+  - 2.0
+  - 12.0
+- api: openrouter
+  model: google/gemini-3.1-pro-preview
   provider: google-vertex
   cost:
   - 2.0

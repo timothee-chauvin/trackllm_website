@@ -192,12 +192,6 @@ endpoints_lt:
   - 2.5
   - 10.0
 - api: openrouter
-  model: openai/chatgpt-4o-latest
-  provider: openai
-  cost:
-  - 5.0
-  - 15.0
-- api: openrouter
   model: openai/gpt-4o-2024-05-13
   provider: azure
   cost:
