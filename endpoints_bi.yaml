@@ -1495,12 +1495,6 @@ endpoints_bi:
   - 0.6
 - api: openrouter
   model: qwen/qwen3-235b-a22b-2507
-  provider: nebius/fp8
-  cost:
-  - 0.2
-  - 0.6
-- api: openrouter
-  model: qwen/qwen3-235b-a22b-2507
   provider: together
   cost:
   - 0.2
@@ -3156,12 +3150,6 @@ endpoints_bi:
   - 0.5
   - 2.4
 - api: openrouter
-  model: moonshotai/kimi-k2.5
-  provider: inceptron/int4
-  cost:
-  - 0.5
-  - 2.4
-- api: openrouter
   model: sao10k/l3-euryale-70b
   provider: novita/bf16
   cost:
@@ -3336,12 +3324,6 @@ endpoints_bi:
   - 0.23
   - 3.0
 - api: openrouter
-  model: moonshotai/kimi-k2.5
-  provider: together
-  cost:
-  - 0.5
-  - 2.8
-- api: openrouter
   model: qwen/qwen3-235b-a22b-thinking-2507
   provider: novita/fp8
   cost:
@@ -3498,6 +3480,12 @@ endpoints_bi:
   - 0.6
   - 3.6
 - api: openrouter
+  model: qwen/qwen3.5-397b-a17b
+  provider: parasail/bf16
+  cost:
+  - 0.6
+  - 3.6
+- api: openrouter
   model: z-ai/glm-5
   provider: fireworks
   cost:
@@ -3602,12 +3590,6 @@ endpoints_bi:
 - api: openrouter
   model: anthropic/claude-3.5-haiku
   provider: amazon-bedrock
-  cost:
-  - 0.8
-  - 4.0
-- api: openrouter
-  model: anthropic/claude-3.5-haiku
-  provider: anthropic
   cost:
   - 0.8
   - 4.0
@@ -4189,12 +4171,6 @@ endpoints_bi:
   - 15.0
 - api: openrouter
   model: anthropic/claude-3.7-sonnet
-  provider: anthropic
-  cost:
-  - 3.0
-  - 15.0
-- api: openrouter
-  model: anthropic/claude-3.7-sonnet
   provider: google-vertex/europe
   cost:
   - 3.0
@@ -4208,12 +4184,6 @@ endpoints_bi:
 - api: openrouter
   model: anthropic/claude-3.7-sonnet
   provider: google-vertex/us
-  cost:
-  - 3.0
-  - 15.0
-- api: openrouter
-  model: anthropic/claude-3.7-sonnet:thinking
-  provider: anthropic
   cost:
   - 3.0
   - 15.0
