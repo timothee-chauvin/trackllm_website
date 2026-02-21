@@ -96,12 +96,6 @@ endpoints_lt:
   - 0.56
   - 1.68
 - api: openrouter
-  model: z-ai/glm-4.7
-  provider: inceptron/fp8
-  cost:
-  - 0.4
-  - 1.9
-- api: openrouter
   model: moonshotai/kimi-k2.5
   provider: inceptron/int4
   cost:
