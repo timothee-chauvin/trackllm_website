@@ -1,1 +1,1 @@
-{"seen_errors":[{"http_code":200,"message":"No logprobs returned"}]}
+{"seen_errors":[{"http_code":200,"message":"No logprobs returned"},{"http_code":401,"message":"{\"message\":\"Provider returned error\",\"code\":401,\"metadata\":{\"raw\":\"{\\\"error\\\":{\\\"code\\\":\\\"unauthorized\\\",\\\"message\\\":\\\"Authentication service unavailable\\\",\\\"type\\\":\\\"invalid_request_error\\\"}}\",\"provider_name\":\"Inceptron\",\"is_byok\":false}}"}]}
