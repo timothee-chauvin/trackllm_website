@@ -930,12 +930,6 @@ endpoints_bi:
   - 0.25
   - 0.25
 - api: openrouter
-  model: qwen/qwq-32b
-  provider: hyperbolic/bf16
-  cost:
-  - 0.25
-  - 0.25
-- api: openrouter
   model: google/gemma-3-27b-it
   provider: phala
   cost:
@@ -1133,6 +1127,12 @@ endpoints_bi:
   cost:
   - 0.15
   - 0.5
+- api: openrouter
+  model: deepseek/deepseek-v3.2
+  provider: ionstream/fp8
+  cost:
+  - 0.25
+  - 0.4
 - api: openrouter
   model: qwen/qwen3-30b-a3b
   provider: alibaba
@@ -1608,12 +1608,6 @@ endpoints_bi:
   - 0.2
   - 0.77
 - api: openrouter
-  model: deepseek/deepseek-chat-v3-0324
-  provider: modelrun/fp4
-  cost:
-  - 0.2
-  - 0.77
-- api: openrouter
   model: z-ai/glm-4.5-air
   provider: novita/bf16
   cost:
@@ -1806,10 +1800,10 @@ endpoints_bi:
   - 0.2275
   - 0.91
 - api: openrouter
-  model: qwen/qwen3.5-397b-a17b
-  provider: atlas-cloud/fp8
+  model: qwen/qwen3-coder-next
+  provider: ionstream/bf16
   cost:
-  - 0.15
+  - 0.14
   - 1.0
 - api: openrouter
   model: qwen/qwen3-next-80b-a3b-instruct
@@ -2136,6 +2130,12 @@ endpoints_bi:
   - 0.27
   - 1.12
 - api: openrouter
+  model: qwen/qwen3-vl-235b-a22b-instruct
+  provider: ionstream/fp8
+  cost:
+  - 0.2
+  - 1.2
+- api: openrouter
   model: sao10k/l3.1-euryale-70b
   provider: nextbit/fp8
   cost:
@@ -2334,6 +2334,12 @@ endpoints_bi:
   - 0.3
   - 1.2
 - api: openrouter
+  model: qwen/qwen3-coder-next
+  provider: atlas-cloud/fp8
+  cost:
+  - 0.18
+  - 1.35
+- api: openrouter
   model: deepseek/deepseek-chat-v3-0324
   provider: baseten/fp8
   cost:
@@ -2472,6 +2478,12 @@ endpoints_bi:
   - 0.2
   - 1.5
 - api: openrouter
+  model: z-ai/glm-4.7
+  provider: io-net/bf16
+  cost:
+  - 0.3
+  - 1.4
+- api: openrouter
   model: deepseek/deepseek-chat
   provider: novita/fp8
   cost:
@@ -2564,6 +2576,12 @@ endpoints_bi:
 - api: openrouter
   model: deepseek/deepseek-chat-v3.1
   provider: modelrun/fp4
+  cost:
+  - 0.5
+  - 1.5
+- api: openrouter
+  model: deepseek/deepseek-v3.2
+  provider: atlas-cloud/fast
   cost:
   - 0.5
   - 1.5
@@ -2874,6 +2892,12 @@ endpoints_bi:
   - 0.4
   - 2.0
 - api: openrouter
+  model: aion-labs/aion-2.0
+  provider: aion-labs
+  cost:
+  - 0.8
+  - 1.6
+- api: openrouter
   model: aion-labs/aion-rp-llama-3.1-8b
   provider: aion-labs
   cost:
@@ -3174,6 +3198,12 @@ endpoints_bi:
   - 0.5
   - 2.5
 - api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: nebius/int4
+  cost:
+  - 0.5
+  - 2.5
+- api: openrouter
   model: openai/gpt-3.5-turbo-0613
   provider: azure
   cost:
@@ -3456,6 +3486,12 @@ endpoints_bi:
   - 1.0
   - 3.0
 - api: openrouter
+  model: qwen/qwen3.5-397b-a17b
+  provider: atlas-cloud/fp8
+  cost:
+  - 0.55
+  - 3.5
+- api: openrouter
   model: z-ai/glm-5
   provider: atlas-cloud/fp8
   cost:
@@ -3481,7 +3517,7 @@ endpoints_bi:
   - 3.6
 - api: openrouter
   model: qwen/qwen3.5-397b-a17b
-  provider: parasail/bf16
+  provider: parasail/fp8
   cost:
   - 0.6
   - 3.6
@@ -4165,6 +4201,12 @@ endpoints_bi:
   - 14.0
 - api: openrouter
   model: openai/gpt-5.2-codex
+  provider: openai
+  cost:
+  - 1.75
+  - 14.0
+- api: openrouter
+  model: openai/gpt-5.3-codex
   provider: openai
   cost:
   - 1.75
