@@ -249,6 +249,27 @@ tr:hover {
   height: 200px;
 }
 
+/* Detailed plots dropdown */
+.detailed-plots {
+  margin-top: 1rem;
+}
+
+.detailed-plots summary {
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  padding: 0.5rem 0;
+  user-select: none;
+}
+
+.detailed-plots summary:hover {
+  color: var(--accent);
+}
+
+.detailed-plots[open] summary {
+  margin-bottom: 1rem;
+}
+
 /* Footer */
 footer {
   margin-top: 3rem;

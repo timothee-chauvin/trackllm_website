@@ -24,6 +24,14 @@ interface LogprobsData {
   seen_logprobs: { tokens: number[]; logprobs: number[] }[];
 }
 
+interface LTScoresData {
+  n_per_test: number;
+  dates: string[];
+  scores: number[];
+  sigmas: (number | null)[];
+  changes: { index: number; sigma: number }[];
+}
+
 type TimeRange = "5d" | "1m" | "3m" | "all";
 
 const TIME_RANGES: { value: TimeRange; label: string }[] = [
@@ -130,6 +138,142 @@ function reprToken(token: string): string {
   const escaped = JSON.stringify(token).slice(1, -1);
   if (escaped.length > 15) return `'${escaped.slice(0, 12)}…'`;
   return `'${escaped}'`;
+}
+
+const SCORE_COLOR = "#0969da";
+const SIGMA_COLOR = "#cf222e";
+
+function renderAnomalyChart(
+  container: HTMLElement,
+  data: LTScoresData
+): void {
+  const dates = data.dates.map((d) => new Date(d));
+
+  // Left y-axis: test statistic
+  const traces: Plotly.Data[] = [
+    {
+      x: dates,
+      y: data.scores,
+      type: "scatter",
+      mode: "lines",
+      name: "Test statistic",
+      yaxis: "y",
+      line: { width: 1.5, color: SCORE_COLOR },
+      hovertemplate: "%{x}<br>Score: %{y:.4f}<extra></extra>",
+    },
+    {
+      x: [dates[0], dates[dates.length - 1]],
+      y: [1.0, 1.0],
+      type: "scatter",
+      mode: "lines",
+      name: "Score threshold (1.0)",
+      yaxis: "y",
+      line: { width: 1, color: SCORE_COLOR, dash: "dot" },
+      hoverinfo: "skip",
+    } as Plotly.Data,
+  ];
+
+  // Right y-axis: deviation in sigmas
+  const sigmaDates: Date[] = [];
+  const sigmaVals: number[] = [];
+  for (let i = 0; i < data.sigmas.length; i++) {
+    if (data.sigmas[i] !== null) {
+      sigmaDates.push(dates[i]);
+      sigmaVals.push(data.sigmas[i] as number);
+    }
+  }
+  if (sigmaDates.length > 0) {
+    traces.push(
+      {
+        x: sigmaDates,
+        y: sigmaVals,
+        type: "scatter",
+        mode: "lines",
+        name: "Deviation (σ)",
+        yaxis: "y2",
+        line: { width: 1.5, color: SIGMA_COLOR },
+        hovertemplate: "%{x}<br>Deviation: %{y:.1f}σ<extra></extra>",
+      },
+      {
+        x: [sigmaDates[0], sigmaDates[sigmaDates.length - 1]],
+        y: [12, 12],
+        type: "scatter",
+        mode: "lines",
+        name: "σ threshold (12)",
+        yaxis: "y2",
+        line: { width: 1, color: SIGMA_COLOR, dash: "dot" },
+        hoverinfo: "skip",
+      } as Plotly.Data
+    );
+  }
+
+  // Change points as vertical lines
+  const shapes: Partial<Plotly.Shape>[] = data.changes.map((cp) => ({
+    type: "line" as const,
+    x0: dates[cp.index],
+    x1: dates[cp.index],
+    y0: 0,
+    y1: 1,
+    yref: "paper" as const,
+    line: { color: SIGMA_COLOR, width: 1.5, dash: "solid" as const },
+  }));
+
+  const annotations: Partial<Plotly.Annotations>[] = data.changes.map(
+    (cp) => ({
+      x: dates[cp.index],
+      y: 1,
+      yref: "paper" as const,
+      text: `${cp.sigma.toFixed(0)}σ`,
+      showarrow: false,
+      font: { color: SIGMA_COLOR, size: 10 },
+      yanchor: "bottom" as const,
+    })
+  );
+
+  const layout: Partial<Plotly.Layout> = {
+    title: {
+      text: `Anomaly Score (${data.scores.length} points, window=${data.n_per_test})`,
+      font: { color: "#1f2328", size: 14 },
+    },
+    xaxis: {
+      title: { text: "Date", font: { color: "#57606a" } },
+      gridcolor: "#d0d7de",
+      tickfont: { color: "#57606a" },
+    },
+    yaxis: {
+      title: { text: "Test Statistic", font: { color: SCORE_COLOR } },
+      gridcolor: "#d0d7de",
+      tickfont: { color: SCORE_COLOR },
+      rangemode: "tozero",
+    },
+    yaxis2: {
+      title: { text: "Deviation (σ)", font: { color: SIGMA_COLOR } },
+      tickfont: { color: SIGMA_COLOR },
+      overlaying: "y",
+      side: "right",
+      rangemode: "tozero",
+      showgrid: false,
+    },
+    paper_bgcolor: "#f6f8fa",
+    plot_bgcolor: "#ffffff",
+    font: { color: "#1f2328" },
+    legend: {
+      font: { color: "#1f2328", size: 10 },
+      bgcolor: "transparent",
+      orientation: "h",
+      y: -0.2,
+    },
+    height: 400,
+    margin: { t: 40, r: 60, b: 80, l: 60 },
+    shapes,
+    annotations,
+  };
+
+  container.innerHTML = "";
+  Plotly.newPlot(container, traces, layout, {
+    responsive: true,
+    displayModeBar: false,
+  });
 }
 
 function renderPromptChart(
@@ -318,6 +462,32 @@ async function renderCharts(manifest: EndpointManifest): Promise<void> {
 
   chartsContainer.innerHTML = "";
 
+  // Anomaly score plot
+  try {
+    const res = await fetch(`../data/${manifest.slug}/lt_scores.json`);
+    if (res.ok) {
+      const ltData: LTScoresData = await res.json();
+      if (ltData.scores.length > 0) {
+        const anomalyDiv = document.createElement("div");
+        anomalyDiv.className = "chart";
+        const plotDiv = document.createElement("div");
+        anomalyDiv.appendChild(plotDiv);
+        chartsContainer.appendChild(anomalyDiv);
+        renderAnomalyChart(plotDiv, ltData);
+      }
+    }
+  } catch {
+    // No lt_scores available
+  }
+
+  // Detailed per-prompt charts inside a dropdown
+  const details = document.createElement("details");
+  details.className = "detailed-plots";
+  const summary = document.createElement("summary");
+  summary.textContent = "Detailed plots";
+  details.appendChild(summary);
+  chartsContainer.appendChild(details);
+
   for (const prompt of manifest.prompts) {
     const chartDiv = document.createElement("div");
     chartDiv.className = "chart";
@@ -328,7 +498,7 @@ async function renderCharts(manifest: EndpointManifest): Promise<void> {
     plotDiv.innerHTML = '<div class="loading">Loading chart...</div>';
     chartDiv.appendChild(plotDiv);
 
-    chartsContainer.appendChild(chartDiv);
+    details.appendChild(chartDiv);
     chartElements.push({
       plotDiv,
       promptName: prompt.prompt,
