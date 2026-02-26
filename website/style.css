@@ -249,6 +249,15 @@ tr:hover {
   height: 200px;
 }
 
+/* Change summary */
+.change-summary {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+  white-space: pre-wrap;
+  line-height: 1.8;
+}
+
 /* Detailed plots dropdown */
 .detailed-plots {
   margin-top: 1rem;
