@@ -43,6 +43,7 @@ const TIME_RANGES: { value: TimeRange; label: string }[] = [
 
 let currentRange: TimeRange = "3m";
 let showTokens: boolean = false;
+let changeDates: Date[] = [];
 const cachedData = new Map<string, LogprobQuery[]>();
 const chartElements: {
   plotDiv: HTMLElement;
@@ -143,6 +144,24 @@ function reprToken(token: string): string {
 const SCORE_COLOR = "#0969da";
 const SIGMA_COLOR = "#cf222e";
 
+function formatChangeSummary(data: LTScoresData): string {
+  const dates = data.dates.map((d) => new Date(d));
+  const first = dates[0];
+  const last = dates[dates.length - 1];
+  const fmt = (d: Date) => d.toISOString().slice(0, 10);
+
+  if (data.changes.length === 0) {
+    return `No detected changes between ${fmt(first)} and ${fmt(last)}.`;
+  }
+
+  const header = `Detected changes between ${fmt(first)} and ${fmt(last)}:`;
+  const items = data.changes.map((cp) => {
+    const d = dates[cp.index];
+    return `  • ${fmt(d)} (score = ${data.scores[cp.index].toFixed(3)}, deviation = ${cp.sigma.toFixed(1)}σ)`;
+  });
+  return header + "\n" + items.join("\n");
+}
+
 function renderAnomalyChart(
   container: HTMLElement,
   data: LTScoresData
@@ -207,16 +226,7 @@ function renderAnomalyChart(
     );
   }
 
-  // Change points as vertical lines
-  const shapes: Partial<Plotly.Shape>[] = data.changes.map((cp) => ({
-    type: "line" as const,
-    x0: dates[cp.index],
-    x1: dates[cp.index],
-    y0: 0,
-    y1: 1,
-    yref: "paper" as const,
-    line: { color: SIGMA_COLOR, width: 1.5, dash: "solid" as const },
-  }));
+  const shapes = makeChangeShapes(data.changes.map((cp) => dates[cp.index]));
 
   const annotations: Partial<Plotly.Annotations>[] = data.changes.map(
     (cp) => ({
@@ -225,7 +235,7 @@ function renderAnomalyChart(
       yref: "paper" as const,
       text: `${cp.sigma.toFixed(0)}σ`,
       showarrow: false,
-      font: { color: SIGMA_COLOR, size: 10 },
+      font: { color: "#888888", size: 10 },
       yanchor: "bottom" as const,
     })
   );
@@ -274,6 +284,20 @@ function renderAnomalyChart(
     responsive: true,
     displayModeBar: false,
   });
+}
+
+function makeChangeShapes(
+  changeDts: Date[],
+): Partial<Plotly.Shape>[] {
+  return changeDts.map((d) => ({
+    type: "line" as const,
+    x0: d,
+    x1: d,
+    y0: 0,
+    y1: 1,
+    yref: "paper" as const,
+    line: { color: "#888888", width: 1.5, dash: "dot" as const },
+  }));
 }
 
 function renderPromptChart(
@@ -368,6 +392,7 @@ function renderPromptChart(
     height: 560,
     margin: { t: 40, r: 20, b: 80, l: 60 },
     showlegend: showTokens && maxLogprobs <= 25,
+    shapes: makeChangeShapes(changeDates),
   };
 
   const config = {
@@ -463,11 +488,20 @@ async function renderCharts(manifest: EndpointManifest): Promise<void> {
   chartsContainer.innerHTML = "";
 
   // Anomaly score plot
+  changeDates = [];
   try {
     const res = await fetch(`../data/${manifest.slug}/lt_scores.json`);
     if (res.ok) {
       const ltData: LTScoresData = await res.json();
       if (ltData.scores.length > 0) {
+        const dates = ltData.dates.map((d) => new Date(d));
+        changeDates = ltData.changes.map((cp) => dates[cp.index]);
+
+        const summaryEl = document.createElement("pre");
+        summaryEl.className = "change-summary";
+        summaryEl.textContent = formatChangeSummary(ltData);
+        chartsContainer.appendChild(summaryEl);
+
         const anomalyDiv = document.createElement("div");
         anomalyDiv.className = "chart";
         const plotDiv = document.createElement("div");
