@@ -392,7 +392,9 @@ function renderPromptChart(
     height: 560,
     margin: { t: 40, r: 20, b: 80, l: 60 },
     showlegend: showTokens && maxLogprobs <= 25,
-    shapes: makeChangeShapes(changeDates),
+    shapes: makeChangeShapes(changeDates.filter(
+      (d) => d >= sorted[0].date && d <= sorted[sorted.length - 1].date
+    )),
   };
 
   const config = {
