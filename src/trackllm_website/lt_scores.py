@@ -120,7 +120,11 @@ def detect_changes(
         window = scores[i - extended_window : i - STAT_EXCLUSION_ZONE]
         mean = window.mean()
         std = window.std()
-        dev = (scores[i] - mean) / std if std > 0 else float("inf")
+        dev = (
+            (scores[i] - mean) / std
+            if std > 0
+            else (0.0 if scores[i] == mean else float("inf"))
+        )
         sigmas[i] = dev
         if dev > STAT_SIGMA_THRESHOLD:
             exceedances[i] = scores[i] - (mean + STAT_SIGMA_THRESHOLD * std)
