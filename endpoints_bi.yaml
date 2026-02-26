@@ -1950,12 +1950,6 @@ endpoints_bi:
   - 0.51
   - 0.74
 - api: openrouter
-  model: qwen/qwen3-235b-a22b-2507
-  provider: google-vertex
-  cost:
-  - 0.25
-  - 1.0
-- api: openrouter
   model: qwen/qwen3-coder
   provider: siliconflow/fp8
   cost:
@@ -2178,12 +2172,6 @@ endpoints_bi:
   - 0.72
   - 0.72
 - api: openrouter
-  model: meta-llama/llama-3.3-70b-instruct
-  provider: google-vertex
-  cost:
-  - 0.72
-  - 0.72
-- api: openrouter
   model: qwen/qwen3-vl-8b-thinking
   provider: alibaba
   cost:
@@ -2219,12 +2207,6 @@ endpoints_bi:
   cost:
   - 0.7
   - 0.8
-- api: openrouter
-  model: meta-llama/llama-4-maverick
-  provider: google-vertex
-  cost:
-  - 0.35
-  - 1.15
 - api: openrouter
   model: meta-llama/llama-4-maverick
   provider: google-vertex
@@ -3623,12 +3605,6 @@ endpoints_bi:
   cost:
   - 1.2
   - 3.5
-- api: openrouter
-  model: anthropic/claude-3.5-haiku
-  provider: amazon-bedrock
-  cost:
-  - 0.8
-  - 4.0
 - api: openrouter
   model: anthropic/claude-3.5-haiku
   provider: amazon-bedrock

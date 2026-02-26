@@ -1107,6 +1107,13 @@ bad_endpoints_bi:
     - 1
 - api: openrouter
   model: minimax/minimax-m2.5
+  provider: clarifai
+  reason:
+    token_usage:
+    - 39
+    - 1
+- api: openrouter
+  model: minimax/minimax-m2.5
   provider: fireworks
   reason:
     token_usage:
@@ -2316,6 +2323,27 @@ bad_endpoints_bi:
     - 1
     - 428
 - api: openrouter
+  model: qwen/qwen3.5-122b-a10b
+  provider: alibaba
+  reason:
+    token_usage:
+    - 11
+    - 161
+- api: openrouter
+  model: qwen/qwen3.5-27b
+  provider: alibaba
+  reason:
+    token_usage:
+    - 11
+    - 168
+- api: openrouter
+  model: qwen/qwen3.5-35b-a3b
+  provider: alibaba
+  reason:
+    token_usage:
+    - 11
+    - 202
+- api: openrouter
   model: qwen/qwen3.5-397b-a17b
   provider: alibaba
   reason:
@@ -2329,6 +2357,13 @@ bad_endpoints_bi:
     token_usage:
     - 11
     - 145
+- api: openrouter
+  model: qwen/qwen3.5-flash-02-23
+  provider: alibaba
+  reason:
+    token_usage:
+    - 11
+    - 206
 - api: openrouter
   model: qwen/qwen3.5-plus-02-15
   provider: alibaba
