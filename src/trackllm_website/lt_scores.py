@@ -153,17 +153,23 @@ def compute_endpoint_scores(endpoint_dir: Path) -> LTScores | None:
     if not per_prompt_stats:
         return None
 
-    min_len = min(len(s) for s in per_prompt_stats)
-    if min_len == 0:
-        return None
+    longest = max(range(len(per_prompt_stats)), key=lambda i: len(per_prompt_stats[i]))
+    ref_dates = per_prompt_dates[longest]
+    ref_ts = np.array([d.timestamp() for d in ref_dates])
 
-    dates = per_prompt_dates[0][:min_len]
-    avg_scores = np.mean([s[:min_len] for s in per_prompt_stats], axis=0)
+    # Interpolate all prompts onto the longest prompt's timeline, average where available
+    grid = np.full((len(per_prompt_stats), len(ref_dates)), np.nan)
+    for i, (stats, dates) in enumerate(zip(per_prompt_stats, per_prompt_dates)):
+        ts = np.array([d.timestamp() for d in dates])
+        mask = (ref_ts >= ts[0]) & (ref_ts <= ts[-1])
+        grid[i, mask] = np.interp(ref_ts[mask], ts, stats)
+
+    avg_scores = np.nanmean(grid, axis=0)
     changes, sigmas = detect_changes(avg_scores)
 
     return LTScores(
         n_per_test=N_PER_TEST,
-        dates=dates,
+        dates=ref_dates,
         scores=avg_scores.tolist(),
         sigmas=[None if np.isnan(v) else v for v in sigmas.tolist()],
         changes=changes,
