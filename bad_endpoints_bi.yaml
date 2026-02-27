@@ -147,6 +147,13 @@ bad_endpoints_bi:
     - 83
     - 57
 - api: openrouter
+  model: bytedance-seed/seed-2.0-mini
+  provider: seed/fp8
+  reason:
+    token_usage:
+    - 35
+    - 1
+- api: openrouter
   model: bytedance/ui-tars-1.5-7b
   provider: parasail/bf16
   reason:
