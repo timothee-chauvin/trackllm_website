@@ -2124,12 +2124,6 @@ endpoints_bi:
   - 0.27
   - 1.12
 - api: openrouter
-  model: qwen/qwen3-vl-235b-a22b-instruct
-  provider: ionstream/fp8
-  cost:
-  - 0.2
-  - 1.2
-- api: openrouter
   model: sao10k/l3.1-euryale-70b
   provider: nextbit/fp8
   cost:
@@ -2627,6 +2621,12 @@ endpoints_bi:
   cost:
   - 0.4
   - 1.6
+- api: openrouter
+  model: qwen/qwen3-vl-235b-a22b-instruct
+  provider: ionstream/fp8
+  cost:
+  - 0.2
+  - 1.8
 - api: openrouter
   model: qwen/qwen3-vl-32b-instruct
   provider: together
