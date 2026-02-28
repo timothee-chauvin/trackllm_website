@@ -282,12 +282,6 @@ endpoints_bi:
   - 0.04
   - 0.17
 - api: openrouter
-  model: openai/gpt-oss-120b
-  provider: chutes/bf16
-  cost:
-  - 0.04
-  - 0.18
-- api: openrouter
   model: openai/gpt-oss-20b
   provider: amazon-bedrock
   cost:
@@ -917,6 +911,12 @@ endpoints_bi:
   cost:
   - 0.1
   - 0.4
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: chutes/bf16
+  cost:
+  - 0.05
+  - 0.45
 - api: openrouter
   model: openai/gpt-oss-120b
   provider: siliconflow/fp8
@@ -1710,12 +1710,6 @@ endpoints_bi:
   - 0.207
   - 0.828
 - api: openrouter
-  model: deepseek/deepseek-chat-v3-0324
-  provider: chutes/fp8
-  cost:
-  - 0.19
-  - 0.87
-- api: openrouter
   model: mistralai/mixtral-8x7b-instruct
   provider: deepinfra/fp8
   cost:
@@ -1907,6 +1901,12 @@ endpoints_bi:
   cost:
   - 0.29
   - 0.95
+- api: openrouter
+  model: deepseek/deepseek-chat-v3-0324
+  provider: chutes/fp8
+  cost:
+  - 0.25
+  - 1.0
 - api: openrouter
   model: deepseek/deepseek-chat-v3-0324
   provider: siliconflow/fp8
@@ -2178,6 +2178,12 @@ endpoints_bi:
   - 0.29
   - 1.2
 - api: openrouter
+  model: minimax/minimax-m2.5
+  provider: atlas-cloud/fp8
+  cost:
+  - 0.295
+  - 1.2
+- api: openrouter
   model: anthropic/claude-3-haiku
   provider: amazon-bedrock
   cost:
@@ -2252,12 +2258,6 @@ endpoints_bi:
 - api: openrouter
   model: minimax/minimax-m2.1
   provider: novita/fp8
-  cost:
-  - 0.3
-  - 1.2
-- api: openrouter
-  model: minimax/minimax-m2.5
-  provider: atlas-cloud/fp8
   cost:
   - 0.3
   - 1.2
@@ -2652,12 +2652,6 @@ endpoints_bi:
   - 0.35
   - 1.71
 - api: openrouter
-  model: z-ai/glm-4.7
-  provider: chutes/bf16
-  cost:
-  - 0.38
-  - 1.7
-- api: openrouter
   model: aion-labs/aion-1.0-mini
   provider: aion-labs/bf16
   cost:
@@ -2687,12 +2681,6 @@ endpoints_bi:
   cost:
   - 0.65
   - 1.5
-- api: openrouter
-  model: deepseek/deepseek-r1-0528
-  provider: chutes/fp8
-  cost:
-  - 0.4
-  - 1.75
 - api: openrouter
   model: z-ai/glm-4.7
   provider: deepinfra/fp4
@@ -2869,6 +2857,12 @@ endpoints_bi:
   - 1.8
 - api: openrouter
   model: z-ai/glm-4.7
+  provider: chutes/bf16
+  cost:
+  - 0.4
+  - 2.0
+- api: openrouter
+  model: z-ai/glm-4.7
   provider: nebius/fp8
   cost:
   - 0.4
@@ -2957,6 +2951,12 @@ endpoints_bi:
   cost:
   - 0.28
   - 2.3
+- api: openrouter
+  model: deepseek/deepseek-r1-0528
+  provider: chutes/fp8
+  cost:
+  - 0.45
+  - 2.15
 - api: openrouter
   model: minimax/minimax-m1
   provider: minimax
