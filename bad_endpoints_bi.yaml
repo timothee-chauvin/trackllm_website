@@ -1429,6 +1429,13 @@ bad_endpoints_bi:
     - 1
 - api: openrouter
   model: moonshotai/kimi-k2.5
+  provider: nextbit/fp4
+  reason:
+    token_usage:
+    - 27
+    - 1
+- api: openrouter
+  model: moonshotai/kimi-k2.5
   provider: novita
   reason:
     token_usage:
