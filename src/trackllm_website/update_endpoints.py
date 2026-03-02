@@ -413,7 +413,7 @@ async def update_endpoints_bi():
 
 
 async def main():
-    # await update_endpoints_lt()
+    await update_endpoints_lt()
     await update_endpoints_bi()
 
 
