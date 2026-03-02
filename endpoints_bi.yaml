@@ -162,6 +162,12 @@ endpoints_bi:
   - 0.04
   - 0.1
 - api: openrouter
+  model: liquid/lfm-2-24b-a2b
+  provider: together
+  cost:
+  - 0.03
+  - 0.12
+- api: openrouter
   model: google/gemma-3-12b-it
   provider: deepinfra/bf16
   cost:
@@ -3146,6 +3152,12 @@ endpoints_bi:
 - api: openrouter
   model: moonshotai/kimi-k2
   provider: nebius/fp4
+  cost:
+  - 0.5
+  - 2.4
+- api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: inceptron/int4
   cost:
   - 0.5
   - 2.4
