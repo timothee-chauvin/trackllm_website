@@ -1,0 +1,13 @@
+{
+  "prompt": "Hi",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "qwen/qwq-32b",
+    "provider": "nextbit/int4",
+    "cost": [
+      0.15,
+      0.4
+    ],
+    "max_logprobs": null
+  }
+}

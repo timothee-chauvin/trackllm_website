@@ -1,0 +1,13 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "thedrummer/unslopnemo-12b",
+    "provider": "nextbit/fp8",
+    "cost": [
+      0.4,
+      0.4
+    ],
+    "max_logprobs": null
+  }
+}

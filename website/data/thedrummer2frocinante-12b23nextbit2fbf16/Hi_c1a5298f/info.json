@@ -1,0 +1,13 @@
+{
+  "prompt": "Hi",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "thedrummer/rocinante-12b",
+    "provider": "nextbit/bf16",
+    "cost": [
+      0.17,
+      0.43
+    ],
+    "max_logprobs": null
+  }
+}
