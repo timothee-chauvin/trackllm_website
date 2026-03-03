@@ -1803,7 +1803,7 @@ endpoints_bi:
   model: qwen/qwen3-coder-next
   provider: ionstream/bf16
   cost:
-  - 0.14
+  - 0.17
   - 1.0
 - api: openrouter
   model: qwen/qwen3-next-80b-a3b-instruct

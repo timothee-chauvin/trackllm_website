@@ -1183,6 +1183,13 @@ bad_endpoints_bi:
     - 39
     - 1
 - api: openrouter
+  model: minimax/minimax-m2.5
+  provider: venice
+  reason:
+    token_usage:
+    - 39
+    - 1
+- api: openrouter
   model: mistralai/ministral-14b-2512
   provider: together
   reason:
@@ -2344,8 +2351,22 @@ bad_endpoints_bi:
     - 11
     - 161
 - api: openrouter
+  model: qwen/qwen3.5-122b-a10b
+  provider: novita/bf16
+  reason:
+    token_usage:
+    - 11
+    - 195
+- api: openrouter
   model: qwen/qwen3.5-27b
   provider: alibaba
+  reason:
+    token_usage:
+    - 11
+    - 168
+- api: openrouter
+  model: qwen/qwen3.5-27b
+  provider: novita/bf16
   reason:
     token_usage:
     - 11
@@ -2357,6 +2378,20 @@ bad_endpoints_bi:
     token_usage:
     - 11
     - 202
+- api: openrouter
+  model: qwen/qwen3.5-35b-a3b
+  provider: parasail/fp8
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: qwen/qwen3.5-35b-a3b
+  provider: venice
+  reason:
+    token_usage:
+    - 11
+    - 1
 - api: openrouter
   model: qwen/qwen3.5-397b-a17b
   provider: alibaba

@@ -6,6 +6,18 @@ endpoints_lt:
   - 0.1
   - 0.1
 - api: openrouter
+  model: qwen/qwq-32b
+  provider: nextbit/int4
+  cost:
+  - 0.15
+  - 0.4
+- api: openrouter
+  model: thedrummer/rocinante-12b
+  provider: nextbit/bf16
+  cost:
+  - 0.17
+  - 0.43
+- api: openrouter
   model: deepseek/deepseek-v3.2
   provider: deepseek
   cost:
@@ -30,11 +42,11 @@ endpoints_lt:
   - 0.15
   - 0.6
 - api: openrouter
-  model: openai/gpt-oss-120b
-  provider: crusoe/bf16
+  model: thedrummer/unslopnemo-12b
+  provider: nextbit/fp8
   cost:
-  - 0.15
-  - 0.6
+  - 0.4
+  - 0.4
 - api: openrouter
   model: gryphe/mythomax-l2-13b
   provider: mancer/fp8
@@ -46,6 +58,12 @@ endpoints_lt:
   provider: mancer/fp8
   cost:
   - 0.5
+  - 0.75
+- api: openrouter
+  model: sao10k/l3.3-euryale-70b
+  provider: nextbit/bf16
+  cost:
+  - 0.65
   - 0.75
 - api: openrouter
   model: minimax/minimax-m2.5
@@ -77,12 +95,6 @@ endpoints_lt:
   cost:
   - 0.75
   - 1.0
-- api: openrouter
-  model: deepseek/deepseek-chat-v3-0324
-  provider: crusoe/fp8
-  cost:
-  - 0.5
-  - 1.5
 - api: openrouter
   model: openai/gpt-3.5-turbo
   provider: openai
@@ -119,12 +131,6 @@ endpoints_lt:
   cost:
   - 1.0
   - 3.2
-- api: openrouter
-  model: deepseek/deepseek-r1-0528
-  provider: crusoe/fp8
-  cost:
-  - 1.35
-  - 5.4
 - api: openrouter
   model: openai/gpt-3.5-turbo-16k
   provider: azure
