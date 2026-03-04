@@ -1,0 +1,13 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "microsoft/phi-4",
+    "provider": "nextbit/int4",
+    "cost": [
+      0.06,
+      0.14
+    ],
+    "max_logprobs": null
+  }
+}
