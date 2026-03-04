@@ -2352,6 +2352,13 @@ bad_endpoints_bi:
     - 161
 - api: openrouter
   model: qwen/qwen3.5-122b-a10b
+  provider: atlas-cloud/fp8
+  reason:
+    token_usage:
+    - 11
+    - 161
+- api: openrouter
+  model: qwen/qwen3.5-122b-a10b
   provider: novita/bf16
   reason:
     token_usage:
@@ -2360,6 +2367,13 @@ bad_endpoints_bi:
 - api: openrouter
   model: qwen/qwen3.5-27b
   provider: alibaba
+  reason:
+    token_usage:
+    - 11
+    - 168
+- api: openrouter
+  model: qwen/qwen3.5-27b
+  provider: atlas-cloud/fp8
   reason:
     token_usage:
     - 11
@@ -2378,6 +2392,13 @@ bad_endpoints_bi:
     token_usage:
     - 11
     - 202
+- api: openrouter
+  model: qwen/qwen3.5-35b-a3b
+  provider: atlas-cloud/fp8
+  reason:
+    token_usage:
+    - 11
+    - 171
 - api: openrouter
   model: qwen/qwen3.5-35b-a3b
   provider: parasail/fp8
