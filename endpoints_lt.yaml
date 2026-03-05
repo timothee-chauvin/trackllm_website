@@ -90,30 +90,6 @@ endpoints_lt:
   - 0.65
   - 0.75
 - api: openrouter
-  model: minimax/minimax-m2.5
-  provider: inceptron/fp8
-  cost:
-  - 0.3
-  - 1.1
-- api: openrouter
-  model: minimax/minimax-m2.1
-  provider: fireworks
-  cost:
-  - 0.3
-  - 1.2
-- api: openrouter
-  model: minimax/minimax-m2.1
-  provider: nebius/fp8
-  cost:
-  - 0.3
-  - 1.2
-- api: openrouter
-  model: minimax/minimax-m2.5
-  provider: fireworks
-  cost:
-  - 0.3
-  - 1.2
-- api: openrouter
   model: mancer/weaver
   provider: mancer/fp8
   cost:
@@ -149,12 +125,6 @@ endpoints_lt:
   cost:
   - 0.6
   - 2.5
-- api: openrouter
-  model: z-ai/glm-5
-  provider: fireworks
-  cost:
-  - 1.0
-  - 3.2
 - api: openrouter
   model: openai/gpt-3.5-turbo-16k
   provider: azure
