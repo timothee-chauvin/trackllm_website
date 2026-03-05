@@ -371,6 +371,13 @@ bad_endpoints_bi:
     - 1
     - 1396
 - api: openrouter
+  model: google/gemini-3.1-flash-image-preview
+  provider: google-vertex
+  reason:
+    token_usage:
+    - 1
+    - 1120
+- api: openrouter
   model: google/gemma-3n-e4b-it
   provider: together
   reason:
@@ -1129,6 +1136,13 @@ bad_endpoints_bi:
 - api: openrouter
   model: minimax/minimax-m2.5
   provider: inceptron/fp8
+  reason:
+    token_usage:
+    - 39
+    - 1
+- api: openrouter
+  model: minimax/minimax-m2.5
+  provider: ionstream/fp8
   reason:
     token_usage:
     - 39
