@@ -1716,6 +1716,13 @@ bad_endpoints_bi:
     - 1
 - api: openrouter
   model: openai/gpt-oss-120b
+  provider: io-net/fp16
+  reason:
+    token_usage:
+    - 66
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-120b
   provider: ncompass
   reason:
     token_usage:
