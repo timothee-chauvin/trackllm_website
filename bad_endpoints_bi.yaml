@@ -147,6 +147,13 @@ bad_endpoints_bi:
     - 83
     - 57
 - api: openrouter
+  model: bytedance-seed/seed-2.0-lite
+  provider: seed/fp8
+  reason:
+    token_usage:
+    - 49
+    - 1
+- api: openrouter
   model: bytedance-seed/seed-2.0-mini
   provider: seed/fp8
   reason:
@@ -1128,6 +1135,13 @@ bad_endpoints_bi:
     - 1
 - api: openrouter
   model: minimax/minimax-m2.5
+  provider: deepinfra/fp8
+  reason:
+    token_usage:
+    - 39
+    - 1
+- api: openrouter
+  model: minimax/minimax-m2.5
   provider: fireworks
   reason:
     token_usage:
@@ -1671,6 +1685,13 @@ bad_endpoints_bi:
   reason:
     token_usage:
     - 70
+    - 1
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: deepinfra/bf16
+  reason:
+    token_usage:
+    - 55
     - 1
 - api: openrouter
   model: openai/gpt-oss-120b
@@ -2422,6 +2443,13 @@ bad_endpoints_bi:
     - 171
 - api: openrouter
   model: qwen/qwen3.5-35b-a3b
+  provider: ionstream/fp8
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: qwen/qwen3.5-35b-a3b
   provider: parasail/fp8
   reason:
     token_usage:
@@ -2448,6 +2476,13 @@ bad_endpoints_bi:
     token_usage:
     - 11
     - 145
+- api: openrouter
+  model: qwen/qwen3.5-9b
+  provider: together
+  reason:
+    token_usage:
+    - 11
+    - 1
 - api: openrouter
   model: qwen/qwen3.5-flash-02-23
   provider: alibaba
