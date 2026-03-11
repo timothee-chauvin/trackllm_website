@@ -1,0 +1,13 @@
+{
+  "prompt": "Hi",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "mistralai/ministral-8b-2512",
+    "provider": "nextbit/fp8",
+    "cost": [
+      0.15,
+      0.15
+    ],
+    "max_logprobs": null
+  }
+}
