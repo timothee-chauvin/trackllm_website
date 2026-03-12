@@ -18,6 +18,12 @@ endpoints_lt:
   - 0.15
   - 0.15
 - api: openrouter
+  model: mistralai/ministral-14b-2512
+  provider: nextbit/fp8
+  cost:
+  - 0.2
+  - 0.2
+- api: openrouter
   model: qwen/qwq-32b
   provider: nextbit/int4
   cost:

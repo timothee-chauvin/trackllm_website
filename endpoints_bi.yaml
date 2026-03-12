@@ -1152,12 +1152,6 @@ endpoints_bi:
   - 0.15
   - 0.5
 - api: openrouter
-  model: deepseek/deepseek-v3.2
-  provider: ionstream/fp8
-  cost:
-  - 0.25
-  - 0.4
-- api: openrouter
   model: qwen/qwen3-30b-a3b
   provider: alibaba
   cost:
@@ -1187,6 +1181,12 @@ endpoints_bi:
   cost:
   - 0.09
   - 0.58
+- api: openrouter
+  model: deepseek/deepseek-v3.2
+  provider: ionstream/fp8
+  cost:
+  - 0.27
+  - 0.41
 - api: openrouter
   model: deepseek/deepseek-v3.2-exp
   provider: atlas-cloud/fp8
@@ -1567,6 +1567,12 @@ endpoints_bi:
   - 0.75
 - api: openrouter
   model: qwen/qwen3-next-80b-a3b-instruct
+  provider: alibaba
+  cost:
+  - 0.0975
+  - 0.78
+- api: openrouter
+  model: qwen/qwen3-next-80b-a3b-thinking
   provider: alibaba
   cost:
   - 0.0975
@@ -3623,12 +3629,6 @@ endpoints_bi:
   cost:
   - 1.0
   - 3.2
-- api: openrouter
-  model: qwen/qwen3-next-80b-a3b-thinking
-  provider: alibaba
-  cost:
-  - 0.325
-  - 3.9
 - api: openrouter
   model: switchpoint/router
   provider: switchpoint
