@@ -12,6 +12,12 @@ endpoints_lt:
   - 0.06
   - 0.14
 - api: openrouter
+  model: mistralai/ministral-3b-2512
+  provider: nextbit/fp8
+  cost:
+  - 0.1
+  - 0.1
+- api: openrouter
   model: mistralai/ministral-8b-2512
   provider: nextbit/fp8
   cost:
@@ -30,23 +36,11 @@ endpoints_lt:
   - 0.15
   - 0.4
 - api: openrouter
-  model: nousresearch/hermes-3-llama-3.1-70b
-  provider: nextbit/fp8
-  cost:
-  - 0.3
-  - 0.3
-- api: openrouter
   model: thedrummer/rocinante-12b
   provider: nextbit/bf16
   cost:
   - 0.17
   - 0.43
-- api: openrouter
-  model: neversleep/llama-3.1-lumimaid-8b
-  provider: nextbit/int4
-  cost:
-  - 0.09
-  - 0.6
 - api: openrouter
   model: deepseek/deepseek-v3.2
   provider: deepseek
@@ -88,12 +82,6 @@ endpoints_lt:
   provider: mancer/fp8
   cost:
   - 0.5
-  - 0.75
-- api: openrouter
-  model: sao10k/l3.1-euryale-70b
-  provider: nextbit/fp8
-  cost:
-  - 0.65
   - 0.75
 - api: openrouter
   model: sao10k/l3.3-euryale-70b

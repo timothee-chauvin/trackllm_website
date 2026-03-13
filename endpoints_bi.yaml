@@ -2526,6 +2526,12 @@ endpoints_bi:
   - 0.75
   - 1.0
 - api: openrouter
+  model: minimax/minimax-m2.5
+  provider: nextbit/fp8
+  cost:
+  - 0.35
+  - 1.4
+- api: openrouter
   model: qwen/qwen3-coder-30b-a3b-instruct
   provider: alibaba
   cost:
@@ -2693,12 +2699,6 @@ endpoints_bi:
   cost:
   - 0.22
   - 1.8
-- api: openrouter
-  model: minimax/minimax-m2.5
-  provider: nextbit/fp8
-  cost:
-  - 0.45
-  - 1.6
 - api: openrouter
   model: z-ai/glm-4.6
   provider: ambient/bf16
@@ -3458,6 +3458,12 @@ endpoints_bi:
 - api: openrouter
   model: moonshotai/kimi-k2.5
   provider: moonshotai/int4
+  cost:
+  - 0.6
+  - 3.0
+- api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: phala
   cost:
   - 0.6
   - 3.0

@@ -708,6 +708,13 @@ bad_endpoints_bi:
     - 1
 - api: openrouter
   model: meta-llama/llama-3.3-70b-instruct
+  provider: akashml/fp16
+  reason:
+    token_usage:
+    - 36
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.3-70b-instruct
   provider: cerebras/fp16
   reason:
     token_usage:
@@ -2149,6 +2156,13 @@ bad_endpoints_bi:
     - 39
 - api: openrouter
   model: qwen/qwen3-235b-a22b-thinking-2507
+  provider: alibaba
+  reason:
+    token_usage:
+    - 9
+    - 146
+- api: openrouter
+  model: qwen/qwen3-235b-a22b-thinking-2507
   provider: atlas-cloud/fp8
   reason:
     token_usage:
@@ -2731,6 +2745,20 @@ bad_endpoints_bi:
   provider: xai
   reason:
     price_mismatch: '756.25'
+- api: openrouter
+  model: x-ai/grok-4.20-beta
+  provider: xai
+  reason:
+    token_usage:
+    - 123
+    - 1
+- api: openrouter
+  model: x-ai/grok-4.20-multi-agent-beta
+  provider: xai
+  reason:
+    token_usage:
+    - 11624
+    - 5126
 - api: openrouter
   model: x-ai/grok-code-fast-1
   provider: xai
