@@ -462,12 +462,6 @@ endpoints_bi:
   - 0.1
   - 0.2
 - api: openrouter
-  model: openai/gpt-oss-120b
-  provider: atlas-cloud/fp8
-  cost:
-  - 0.1
-  - 0.2
-- api: openrouter
   model: nvidia/nemotron-nano-9b-v2
   provider: together
   cost:
@@ -926,6 +920,12 @@ endpoints_bi:
 - api: openrouter
   model: openai/gpt-4.1-nano
   provider: openai
+  cost:
+  - 0.1
+  - 0.4
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: atlas-cloud/fp8
   cost:
   - 0.1
   - 0.4
@@ -2178,6 +2178,12 @@ endpoints_bi:
   - 0.28
   - 1.1
 - api: openrouter
+  model: minimax/minimax-m2.5
+  provider: inceptron/fp8
+  cost:
+  - 0.28
+  - 1.1
+- api: openrouter
   model: deepseek/deepseek-chat-v3-0324
   provider: novita/fp8
   cost:
@@ -2204,12 +2210,6 @@ endpoints_bi:
 - api: openrouter
   model: minimax/minimax-m2.5
   provider: chutes/fp8
-  cost:
-  - 0.3
-  - 1.1
-- api: openrouter
-  model: minimax/minimax-m2.5
-  provider: inceptron/fp8
   cost:
   - 0.3
   - 1.1
@@ -2336,6 +2336,12 @@ endpoints_bi:
 - api: openrouter
   model: minimax/minimax-m2.5
   provider: minimax/fp8
+  cost:
+  - 0.3
+  - 1.2
+- api: openrouter
+  model: minimax/minimax-m2.5
+  provider: nextbit/fp8
   cost:
   - 0.3
   - 1.2
@@ -2525,12 +2531,6 @@ endpoints_bi:
   cost:
   - 0.75
   - 1.0
-- api: openrouter
-  model: minimax/minimax-m2.5
-  provider: nextbit/fp8
-  cost:
-  - 0.35
-  - 1.4
 - api: openrouter
   model: qwen/qwen3-coder-30b-a3b-instruct
   provider: alibaba

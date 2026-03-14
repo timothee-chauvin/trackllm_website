@@ -2519,6 +2519,13 @@ bad_endpoints_bi:
     - 11
     - 1
 - api: openrouter
+  model: qwen/qwen3.5-9b
+  provider: venice/fp8
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
   model: qwen/qwen3.5-flash-02-23
   provider: alibaba
   reason:
