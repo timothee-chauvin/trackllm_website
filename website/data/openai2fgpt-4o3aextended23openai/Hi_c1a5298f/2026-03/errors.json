@@ -1,1 +1,1 @@
-{"seen_errors":[]}
+{"seen_errors":[{"http_code":503,"message":"{\"message\":\"Provider returned error\",\"code\":503,\"metadata\":{\"raw\":\"{\\n    \\\"error\\\": {\\n        \\\"message\\\": \\\"No available capacity was found for the model\\\",\\n        \\\"type\\\": \\\"invalid_request_error\\\",\\n        \\\"param\\\": null,\\n        \\\"code\\\": null\\n    }\\n}\\n\",\"provider_name\":\"OpenAI\",\"is_byok\":false}}"}]}
