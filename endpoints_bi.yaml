@@ -2226,6 +2226,12 @@ endpoints_bi:
   - 0.72
   - 0.72
 - api: openrouter
+  model: minimax/minimax-m2.5
+  provider: nextbit/fp8
+  cost:
+  - 0.25
+  - 1.2
+- api: openrouter
   model: qwen/qwen3-vl-8b-thinking
   provider: alibaba
   cost:
@@ -2336,12 +2342,6 @@ endpoints_bi:
 - api: openrouter
   model: minimax/minimax-m2.5
   provider: minimax/fp8
-  cost:
-  - 0.3
-  - 1.2
-- api: openrouter
-  model: minimax/minimax-m2.5
-  provider: nextbit/fp8
   cost:
   - 0.3
   - 1.2
@@ -2592,6 +2592,12 @@ endpoints_bi:
   - 0.26
   - 1.56
 - api: openrouter
+  model: minimax/minimax-m2.1
+  provider: venice
+  cost:
+  - 0.35
+  - 1.5
+- api: openrouter
   model: arcee-ai/virtuoso-large
   provider: together
   cost:
@@ -2621,12 +2627,6 @@ endpoints_bi:
   cost:
   - 0.8
   - 1.2
-- api: openrouter
-  model: minimax/minimax-m2.1
-  provider: venice
-  cost:
-  - 0.4
-  - 1.6
 - api: openrouter
   model: mistralai/mistral-large-2512
   provider: mistral
@@ -3558,6 +3558,12 @@ endpoints_bi:
   - 0.55
   - 3.5
 - api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: venice
+  cost:
+  - 0.56
+  - 3.5
+- api: openrouter
   model: z-ai/glm-5
   provider: atlas-cloud/fp8
   cost:
@@ -3641,12 +3647,6 @@ endpoints_bi:
   cost:
   - 0.85
   - 3.4
-- api: openrouter
-  model: moonshotai/kimi-k2.5
-  provider: venice
-  cost:
-  - 0.75
-  - 3.75
 - api: openrouter
   model: openai/gpt-5-image-mini
   provider: openai
