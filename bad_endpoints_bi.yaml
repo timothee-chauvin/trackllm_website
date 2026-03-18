@@ -1274,6 +1274,13 @@ bad_endpoints_bi:
     - 178
     - 1
 - api: openrouter
+  model: mistralai/mistral-small-2603
+  provider: mistral
+  reason:
+    token_usage:
+    - 16
+    - 1
+- api: openrouter
   model: mistralai/mistral-small-3.1-24b-instruct
   provider: chutes/bf16
   reason:
@@ -2479,6 +2486,13 @@ bad_endpoints_bi:
 - api: openrouter
   model: qwen/qwen3.5-35b-a3b
   provider: ionstream/fp8
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: qwen/qwen3.5-35b-a3b
+  provider: nextbit/fp8
   reason:
     token_usage:
     - 11
