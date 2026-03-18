@@ -1,0 +1,13 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "gryphe/mythomax-l2-13b",
+    "provider": "nextbit/int4",
+    "cost": [
+      0.06,
+      0.06
+    ],
+    "max_logprobs": null
+  }
+}
