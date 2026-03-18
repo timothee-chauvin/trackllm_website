@@ -1,7 +1,19 @@
 endpoints_lt:
 - api: openrouter
+  model: gryphe/mythomax-l2-13b
+  provider: nextbit/int4
+  cost:
+  - 0.06
+  - 0.06
+- api: openrouter
   model: meta-llama/llama-3.1-8b-instruct
   provider: cerebras/fp16
+  cost:
+  - 0.1
+  - 0.1
+- api: openrouter
+  model: mistralai/ministral-3b-2512
+  provider: nextbit/fp8
   cost:
   - 0.1
   - 0.1
@@ -9,14 +21,8 @@ endpoints_lt:
   model: microsoft/phi-4
   provider: nextbit/int4
   cost:
-  - 0.06
+  - 0.065
   - 0.14
-- api: openrouter
-  model: mistralai/ministral-3b-2512
-  provider: nextbit/fp8
-  cost:
-  - 0.1
-  - 0.1
 - api: openrouter
   model: mistralai/ministral-8b-2512
   provider: nextbit/fp8
@@ -71,6 +77,12 @@ endpoints_lt:
   cost:
   - 0.4
   - 0.4
+- api: openrouter
+  model: undi95/remm-slerp-l2-13b
+  provider: nextbit/bf16
+  cost:
+  - 0.45
+  - 0.65
 - api: openrouter
   model: gryphe/mythomax-l2-13b
   provider: mancer/fp8
