@@ -1191,6 +1191,13 @@ bad_endpoints_bi:
     - 3
 - api: openrouter
   model: minimax/minimax-m2.5
+  provider: nebius/fp4
+  reason:
+    token_usage:
+    - 39
+    - 1
+- api: openrouter
+  model: minimax/minimax-m2.5
   provider: nextbit/fp8
   reason:
     token_usage:
@@ -1231,6 +1238,20 @@ bad_endpoints_bi:
     token_usage:
     - 39
     - 1
+- api: openrouter
+  model: minimax/minimax-m2.7
+  provider: minimax/fp8
+  reason:
+    token_usage:
+    - 42
+    - 3
+- api: openrouter
+  model: minimax/minimax-m2.7
+  provider: minimax/highspeed
+  reason:
+    token_usage:
+    - 42
+    - 3
 - api: openrouter
   model: mistralai/ministral-14b-2512
   provider: together
@@ -1450,6 +1471,13 @@ bad_endpoints_bi:
     - 1
 - api: openrouter
   model: moonshotai/kimi-k2-thinking
+  provider: nebius/int4
+  reason:
+    token_usage:
+    - 26
+    - 1
+- api: openrouter
+  model: moonshotai/kimi-k2-thinking
   provider: novita/bf16
   reason:
     token_usage:
@@ -1633,6 +1661,13 @@ bad_endpoints_bi:
 - api: openrouter
   model: nvidia/nemotron-3-nano-30b-a3b
   provider: deepinfra/fp4
+  reason:
+    token_usage:
+    - 17
+    - 1
+- api: openrouter
+  model: nvidia/nemotron-3-super-120b-a12b
+  provider: nebius/bf16
   reason:
     token_usage:
     - 17
@@ -2520,6 +2555,13 @@ bad_endpoints_bi:
     - 247
 - api: openrouter
   model: qwen/qwen3.5-397b-a17b
+  provider: nebius/fp4
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
+  model: qwen/qwen3.5-397b-a17b
   provider: novita
   reason:
     token_usage:
@@ -2813,6 +2855,20 @@ bad_endpoints_bi:
     token_usage:
     - 38
     - 1
+- api: openrouter
+  model: xiaomi/mimo-v2-omni
+  provider: xiaomi/fp8
+  reason:
+    token_usage:
+    - 251
+    - 207
+- api: openrouter
+  model: xiaomi/mimo-v2-pro
+  provider: xiaomi/fp8
+  reason:
+    token_usage:
+    - 250
+    - 138
 - api: openrouter
   model: z-ai/glm-4.5-air
   provider: siliconflow/fp8
