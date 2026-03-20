@@ -1650,6 +1650,12 @@ endpoints_bi:
   - 0.13
   - 0.85
 - api: openrouter
+  model: deepseek/deepseek-v3.1-terminus
+  provider: chutes/fp8
+  cost:
+  - 0.21
+  - 0.78
+- api: openrouter
   model: deepseek/deepseek-chat-v3.1
   provider: chutes/fp8
   cost:
@@ -1853,12 +1859,6 @@ endpoints_bi:
   cost:
   - 0.27
   - 0.85
-- api: openrouter
-  model: deepseek/deepseek-v3.1-terminus
-  provider: chutes/fp8
-  cost:
-  - 0.23
-  - 0.9
 - api: openrouter
   model: qwen/qwen3-14b
   provider: alibaba
@@ -2730,6 +2730,12 @@ endpoints_bi:
   - 0.21
   - 1.9
 - api: openrouter
+  model: z-ai/glm-4.7
+  provider: chutes/bf16
+  cost:
+  - 0.39
+  - 1.75
+- api: openrouter
   model: deepseek/deepseek-chat-v3.1
   provider: sambanova/fp8
   cost:
@@ -2909,12 +2915,6 @@ endpoints_bi:
   cost:
   - 0.6
   - 1.8
-- api: openrouter
-  model: z-ai/glm-4.7
-  provider: chutes/bf16
-  cost:
-  - 0.4
-  - 2.0
 - api: openrouter
   model: z-ai/glm-4.7
   provider: nebius/fp8
