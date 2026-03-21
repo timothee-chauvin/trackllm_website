@@ -715,6 +715,13 @@ bad_endpoints_bi:
     - 1
 - api: openrouter
   model: meta-llama/llama-3.3-70b-instruct
+  provider: akashml/fp8
+  reason:
+    token_usage:
+    - 36
+    - 1
+- api: openrouter
+  model: meta-llama/llama-3.3-70b-instruct
   provider: cerebras/fp16
   reason:
     token_usage:
@@ -1518,6 +1525,13 @@ bad_endpoints_bi:
     token_usage:
     - 12
     - 1
+- api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: modelrun/fp4
+  reason:
+    token_usage:
+    - 27
+    - 2
 - api: openrouter
   model: moonshotai/kimi-k2.5
   provider: nextbit/fp4

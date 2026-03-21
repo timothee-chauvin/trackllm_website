@@ -258,6 +258,12 @@ endpoints_bi:
   - 0.1
   - 0.1
 - api: openrouter
+  model: mistralai/ministral-3b-2512
+  provider: nextbit/fp8
+  cost:
+  - 0.1
+  - 0.1
+- api: openrouter
   model: nvidia/nemotron-nano-9b-v2
   provider: deepinfra/bf16
   cost:
@@ -673,6 +679,12 @@ endpoints_bi:
   - 0.2
 - api: openrouter
   model: mistralai/ministral-14b-2512
+  provider: nextbit/fp8
+  cost:
+  - 0.2
+  - 0.2
+- api: openrouter
+  model: mistralai/ministral-14b-2512
   provider: together
   cost:
   - 0.2
@@ -734,6 +746,12 @@ endpoints_bi:
 - api: openrouter
   model: qwen/qwen3-30b-a3b-instruct-2507
   provider: atlas-cloud/bf16
+  cost:
+  - 0.1
+  - 0.3
+- api: openrouter
+  model: qwen/qwen3-30b-a3b-instruct-2507
+  provider: atlas-cloud/fp8
   cost:
   - 0.1
   - 0.3
@@ -2166,6 +2184,12 @@ endpoints_bi:
   - 0.55
   - 0.8
 - api: openrouter
+  model: minimax/minimax-m2.5
+  provider: chutes/fp8
+  cost:
+  - 0.2
+  - 1.17
+- api: openrouter
   model: meta-llama/llama-3.3-70b-instruct
   provider: groq
   cost:
@@ -2219,12 +2243,6 @@ endpoints_bi:
   cost:
   - 0.2
   - 1.2
-- api: openrouter
-  model: minimax/minimax-m2.5
-  provider: chutes/fp8
-  cost:
-  - 0.3
-  - 1.1
 - api: openrouter
   model: meta-llama/llama-3.3-70b-instruct
   provider: wandb/fp16
@@ -2531,6 +2549,12 @@ endpoints_bi:
   cost:
   - 0.75
   - 1.0
+- api: openrouter
+  model: qwen/qwen3-vl-235b-a22b-instruct
+  provider: venice/fp8
+  cost:
+  - 0.25
+  - 1.5
 - api: openrouter
   model: qwen/qwen3-coder-30b-a3b-instruct
   provider: alibaba
@@ -3276,6 +3300,12 @@ endpoints_bi:
   - 0.6
   - 2.4
 - api: openrouter
+  model: z-ai/glm-5
+  provider: ambient/fp8
+  cost:
+  - 0.72
+  - 2.3
+- api: openrouter
   model: moonshotai/kimi-k2-thinking
   provider: siliconflow/fp8
   cost:
@@ -3408,6 +3438,12 @@ endpoints_bi:
   - 0.3
   - 3.0
 - api: openrouter
+  model: z-ai/glm-5
+  provider: deepinfra/fp4
+  cost:
+  - 0.8
+  - 2.56
+- api: openrouter
   model: moonshotai/kimi-k2.5
   provider: parasail/int4
   cost:
@@ -3449,6 +3485,12 @@ endpoints_bi:
   cost:
   - 0.95
   - 2.55
+- api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: io-net/int4
+  cost:
+  - 0.55
+  - 3.0
 - api: openrouter
   model: moonshotai/kimi-k2.5
   provider: baseten/fp4
@@ -3575,6 +3617,12 @@ endpoints_bi:
   cost:
   - 0.95
   - 3.15
+- api: openrouter
+  model: z-ai/glm-5-turbo
+  provider: z-ai
+  cost:
+  - 0.96
+  - 3.2
 - api: openrouter
   model: arcee-ai/maestro-reasoning
   provider: together
@@ -4364,6 +4412,12 @@ endpoints_bi:
 - api: openrouter
   model: anthropic/claude-sonnet-4.6
   provider: google-vertex
+  cost:
+  - 3.0
+  - 15.0
+- api: openrouter
+  model: anthropic/claude-sonnet-4.6
+  provider: google-vertex/us-east5
   cost:
   - 3.0
   - 15.0
