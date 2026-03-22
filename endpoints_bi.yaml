@@ -264,6 +264,12 @@ endpoints_bi:
   - 0.1
   - 0.1
 - api: openrouter
+  model: mistralai/pixtral-12b
+  provider: hyperbolic
+  cost:
+  - 0.1
+  - 0.1
+- api: openrouter
   model: nvidia/nemotron-nano-9b-v2
   provider: deepinfra/bf16
   cost:
@@ -2622,6 +2628,12 @@ endpoints_bi:
   - 0.35
   - 1.5
 - api: openrouter
+  model: qwen/qwen3-coder
+  provider: venice/fp8
+  cost:
+  - 0.35
+  - 1.5
+- api: openrouter
   model: arcee-ai/virtuoso-large
   provider: together
   cost:
@@ -2861,6 +2873,12 @@ endpoints_bi:
   cost:
   - 0.455
   - 1.82
+- api: openrouter
+  model: deepseek/deepseek-v3.2
+  provider: alibaba
+  cost:
+  - 0.57
+  - 1.71
 - api: openrouter
   model: z-ai/glm-4.6
   provider: siliconflow/fp8
@@ -3551,6 +3569,12 @@ endpoints_bi:
   cost:
   - 0.8
   - 3.2
+- api: openrouter
+  model: deepseek/deepseek-r1
+  provider: hyperbolic
+  cost:
+  - 2.0
+  - 2.0
 - api: openrouter
   model: deepseek/deepseek-r1-distill-llama-70b
   provider: together
