@@ -1146,12 +1146,6 @@ endpoints_bi:
   - 0.125
   - 0.5
 - api: openrouter
-  model: qwen/qwen3-235b-a22b-2507
-  provider: chutes/bf16
-  cost:
-  - 0.08
-  - 0.55
-- api: openrouter
   model: deepseek/deepseek-v3.2
   provider: atlas-cloud/fp8
   cost:
@@ -1261,6 +1255,18 @@ endpoints_bi:
   - 0.55
 - api: openrouter
   model: deepseek/deepseek-v3.2
+  provider: akashml/fp8
+  cost:
+  - 0.28
+  - 0.42
+- api: openrouter
+  model: deepseek/deepseek-v3.2
+  provider: chutes/fp8
+  cost:
+  - 0.28
+  - 0.42
+- api: openrouter
+  model: deepseek/deepseek-v3.2
   provider: deepseek
   cost:
   - 0.28
@@ -1268,6 +1274,12 @@ endpoints_bi:
 - api: openrouter
   model: meta-llama/llama-4-scout
   provider: friendli
+  cost:
+  - 0.1
+  - 0.6
+- api: openrouter
+  model: qwen/qwen3-235b-a22b-2507
+  provider: chutes/bf16
   cost:
   - 0.1
   - 0.6
@@ -1674,18 +1686,6 @@ endpoints_bi:
   - 0.13
   - 0.85
 - api: openrouter
-  model: deepseek/deepseek-v3.1-terminus
-  provider: chutes/fp8
-  cost:
-  - 0.21
-  - 0.78
-- api: openrouter
-  model: deepseek/deepseek-chat-v3.1
-  provider: chutes/fp8
-  cost:
-  - 0.2
-  - 0.8
-- api: openrouter
   model: deepseek/deepseek-chat-v3.1
   provider: deepinfra/fp4
   cost:
@@ -1853,12 +1853,6 @@ endpoints_bi:
   cost:
   - 0.22
   - 0.88
-- api: openrouter
-  model: tngtech/deepseek-r1t2-chimera
-  provider: chutes/fp8
-  cost:
-  - 0.25
-  - 0.85
 - api: openrouter
   model: undi95/remm-slerp-l2-13b
   provider: nextbit/bf16
@@ -2059,6 +2053,12 @@ endpoints_bi:
   - 1.0
 - api: openrouter
   model: deepseek/deepseek-chat-v3.1
+  provider: chutes/fp8
+  cost:
+  - 0.27
+  - 1.0
+- api: openrouter
+  model: deepseek/deepseek-chat-v3.1
   provider: novita/fp8
   cost:
   - 0.27
@@ -2066,6 +2066,12 @@ endpoints_bi:
 - api: openrouter
   model: deepseek/deepseek-chat-v3.1
   provider: siliconflow/fp8
+  cost:
+  - 0.27
+  - 1.0
+- api: openrouter
+  model: deepseek/deepseek-v3.1-terminus
+  provider: chutes/fp8
   cost:
   - 0.27
   - 1.0
@@ -2249,6 +2255,12 @@ endpoints_bi:
   cost:
   - 0.2
   - 1.2
+- api: openrouter
+  model: tngtech/deepseek-r1t2-chimera
+  provider: chutes/fp8
+  cost:
+  - 0.3
+  - 1.1
 - api: openrouter
   model: meta-llama/llama-3.3-70b-instruct
   provider: wandb/fp16
@@ -3552,12 +3564,6 @@ endpoints_bi:
   - 0.65
   - 3.25
 - api: openrouter
-  model: z-ai/glm-5
-  provider: io-net/fp8
-  cost:
-  - 0.94
-  - 3.0
-- api: openrouter
   model: qwen/qwen3-vl-235b-a22b-thinking
   provider: siliconflow/fp8
   cost:
@@ -3620,6 +3626,12 @@ endpoints_bi:
 - api: openrouter
   model: relace/relace-search
   provider: relace/bf16
+  cost:
+  - 1.0
+  - 3.0
+- api: openrouter
+  model: z-ai/glm-5
+  provider: io-net/fp8
   cost:
   - 1.0
   - 3.0
@@ -4430,6 +4442,12 @@ endpoints_bi:
 - api: openrouter
   model: anthropic/claude-sonnet-4.6
   provider: anthropic
+  cost:
+  - 3.0
+  - 15.0
+- api: openrouter
+  model: anthropic/claude-sonnet-4.6
+  provider: azure
   cost:
   - 3.0
   - 15.0
