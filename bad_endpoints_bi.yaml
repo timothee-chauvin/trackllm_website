@@ -1142,6 +1142,13 @@ bad_endpoints_bi:
     - 1
 - api: openrouter
   model: minimax/minimax-m2.5
+  provider: akashml/fp8
+  reason:
+    token_usage:
+    - 39
+    - 1
+- api: openrouter
+  model: minimax/minimax-m2.5
   provider: atlas-cloud/fp8
   reason:
     token_usage:
@@ -1252,6 +1259,13 @@ bad_endpoints_bi:
     token_usage:
     - 39
     - 1
+- api: openrouter
+  model: minimax/minimax-m2.7
+  provider: atlas-cloud/fp8
+  reason:
+    token_usage:
+    - 42
+    - 3
 - api: openrouter
   model: minimax/minimax-m2.7
   provider: minimax/fp8
