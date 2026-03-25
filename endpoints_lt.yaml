@@ -30,12 +30,6 @@ endpoints_lt:
   - 0.3
   - 0.3
 - api: openrouter
-  model: mistralai/ministral-3b-2512
-  provider: nextbit/fp8
-  cost:
-  - 0.3
-  - 0.3
-- api: openrouter
   model: thedrummer/rocinante-12b
   provider: nextbit/bf16
   cost:
@@ -47,6 +41,12 @@ endpoints_lt:
   cost:
   - 0.28
   - 0.42
+- api: openrouter
+  model: mistralai/ministral-3b-2512
+  provider: nextbit/fp8
+  cost:
+  - 0.35
+  - 0.35
 - api: openrouter
   model: openai/gpt-4o-mini
   provider: azure

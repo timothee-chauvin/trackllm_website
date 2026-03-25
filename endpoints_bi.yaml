@@ -1092,12 +1092,6 @@ endpoints_bi:
   - 0.3
   - 0.3
 - api: openrouter
-  model: mistralai/ministral-3b-2512
-  provider: nextbit/fp8
-  cost:
-  - 0.3
-  - 0.3
-- api: openrouter
   model: mistralai/mistral-nemo
   provider: azure
   cost:
@@ -1144,6 +1138,12 @@ endpoints_bi:
   provider: venice/fp8
   cost:
   - 0.125
+  - 0.5
+- api: openrouter
+  model: nex-agi/deepseek-v3.1-nex-n1
+  provider: siliconflow/fp8
+  cost:
+  - 0.135
   - 0.5
 - api: openrouter
   model: deepseek/deepseek-v3.2
@@ -1277,6 +1277,12 @@ endpoints_bi:
   cost:
   - 0.1
   - 0.6
+- api: openrouter
+  model: mistralai/ministral-3b-2512
+  provider: nextbit/fp8
+  cost:
+  - 0.35
+  - 0.35
 - api: openrouter
   model: qwen/qwen3-235b-a22b-2507
   provider: chutes/bf16
@@ -2083,12 +2089,6 @@ endpoints_bi:
   - 1.0
 - api: openrouter
   model: deepseek/deepseek-v3.1-terminus
-  provider: siliconflow/fp8
-  cost:
-  - 0.27
-  - 1.0
-- api: openrouter
-  model: nex-agi/deepseek-v3.1-nex-n1
   provider: siliconflow/fp8
   cost:
   - 0.27
