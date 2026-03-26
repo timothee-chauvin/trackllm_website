@@ -21,12 +21,6 @@ endpoints_lt:
   model: mistralai/ministral-8b-2512
   provider: nextbit/fp8
   cost:
-  - 0.15
-  - 0.15
-- api: openrouter
-  model: mistralai/ministral-14b-2512
-  provider: nextbit/fp8
-  cost:
   - 0.3
   - 0.3
 - api: openrouter
@@ -41,6 +35,12 @@ endpoints_lt:
   cost:
   - 0.28
   - 0.42
+- api: openrouter
+  model: mistralai/ministral-14b-2512
+  provider: nextbit/fp8
+  cost:
+  - 0.35
+  - 0.35
 - api: openrouter
   model: mistralai/ministral-3b-2512
   provider: nextbit/fp8
