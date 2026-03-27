@@ -276,6 +276,12 @@ endpoints_bi:
   - 0.1
   - 0.1
 - api: openrouter
+  model: reka/reka-edge
+  provider: reka/bf16
+  cost:
+  - 0.1
+  - 0.1
+- api: openrouter
   model: z-ai/glm-4-32b
   provider: z-ai
   cost:
@@ -497,6 +503,12 @@ endpoints_bi:
   cost:
   - 0.07
   - 0.27
+- api: openrouter
+  model: mistralai/mistral-small-3.2-24b-instruct
+  provider: venice/fp8
+  cost:
+  - 0.09375
+  - 0.25
 - api: openrouter
   model: baidu/ernie-4.5-21b-a3b
   provider: novita/bf16
@@ -811,6 +823,12 @@ endpoints_bi:
   - 0.29
 - api: openrouter
   model: openai/gpt-oss-120b
+  provider: chutes/bf16
+  cost:
+  - 0.09
+  - 0.36
+- api: openrouter
+  model: openai/gpt-oss-120b
   provider: clarifai/fp4
   cost:
   - 0.09
@@ -935,12 +953,6 @@ endpoints_bi:
   cost:
   - 0.1
   - 0.4
-- api: openrouter
-  model: openai/gpt-oss-120b
-  provider: chutes/bf16
-  cost:
-  - 0.05
-  - 0.45
 - api: openrouter
   model: openai/gpt-oss-120b
   provider: siliconflow/fp8
@@ -2670,6 +2682,12 @@ endpoints_bi:
   - 0.5
   - 1.5
 - api: openrouter
+  model: deepseek/deepseek-v3.2
+  provider: friendli
+  cost:
+  - 0.5
+  - 1.5
+- api: openrouter
   model: eleutherai/llemma_7b
   provider: featherless
   cost:
@@ -3803,6 +3821,12 @@ endpoints_bi:
   cost:
   - 1.04
   - 4.16
+- api: openrouter
+  model: z-ai/glm-5-turbo
+  provider: atlas-cloud/fp8
+  cost:
+  - 1.2
+  - 4.0
 - api: openrouter
   model: z-ai/glm-5-turbo
   provider: z-ai
