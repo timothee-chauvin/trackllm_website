@@ -2744,6 +2744,13 @@ bad_endpoints_bi:
     - 1
 - api: openrouter
   model: stepfun/step-3.5-flash
+  provider: deepinfra/fp8
+  reason:
+    token_usage:
+    - 12
+    - 1
+- api: openrouter
+  model: stepfun/step-3.5-flash
   provider: stepfun/fp8
   reason:
     token_usage:
