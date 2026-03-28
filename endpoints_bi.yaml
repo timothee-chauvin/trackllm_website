@@ -3120,6 +3120,12 @@ endpoints_bi:
   - 0.45
   - 2.2
 - api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: io-net/int4
+  cost:
+  - 0.45
+  - 2.22
+- api: openrouter
   model: deepseek/deepseek-r1-0528
   provider: siliconflow/fp8
   cost:
@@ -3533,12 +3539,6 @@ endpoints_bi:
   cost:
   - 0.95
   - 2.55
-- api: openrouter
-  model: moonshotai/kimi-k2.5
-  provider: io-net/int4
-  cost:
-  - 0.55
-  - 3.0
 - api: openrouter
   model: moonshotai/kimi-k2.5
   provider: baseten/fp4
