@@ -2172,6 +2172,12 @@ endpoints_bi:
   - 0.2
   - 1.1
 - api: openrouter
+  model: minimax/minimax-m2.5
+  provider: chutes/fp8
+  cost:
+  - 0.19
+  - 1.15
+- api: openrouter
   model: qwen/qwen3-next-80b-a3b-instruct
   provider: google-vertex
   cost:
@@ -2207,12 +2213,6 @@ endpoints_bi:
   cost:
   - 0.55
   - 0.8
-- api: openrouter
-  model: minimax/minimax-m2.5
-  provider: chutes/fp8
-  cost:
-  - 0.2
-  - 1.17
 - api: openrouter
   model: meta-llama/llama-3.3-70b-instruct
   provider: groq
@@ -3102,17 +3102,17 @@ endpoints_bi:
   - 0.52
   - 2.08
 - api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: chutes/int4
+  cost:
+  - 0.42
+  - 2.2
+- api: openrouter
   model: deepseek/deepseek-r1-0528
   provider: deepinfra/fp4
   cost:
   - 0.5
   - 2.15
-- api: openrouter
-  model: moonshotai/kimi-k2.5
-  provider: chutes/int4
-  cost:
-  - 0.45
-  - 2.2
 - api: openrouter
   model: z-ai/glm-4.7
   provider: siliconflow/fp8
@@ -3123,7 +3123,7 @@ endpoints_bi:
   model: moonshotai/kimi-k2.5
   provider: io-net/int4
   cost:
-  - 0.45
+  - 0.445
   - 2.22
 - api: openrouter
   model: deepseek/deepseek-r1-0528
