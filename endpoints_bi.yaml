@@ -2142,6 +2142,12 @@ endpoints_bi:
   - 0.2
   - 1.1
 - api: openrouter
+  model: minimax/minimax-m2.5
+  provider: inceptron/fp8
+  cost:
+  - 0.2
+  - 1.1
+- api: openrouter
   model: prime-intellect/intellect-3
   provider: nebius/fp8
   cost:
@@ -2228,12 +2234,6 @@ endpoints_bi:
 - api: openrouter
   model: baidu/ernie-4.5-300b-a47b
   provider: siliconflow/fp8
-  cost:
-  - 0.28
-  - 1.1
-- api: openrouter
-  model: minimax/minimax-m2.5
-  provider: inceptron/fp8
   cost:
   - 0.28
   - 1.1
