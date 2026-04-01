@@ -1191,6 +1191,13 @@ bad_endpoints_bi:
     - 1
 - api: openrouter
   model: minimax/minimax-m2.5
+  provider: io-net/fp8
+  reason:
+    token_usage:
+    - 39
+    - 1
+- api: openrouter
+  model: minimax/minimax-m2.5
   provider: ionstream/fp8
   reason:
     token_usage:
@@ -2751,6 +2758,13 @@ bad_endpoints_bi:
     - 1
 - api: openrouter
   model: stepfun/step-3.5-flash
+  provider: siliconflow/fp8
+  reason:
+    token_usage:
+    - 13
+    - 180
+- api: openrouter
+  model: stepfun/step-3.5-flash
   provider: stepfun/fp8
   reason:
     token_usage:
@@ -2872,12 +2886,26 @@ bad_endpoints_bi:
   reason:
     price_mismatch: '756.25'
 - api: openrouter
+  model: x-ai/grok-4.20
+  provider: xai
+  reason:
+    token_usage:
+    - 123
+    - 1
+- api: openrouter
   model: x-ai/grok-4.20-beta
   provider: xai
   reason:
     token_usage:
     - 123
     - 1
+- api: openrouter
+  model: x-ai/grok-4.20-multi-agent
+  provider: xai
+  reason:
+    token_usage:
+    - 8722
+    - 1979
 - api: openrouter
   model: x-ai/grok-4.20-multi-agent-beta
   provider: xai

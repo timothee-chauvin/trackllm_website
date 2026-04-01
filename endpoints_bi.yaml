@@ -2070,6 +2070,12 @@ endpoints_bi:
   - 0.255
   - 1.0
 - api: openrouter
+  model: minimax/minimax-m2.5
+  provider: chutes/fp8
+  cost:
+  - 0.16
+  - 1.1
+- api: openrouter
   model: deepseek/deepseek-chat-v3.1
   provider: chutes/fp8
   cost:
@@ -2112,6 +2118,12 @@ endpoints_bi:
   - 0.255
   - 1.02
 - api: openrouter
+  model: minimax/minimax-m2.5
+  provider: inceptron/fp8
+  cost:
+  - 0.18
+  - 1.1
+- api: openrouter
   model: qwen/qwen3-vl-30b-a3b-instruct
   provider: siliconflow/fp8
   cost:
@@ -2138,12 +2150,6 @@ endpoints_bi:
 - api: openrouter
   model: minimax/minimax-01
   provider: minimax
-  cost:
-  - 0.2
-  - 1.1
-- api: openrouter
-  model: minimax/minimax-m2.5
-  provider: inceptron/fp8
   cost:
   - 0.2
   - 1.1
@@ -2177,12 +2183,6 @@ endpoints_bi:
   cost:
   - 0.2
   - 1.1
-- api: openrouter
-  model: minimax/minimax-m2.5
-  provider: chutes/fp8
-  cost:
-  - 0.19
-  - 1.15
 - api: openrouter
   model: qwen/qwen3-next-80b-a3b-instruct
   provider: google-vertex
