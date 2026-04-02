@@ -91,6 +91,13 @@ bad_endpoints_bi:
     - 35
     - 1
 - api: openrouter
+  model: arcee-ai/trinity-large-thinking
+  provider: arcee-ai
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
   model: arcee-ai/trinity-mini
   provider: clarifai/bf16
   reason:
@@ -1724,6 +1731,13 @@ bad_endpoints_bi:
 - api: openrouter
   model: nvidia/nemotron-3-super-120b-a12b
   provider: nebius/bf16
+  reason:
+    token_usage:
+    - 17
+    - 1
+- api: openrouter
+  model: nvidia/nemotron-3-super-120b-a12b
+  provider: nebius/fp4
   reason:
     token_usage:
     - 17
