@@ -98,6 +98,13 @@ bad_endpoints_bi:
     - 11
     - 1
 - api: openrouter
+  model: arcee-ai/trinity-large-thinking
+  provider: parasail/fp8
+  reason:
+    token_usage:
+    - 11
+    - 1
+- api: openrouter
   model: arcee-ai/trinity-mini
   provider: clarifai/bf16
   reason:
@@ -397,6 +404,20 @@ bad_endpoints_bi:
   reason:
     token_usage:
     - 17
+    - 1
+- api: openrouter
+  model: google/gemma-4-31b-it
+  provider: novita/bf16
+  reason:
+    token_usage:
+    - 14
+    - 1
+- api: openrouter
+  model: google/gemma-4-31b-it
+  provider: parasail/bf16
+  reason:
+    token_usage:
+    - 14
     - 1
 - api: openrouter
   model: gryphe/mythomax-l2-13b
