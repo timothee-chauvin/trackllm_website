@@ -1896,17 +1896,17 @@ endpoints_bi:
   - 0.45
   - 0.65
 - api: openrouter
+  model: minimax/minimax-m2.5
+  provider: chutes/fp8
+  cost:
+  - 0.118
+  - 0.99
+- api: openrouter
   model: meta-llama/llama-3-8b-instruct
   provider: cloudflare
   cost:
   - 0.28
   - 0.83
-- api: openrouter
-  model: minimax/minimax-m2.5
-  provider: chutes/fp8
-  cost:
-  - 0.118
-  - 1.0
 - api: openrouter
   model: meta-llama/llama-4-maverick
   provider: novita/fp8
@@ -2832,6 +2832,12 @@ endpoints_bi:
   - 0.4
   - 1.7
 - api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: io-net/int4
+  cost:
+  - 0.3827
+  - 1.72
+- api: openrouter
   model: qwen/qwen3-vl-235b-a22b-instruct
   provider: parasail/fp8
   cost:
@@ -2963,12 +2969,6 @@ endpoints_bi:
   cost:
   - 0.3827
   - 1.909
-- api: openrouter
-  model: moonshotai/kimi-k2.5
-  provider: io-net/int4
-  cost:
-  - 0.3827
-  - 1.9092
 - api: openrouter
   model: deepseek/deepseek-chat-v3.1
   provider: google-vertex
