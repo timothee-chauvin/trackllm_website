@@ -474,6 +474,12 @@ endpoints_bi:
   - 0.1
   - 0.2
 - api: openrouter
+  model: rekaai/reka-flash-3
+  provider: reka/fp8
+  cost:
+  - 0.1
+  - 0.2
+- api: openrouter
   model: nvidia/nemotron-nano-9b-v2
   provider: together
   cost:
