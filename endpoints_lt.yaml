@@ -30,6 +30,18 @@ endpoints_lt:
   - 0.17
   - 0.43
 - api: openrouter
+  model: google/gemma-4-26b-a4b-it
+  provider: venice/bf16
+  cost:
+  - 0.1625
+  - 0.5
+- api: openrouter
+  model: google/gemma-4-31b-it
+  provider: venice/bf16
+  cost:
+  - 0.175
+  - 0.5
+- api: openrouter
   model: deepseek/deepseek-v3.2
   provider: deepseek
   cost:

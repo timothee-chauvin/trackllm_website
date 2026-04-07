@@ -420,6 +420,13 @@ bad_endpoints_bi:
     - 14
     - 1
 - api: openrouter
+  model: google/gemma-4-26b-a4b-it
+  provider: venice/bf16
+  reason:
+    token_usage:
+    - 14
+    - 1
+- api: openrouter
   model: google/gemma-4-31b-it
   provider: akashml/bf16
   reason:
@@ -436,6 +443,13 @@ bad_endpoints_bi:
 - api: openrouter
   model: google/gemma-4-31b-it
   provider: parasail/bf16
+  reason:
+    token_usage:
+    - 14
+    - 1
+- api: openrouter
+  model: google/gemma-4-31b-it
+  provider: venice/bf16
   reason:
     token_usage:
     - 14
