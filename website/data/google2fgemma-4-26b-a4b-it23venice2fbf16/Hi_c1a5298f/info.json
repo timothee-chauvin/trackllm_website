@@ -1,0 +1,13 @@
+{
+  "prompt": "Hi",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "google/gemma-4-26b-a4b-it",
+    "provider": "venice/bf16",
+    "cost": [
+      0.1625,
+      0.5
+    ],
+    "max_logprobs": null
+  }
+}
