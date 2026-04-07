@@ -1,1 +1,1 @@
-{"seen_errors":[]}
+{"seen_errors":[{"http_code":503,"message":"{\"message\":\"Provider returned error\",\"code\":503,\"metadata\":{\"raw\":\"{\\\"error\\\":\\\"The model is currently overloaded. Please try again later.\\\"}\",\"provider_name\":\"Venice\",\"is_byok\":false,\"retry_after_seconds\":2}}"}]}
