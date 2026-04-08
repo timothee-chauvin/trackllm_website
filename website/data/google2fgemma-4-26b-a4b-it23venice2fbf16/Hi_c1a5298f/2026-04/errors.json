@@ -1,1 +1,1 @@
-{"seen_errors":[{"http_code":0,"message":"Timeout after 15.0s"}]}
+{"seen_errors":[{"http_code":0,"message":"Timeout after 15.0s"},{"http_code":404,"message":"{\"message\":\"No endpoints found that can handle the requested parameters. To learn more about provider routing, visit: https://openrouter.ai/docs/guides/routing/provider-selection\",\"code\":404}"}]}
