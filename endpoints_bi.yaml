@@ -2508,12 +2508,6 @@ endpoints_bi:
   - 0.3
   - 1.3
 - api: openrouter
-  model: z-ai/glm-5
-  provider: gmicloud/fp8
-  cost:
-  - 1.0
-  - 0.6
-- api: openrouter
   model: qwen/qwen3-next-80b-a3b-instruct
   provider: atlas-cloud/fp8
   cost:
@@ -3758,6 +3752,12 @@ endpoints_bi:
 - api: openrouter
   model: z-ai/glm-5
   provider: friendli
+  cost:
+  - 1.0
+  - 3.2
+- api: openrouter
+  model: z-ai/glm-5
+  provider: gmicloud/fp8
   cost:
   - 1.0
   - 3.2
