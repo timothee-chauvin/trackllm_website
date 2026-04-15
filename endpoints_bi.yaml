@@ -2310,6 +2310,12 @@ endpoints_bi:
   - 0.72
   - 0.72
 - api: openrouter
+  model: minimax/minimax-m2.5
+  provider: parasail/fp8
+  cost:
+  - 0.25
+  - 1.2
+- api: openrouter
   model: qwen/qwen3-vl-8b-thinking
   provider: alibaba
   cost:
@@ -2438,12 +2444,6 @@ endpoints_bi:
 - api: openrouter
   model: minimax/minimax-m2.5
   provider: novita/fp8
-  cost:
-  - 0.3
-  - 1.2
-- api: openrouter
-  model: minimax/minimax-m2.5
-  provider: parasail/fp8
   cost:
   - 0.3
   - 1.2
