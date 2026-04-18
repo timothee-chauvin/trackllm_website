@@ -1230,6 +1230,12 @@ endpoints_bi:
   - 0.09
   - 0.58
 - api: openrouter
+  model: deepseek/deepseek-v3.2
+  provider: siliconflow/fp8
+  cost:
+  - 0.259
+  - 0.42
+- api: openrouter
   model: deepseek/deepseek-v3.2-exp
   provider: atlas-cloud/fp8
   cost:
@@ -1247,12 +1253,6 @@ endpoints_bi:
   cost:
   - 0.27
   - 0.41
-- api: openrouter
-  model: deepseek/deepseek-v3.2
-  provider: siliconflow/fp8
-  cost:
-  - 0.27
-  - 0.42
 - api: openrouter
   model: mistralai/mistral-small-3.2-24b-instruct
   provider: parasail/bf16
@@ -2874,12 +2874,6 @@ endpoints_bi:
   - 0.43
   - 1.74
 - api: openrouter
-  model: z-ai/glm-4.6
-  provider: atlas-cloud/fp8
-  cost:
-  - 0.44
-  - 1.74
-- api: openrouter
   model: deepseek/deepseek-chat-v3.1
   provider: wandb/fp8
   cost:
@@ -3290,6 +3284,12 @@ endpoints_bi:
 - api: openrouter
   model: z-ai/glm-4.5
   provider: z-ai/fp8
+  cost:
+  - 0.6
+  - 2.2
+- api: openrouter
+  model: z-ai/glm-4.6
+  provider: atlas-cloud/fp8
   cost:
   - 0.6
   - 2.2
