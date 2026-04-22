@@ -420,6 +420,12 @@ endpoints_bi:
   - 0.15
   - 0.15
 - api: openrouter
+  model: mistralai/ministral-3b-2512
+  provider: nextbit/fp8
+  cost:
+  - 0.15
+  - 0.15
+- api: openrouter
   model: mistralai/ministral-8b-2512
   provider: mistral
   cost:
@@ -1303,12 +1309,6 @@ endpoints_bi:
   - 0.6
 - api: openrouter
   model: mistralai/ministral-14b-2512
-  provider: nextbit/fp8
-  cost:
-  - 0.35
-  - 0.35
-- api: openrouter
-  model: mistralai/ministral-3b-2512
   provider: nextbit/fp8
   cost:
   - 0.35
@@ -2214,12 +2214,6 @@ endpoints_bi:
   - 0.15
   - 1.2
 - api: openrouter
-  model: minimax/minimax-m2.5
-  provider: parasail/fp8
-  cost:
-  - 0.15
-  - 1.2
-- api: openrouter
   model: qwen/qwen3-next-80b-a3b-instruct
   provider: google-vertex
   cost:
@@ -2255,6 +2249,12 @@ endpoints_bi:
   cost:
   - 0.55
   - 0.8
+- api: openrouter
+  model: minimax/minimax-m2.5
+  provider: parasail/fp8
+  cost:
+  - 0.17
+  - 1.2
 - api: openrouter
   model: meta-llama/llama-3.3-70b-instruct
   provider: groq
@@ -3210,6 +3210,12 @@ endpoints_bi:
   - 0.39
   - 2.34
 - api: openrouter
+  model: z-ai/glm-5
+  provider: gmicloud/fp8
+  cost:
+  - 0.65
+  - 2.08
+- api: openrouter
   model: moonshotai/kimi-k2
   provider: deepinfra/fp4
   cost:
@@ -3752,12 +3758,6 @@ endpoints_bi:
 - api: openrouter
   model: z-ai/glm-5
   provider: friendli
-  cost:
-  - 1.0
-  - 3.2
-- api: openrouter
-  model: z-ai/glm-5
-  provider: gmicloud/fp8
   cost:
   - 1.0
   - 3.2
