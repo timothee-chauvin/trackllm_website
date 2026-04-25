@@ -1698,17 +1698,17 @@ endpoints_bi:
   - 0.35
   - 0.56
 - api: openrouter
+  model: qwen/qwen3-coder-next
+  provider: ionstream/fp8
+  cost:
+  - 0.14
+  - 0.8
+- api: openrouter
   model: meta-llama/llama-4-scout
   provider: google-vertex
   cost:
   - 0.25
   - 0.7
-- api: openrouter
-  model: qwen/qwen3-coder-next
-  provider: ionstream/fp8
-  cost:
-  - 0.15
-  - 0.8
 - api: openrouter
   model: qwen/qwen3-coder-next
   provider: parasail/bf16
