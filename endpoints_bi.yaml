@@ -1626,6 +1626,12 @@ endpoints_bi:
   - 0.3
   - 0.5
 - api: openrouter
+  model: minimax/minimax-m2.5
+  provider: sambanova
+  cost:
+  - 0.22
+  - 0.59
+- api: openrouter
   model: openai/gpt-oss-120b
   provider: parasail/fp4
   cost:
@@ -2034,12 +2040,6 @@ endpoints_bi:
   - 0.27
   - 0.95
 - api: openrouter
-  model: qwen/qwen3-coder
-  provider: deepinfra/turbo
-  cost:
-  - 0.22
-  - 1.0
-- api: openrouter
   model: microsoft/wizardlm-2-8x22b
   provider: novita/bf16
   cost:
@@ -2195,6 +2195,12 @@ endpoints_bi:
   cost:
   - 0.1
   - 1.2
+- api: openrouter
+  model: qwen/qwen3-coder
+  provider: deepinfra/turbo
+  cost:
+  - 0.3
+  - 1.0
 - api: openrouter
   model: qwen/qwen3-vl-235b-a22b-instruct
   provider: alibaba
@@ -2444,12 +2450,6 @@ endpoints_bi:
 - api: openrouter
   model: minimax/minimax-m2.5
   provider: novita/fp8
-  cost:
-  - 0.3
-  - 1.2
-- api: openrouter
-  model: minimax/minimax-m2.5
-  provider: sambanova
   cost:
   - 0.3
   - 1.2
