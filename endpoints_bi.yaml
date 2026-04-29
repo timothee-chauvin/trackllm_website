@@ -2250,12 +2250,6 @@ endpoints_bi:
   - 0.55
   - 0.8
 - api: openrouter
-  model: minimax/minimax-m2.5
-  provider: parasail/fp8
-  cost:
-  - 0.17
-  - 1.2
-- api: openrouter
   model: meta-llama/llama-3.3-70b-instruct
   provider: groq
   cost:
@@ -2444,6 +2438,12 @@ endpoints_bi:
 - api: openrouter
   model: minimax/minimax-m2.5
   provider: novita/fp8
+  cost:
+  - 0.3
+  - 1.2
+- api: openrouter
+  model: minimax/minimax-m2.5
+  provider: parasail/fp8
   cost:
   - 0.3
   - 1.2
