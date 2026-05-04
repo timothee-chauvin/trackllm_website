@@ -564,12 +564,6 @@ endpoints_bi:
   - 0.12
   - 0.24
 - api: openrouter
-  model: qwen/qwen3-30b-a3b
-  provider: deepinfra/fp8
-  cost:
-  - 0.08
-  - 0.28
-- api: openrouter
   model: qwen/qwen3-32b
   provider: deepinfra/fp8
   cost:
@@ -1040,6 +1034,12 @@ endpoints_bi:
 - api: openrouter
   model: alibaba/tongyi-deepresearch-30b-a3b
   provider: atlas-cloud/fp8
+  cost:
+  - 0.09
+  - 0.45
+- api: openrouter
+  model: qwen/qwen3-30b-a3b
+  provider: deepinfra/fp8
   cost:
   - 0.09
   - 0.45
@@ -1740,12 +1740,6 @@ endpoints_bi:
   - 0.21
   - 0.79
 - api: openrouter
-  model: deepseek/deepseek-v3.1-terminus
-  provider: deepinfra/fp4
-  cost:
-  - 0.21
-  - 0.79
-- api: openrouter
   model: deepseek/deepseek-v3.1-terminus:exacto
   provider: deepinfra/fp4
   cost:
@@ -2033,6 +2027,12 @@ endpoints_bi:
   cost:
   - 0.32
   - 0.89
+- api: openrouter
+  model: deepseek/deepseek-v3.1-terminus
+  provider: deepinfra/fp4
+  cost:
+  - 0.27
+  - 0.95
 - api: openrouter
   model: minimax/minimax-m2.1
   provider: deepinfra/fp8
