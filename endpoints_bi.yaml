@@ -1626,12 +1626,6 @@ endpoints_bi:
   - 0.3
   - 0.5
 - api: openrouter
-  model: minimax/minimax-m2.5
-  provider: sambanova
-  cost:
-  - 0.22
-  - 0.59
-- api: openrouter
   model: openai/gpt-oss-120b
   provider: parasail/fp4
   cost:
@@ -2450,6 +2444,12 @@ endpoints_bi:
 - api: openrouter
   model: minimax/minimax-m2.5
   provider: parasail/fp8
+  cost:
+  - 0.3
+  - 1.2
+- api: openrouter
+  model: minimax/minimax-m2.5
+  provider: sambanova
   cost:
   - 0.3
   - 1.2
@@ -3720,6 +3720,12 @@ endpoints_bi:
   - 0.56
   - 3.5
 - api: openrouter
+  model: qwen/qwen3.5-397b-a17b
+  provider: parasail/fp8
+  cost:
+  - 0.5
+  - 3.6
+- api: openrouter
   model: z-ai/glm-5
   provider: atlas-cloud/fp8
   cost:
@@ -3734,12 +3740,6 @@ endpoints_bi:
 - api: openrouter
   model: qwen/qwen3.5-397b-a17b
   provider: novita
-  cost:
-  - 0.6
-  - 3.6
-- api: openrouter
-  model: qwen/qwen3.5-397b-a17b
-  provider: parasail/fp8
   cost:
   - 0.6
   - 3.6
