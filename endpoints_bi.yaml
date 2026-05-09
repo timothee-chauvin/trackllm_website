@@ -1411,6 +1411,12 @@ endpoints_bi:
   - 0.6
 - api: openrouter
   model: openai/gpt-4o-mini
+  provider: azure/swedencentral
+  cost:
+  - 0.15
+  - 0.6
+- api: openrouter
+  model: openai/gpt-4o-mini
   provider: openai
   cost:
   - 0.15
@@ -4526,6 +4532,12 @@ endpoints_bi:
 - api: openrouter
   model: anthropic/claude-sonnet-4.6
   provider: azure
+  cost:
+  - 3.0
+  - 15.0
+- api: openrouter
+  model: anthropic/claude-sonnet-4.6
+  provider: azure/us-east-2
   cost:
   - 3.0
   - 15.0
