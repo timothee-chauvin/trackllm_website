@@ -124,7 +124,7 @@ endpoints_bi:
   provider: cloudflare
   cost:
   - 0.017
-  - 0.11
+  - 0.112
 - api: openrouter
   model: meta-llama/llama-3.1-8b-instruct
   provider: groq
@@ -322,7 +322,7 @@ endpoints_bi:
   provider: cloudflare
   cost:
   - 0.027
-  - 0.2
+  - 0.201
 - api: openrouter
   model: openai/gpt-oss-120b
   provider: deepinfra/fp4
@@ -624,6 +624,12 @@ endpoints_bi:
   - 0.09
   - 0.29
 - api: openrouter
+  model: meta-llama/llama-3.2-3b-instruct
+  provider: cloudflare
+  cost:
+  - 0.0509
+  - 0.335
+- api: openrouter
   model: qwen/qwen3-30b-a3b-instruct-2507
   provider: siliconflow/fp8
   cost:
@@ -635,12 +641,6 @@ endpoints_bi:
   cost:
   - 0.09
   - 0.3
-- api: openrouter
-  model: meta-llama/llama-3.2-3b-instruct
-  provider: cloudflare
-  cost:
-  - 0.051
-  - 0.34
 - api: openrouter
   model: qwen/qwen3-30b-a3b-thinking-2507
   provider: cloudflare
@@ -825,8 +825,8 @@ endpoints_bi:
   model: meta-llama/llama-3.1-8b-instruct
   provider: cloudflare/fp8
   cost:
-  - 0.15
-  - 0.29
+  - 0.152
+  - 0.287
 - api: openrouter
   model: openai/gpt-oss-120b
   provider: chutes/bf16
@@ -987,7 +987,7 @@ endpoints_bi:
   model: meta-llama/llama-guard-3-8b
   provider: cloudflare
   cost:
-  - 0.48
+  - 0.484
   - 0.03
 - api: openrouter
   model: qwen/qwen3-32b
@@ -1701,14 +1701,14 @@ endpoints_bi:
   model: google/gemma-3-12b-it
   provider: cloudflare
   cost:
-  - 0.35
-  - 0.56
+  - 0.345
+  - 0.556
 - api: openrouter
   model: mistralai/mistral-small-3.1-24b-instruct
   provider: cloudflare
   cost:
-  - 0.35
-  - 0.56
+  - 0.351
+  - 0.555
 - api: openrouter
   model: qwen/qwen3-coder-next
   provider: ionstream/fp8
@@ -1911,8 +1911,8 @@ endpoints_bi:
   model: meta-llama/llama-3-8b-instruct
   provider: cloudflare
   cost:
-  - 0.28
-  - 0.83
+  - 0.282
+  - 0.827
 - api: openrouter
   model: meta-llama/llama-4-maverick
   provider: novita/fp8
@@ -3123,8 +3123,8 @@ endpoints_bi:
   model: meta-llama/llama-3.3-70b-instruct
   provider: cloudflare/fp8
   cost:
-  - 0.29
-  - 2.25
+  - 0.293
+  - 2.253
 - api: openrouter
   model: z-ai/glm-4.5
   provider: wandb/bf16
