@@ -1716,16 +1716,16 @@ endpoints_bi:
   - 0.11
   - 0.8
 - api: openrouter
-  model: qwen/qwen3-235b-a22b-2507
-  provider: parasail/fp8
-  cost:
-  - 0.12
-  - 0.8
-- api: openrouter
   model: qwen/qwen3-coder-next
   provider: parasail/bf16
   cost:
   - 0.12
+  - 0.8
+- api: openrouter
+  model: qwen/qwen3-235b-a22b-2507
+  provider: parasail/fp8
+  cost:
+  - 0.14
   - 0.8
 - api: openrouter
   model: meta-llama/llama-4-scout
