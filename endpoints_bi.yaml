@@ -3108,12 +3108,6 @@ endpoints_bi:
   - 0.54
   - 1.98
 - api: openrouter
-  model: z-ai/glm-5
-  provider: gmicloud/fp8
-  cost:
-  - 0.6
-  - 1.92
-- api: openrouter
   model: qwen/qwen3-235b-a22b-thinking-2507
   provider: deepinfra/fp8
   cost:
@@ -3557,6 +3551,12 @@ endpoints_bi:
   cost:
   - 0.3
   - 3.0
+- api: openrouter
+  model: z-ai/glm-5
+  provider: gmicloud/fp8
+  cost:
+  - 0.8
+  - 2.56
 - api: openrouter
   model: moonshotai/kimi-k2.5
   provider: parasail/int4
