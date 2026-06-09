@@ -10,6 +10,13 @@ import orjson
 from aiolimiter import AsyncLimiter
 
 from trackllm_website.api import OpenRouterClient
+from trackllm_website.bi.common import (
+    PlainStrategy,
+    QueryStrategy,
+    extract_first_token,
+    resolve_strategies,
+    strategy_to_query_args,
+)
 from trackllm_website.config import Endpoint, config, logger
 from trackllm_website.util import slugify
 
@@ -69,6 +76,7 @@ class EndpointState:
     rate_limiter: AsyncLimiter
     concurrency_semaphore: asyncio.Semaphore
     start_timestamp: Timestamp
+    query_strategy: QueryStrategy = field(default_factory=PlainStrategy)
 
     results: dict[Prompt, dict[Timestamp, list[tuple[Timestamp, ResponseToken]]]] = (
         field(default_factory=dict)
@@ -146,6 +154,7 @@ async def query_single(
         prompt,
         temperature=0.0,
         logprobs=False,
+        **strategy_to_query_args(state.query_strategy),
     )
     if response.error:
         logger.warning(
@@ -153,7 +162,8 @@ async def query_single(
         )
         state.record_response(prompt, None, timestamp, error=True)
         return
-    content = ResponseToken(response.content) if response.content else None
+    first_tok = extract_first_token(response)
+    content = ResponseToken(first_tok) if first_tok else None
     state.record_response(prompt, content, timestamp, error=False)
 
 
@@ -184,6 +194,10 @@ async def phase_2() -> None:
     logger.info(f"Loaded border inputs for {len(border_inputs_by_endpoint)} endpoints")
 
     endpoints = config.endpoints_bi_phase_1
+
+    async with OpenRouterClient(timeout=60.0) as probe_client:
+        strategies, _failed = await resolve_strategies(probe_client, endpoints)
+
     now = datetime.now(tz=timezone.utc).replace(microsecond=0)
     year_month = now.strftime("%Y-%m")
     start_timestamp = Timestamp(now.isoformat())
@@ -194,7 +208,10 @@ async def phase_2() -> None:
     states = []
     for ep in endpoints:
         endpoint_key = str(ep)
-        border_inputs = border_inputs_by_endpoint[endpoint_key]
+        if endpoint_key not in strategies:
+            logger.warning(f"No strategy for {ep}, skipping")
+            continue
+        border_inputs = border_inputs_by_endpoint.get(endpoint_key, [])
         if not border_inputs:
             logger.warning(f"Empty border inputs for {ep}, skipping")
             continue
@@ -207,6 +224,7 @@ async def phase_2() -> None:
                 rate_limiter=AsyncLimiter(requests_per_second, 1),
                 concurrency_semaphore=asyncio.Semaphore(max_concurrent_requests),
                 start_timestamp=start_timestamp,
+                query_strategy=strategies[endpoint_key],
             )
         )
 

@@ -7,10 +7,12 @@ from pathlib import Path
 import orjson
 from aiolimiter import AsyncLimiter
 
+from trackllm_website.api import OpenRouterClient
 from trackllm_website.bi.common import (
     EndpointState,
     get_input_tokens,
     load_tokenizers,
+    resolve_strategies,
     run_queries,
 )
 from trackllm_website.config import config, logger
@@ -69,7 +71,17 @@ async def phase_1a(temperature: float, base_dir: Path | None = None) -> None:
     tokenizer_index, fallback_tokens = load_tokenizers()
 
     endpoints = config.endpoints_bi_phase_1
-    logger.info(f"Running phase 1a for {len(endpoints)} endpoints")
+
+    async with OpenRouterClient(timeout=60.0) as probe_client:
+        strategies, _failed = await resolve_strategies(probe_client, endpoints)
+
+    valid_endpoints = [ep for ep in endpoints if str(ep) in strategies]
+    skipped = len(endpoints) - len(valid_endpoints)
+    if skipped:
+        logger.info(
+            f"Skipped {skipped} endpoints (no working strategy / hidden reasoning)"
+        )
+    logger.info(f"Running phase 1a for {len(valid_endpoints)} endpoints")
 
     requests_per_second = config.bi.phase_1.requests_per_second_per_endpoint
     max_concurrent_requests = config.bi.phase_1.max_concurrent_requests_per_endpoint
@@ -90,8 +102,9 @@ async def phase_1a(temperature: float, base_dir: Path | None = None) -> None:
             concurrency_semaphore=asyncio.Semaphore(max_concurrent_requests),
             pending_before_new_semaphore=asyncio.Semaphore(max_concurrent_tokens),
             queries_per_token=config.bi.phase_1.queries_per_token,
+            query_strategy=strategies[str(ep)],
         )
-        for ep in endpoints
+        for ep in valid_endpoints
     ]
 
     pending_lists = [s.get_unfinished_prompts() for s in states]
