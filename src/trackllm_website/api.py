@@ -17,12 +17,12 @@ from trackllm_website.storage import (
 
 
 class OpenRouterClient:
-    def __init__(self):
+    def __init__(self, timeout: float | None = None):
         self.connector = aiohttp.TCPConnector(limit=600)
         self.session = aiohttp.ClientSession(
             connector=self.connector,
             headers={"Authorization": f"Bearer {config.openrouter_api_key}"},
-            timeout=aiohttp.ClientTimeout(total=config.api.timeout),
+            timeout=aiohttp.ClientTimeout(total=timeout or config.api.timeout),
         )
 
     async def close(self):
@@ -40,18 +40,28 @@ class OpenRouterClient:
     ) -> float | int | None:
         """Fetch actual cost from OpenRouter generation endpoint."""
         should_close = session is None
-        # give the metadata item some time to be created
-        await asyncio.sleep(5)
         session = session or aiohttp.ClientSession()
         try:
-            async with session.get(
-                url="https://openrouter.ai/api/v1/generation",
-                headers={"Authorization": f"Bearer {config.openrouter_api_key}"},
-                params={"id": generation_id},
-                timeout=aiohttp.ClientTimeout(total=10),
-            ) as resp:
-                data = await resp.json()
-                return data["data"]["total_cost"]
+            for delay in (5, 10, 20, 40):
+                await asyncio.sleep(delay)
+                try:
+                    async with session.get(
+                        url="https://openrouter.ai/api/v1/generation",
+                        headers={
+                            "Authorization": f"Bearer {config.openrouter_api_key}"
+                        },
+                        params={"id": generation_id},
+                        timeout=aiohttp.ClientTimeout(total=10),
+                    ) as resp:
+                        if not resp.ok:
+                            continue
+                        data = await resp.json()
+                        cost = data.get("data", {}).get("total_cost")
+                        if cost is not None:
+                            return cost
+                except Exception:
+                    continue
+            return None
         finally:
             if should_close:
                 await session.close()
@@ -63,6 +73,7 @@ class OpenRouterClient:
         temperature: float | int = config.api.temperature,
         logprobs: bool = True,
         output_tokens: int | None = None,
+        reasoning: dict | None = None,
     ) -> Response:
         request_data = {
             "model": endpoint.model,
@@ -80,6 +91,8 @@ class OpenRouterClient:
             request_data["top_logprobs"] = endpoint.get_max_logprobs(cfg=config)
         if endpoint.provider:
             request_data["provider"]["only"] = [endpoint.provider]
+        if reasoning is not None:
+            request_data["reasoning"] = reasoning
 
         async with self.session.post(
             url="https://openrouter.ai/api/v1/chat/completions",
@@ -106,13 +119,19 @@ class OpenRouterClient:
         usage = response["usage"]
         input_tokens = usage["prompt_tokens"]
         output_tokens = usage["completion_tokens"]
+        reasoning_tokens = (
+            usage.get("completion_tokens_details", {}).get("reasoning_tokens", 0) or 0
+        )
         cost = compute_cost(usage, endpoint)
         generation_id = response.get("id")
 
-        # Extract content
+        # Extract content and reasoning
         content = None
+        reasoning_content = None
         if response["choices"]:
-            content = response["choices"][0].get("message", {}).get("content")
+            message = response["choices"][0].get("message", {})
+            content = message.get("content")
+            reasoning_content = message.get("reasoning")
 
         # Extract logprobs for the first token (if requested)
         response_logprobs = None
@@ -134,6 +153,8 @@ class OpenRouterClient:
                 cost=cost,
                 input_tokens=input_tokens,
                 output_tokens=output_tokens,
+                reasoning_tokens=reasoning_tokens,
+                reasoning_content=reasoning_content,
                 generation_id=generation_id,
                 error=ResponseError(
                     http_code=resp.status,
@@ -150,6 +171,8 @@ class OpenRouterClient:
             cost=cost,
             input_tokens=input_tokens,
             output_tokens=output_tokens,
+            reasoning_tokens=reasoning_tokens,
+            reasoning_content=reasoning_content,
             generation_id=generation_id,
             error=None,
         )
@@ -162,6 +185,8 @@ class OpenRouterClient:
         logprobs: bool = True,
         on_retry: Callable[[int], None] | None = None,
         output_tokens: int | None = None,
+        reasoning: dict | None = None,
+        max_retries: int | None = None,
     ) -> Response:
         try:
             return await retry_with_exponential_backoff(
@@ -171,7 +196,10 @@ class OpenRouterClient:
                 temperature,
                 logprobs,
                 output_tokens,
-                max_retries=config.api.max_retries,
+                reasoning,
+                max_retries=max_retries
+                if max_retries is not None
+                else config.api.max_retries,
                 on_retry=on_retry,
             )
         except Exception as e:

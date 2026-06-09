@@ -52,6 +52,8 @@ class Response(BaseModel):
     cost: float | int
     input_tokens: int = 0
     output_tokens: int = 0
+    reasoning_tokens: int = 0
+    reasoning_content: str | None = None
     generation_id: str | None = None
 
 

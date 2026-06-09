@@ -81,10 +81,26 @@ class Phase2Config(BaseModel):
     abandon_this_run_after: int
 
 
+class ProbeConfig(BaseModel):
+    strategies_path: str
+    prompt: str
+    max_budget: int
+    max_retries: int
+
+
+class PrevalenceConfig(BaseModel):
+    queries_per_token: int
+    tokens_per_endpoint: int
+
+
 class BIConfig(BaseModel):
     data_dir: Path
+    max_input_tokens: int
+    max_output_tokens: int | None = None
+    probe: ProbeConfig
     phase_1: Phase1Config
     phase_2: Phase2Config
+    prevalence: PrevalenceConfig
 
     @property
     def tokenizers_dir(self) -> Path:
@@ -115,15 +131,22 @@ class ApiConfig(BaseModel):
     openrouter_avoid_free_endpoints: bool
 
 
+class PlottingConfig(BaseModel):
+    template: str
+    font_family: str
+
+
 class Config(BaseSettings):
     endpoints_yaml_path_lt: Path = root / "endpoints_lt.yaml"
     endpoints_yaml_path_bi: Path = root / "endpoints_bi.yaml"
     endpoints_yaml_path_bi_phase_1: Path = root / "endpoints_bi_phase_1.yaml"
+    endpoints_yaml_path_bi_prevalence: Path = root / "endpoints_bi_prevalence.yaml"
     model_config = SettingsConfigDict(
         yaml_file=[
             endpoints_yaml_path_lt,
             endpoints_yaml_path_bi,
             endpoints_yaml_path_bi_phase_1,
+            endpoints_yaml_path_bi_prevalence,
         ],
         toml_file=root / "config.toml",
         env_file=root / ".env",
@@ -135,11 +158,13 @@ class Config(BaseSettings):
     prompts: list[str]
     data_dir: Path
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+    plotting: PlottingConfig
 
     # read from endpoints_....yaml
     endpoints_lt: list[Endpoint] = []
     endpoints_bi: list[Endpoint] = []
     endpoints_bi_phase_1: list[Endpoint] = []
+    endpoints_bi_prevalence: list[Endpoint] = []
 
     # read from .env
     openrouter_api_key: str
