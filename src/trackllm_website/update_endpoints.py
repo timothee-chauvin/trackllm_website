@@ -104,34 +104,30 @@ async def get_model_endpoints(
             data = await response.json()
             model_endpoints = data["data"]["endpoints"]
             filtered_endpoints = []
-            for endpoint_data in model_endpoints:
+            for endpoint in model_endpoints:
                 if logprob_filter and not (
-                    "logprobs" in endpoint_data["supported_parameters"]
-                    and "top_logprobs" in endpoint_data["supported_parameters"]
+                    "logprobs" in endpoint["supported_parameters"]
+                    and "top_logprobs" in endpoint["supported_parameters"]
                 ):
                     continue
-                if endpoint_data["tag"] in [e.provider for e in filtered_endpoints]:
-                    # Duplicate provider (it's happened).
-                    continue
-                endpoint = Endpoint(
+                endpoint_data = Endpoint(
                     api="openrouter",
                     model=model_id,
-                    provider=endpoint_data["tag"],
+                    provider=endpoint["tag"],
                     cost=(
                         float(
                             (
-                                Decimal(endpoint_data["pricing"]["prompt"]) * 1_000_000
+                                Decimal(endpoint["pricing"]["prompt"]) * 1_000_000
                             ).normalize()
                         ),
                         float(
                             (
-                                Decimal(endpoint_data["pricing"]["completion"])
-                                * 1_000_000
+                                Decimal(endpoint["pricing"]["completion"]) * 1_000_000
                             ).normalize()
                         ),
                     ),
                 )
-                filtered_endpoints.append(endpoint)
+                filtered_endpoints.append(endpoint_data)
             return filtered_endpoints
     except Exception as e:
         logger.error(f"Error fetching endpoints for {model_id}: {e}")
@@ -187,8 +183,6 @@ def compute_expected_cost(
 
 async def test_endpoint_token_usage(
     endpoint: Endpoint,
-    max_input_tokens: int = 10,
-    max_output_tokens: int = 1,
     price_tolerance: float = 0.01,
 ) -> tuple[Endpoint | None, BadEndpoint | None]:
     """Test if an endpoint uses acceptable token counts and correct pricing.
@@ -204,9 +198,11 @@ async def test_endpoint_token_usage(
                     f"{endpoint} token test: ❌ (error: {response.error.message})"
                 )
                 return None, None  # Don't mark as bad on error, might be transient
-            if (
-                response.input_tokens > max_input_tokens
-                or response.output_tokens > max_output_tokens
+            max_input_tokens = config.bi.max_input_tokens
+            max_output_tokens = config.bi.max_output_tokens
+            if response.input_tokens > max_input_tokens or (
+                max_output_tokens is not None
+                and response.output_tokens > max_output_tokens
             ):
                 logger.info(
                     f"{endpoint} token test: ❌ "
@@ -225,7 +221,15 @@ async def test_endpoint_token_usage(
                 response.input_tokens, response.output_tokens, endpoint
             )
             if expected_cost > 0:
+                if not response.generation_id:
+                    logger.info(f"{endpoint} price test: ⏭️ (no generation_id)")
+                    return None, None
                 actual_cost = await client.get_generation_cost(response.generation_id)
+                if actual_cost is None:
+                    logger.info(
+                        f"{endpoint} price test: ⏭️ (couldn't fetch generation cost for id {response.generation_id})"
+                    )
+                    return None, None
                 if actual_cost > expected_cost * (1 + price_tolerance):
                     ratio = actual_cost / expected_cost
                     logger.info(
@@ -385,8 +389,8 @@ async def update_endpoints_bi():
     save_bad_endpoints_bi(all_bad)
     logger.info(f"Saved {len(all_bad)} total bad endpoints to {BAD_ENDPOINTS_BI_PATH}")
 
-    # Combine still-good and newly-valid endpoints
-    all_good = still_good + newly_valid
+    # Combine still-good and newly-valid endpoints, deduplicating by identity
+    all_good = list({e: e for e in still_good + newly_valid}.values())
 
     # Sort and save valid endpoints to endpoints_bi.yaml
     sorted_endpoints = sorted(
