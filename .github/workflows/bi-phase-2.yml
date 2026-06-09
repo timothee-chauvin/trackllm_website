@@ -1,9 +1,12 @@
 name: Run BI Phase 2
 
 on:
-  schedule:
-    # Run every 24 hours at 21:01 UTC
-    - cron: '01 21 * * *'
+  # Disabled for now. The `feature/bi-experiments` branch this job targeted has
+  # been merged into main and deleted; re-enable (and repoint ref/push below to a
+  # live branch) before relying on the schedule again.
+  # schedule:
+  #   # Run every 24 hours at 21:01 UTC
+  #   - cron: '01 21 * * *'
   workflow_dispatch:  # Allow manual triggering
 
 permissions:
