@@ -1,0 +1,781 @@
+endpoints_bi_prevalence:
+- api: openrouter
+  model: liquid/lfm2-8b-a1b
+  provider: liquid
+  cost:
+  - 0.01
+  - 0.02
+- api: openrouter
+  model: mistralai/mistral-nemo
+  provider: deepinfra/fp8
+  cost:
+  - 0.02
+  - 0.04
+- api: openrouter
+  model: meta-llama/llama-3.1-8b-instruct
+  provider: deepinfra/bf16
+  cost:
+  - 0.02
+  - 0.05
+- api: openrouter
+  model: meta-llama/llama-3.1-8b-instruct
+  provider: novita/fp8
+  cost:
+  - 0.02
+  - 0.05
+- api: openrouter
+  model: meta-llama/llama-3-8b-instruct
+  provider: deepinfra/bf16
+  cost:
+  - 0.03
+  - 0.04
+- api: openrouter
+  model: meta-llama/llama-3.1-8b-instruct
+  provider: nebius/fp8
+  cost:
+  - 0.02
+  - 0.06
+- api: openrouter
+  model: meta-llama/llama-3-8b-instruct
+  provider: novita/bf16
+  cost:
+  - 0.04
+  - 0.04
+- api: openrouter
+  model: sao10k/l3-lunaris-8b
+  provider: deepinfra/turbo
+  cost:
+  - 0.04
+  - 0.05
+- api: openrouter
+  model: meta-llama/llama-3.2-11b-vision-instruct
+  provider: deepinfra/fp8
+  cost:
+  - 0.049
+  - 0.049
+- api: openrouter
+  model: sao10k/l3-lunaris-8b
+  provider: novita/bf16
+  cost:
+  - 0.05
+  - 0.05
+- api: openrouter
+  model: google/gemma-2-9b-it
+  provider: nebius/fast
+  cost:
+  - 0.03
+  - 0.09
+- api: openrouter
+  model: google/gemma-3-4b-it
+  provider: deepinfra/bf16
+  cost:
+  - 0.04
+  - 0.08
+- api: openrouter
+  model: qwen/qwen-2.5-7b-instruct
+  provider: atlas-cloud/fp8
+  cost:
+  - 0.04
+  - 0.1
+- api: openrouter
+  model: liquid/lfm-2-24b-a2b
+  provider: together
+  cost:
+  - 0.03
+  - 0.12
+- api: openrouter
+  model: qwen/qwen-turbo
+  provider: alibaba
+  cost:
+  - 0.0325
+  - 0.13
+- api: openrouter
+  model: google/gemma-3-12b-it
+  provider: deepinfra/bf16
+  cost:
+  - 0.04
+  - 0.13
+- api: openrouter
+  model: qwen/qwen3-235b-a22b-2507
+  provider: deepinfra/fp8
+  cost:
+  - 0.071
+  - 0.1
+- api: openrouter
+  model: amazon/nova-micro-v1
+  provider: amazon-bedrock
+  cost:
+  - 0.035
+  - 0.14
+- api: openrouter
+  model: arcee-ai/trinity-mini
+  provider: clarifai/bf16
+  cost:
+  - 0.045
+  - 0.15
+- api: openrouter
+  model: nvidia/nemotron-nano-9b-v2
+  provider: deepinfra/bf16
+  cost:
+  - 0.04
+  - 0.16
+- api: openrouter
+  model: reka/reka-edge
+  provider: reka/bf16
+  cost:
+  - 0.1
+  - 0.1
+- api: openrouter
+  model: qwen/qwen3.5-9b
+  provider: venice/fp8
+  cost:
+  - 0.05
+  - 0.15
+- api: openrouter
+  model: qwen/qwen3-235b-a22b-2507
+  provider: wandb/bf16
+  cost:
+  - 0.1
+  - 0.1
+- api: openrouter
+  model: mistralai/ministral-3b-2512
+  provider: mistral
+  cost:
+  - 0.1
+  - 0.1
+- api: openrouter
+  model: meta-llama/llama-3-8b-instruct
+  provider: together/int4
+  cost:
+  - 0.1
+  - 0.1
+- api: openrouter
+  model: meta-llama/llama-3.1-8b-instruct
+  provider: cerebras/fp16
+  cost:
+  - 0.1
+  - 0.1
+- api: openrouter
+  model: meta-llama/llama-3.1-8b-instruct
+  provider: friendli
+  cost:
+  - 0.1
+  - 0.1
+- api: openrouter
+  model: microsoft/phi-4
+  provider: nextbit/int4
+  cost:
+  - 0.065
+  - 0.14
+- api: openrouter
+  model: microsoft/phi-4
+  provider: deepinfra/bf16
+  cost:
+  - 0.07
+  - 0.14
+- api: openrouter
+  model: mistralai/mistral-nemo
+  provider: novita/fp8
+  cost:
+  - 0.04
+  - 0.17
+- api: openrouter
+  model: meta-llama/llama-3.2-1b-instruct
+  provider: cloudflare
+  cost:
+  - 0.027
+  - 0.2
+- api: openrouter
+  model: google/gemma-3-27b-it
+  provider: deepinfra/fp8
+  cost:
+  - 0.08
+  - 0.16
+- api: openrouter
+  model: qwen/qwen3.5-9b
+  provider: together
+  cost:
+  - 0.1
+  - 0.15
+- api: openrouter
+  model: mistralai/mistral-small-3.2-24b-instruct
+  provider: deepinfra/fp8
+  cost:
+  - 0.075
+  - 0.2
+- api: openrouter
+  model: nousresearch/hermes-2-pro-llama-3-8b
+  provider: novita/fp16
+  cost:
+  - 0.14
+  - 0.14
+- api: openrouter
+  model: qwen/qwen3-14b
+  provider: nextbit/int4
+  cost:
+  - 0.06
+  - 0.24
+- api: openrouter
+  model: mistralai/ministral-8b-2512
+  provider: mistral
+  cost:
+  - 0.15
+  - 0.15
+- api: openrouter
+  model: mistralai/mistral-7b-instruct-v0.1
+  provider: cloudflare
+  cost:
+  - 0.11
+  - 0.19
+- api: openrouter
+  model: amazon/nova-lite-v1
+  provider: amazon-bedrock
+  cost:
+  - 0.06
+  - 0.24
+- api: openrouter
+  model: meta-llama/llama-3.1-8b-instruct
+  provider: sambanova/bf16
+  cost:
+  - 0.1
+  - 0.2
+- api: openrouter
+  model: google/gemma-3-27b-it
+  provider: novita/bf16
+  cost:
+  - 0.119
+  - 0.2
+- api: openrouter
+  model: qwen/qwen3-32b
+  provider: chutes/bf16
+  cost:
+  - 0.08
+  - 0.24
+- api: openrouter
+  model: qwen/qwen3.5-flash-02-23
+  provider: alibaba
+  cost:
+  - 0.065
+  - 0.26
+- api: openrouter
+  model: qwen/qwen3-coder-30b-a3b-instruct
+  provider: novita/fp8
+  cost:
+  - 0.07
+  - 0.27
+- api: openrouter
+  model: mistralai/mistral-small-3.2-24b-instruct
+  provider: venice/fp8
+  cost:
+  - 0.09375
+  - 0.25
+- api: openrouter
+  model: qwen/qwen3-coder-30b-a3b-instruct
+  provider: siliconflow/fp8
+  cost:
+  - 0.07
+  - 0.28
+- api: openrouter
+  model: qwen/qwen3-14b
+  provider: deepinfra/fp8
+  cost:
+  - 0.12
+  - 0.24
+- api: openrouter
+  model: qwen/qwen3-32b
+  provider: deepinfra/fp8
+  cost:
+  - 0.08
+  - 0.28
+- api: openrouter
+  model: qwen/qwen3-30b-a3b
+  provider: deepinfra/fp8
+  cost:
+  - 0.08
+  - 0.28
+- api: openrouter
+  model: google/gemini-2.0-flash-lite-001
+  provider: google-ai-studio
+  cost:
+  - 0.075
+  - 0.3
+- api: openrouter
+  model: google/gemini-2.0-flash-lite-001
+  provider: google-vertex
+  cost:
+  - 0.075
+  - 0.3
+- api: openrouter
+  model: meta-llama/llama-4-scout
+  provider: deepinfra/fp8
+  cost:
+  - 0.08
+  - 0.3
+- api: openrouter
+  model: qwen/qwen3-30b-a3b-thinking-2507
+  provider: siliconflow/fp8
+  cost:
+  - 0.09
+  - 0.3
+- api: openrouter
+  model: qwen/qwen3-30b-a3b-instruct-2507
+  provider: siliconflow/fp8
+  cost:
+  - 0.09
+  - 0.3
+- api: openrouter
+  model: meta-llama/llama-3.2-3b-instruct
+  provider: cloudflare
+  cost:
+  - 0.051
+  - 0.34
+- api: openrouter
+  model: stepfun/step-3.5-flash
+  provider: stepfun/fp8
+  cost:
+  - 0.1
+  - 0.3
+- api: openrouter
+  model: mistralai/voxtral-small-24b-2507
+  provider: mistral
+  cost:
+  - 0.1
+  - 0.3
+- api: openrouter
+  model: mistralai/devstral-small
+  provider: mistral
+  cost:
+  - 0.1
+  - 0.3
+- api: openrouter
+  model: qwen/qwen3-30b-a3b-instruct-2507
+  provider: wandb/bf16
+  cost:
+  - 0.1
+  - 0.3
+- api: openrouter
+  model: qwen/qwen3-30b-a3b-thinking-2507
+  provider: nebius/fp8
+  cost:
+  - 0.1
+  - 0.3
+- api: openrouter
+  model: qwen/qwen3-30b-a3b-instruct-2507
+  provider: atlas-cloud/fp8
+  cost:
+  - 0.1
+  - 0.3
+- api: openrouter
+  model: mistralai/ministral-14b-2512
+  provider: mistral
+  cost:
+  - 0.2
+  - 0.2
+- api: openrouter
+  model: stepfun/step-3.5-flash
+  provider: deepinfra/fp8
+  cost:
+  - 0.1
+  - 0.3
+- api: openrouter
+  model: qwen/qwen3-8b
+  provider: atlas-cloud/fp8
+  cost:
+  - 0.05
+  - 0.4
+- api: openrouter
+  model: meta-llama/llama-4-scout
+  provider: groq
+  cost:
+  - 0.11
+  - 0.34
+- api: openrouter
+  model: z-ai/glm-4.7-flash
+  provider: deepinfra/bf16
+  cost:
+  - 0.06
+  - 0.4
+- api: openrouter
+  model: z-ai/glm-4.7-flash
+  provider: novita/bf16
+  cost:
+  - 0.07
+  - 0.4
+- api: openrouter
+  model: z-ai/glm-4.7-flash
+  provider: z-ai
+  cost:
+  - 0.07
+  - 0.4
+- api: openrouter
+  model: google/gemini-2.5-flash-lite
+  provider: google-vertex
+  cost:
+  - 0.1
+  - 0.4
+- api: openrouter
+  model: google/gemini-2.0-flash-001
+  provider: google-ai-studio
+  cost:
+  - 0.1
+  - 0.4
+- api: openrouter
+  model: google/gemini-2.5-flash-lite-preview-09-2025
+  provider: google-ai-studio
+  cost:
+  - 0.1
+  - 0.4
+- api: openrouter
+  model: google/gemini-2.5-flash-lite
+  provider: google-ai-studio
+  cost:
+  - 0.1
+  - 0.4
+- api: openrouter
+  model: google/gemini-2.0-flash-001
+  provider: google-vertex
+  cost:
+  - 0.1
+  - 0.4
+- api: openrouter
+  model: google/gemini-2.5-flash-lite-preview-09-2025
+  provider: google-vertex
+  cost:
+  - 0.1
+  - 0.4
+- api: openrouter
+  model: google/gemma-3-27b-it
+  provider: phala
+  cost:
+  - 0.11
+  - 0.4
+- api: openrouter
+  model: qwen/qwen3-vl-32b-instruct
+  provider: alibaba
+  cost:
+  - 0.104
+  - 0.416
+- api: openrouter
+  model: meta-llama/llama-3.3-70b-instruct
+  provider: nebius/fp8
+  cost:
+  - 0.13
+  - 0.4
+- api: openrouter
+  model: google/gemma-3-27b-it
+  provider: parasail/fp8
+  cost:
+  - 0.08
+  - 0.45
+- api: openrouter
+  model: z-ai/glm-4.7-flash
+  provider: phala
+  cost:
+  - 0.1
+  - 0.43
+- api: openrouter
+  model: meta-llama/llama-3.3-70b-instruct
+  provider: novita/bf16
+  cost:
+  - 0.135
+  - 0.4
+- api: openrouter
+  model: qwen/qwen3-30b-a3b
+  provider: novita/fp8
+  cost:
+  - 0.09
+  - 0.45
+- api: openrouter
+  model: alibaba/tongyi-deepresearch-30b-a3b
+  provider: atlas-cloud/fp8
+  cost:
+  - 0.09
+  - 0.45
+- api: openrouter
+  model: qwen/qwen-vl-plus
+  provider: alibaba
+  cost:
+  - 0.1365
+  - 0.4095
+- api: openrouter
+  model: qwen/qwen3-vl-8b-instruct
+  provider: alibaba
+  cost:
+  - 0.117
+  - 0.455
+- api: openrouter
+  model: qwen/qwen3-8b
+  provider: alibaba
+  cost:
+  - 0.117
+  - 0.455
+- api: openrouter
+  model: qwen/qwen3-vl-8b-instruct
+  provider: novita/fp8
+  cost:
+  - 0.08
+  - 0.5
+- api: openrouter
+  model: nousresearch/hermes-3-llama-3.1-70b
+  provider: deepinfra/fp8
+  cost:
+  - 0.3
+  - 0.3
+- api: openrouter
+  model: mistralai/ministral-8b-2512
+  provider: nextbit/fp8
+  cost:
+  - 0.3
+  - 0.3
+- api: openrouter
+  model: qwen/qwen-2.5-7b-instruct
+  provider: together/fp8
+  cost:
+  - 0.3
+  - 0.3
+- api: openrouter
+  model: deepseek/deepseek-v3.2
+  provider: atlas-cloud/fp8
+  cost:
+  - 0.26
+  - 0.38
+- api: openrouter
+  model: deepseek/deepseek-v3.2
+  provider: deepinfra/fp4
+  cost:
+  - 0.26
+  - 0.38
+- api: openrouter
+  model: qwen/qwen3-vl-30b-a3b-instruct
+  provider: alibaba
+  cost:
+  - 0.13
+  - 0.52
+- api: openrouter
+  model: deepseek/deepseek-v3.2-exp
+  provider: atlas-cloud/fp8
+  cost:
+  - 0.27
+  - 0.41
+- api: openrouter
+  model: deepseek/deepseek-v3.2-exp
+  provider: novita/fp8
+  cost:
+  - 0.27
+  - 0.41
+- api: openrouter
+  model: mistralai/mistral-small-3.2-24b-instruct
+  provider: parasail/bf16
+  cost:
+  - 0.09
+  - 0.6
+- api: openrouter
+  model: mistralai/ministral-3b-2512
+  provider: nextbit/fp8
+  cost:
+  - 0.35
+  - 0.35
+- api: openrouter
+  model: mistralai/ministral-14b-2512
+  provider: nextbit/fp8
+  cost:
+  - 0.35
+  - 0.35
+- api: openrouter
+  model: deepseek/deepseek-v3.2
+  provider: chutes/fp8
+  cost:
+  - 0.28
+  - 0.42
+- api: openrouter
+  model: deepseek/deepseek-v3.2
+  provider: deepseek
+  cost:
+  - 0.28
+  - 0.42
+- api: openrouter
+  model: deepseek/deepseek-v3.2
+  provider: akashml/fp8
+  cost:
+  - 0.28
+  - 0.42
+- api: openrouter
+  model: tencent/hunyuan-a13b-instruct
+  provider: siliconflow/fp8
+  cost:
+  - 0.14
+  - 0.57
+- api: openrouter
+  model: qwen/qwq-32b
+  provider: siliconflow/fp8
+  cost:
+  - 0.15
+  - 0.58
+- api: openrouter
+  model: cohere/command-r-08-2024
+  provider: cohere
+  cost:
+  - 0.15
+  - 0.6
+- api: openrouter
+  model: qwen/qwen3-30b-a3b
+  provider: friendli
+  cost:
+  - 0.15
+  - 0.6
+- api: openrouter
+  model: qwen/qwen3-vl-30b-a3b-instruct
+  provider: deepinfra/fp8
+  cost:
+  - 0.15
+  - 0.6
+- api: openrouter
+  model: openai/gpt-4o-mini-2024-07-18
+  provider: openai
+  cost:
+  - 0.15
+  - 0.6
+- api: openrouter
+  model: openai/gpt-4o-mini
+  provider: azure
+  cost:
+  - 0.15
+  - 0.6
+- api: openrouter
+  model: meta-llama/llama-4-maverick
+  provider: deepinfra/base
+  cost:
+  - 0.15
+  - 0.6
+- api: openrouter
+  model: openai/gpt-4o-mini
+  provider: openai
+  cost:
+  - 0.15
+  - 0.6
+- api: openrouter
+  model: qwen/qwen-2.5-72b-instruct
+  provider: novita/bf16
+  cost:
+  - 0.38
+  - 0.4
+- api: openrouter
+  model: x-ai/grok-3-mini-beta
+  provider: xai
+  cost:
+  - 0.3
+  - 0.5
+- api: openrouter
+  model: meta-llama/llama-3.1-70b-instruct
+  provider: deepinfra/base
+  cost:
+  - 0.4
+  - 0.4
+- api: openrouter
+  model: nvidia/nemotron-nano-12b-v2-vl
+  provider: deepinfra/fp8
+  cost:
+  - 0.2
+  - 0.6
+- api: openrouter
+  model: thedrummer/unslopnemo-12b
+  provider: nextbit/fp8
+  cost:
+  - 0.4
+  - 0.4
+- api: openrouter
+  model: x-ai/grok-3-mini
+  provider: xai
+  cost:
+  - 0.3
+  - 0.5
+- api: openrouter
+  model: meta-llama/llama-3.1-70b-instruct
+  provider: deepinfra/turbo
+  cost:
+  - 0.4
+  - 0.4
+- api: openrouter
+  model: qwen/qwen3-coder-next
+  provider: chutes/bf16
+  cost:
+  - 0.12
+  - 0.75
+- api: openrouter
+  model: qwen/qwen3-next-80b-a3b-thinking
+  provider: alibaba
+  cost:
+  - 0.0975
+  - 0.78
+- api: openrouter
+  model: qwen/qwen3-next-80b-a3b-instruct
+  provider: alibaba
+  cost:
+  - 0.0975
+  - 0.78
+- api: openrouter
+  model: qwen/qwen3-32b
+  provider: groq
+  cost:
+  - 0.29
+  - 0.59
+- api: openrouter
+  model: deepseek/deepseek-chat-v3.1
+  provider: sambanova/high-throughput
+  cost:
+  - 0.15
+  - 0.75
+- api: openrouter
+  model: mistralai/mistral-small-3.1-24b-instruct
+  provider: cloudflare
+  cost:
+  - 0.35
+  - 0.56
+- api: openrouter
+  model: google/gemma-3-12b-it
+  provider: cloudflare
+  cost:
+  - 0.35
+  - 0.56
+- api: openrouter
+  model: qwen/qwen3-coder-next
+  provider: ionstream/fp8
+  cost:
+  - 0.15
+  - 0.8
+- api: openrouter
+  model: deepseek/deepseek-chat-v3-0324
+  provider: deepinfra/fp4
+  cost:
+  - 0.2
+  - 0.77
+- api: openrouter
+  model: z-ai/glm-4.5-air
+  provider: novita/bf16
+  cost:
+  - 0.13
+  - 0.85
+- api: openrouter
+  model: z-ai/glm-4.5-air
+  provider: siliconflow/fp8
+  cost:
+  - 0.14
+  - 0.86
+- api: openrouter
+  model: deepseek/deepseek-v3.1-terminus
+  provider: deepinfra/fp4
+  cost:
+  - 0.21
+  - 0.79
+- api: openrouter
+  model: deepseek/deepseek-chat-v3.1
+  provider: deepinfra/fp4
+  cost:
+  - 0.21
+  - 0.79
+- api: openrouter
+  model: meituan/longcat-flash-chat
+  provider: atlas-cloud/fp8
+  cost:
+  - 0.2
+  - 0.8
