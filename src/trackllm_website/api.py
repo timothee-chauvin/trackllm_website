@@ -82,7 +82,10 @@ class OpenRouterClient:
             "temperature": temperature,
             "provider": {
                 "allow_fallbacks": False,
-                "require_parameters": True,
+                # require_parameters would filter providers on max_completion_tokens vs
+                # max_tokens naming; with `only` pinning a single provider it only causes
+                # spurious 404s. Actual logprob support is checked by inspecting the response.
+                "require_parameters": False,
             },
             "top_p": 1.0,
         }
