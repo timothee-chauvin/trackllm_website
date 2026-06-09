@@ -624,6 +624,12 @@ endpoints_bi:
   - 0.0509
   - 0.335
 - api: openrouter
+  model: mistralai/mistral-small-3.2-24b-instruct
+  provider: parasail/bf16
+  cost:
+  - 0.09
+  - 0.3
+- api: openrouter
   model: qwen/qwen3-30b-a3b-instruct-2507
   provider: siliconflow/fp8
   cost:
@@ -1235,12 +1241,6 @@ endpoints_bi:
   cost:
   - 0.345
   - 0.345
-- api: openrouter
-  model: mistralai/mistral-small-3.2-24b-instruct
-  provider: parasail/bf16
-  cost:
-  - 0.09
-  - 0.6
 - api: openrouter
   model: neversleep/llama-3.1-lumimaid-8b
   provider: nextbit/int4
