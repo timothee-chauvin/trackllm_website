@@ -1,0 +1,13 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "google/gemma-4-26b-a4b-it",
+    "provider": "nextbit/bf16",
+    "cost": [
+      0.13,
+      0.4
+    ],
+    "max_logprobs": null
+  }
+}

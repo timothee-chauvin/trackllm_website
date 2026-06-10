@@ -1,0 +1,13 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "google/gemma-4-26b-a4b-it",
+    "provider": "dekallm/bf16",
+    "cost": [
+      0.06,
+      0.33
+    ],
+    "max_logprobs": null
+  }
+}
