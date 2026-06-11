@@ -36,7 +36,7 @@ max_concurrent_tokens_per_endpoint = 100
 tokens_per_endpoint = 5000
 request_delay_seconds = 5.0
 border_input_candidate_ratio = 2
-target_border_inputs = 30
+target_border_inputs = 50
 queries_per_candidate = 100
 
 [bi.prevalence]
@@ -44,11 +44,30 @@ queries_per_token = 3
 tokens_per_endpoint = 1000
 
 [bi.phase_2]
-queries_per_token = 20
+queries_per_token = 10
 requests_per_second_per_endpoint = 5
 max_concurrent_requests_per_endpoint = 10
 request_delay_seconds = 5.0
 abandon_this_run_after = 100
+
+[bi.detection]
+window = 14
+exclusion = 4
+min_baseline = 5
+sigma_k = 4.0
+abs_delta = 0.2
+persistence = 3
+cooldown = 10
+instability_window = 14
+instability_threshold = 0.4
+
+[bi.reinit]
+reprobe_samples = 10
+reference_samples = 100
+top_k_bis = 20
+min_bis = 10
+stall_days = 7
+recheck_days = 14
 
 [plotting]
 template = "plotly_white"
