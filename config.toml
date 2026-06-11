@@ -68,6 +68,7 @@ top_k_bis = 20
 min_bis = 10
 stall_days = 7
 recheck_days = 14
+onboard_concurrency = 20
 
 [plotting]
 template = "plotly_white"
