@@ -40,7 +40,9 @@ jobs:
         git config --local user.name "github-actions[bot]"
         git add data_bi
         git diff --staged --quiet || git commit -m "[bot] Daily BI monitor run"
+        pushed=
         for i in 1 2 3; do
-          git pull --rebase origin main && git push && break
+          git pull --rebase origin main && git push && pushed=1 && break
           sleep $((i * 10))
         done
+        [ -n "$pushed" ] || exit 1
