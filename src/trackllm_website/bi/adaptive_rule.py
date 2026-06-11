@@ -6,7 +6,6 @@ most recent days): a change requires the deviation to exceed BOTH an absolute
 delta and a multiple of the baseline std, for `persistence` consecutive days.
 """
 
-import statistics
 from pathlib import Path
 
 import fire
@@ -22,6 +21,7 @@ from trackllm_website.bi.bi_quality import (
     select_prompts,
     subsample,
 )
+from trackllm_website.bi.detection import adaptive_transitions
 from trackllm_website.bi.phase_2 import Timestamp
 from trackllm_website.bi.sampling_sweep import (
     DAYS_AFTER,
@@ -35,49 +35,6 @@ from trackllm_website.config import config, logger
 REPORT_DIR = Path("reports/bi_quality")
 N_SAMPLES = 10
 N_GRID = [5, 10, 20, 30, 40, 50]
-
-WINDOW = 14
-EXCLUSION = 4
-MIN_BASELINE = 5
-SIGMA_K = 4.0
-ABS_DELTA = 0.2
-PERSISTENCE = 3
-COOLDOWN = 10
-
-
-def adaptive_transitions(
-    tv_over_time: list[tuple[Timestamp, float]],
-) -> list[Timestamp]:
-    """Detect changes as sustained deviations from a trailing baseline.
-
-    A day deviates when |tv - baseline_mean| exceeds both ABS_DELTA and
-    SIGMA_K * baseline_std; a change is declared after PERSISTENCE consecutive
-    deviating days (dated at the first one). The baseline excludes the last
-    EXCLUSION days so it is not contaminated during the persistence window.
-    """
-    timestamps = [ts for ts, _ in tv_over_time]
-    vals = [v for _, v in tv_over_time]
-    events: list[Timestamp] = []
-    streak = 0
-    last_event_idx: int | None = None
-
-    for i in range(len(vals)):
-        baseline = vals[max(0, i - EXCLUSION - WINDOW) : i - EXCLUSION]
-        if len(baseline) < MIN_BASELINE:
-            continue
-        mean = statistics.mean(baseline)
-        std = statistics.stdev(baseline)
-        dev = abs(vals[i] - mean)
-        if dev > ABS_DELTA and dev > SIGMA_K * std:
-            streak += 1
-        else:
-            streak = 0
-        if streak == PERSISTENCE:
-            onset = i - PERSISTENCE + 1
-            if last_event_idx is None or onset - last_event_idx >= COOLDOWN:
-                events.append(timestamps[onset])
-                last_event_idx = onset
-    return events
 
 
 def run_matrix(n_prompts: int) -> None:

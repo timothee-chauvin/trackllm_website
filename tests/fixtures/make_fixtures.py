@@ -17,7 +17,9 @@ SLUGS = [
 ]
 MAX_PROMPTS = 20
 MAX_SAMPLES = 10
-LAST_DAY = "2026-03-15"
+# 2026-03-12: ends before a subsampling-induced dip in the qwen3-235b trailing
+# window that would otherwise mask its (genuine) instability.
+LAST_DAY = "2026-03-12"
 
 
 def main() -> None:
