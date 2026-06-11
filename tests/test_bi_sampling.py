@@ -40,3 +40,27 @@ def test_sample_prompts_collects_n_per_prompt(monkeypatch):
     assert n_errors == 0
     assert [tok for _, tok in samples["a"]] == ["x", "y", "x"]
     assert len(samples["b"]) == 3
+
+
+class RaisingClient:
+    def __init__(self, answers, raising_prompt):
+        self.answers = answers
+        self.raising_prompt = raising_prompt
+
+    async def query(self, endpoint, prompt, **kwargs):
+        if prompt == self.raising_prompt:
+            raise RuntimeError("boom")
+        return make_response(endpoint, prompt, next(self.answers[prompt]))
+
+
+def test_sample_prompts_survives_per_prompt_exception(monkeypatch):
+    from trackllm_website.config import config
+
+    monkeypatch.setattr(config.bi.phase_2, "request_delay_seconds", 0.0)
+    endpoint = Endpoint(api="openrouter", model="m/x", provider="p", cost=(1, 1))
+    client = RaisingClient({"a": iter("xyxyx")}, raising_prompt="b")
+    samples, n_errors = asyncio.run(
+        sample_prompts(client, endpoint, PlainStrategy(), ["a", "b"], 3)
+    )
+    assert [tok for _, tok in samples["a"]] == ["x", "y", "x"]
+    assert n_errors > 0

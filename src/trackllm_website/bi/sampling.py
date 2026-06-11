@@ -56,5 +56,9 @@ async def sample_prompts(
             if i < n_per_prompt - 1:
                 await asyncio.sleep(cfg.request_delay_seconds)
 
-    await asyncio.gather(*(one(p) for p in prompts))
+    results = await asyncio.gather(*(one(p) for p in prompts), return_exceptions=True)
+    for prompt, result in zip(prompts, results):
+        if isinstance(result, Exception):
+            logger.warning(f"Sampling failed for {endpoint}: {prompt!r}: {result!r}")
+            n_errors += 1
     return samples, n_errors
