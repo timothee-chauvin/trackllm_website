@@ -230,7 +230,7 @@ async def run_bi_prevalence(
 
     This is essentially the same as phase_1a, but:
     - Runs across multiple temperatures (shared rate limiters per endpoint)
-    - Uses config.endpoints_bi_prevalence instead of config.endpoints_bi_phase_1
+    - Uses config.endpoints_bi_prevalence instead of config.endpoints_bi
     - Stops early per endpoint once 5 border inputs are found
     - Supports reasoning models via strategy resolution
     """

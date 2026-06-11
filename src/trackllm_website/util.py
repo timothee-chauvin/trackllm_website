@@ -114,11 +114,7 @@ def endpoint_from_slug(slug: str) -> Endpoint:
     """Find an Endpoint whose str representation slugifies to the given slug."""
     from trackllm_website.config import config
 
-    all_endpoints = (
-        config.endpoints_bi
-        + config.endpoints_bi_phase_1
-        + config.endpoints_bi_prevalence
-    )
+    all_endpoints = config.endpoints_bi + config.endpoints_bi_prevalence
     for endpoint in all_endpoints:
         if slugify(f"{endpoint.model}#{endpoint.provider}") == slug:
             return endpoint

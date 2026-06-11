@@ -703,7 +703,7 @@ def compute_phase1_cost(
     phase_1_dir = config.bi.get_phase_1_dir(0.0)
 
     endpoint_costs: dict[str, tuple[float, float]] = {}
-    for ep in config.endpoints_bi_phase_1:
+    for ep in config.endpoints_bi:
         slug = slugify(f"{ep.model}#{ep.provider}")
         endpoint_costs[slug] = ep.cost
 
