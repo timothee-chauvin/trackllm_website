@@ -1,8 +1,6 @@
 """Common utilities for BI (border input) experiments."""
 
 import asyncio
-import os
-import tempfile
 import time
 from collections import deque
 from dataclasses import dataclass, field
@@ -21,7 +19,7 @@ from trackllm_website.bi.download_tokenizers import (
 )
 from trackllm_website.config import Endpoint, config, logger, root
 from trackllm_website.storage import Response
-from trackllm_website.util import slugify
+from trackllm_website.util import atomic_write_bytes, slugify
 
 SAVE_INTERVAL = 5
 
@@ -83,8 +81,10 @@ def load_strategies() -> dict[str, dict | None]:
 
 
 def save_strategies(strategies: dict[str, dict | None]) -> None:
-    with open(root / config.bi.probe.strategies_path, "wb") as f:
-        f.write(orjson.dumps(strategies, option=orjson.OPT_SORT_KEYS))
+    atomic_write_bytes(
+        root / config.bi.probe.strategies_path,
+        orjson.dumps(strategies, option=orjson.OPT_SORT_KEYS),
+    )
 
 
 def _raw_to_strategy(raw: dict | None) -> QueryStrategy:
@@ -290,17 +290,10 @@ async def save_results(
 ) -> None:
     """Save results and metadata to JSON file."""
     async with _get_file_semaphore():
-        path.parent.mkdir(parents=True, exist_ok=True)
         serializable = {str(k): v for k, v in results.items()}
         if meta:
             serializable[META_KEY] = {str(k): v for k, v in meta.items()}
-
-        with tempfile.NamedTemporaryFile(
-            "wb", delete=False, dir=path.parent
-        ) as tmp_file:
-            tmp_file.write(orjson.dumps(serializable))
-            temp_name = tmp_file.name
-        os.replace(temp_name, path)
+        atomic_write_bytes(path, orjson.dumps(serializable))
 
 
 def load_tokenizers() -> tuple[dict[str, str], list[str]]:

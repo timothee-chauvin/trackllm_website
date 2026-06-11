@@ -17,8 +17,9 @@ from trackllm_website.bi.common import (
     resolve_strategies,
     strategy_to_query_args,
 )
+from trackllm_website.bi.state import load_all_states
 from trackllm_website.config import Endpoint, config, logger
-from trackllm_website.util import slugify
+from trackllm_website.util import atomic_write_bytes, slugify
 
 Prompt = NewType("Prompt", str)
 Timestamp = NewType("Timestamp", str)
@@ -49,9 +50,7 @@ def save_results(
     results: dict[Prompt, dict[Timestamp, list[tuple[Timestamp, ResponseToken]]]],
 ) -> None:
     """Save results to JSON file."""
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, "wb") as f:
-        f.write(orjson.dumps(results))
+    atomic_write_bytes(path, orjson.dumps(results))
 
 
 def load_border_inputs(temperature: float) -> dict[str, list[Prompt]]:
@@ -193,7 +192,11 @@ async def phase_2() -> None:
     border_inputs_by_endpoint = load_border_inputs(temperature=0.0)
     logger.info(f"Loaded border inputs for {len(border_inputs_by_endpoint)} endpoints")
 
-    endpoints = config.endpoints_bi_phase_1
+    endpoints = [
+        s.endpoint
+        for s in load_all_states(config.bi.state_dir).values()
+        if s.status == "monitoring"
+    ]
 
     async with OpenRouterClient(timeout=60.0) as probe_client:
         strategies, _failed = await resolve_strategies(probe_client, endpoints)

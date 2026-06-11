@@ -1,26 +1,22 @@
-name: Run BI Phase 2
+name: BI Daily Monitor
 
 on:
-  # Disabled for now. The `feature/bi-experiments` branch this job targeted has
-  # been merged into main and deleted; re-enable (and repoint ref/push below to a
-  # live branch) before relying on the schedule again.
-  # schedule:
-  #   # Run every 24 hours at 21:01 UTC
-  #   - cron: '01 21 * * *'
+  schedule:
+    # Run every 24 hours at 21:01 UTC
+    - cron: '01 21 * * *'
   workflow_dispatch:  # Allow manual triggering
 
 permissions:
   contents: write  # Allow pushing commits
 
 jobs:
-  bi-phase-2:
+  bi-monitor:
     runs-on: ubuntu-latest
+    timeout-minutes: 300
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      with:
-        ref: feature/bi-experiments
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -33,15 +29,20 @@ jobs:
     - name: Install dependencies
       run: uv sync
 
-    - name: Run phase_2.py
+    - name: Run BI monitor
       env:
         OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-      run: uv run python src/trackllm_website/bi/phase_2.py
+      run: uv run python -m trackllm_website.bi.monitor
 
     - name: Commit and push changes
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-        git add .
-        git diff --staged --quiet || git commit -m "[bot] Daily BI Phase 2 run"
-        git push origin HEAD:feature/bi-experiments
+        git add data_bi
+        git diff --staged --quiet || git commit -m "[bot] Daily BI monitor run"
+        pushed=
+        for i in 1 2 3; do
+          git pull --rebase origin main && git push && pushed=1 && break
+          sleep $((i * 10))
+        done
+        [ -n "$pushed" ] || exit 1

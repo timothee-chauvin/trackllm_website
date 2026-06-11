@@ -15,7 +15,7 @@ from trackllm_website.bi.common import (
     resolve_strategies,
     run_queries,
 )
-from trackllm_website.config import config, logger
+from trackllm_website.config import Endpoint, config, logger
 
 
 @dataclass
@@ -61,7 +61,9 @@ def stop_early_phase1(state: EndpointState) -> bool:
     return False
 
 
-async def phase_1a(temperature: float, base_dir: Path | None = None) -> None:
+async def phase_1a(
+    endpoints: list[Endpoint], temperature: float, base_dir: Path | None
+) -> None:
     """Phase 1a: Identify candidate border inputs."""
     if base_dir is None:
         base_dir = config.bi.data_dir / "phase_1"
@@ -69,8 +71,6 @@ async def phase_1a(temperature: float, base_dir: Path | None = None) -> None:
 
     logger.info(f"Running phase 1a with temperature={temperature:g}")
     tokenizer_index, fallback_tokens = load_tokenizers()
-
-    endpoints = config.endpoints_bi_phase_1
 
     async with OpenRouterClient(timeout=60.0) as probe_client:
         strategies, _failed = await resolve_strategies(probe_client, endpoints)
@@ -126,7 +126,7 @@ async def phase_1b(temperature: float, base_dir: Path | None = None) -> None:
     logger.info(f"Running phase 1b with temperature={temperature:g}")
     tokenizer_index, fallback_tokens = load_tokenizers()
 
-    endpoints = config.endpoints_bi_phase_1
+    endpoints = config.endpoints_bi
     logger.info(f"Running phase 1b for {len(endpoints)} endpoints")
 
     requests_per_second = config.bi.phase_1.requests_per_second_per_endpoint
@@ -166,4 +166,4 @@ async def phase_1b(temperature: float, base_dir: Path | None = None) -> None:
 
 if __name__ == "__main__":
     TEMPERATURE = 0.0
-    asyncio.run(phase_1a(TEMPERATURE))
+    asyncio.run(phase_1a(config.endpoints_bi, TEMPERATURE, None))

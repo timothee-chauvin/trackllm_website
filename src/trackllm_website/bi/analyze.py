@@ -2,6 +2,7 @@
 
 import random
 from collections import Counter, defaultdict
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Literal
 
@@ -19,6 +20,19 @@ from trackllm_website.config import config, logger
 from trackllm_website.util import endpoint_from_slug, slugify
 
 Results = dict[Prompt, dict[Timestamp, list[list[str]]]]
+
+# Paul Tol's muted color scheme
+TOL_MUTED = [
+    "#CC6677",
+    "#332288",
+    "#DDCC77",
+    "#117733",
+    "#88CCEE",
+    "#882255",
+    "#44AA99",
+    "#999933",
+    "#AA4499",
+]
 
 
 def get_endpoint_legend_name(slug: str) -> str:
@@ -82,9 +96,9 @@ def compute_tv_distance(
 
 
 def get_distribution(
-    responses: list[list[str]],
+    responses: Sequence[Sequence[str]],
 ) -> Counter[str]:
-    """Get token distribution from responses."""
+    """Get token distribution from responses (each item is (timestamp, token))."""
     return Counter(token for _, token in responses)
 
 
@@ -307,30 +321,23 @@ def plot_tv_distance_transitions(
     reference_samples: int = 50,
     transition_lines: Literal["none", "grey", "colored"] = "none",
     test_samples: int = 3,
-) -> None:
+    show_others: bool = False,
+) -> go.Figure:
     """Plot TV distance for endpoints showing a clear transition pattern.
 
     Only includes endpoints with at least `days_before` consecutive days below
     `threshold` followed by at least `days_after` consecutive days above `threshold`.
+    If `show_others`, endpoints without transitions are drawn as light grey
+    background traces.
     """
     phase_2_dir = config.bi.phase_2_dir
 
     fig = go.Figure()
     endpoint_dirs = sorted(phase_2_dir.iterdir())
     color_idx = 0
-    # Paul Tol's muted color scheme
-    colors = [
-        "#CC6677",
-        "#332288",
-        "#DDCC77",
-        "#117733",
-        "#88CCEE",
-        "#882255",
-        "#44AA99",
-        "#999933",
-        "#AA4499",
-    ]
+    colors = TOL_MUTED
 
+    series: list[tuple[str, list[tuple[Timestamp, float]], list[Timestamp]]] = []
     for endpoint_dir in endpoint_dirs:
         if not endpoint_dir.is_dir():
             continue
@@ -349,13 +356,32 @@ def plot_tv_distance_transitions(
             continue
 
         transitions = find_transitions(tv_over_time, threshold, days_before, days_after)
+        series.append((endpoint_dir.name, tv_over_time, transitions))
+
+    if show_others:
+        for name, tv_over_time, transitions in series:
+            if transitions:
+                continue
+            timestamps, tv_values = zip(*tv_over_time)
+            fig.add_trace(
+                go.Scatter(
+                    x=timestamps,
+                    y=tv_values,
+                    mode="lines",
+                    name=get_endpoint_legend_name(name),
+                    line=dict(color="lightgrey", width=1),
+                    showlegend=False,
+                )
+            )
+
+    for name, tv_over_time, transitions in series:
         if not transitions:
             continue
 
         timestamps, tv_values = zip(*tv_over_time)
         print(
-            f"{endpoint_dir.name}: {len(tv_over_time)} days of detection + 1 reference day, "
-            f"{len(transitions)} change(s)"
+            f"{name}: {len(tv_over_time)} days of detection + 1 reference day, "
+            f"{len(transitions)} change(s): {', '.join(ts[:10] for ts in transitions)}"
         )
 
         color = colors[color_idx % len(colors)]
@@ -364,7 +390,7 @@ def plot_tv_distance_transitions(
                 x=timestamps,
                 y=tv_values,
                 mode="lines+markers",
-                name=get_endpoint_legend_name(endpoint_dir.name),
+                name=get_endpoint_legend_name(name),
                 line_color=color,
             )
         )
@@ -385,7 +411,10 @@ def plot_tv_distance_transitions(
     fig.add_hline(y=threshold, line_dash="dash", line_color="gray", opacity=0.5)
 
     # Sort by name length ascending. Works well with data as of Mar 31 2026.
-    fig.data = sorted(fig.data, key=lambda t: len(t.name or ""), reverse=False)
+    # Grey background traces (showlegend=False) stay first so colored ones draw on top.
+    fig.data = sorted(
+        fig.data, key=lambda t: (t.showlegend is not False, len(t.name or ""))
+    )
 
     fig.update_layout(
         template=config.plotting.template,
@@ -413,6 +442,7 @@ def plot_tv_distance_transitions(
         print(f"Saved figure to {output_path}")
     else:
         fig.show()
+    return fig
 
 
 def plot_tv_distance_heatmap(
@@ -672,8 +702,14 @@ def compute_phase1_cost(
     """
     phase_1_dir = config.bi.get_phase_1_dir(0.0)
 
+    from trackllm_website.bi.state import load_all_states
+
     endpoint_costs: dict[str, tuple[float, float]] = {}
-    for ep in config.endpoints_bi_phase_1:
+    # Historical endpoints may be absent from config.endpoints_bi but still
+    # present in the state-file registry.
+    for slug, state in load_all_states(config.bi.state_dir).items():
+        endpoint_costs[slug] = state.endpoint.cost
+    for ep in config.endpoints_bi:
         slug = slugify(f"{ep.model}#{ep.provider}")
         endpoint_costs[slug] = ep.cost
 

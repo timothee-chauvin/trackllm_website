@@ -11,7 +11,7 @@ Change detection uses running mean/std normalization + peak detection.
 import fire
 import numpy as np
 import orjson
-from datetime import datetime
+from datetime import datetime, timezone
 from numpy.lib.stride_tricks import sliding_window_view
 from pathlib import Path
 from scipy.signal import find_peaks
@@ -209,7 +209,17 @@ def _is_scores_current(endpoint_dir: Path) -> bool:
 
 def compute_all():
     """Compute LT scores for all endpoints from scratch."""
+    from trackllm_website.lt_events import (
+        EVENTS_FILENAME,
+        load_events,
+        save_events,
+        update_endpoint_events,
+    )
+
     data_dir = Path(config.data_dir)
+    now = datetime.now(tz=timezone.utc)
+    events_path = data_dir / EVENTS_FILENAME
+    all_events = load_events(events_path)
     n_computed = 0
     for endpoint_dir in sorted(data_dir.iterdir()):
         if not endpoint_dir.is_dir():
@@ -219,17 +229,29 @@ def compute_all():
             logger.info(f"{endpoint_dir.name}: not enough data")
             continue
         _save_scores(endpoint_dir / SCORES_FILENAME, scores)
+        update_endpoint_events(all_events, endpoint_dir.name, scores, now)
         n_computed += 1
         logger.info(
             f"{endpoint_dir.name}: {len(scores.scores)} scores, "
             f"{len(scores.changes)} changes"
         )
+    save_events(events_path, all_events)
     logger.info(f"Computed scores for {n_computed} endpoints")
 
 
 def compute_latest():
     """Recompute LT scores only for endpoints with new data since last run."""
+    from trackllm_website.lt_events import (
+        EVENTS_FILENAME,
+        load_events,
+        save_events,
+        update_endpoint_events,
+    )
+
     data_dir = Path(config.data_dir)
+    now = datetime.now(tz=timezone.utc)
+    events_path = data_dir / EVENTS_FILENAME
+    all_events = load_events(events_path)
     n_skipped = 0
     n_computed = 0
     for endpoint_dir in sorted(data_dir.iterdir()):
@@ -242,11 +264,13 @@ def compute_latest():
         if scores is None:
             continue
         _save_scores(endpoint_dir / SCORES_FILENAME, scores)
+        update_endpoint_events(all_events, endpoint_dir.name, scores, now)
         n_computed += 1
         logger.info(
             f"{endpoint_dir.name}: {len(scores.scores)} scores, "
             f"{len(scores.changes)} changes"
         )
+    save_events(events_path, all_events)
     logger.info(f"Computed: {n_computed}, skipped (up-to-date): {n_skipped}")
 
 

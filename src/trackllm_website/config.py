@@ -93,6 +93,32 @@ class PrevalenceConfig(BaseModel):
     tokens_per_endpoint: int
 
 
+class DetectionConfig(BaseModel):
+    window: int
+    exclusion: int
+    min_baseline: int
+    sigma_k: float
+    abs_delta: float
+    persistence: int
+    cooldown: int
+    instability_window: int
+    instability_threshold: float
+
+
+class ReinitConfig(BaseModel):
+    reprobe_samples: int
+    reference_samples: int
+    top_k_bis: int
+    min_bis: int
+    stall_days: int
+    recheck_days: int
+    onboard_concurrency: int
+
+
+class MonitorConfig(BaseModel):
+    max_concurrent_endpoints: int
+
+
 class BIConfig(BaseModel):
     data_dir: Path
     max_input_tokens: int
@@ -101,10 +127,17 @@ class BIConfig(BaseModel):
     phase_1: Phase1Config
     phase_2: Phase2Config
     prevalence: PrevalenceConfig
+    detection: DetectionConfig
+    reinit: ReinitConfig
+    monitor: MonitorConfig
 
     @property
     def tokenizers_dir(self) -> Path:
         return self.data_dir / "tokenizers"
+
+    @property
+    def state_dir(self) -> Path:
+        return self.data_dir / "state"
 
     def get_phase_1_dir(
         self, temperature: float | int, base_dir: Path | None = None
@@ -139,13 +172,11 @@ class PlottingConfig(BaseModel):
 class Config(BaseSettings):
     endpoints_yaml_path_lt: Path = root / "endpoints_lt.yaml"
     endpoints_yaml_path_bi: Path = root / "endpoints_bi.yaml"
-    endpoints_yaml_path_bi_phase_1: Path = root / "endpoints_bi_phase_1.yaml"
     endpoints_yaml_path_bi_prevalence: Path = root / "endpoints_bi_prevalence.yaml"
     model_config = SettingsConfigDict(
         yaml_file=[
             endpoints_yaml_path_lt,
             endpoints_yaml_path_bi,
-            endpoints_yaml_path_bi_phase_1,
             endpoints_yaml_path_bi_prevalence,
         ],
         toml_file=root / "config.toml",
@@ -163,7 +194,6 @@ class Config(BaseSettings):
     # read from endpoints_....yaml
     endpoints_lt: list[Endpoint] = []
     endpoints_bi: list[Endpoint] = []
-    endpoints_bi_phase_1: list[Endpoint] = []
     endpoints_bi_prevalence: list[Endpoint] = []
 
     # read from .env

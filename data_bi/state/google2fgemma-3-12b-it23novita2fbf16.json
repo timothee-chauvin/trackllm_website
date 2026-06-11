@@ -1,0 +1,29 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "google/gemma-3-12b-it",
+    "provider": "novita/bf16",
+    "cost": [
+      0.05,
+      0.1
+    ],
+    "max_logprobs": null
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "stalled",
+    "since": "2026-01-14T21:01:16Z",
+    "last_recheck": "2026-06-11T16:22:58.010177Z"
+  },
+  "epochs": [
+    {
+      "start": "2026-01-14T21:01:16Z",
+      "border_inputs": [],
+      "reference": {},
+      "end": "2026-01-14T21:01:16Z",
+      "end_reason": "gap",
+      "change_date": null,
+      "params": null
+    }
+  ]
+}

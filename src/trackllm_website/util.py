@@ -1,9 +1,21 @@
 import asyncio
 import hashlib
+import os
+import tempfile
 from collections.abc import AsyncIterator, Coroutine
+from pathlib import Path
 from typing import Any
 
 from trackllm_website.config import Endpoint
+
+
+def atomic_write_bytes(path: Path, data: bytes) -> None:
+    """Write bytes to path atomically via a tempfile in the same directory + os.replace."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile("wb", delete=False, dir=path.parent) as tmp_file:
+        tmp_file.write(data)
+        temp_name = tmp_file.name
+    os.replace(temp_name, path)
 
 
 async def gather_with_concurrency(
@@ -102,12 +114,19 @@ def endpoint_from_slug(slug: str) -> Endpoint:
     """Find an Endpoint whose str representation slugifies to the given slug."""
     from trackllm_website.config import config
 
-    all_endpoints = (
-        config.endpoints_bi
-        + config.endpoints_bi_phase_1
-        + config.endpoints_bi_prevalence
-    )
+    all_endpoints = config.endpoints_bi + config.endpoints_bi_prevalence
     for endpoint in all_endpoints:
         if slugify(f"{endpoint.model}#{endpoint.provider}") == slug:
             return endpoint
+
+    # Fall back to the state files, which form the registry of historically
+    # monitored endpoints that may no longer be in the live OpenRouter catalog
+    # (and hence dropped from the config lists). Lazy-imported to avoid a cycle:
+    # state.py imports slugify from this module.
+    from trackllm_website.bi.state import load_all_states
+
+    state = load_all_states(config.bi.state_dir).get(slug)
+    if state is not None:
+        return state.endpoint
+
     raise ValueError(f"No endpoint found for slug: {slug}")
