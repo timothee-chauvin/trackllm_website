@@ -36,9 +36,7 @@ async def sample_prompts(
         for i in range(n_per_prompt):
             async with semaphore:
                 await limiter.acquire()
-                ts = (
-                    datetime.now(tz=timezone.utc).replace(microsecond=0).isoformat()
-                )
+                ts = datetime.now(tz=timezone.utc).replace(microsecond=0).isoformat()
                 response = await client.query(
                     endpoint,
                     prompt,
