@@ -167,13 +167,11 @@ class PlottingConfig(BaseModel):
 class Config(BaseSettings):
     endpoints_yaml_path_lt: Path = root / "endpoints_lt.yaml"
     endpoints_yaml_path_bi: Path = root / "endpoints_bi.yaml"
-    endpoints_yaml_path_bi_phase_1: Path = root / "endpoints_bi_phase_1.yaml"
     endpoints_yaml_path_bi_prevalence: Path = root / "endpoints_bi_prevalence.yaml"
     model_config = SettingsConfigDict(
         yaml_file=[
             endpoints_yaml_path_lt,
             endpoints_yaml_path_bi,
-            endpoints_yaml_path_bi_phase_1,
             endpoints_yaml_path_bi_prevalence,
         ],
         toml_file=root / "config.toml",
@@ -191,7 +189,6 @@ class Config(BaseSettings):
     # read from endpoints_....yaml
     endpoints_lt: list[Endpoint] = []
     endpoints_bi: list[Endpoint] = []
-    endpoints_bi_phase_1: list[Endpoint] = []
     endpoints_bi_prevalence: list[Endpoint] = []
 
     # read from .env
