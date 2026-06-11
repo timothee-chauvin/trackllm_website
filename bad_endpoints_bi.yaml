@@ -1306,6 +1306,13 @@ bad_endpoints_bi:
     - 1
 - api: openrouter
   model: minimax/minimax-m2.5
+  provider: digitalocean
+  reason:
+    token_usage:
+    - 39
+    - 231
+- api: openrouter
+  model: minimax/minimax-m2.5
   provider: fireworks
   reason:
     token_usage:
@@ -1948,6 +1955,13 @@ bad_endpoints_bi:
     token_usage:
     - 17
     - 1
+- api: openrouter
+  model: nvidia/nemotron-3-super-120b-a12b
+  provider: digitalocean
+  reason:
+    token_usage:
+    - 17
+    - 213
 - api: openrouter
   model: nvidia/nemotron-3-super-120b-a12b
   provider: nebius/bf16

@@ -738,6 +738,12 @@ endpoints_bi:
   - 0.09
   - 0.3
 - api: openrouter
+  model: deepseek/deepseek-v4-flash
+  provider: io-net/fp8
+  cost:
+  - 0.13026
+  - 0.26052
+- api: openrouter
   model: qwen/qwen3-30b-a3b-thinking-2507
   provider: cloudflare
   cost:
@@ -1220,6 +1226,12 @@ endpoints_bi:
 - api: openrouter
   model: google/gemma-4-26b-a4b-it
   provider: nextbit/bf16
+  cost:
+  - 0.13
+  - 0.4
+- api: openrouter
+  model: google/gemma-4-31b-it
+  provider: siliconflow/fp8
   cost:
   - 0.13
   - 0.4
@@ -2202,6 +2214,12 @@ endpoints_bi:
   - 0.22
   - 0.88
 - api: openrouter
+  model: qwen/qwen3-235b-a22b-2507
+  provider: google-vertex/us-south1
+  cost:
+  - 0.22
+  - 0.88
+- api: openrouter
   model: undi95/remm-slerp-l2-13b
   provider: nextbit/bf16
   cost:
@@ -2429,12 +2447,6 @@ endpoints_bi:
   cost:
   - 0.51
   - 0.74
-- api: openrouter
-  model: qwen/qwen3-235b-a22b-2507
-  provider: google-vertex/us-south1
-  cost:
-  - 0.25
-  - 1.0
 - api: openrouter
   model: qwen/qwen3-coder
   provider: siliconflow/fp8
@@ -4284,6 +4296,12 @@ endpoints_bi:
   - 0.65
   - 3.0
 - api: openrouter
+  model: deepseek/deepseek-v4-pro
+  provider: nextbit/fp8
+  cost:
+  - 1.1
+  - 2.6
+- api: openrouter
   model: deepseek/deepseek-chat-v3-0324
   provider: wandb/fp8
   cost:
@@ -4555,6 +4573,12 @@ endpoints_bi:
   - 3.4
 - api: openrouter
   model: moonshotai/kimi-k2.6
+  provider: decart/fp4
+  cost:
+  - 0.74
+  - 3.49
+- api: openrouter
+  model: moonshotai/kimi-k2.6
   provider: inceptron/int4
   cost:
   - 0.73
@@ -4681,12 +4705,6 @@ endpoints_bi:
   - 4.0
 - api: openrouter
   model: deepseek/deepseek-v4-pro
-  provider: nextbit/fp8
-  cost:
-  - 1.6
-  - 3.2
-- api: openrouter
-  model: deepseek/deepseek-v4-pro
   provider: novita/fp8
   cost:
   - 1.6
@@ -4718,6 +4736,12 @@ endpoints_bi:
 - api: openrouter
   model: moonshotai/kimi-k2.6
   provider: ambient
+  cost:
+  - 0.95
+  - 4.0
+- api: openrouter
+  model: moonshotai/kimi-k2.6
+  provider: ambient/int4
   cost:
   - 0.95
   - 4.0
@@ -4910,6 +4934,12 @@ endpoints_bi:
 - api: openrouter
   model: z-ai/glm-5.1
   provider: friendli
+  cost:
+  - 1.4
+  - 4.4
+- api: openrouter
+  model: z-ai/glm-5.1
+  provider: inceptron/fp8
   cost:
   - 1.4
   - 4.4
