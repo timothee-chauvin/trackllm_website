@@ -9,7 +9,7 @@ from pathlib import Path
 
 import orjson
 
-from trackllm_website.bi.common import QueryStrategy
+from trackllm_website.bi.common import META_KEY, QueryStrategy
 from trackllm_website.bi.detection import select_top_bis
 from trackllm_website.bi.phase_1 import phase_1a
 from trackllm_website.bi.sampling import sample_prompts
@@ -17,31 +17,39 @@ from trackllm_website.bi.state import Epoch
 from trackllm_website.config import Endpoint, config, logger
 
 
-async def discover_candidates(endpoint: Endpoint, exclude: list[str]) -> list[str]:
-    """Run phase 1a discovery for one endpoint, returning new BI candidates.
+def parse_phase_1_candidates(results_dir: Path, exclude: list[str]) -> list[str]:
+    """Parse phase-1a output files into BI candidates.
 
-    Phase 1a writes one file per endpoint under the T=0 dir, with structure
-    {token_count: {prompt: [outputs]}}; a prompt is a border input when it has
-    at least two distinct outputs. The border_inputs.json file (phase 1b) is
-    skipped if present.
+    Phase 1a writes one file per endpoint with structure
+    {token_count: {prompt: [outputs]}}, plus a top-level META_KEY entry when
+    meta tracking is on; a prompt is a border input when it has at least two
+    distinct non-empty outputs. The border_inputs.json file (phase 1b) and the
+    META_KEY top-level key are skipped.
     """
     excluded = set(exclude)
+    candidates: list[str] = []
+    for f in results_dir.glob("*.json"):
+        if f.name == "border_inputs.json":
+            continue
+        data = orjson.loads(f.read_bytes())
+        for token_count, prompts_dict in data.items():
+            if token_count == META_KEY:
+                continue
+            for prompt, outputs in prompts_dict.items():
+                if prompt in excluded:
+                    continue
+                if len({o for o in outputs if o}) >= 2:
+                    candidates.append(prompt)
+    return candidates
+
+
+async def discover_candidates(endpoint: Endpoint, exclude: list[str]) -> list[str]:
+    """Run phase 1a discovery for one endpoint, returning new BI candidates."""
     with tempfile.TemporaryDirectory() as tmp:
         base_dir = Path(tmp)
         await phase_1a([endpoint], 0.0, base_dir)
         results_dir = config.bi.get_phase_1_dir(0.0, base_dir)
-        candidates: list[str] = []
-        for f in results_dir.glob("*.json"):
-            if f.name == "border_inputs.json":
-                continue
-            data = orjson.loads(f.read_bytes())
-            for prompts_dict in data.values():
-                for prompt, outputs in prompts_dict.items():
-                    if prompt in excluded:
-                        continue
-                    if len({o for o in outputs if o}) >= 2:
-                        candidates.append(prompt)
-        return candidates
+        return parse_phase_1_candidates(results_dir, exclude)
 
 
 async def reinit(

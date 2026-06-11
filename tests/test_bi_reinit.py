@@ -1,7 +1,11 @@
 import asyncio
 from datetime import datetime, timezone
+from pathlib import Path
+
+import orjson
 
 from trackllm_website.bi import reinit as reinit_mod
+from trackllm_website.bi.reinit import parse_phase_1_candidates
 from trackllm_website.config import Endpoint
 
 ENDPOINT = Endpoint(api="openrouter", model="m/x", provider="p", cost=(1, 1))
@@ -41,9 +45,7 @@ def test_reinit_keeps_survivors_and_ranks(monkeypatch):
     monkeypatch.setattr(reinit_mod.config.bi.reinit, "top_k_bis", 2)
     monkeypatch.setattr(reinit_mod.config.bi.reinit, "min_bis", 2)
 
-    epoch = asyncio.run(
-        reinit_mod.reinit(None, None, ENDPOINT, ["alive", "dead"], NOW)
-    )
+    epoch = asyncio.run(reinit_mod.reinit(None, None, ENDPOINT, ["alive", "dead"], NOW))
     assert epoch is not None
     assert sorted(epoch.border_inputs) == ["alive", "new1"]
     assert set(epoch.reference) == {"alive", "new1"}
@@ -57,3 +59,18 @@ def test_reinit_returns_none_below_min_bis(monkeypatch):
 
     monkeypatch.setattr(reinit_mod, "discover_candidates", fake_discover)
     assert asyncio.run(reinit_mod.reinit(None, None, ENDPOINT, ["dead"], NOW)) is None
+
+
+def test_parse_phase_1_candidates_skips_meta_and_decoy(tmp_path: Path):
+    (tmp_path / "endpoint.json").write_bytes(
+        orjson.dumps(
+            {
+                "1": {"bi_prompt": ["a", "b", "a"], "boring": ["a", "a", "a"]},
+                "_meta": {"1": {"bi_prompt": [[1, 1, 0]], "boring": [[1, 1, 0]]}},
+            }
+        )
+    )
+    (tmp_path / "border_inputs.json").write_bytes(orjson.dumps({"decoy": ["a", "b"]}))
+
+    assert parse_phase_1_candidates(tmp_path, []) == ["bi_prompt"]
+    assert parse_phase_1_candidates(tmp_path, ["bi_prompt"]) == []
