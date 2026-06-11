@@ -702,7 +702,13 @@ def compute_phase1_cost(
     """
     phase_1_dir = config.bi.get_phase_1_dir(0.0)
 
+    from trackllm_website.bi.state import load_all_states
+
     endpoint_costs: dict[str, tuple[float, float]] = {}
+    # Historical endpoints may be absent from config.endpoints_bi but still
+    # present in the state-file registry.
+    for slug, state in load_all_states(config.bi.state_dir).items():
+        endpoint_costs[slug] = state.endpoint.cost
     for ep in config.endpoints_bi:
         slug = slugify(f"{ep.model}#{ep.provider}")
         endpoint_costs[slug] = ep.cost
@@ -716,13 +722,8 @@ def compute_phase1_cost(
 
         slug = json_path.stem
         if slug not in endpoint_costs:
-            # Historical endpoints may be absent from config.endpoints_bi but still
-            # resolvable via the state-file registry (see endpoint_from_slug).
-            try:
-                endpoint_costs[slug] = endpoint_from_slug(slug).cost
-            except ValueError:
-                logger.warning(f"No cost info for endpoint: {slug}")
-                continue
+            logger.warning(f"No cost info for endpoint: {slug}")
+            continue
 
         with open(json_path, "rb") as f:
             data = orjson.loads(f.read())
