@@ -1,0 +1,962 @@
+{
+  "01-ai2fyi-large23fireworks": [],
+  "agentica-org2fdeepcoder-14b-preview23chutes": [],
+  "agentica-org2fdeepcoder-14b-preview3afree23chutes": [],
+  "alpindale2fgoliath-120b23mancer2fint4": [],
+  "anthracite-org2fmagnum-v4-72b23mancer2ffp8": [],
+  "arliai2fqwq-32b-arliai-rpr-v123chutes": [],
+  "arliai2fqwq-32b-arliai-rpr-v13afree23chutes": [],
+  "cognitivecomputations2fdolphin3.0-mistral-24b23chutes": [],
+  "cognitivecomputations2fdolphin3.0-mistral-24b3afree23chutes": [
+    {
+      "endpoint": "cognitivecomputations2fdolphin3.0-mistral-24b3afree23chutes",
+      "index": 523,
+      "date": "2025-07-29T02:00:33Z",
+      "sigma": 4.7158971986641514e39,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "cognitivecomputations2fdolphin3.0-r1-mistral-24b23chutes": [],
+  "cognitivecomputations2fdolphin3.0-r1-mistral-24b3afree23chutes": [],
+  "deepseek2fdeepseek-chat-v3-032423chutes2ffp8": [
+    {
+      "endpoint": "deepseek2fdeepseek-chat-v3-032423chutes2ffp8",
+      "index": 382,
+      "date": "2025-08-28T14:00:32Z",
+      "sigma": 3.619464942077191e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "deepseek2fdeepseek-chat-v3-032423chutes2ffp8",
+      "index": 1407,
+      "date": "2025-10-10T14:00:37Z",
+      "sigma": 1.7166804940726318e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "deepseek2fdeepseek-chat-v3-032423crusoe2ffp8": [
+    {
+      "endpoint": "deepseek2fdeepseek-chat-v3-032423crusoe2ffp8",
+      "index": 4510,
+      "date": "2026-01-11T09:23:55Z",
+      "sigma": 98.77347655967141,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "deepseek2fdeepseek-chat-v3-032423deepseek2ffp8": [],
+  "deepseek2fdeepseek-chat-v3-032423fireworks": [
+    {
+      "endpoint": "deepseek2fdeepseek-chat-v3-032423fireworks",
+      "index": 1960,
+      "date": "2025-09-18T23:00:11Z",
+      "sigma": 14.889190658412454,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "deepseek2fdeepseek-chat-v3-032423fireworks",
+      "index": 3135,
+      "date": "2025-11-07T00:00:16Z",
+      "sigma": 23.368650855060377,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "deepseek2fdeepseek-chat-v3-032423fireworks",
+      "index": 3447,
+      "date": "2025-11-20T00:00:16Z",
+      "sigma": 52.9150945870753,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "deepseek2fdeepseek-chat-v3-032423hyperbolic2ffp8": [
+    {
+      "endpoint": "deepseek2fdeepseek-chat-v3-032423hyperbolic2ffp8",
+      "index": 355,
+      "date": "2025-08-09T13:00:21Z",
+      "sigma": 2.629643321733524e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "deepseek2fdeepseek-chat-v3-032423hyperbolic2ffp8",
+      "index": 631,
+      "date": "2025-08-23T02:00:21Z",
+      "sigma": 4.1236147502388685e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "deepseek2fdeepseek-chat-v3-032423hyperbolic2ffp8",
+      "index": 657,
+      "date": "2025-08-24T10:00:31Z",
+      "sigma": 2.262163025515929e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "deepseek2fdeepseek-chat-v3-032423klusterai": [],
+  "deepseek2fdeepseek-chat-v3-032423lambda2ffp8": [
+    {
+      "endpoint": "deepseek2fdeepseek-chat-v3-032423lambda2ffp8",
+      "index": 500,
+      "date": "2025-07-17T01:00:09Z",
+      "sigma": 21.765006179466322,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "deepseek2fdeepseek-chat-v3-032423nebius2ffp8": [],
+  "deepseek2fdeepseek-chat-v3-03243afree23chutes2ffp8": [
+    {
+      "endpoint": "deepseek2fdeepseek-chat-v3-03243afree23chutes2ffp8",
+      "index": 632,
+      "date": "2025-08-02T14:01:13Z",
+      "sigma": 2.2882431197447607e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "deepseek2fdeepseek-chat-v3-03243afree23chutes2ffp8",
+      "index": 946,
+      "date": "2025-08-16T11:02:23Z",
+      "sigma": 1.1290392548227965e39,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "deepseek2fdeepseek-chat-v3-03243afree23chutes2ffp8",
+      "index": 1353,
+      "date": "2025-09-06T12:07:38Z",
+      "sigma": 2.480259342256127e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "deepseek2fdeepseek-chat-v3.123byteplus": [],
+  "deepseek2fdeepseek-chat-v3.123chutes": [
+    {
+      "endpoint": "deepseek2fdeepseek-chat-v3.123chutes",
+      "index": 1065,
+      "date": "2025-10-12T01:00:26Z",
+      "sigma": 2.0316578057100135e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "deepseek2fdeepseek-chat-v3.123deepseek": [],
+  "deepseek2fdeepseek-chat-v3.123fireworks": [
+    {
+      "endpoint": "deepseek2fdeepseek-chat-v3.123fireworks",
+      "index": 231,
+      "date": "2025-09-07T06:00:28Z",
+      "sigma": 224.9125080225447,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "deepseek2fdeepseek-chat-v3.123gmicloud2ffp8": [],
+  "deepseek2fdeepseek-chat-v3.123parasail2ffp8": [],
+  "deepseek2fdeepseek-chat23chutes": [
+    {
+      "endpoint": "deepseek2fdeepseek-chat23chutes",
+      "index": 269,
+      "date": "2025-08-23T20:00:17Z",
+      "sigma": 2.4293766915587577e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "deepseek2fdeepseek-chat23fireworks": [],
+  "deepseek2fdeepseek-chat23nebius2ffp8": [],
+  "deepseek2fdeepseek-chat3afree23chutes": [],
+  "deepseek2fdeepseek-r1-0528-qwen3-8b23chutes": [
+    {
+      "endpoint": "deepseek2fdeepseek-r1-0528-qwen3-8b23chutes",
+      "index": 1052,
+      "date": "2025-09-26T23:00:14Z",
+      "sigma": 4.2648479849920685e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "deepseek2fdeepseek-r1-0528-qwen3-8b3afree23chutes": [],
+  "deepseek2fdeepseek-r1-052823chutes": [
+    {
+      "endpoint": "deepseek2fdeepseek-r1-052823chutes",
+      "index": 265,
+      "date": "2025-08-23T16:00:14Z",
+      "sigma": 1.5091284149526697e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "deepseek2fdeepseek-r1-052823chutes",
+      "index": 291,
+      "date": "2025-08-24T18:00:13Z",
+      "sigma": 1.4708094841334432e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "deepseek2fdeepseek-r1-052823chutes",
+      "index": 537,
+      "date": "2025-09-04T05:00:15Z",
+      "sigma": 1.5472083091224277e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "deepseek2fdeepseek-r1-052823chutes",
+      "index": 1413,
+      "date": "2025-10-11T17:00:24Z",
+      "sigma": 1.4495070055848182e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "deepseek2fdeepseek-r1-052823crusoe2ffp8": [
+    {
+      "endpoint": "deepseek2fdeepseek-r1-052823crusoe2ffp8",
+      "index": 1677,
+      "date": "2025-10-01T14:00:26Z",
+      "sigma": 12.733588769630906,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "deepseek2fdeepseek-r1-052823crusoe2ffp8",
+      "index": 4500,
+      "date": "2026-01-11T09:23:54Z",
+      "sigma": 17.326716984761347,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "deepseek2fdeepseek-r1-052823fireworks": [
+    {
+      "endpoint": "deepseek2fdeepseek-r1-052823fireworks",
+      "index": 3111,
+      "date": "2025-11-05T09:00:18Z",
+      "sigma": 25.68700666344715,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "deepseek2fdeepseek-r1-052823fireworks",
+      "index": 3136,
+      "date": "2025-11-06T10:00:21Z",
+      "sigma": 24.36955635292657,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "deepseek2fdeepseek-r1-052823fireworks",
+      "index": 3358,
+      "date": "2025-11-15T16:00:13Z",
+      "sigma": 22.62775285412694,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "deepseek2fdeepseek-r1-052823klusterai": [],
+  "deepseek2fdeepseek-r1-052823lambda2ffp8": [
+    {
+      "endpoint": "deepseek2fdeepseek-r1-052823lambda2ffp8",
+      "index": 411,
+      "date": "2025-08-25T23:00:18Z",
+      "sigma": 14.436462201482641,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "deepseek2fdeepseek-r1-052823nebius2ffp8": [],
+  "deepseek2fdeepseek-r1-05283afree23chutes": [
+    {
+      "endpoint": "deepseek2fdeepseek-r1-05283afree23chutes",
+      "index": 988,
+      "date": "2025-08-18T12:00:28Z",
+      "sigma": 2.3737417402288103e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "deepseek2fdeepseek-r1-05283afree23chutes",
+      "index": 1020,
+      "date": "2025-08-19T20:00:25Z",
+      "sigma": 1.0200136056279274e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "deepseek2fdeepseek-r1-05283afree23chutes",
+      "index": 1356,
+      "date": "2025-09-05T13:03:28Z",
+      "sigma": 4.686295200149491e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "deepseek2fdeepseek-r1-distill-llama-70b23chutes": [
+    {
+      "endpoint": "deepseek2fdeepseek-r1-distill-llama-70b23chutes",
+      "index": 1094,
+      "date": "2025-09-27T12:00:24Z",
+      "sigma": 9.959690397997103e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "deepseek2fdeepseek-r1-distill-llama-70b23lambda2ffp8": [],
+  "deepseek2fdeepseek-r1-distill-llama-70b23nebius2ffp8": [],
+  "deepseek2fdeepseek-r1-distill-llama-70b3afree23chutes": [
+    {
+      "endpoint": "deepseek2fdeepseek-r1-distill-llama-70b3afree23chutes",
+      "index": 1714,
+      "date": "2025-09-25T03:00:40Z",
+      "sigma": 4.628737448145878e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "deepseek2fdeepseek-r123fireworks2ffp8": [],
+  "deepseek2fdeepseek-r123lambda2ffp8": [
+    {
+      "endpoint": "deepseek2fdeepseek-r123lambda2ffp8",
+      "index": 157,
+      "date": "2025-07-04T09:00:08Z",
+      "sigma": 22.49750307248223,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "deepseek2fdeepseek-r123nebius2fbase": [],
+  "deepseek2fdeepseek-r123nebius2ffast": [
+    {
+      "endpoint": "deepseek2fdeepseek-r123nebius2ffast",
+      "index": 955,
+      "date": "2025-08-06T18:00:19Z",
+      "sigma": 263.7519919430926,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "deepseek2fdeepseek-v3.223deepseek": [
+    {
+      "endpoint": "deepseek2fdeepseek-v3.223deepseek",
+      "index": 1023,
+      "date": "2026-01-17T07:23:36Z",
+      "sigma": null,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "deepseek2fdeepseek-v3.223deepseek",
+      "index": 1347,
+      "date": "2026-02-01T07:27:49Z",
+      "sigma": null,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "deepseek2fdeepseek-v3.223deepseek",
+      "index": 1925,
+      "date": "2026-02-26T22:26:01Z",
+      "sigma": 17.332648425923434,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "google2fgemma-2-9b-it23chutes": [],
+  "google2fgemma-2-9b-it3afree23chutes": [],
+  "google2fgemma-3-12b-it23chutes2fbf16": [],
+  "google2fgemma-3-12b-it3afree23chutes2fbf16": [],
+  "google2fgemma-3-27b-it23chutes2fbf16": [],
+  "google2fgemma-3-27b-it23klusterai": [],
+  "google2fgemma-3-27b-it23nebius2ffp8": [],
+  "google2fgemma-3-27b-it3afree23chutes2fbf16": [
+    {
+      "endpoint": "google2fgemma-3-27b-it3afree23chutes2fbf16",
+      "index": 947,
+      "date": "2025-08-26T16:00:33Z",
+      "sigma": 3.8721977003729575e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "gryphe2fmythomax-l2-13b23mancer2ffp8": [],
+  "gryphe2fmythomax-l2-13b23nextbit2fint4": [],
+  "mancer2fweaver23mancer2ffp8": [
+    {
+      "endpoint": "mancer2fweaver23mancer2ffp8",
+      "index": 2370,
+      "date": "2026-03-17T01:55:14Z",
+      "sigma": 135.44483848968255,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "meta-llama2fllama-3.1-405b-instruct23fireworks2ffp8": [],
+  "meta-llama2fllama-3.1-405b-instruct23lambda2ffp8": [],
+  "meta-llama2fllama-3.1-405b-instruct23nebius2ffp8": [],
+  "meta-llama2fllama-3.1-70b-instruct23fireworks": [],
+  "meta-llama2fllama-3.1-70b-instruct23lambda2ffp8": [],
+  "meta-llama2fllama-3.1-70b-instruct23nebius2ffp8": [],
+  "meta-llama2fllama-3.1-8b-instruct23cerebras2ffp16": [],
+  "meta-llama2fllama-3.1-8b-instruct23fireworks": [],
+  "meta-llama2fllama-3.1-8b-instruct23klusterai2ffp8": [],
+  "meta-llama2fllama-3.1-8b-instruct23lambda2fbf16": [],
+  "meta-llama2fllama-3.1-8b-instruct23nebius2ffp8": [],
+  "meta-llama2fllama-3.2-11b-vision-instruct23lambda2fbf16": [],
+  "meta-llama2fllama-3.2-3b-instruct23lambda2fbf16": [],
+  "meta-llama2fllama-3.3-70b-instruct23cerebras2ffp16": [],
+  "meta-llama2fllama-3.3-70b-instruct23crusoe2fbf16": [],
+  "meta-llama2fllama-3.3-70b-instruct23crusoe2fint8": [],
+  "meta-llama2fllama-3.3-70b-instruct23fireworks2ffp16": [
+    {
+      "endpoint": "meta-llama2fllama-3.3-70b-instruct23fireworks2ffp16",
+      "index": 4518,
+      "date": "2025-12-18T21:23:13Z",
+      "sigma": 39.0400003545166,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "meta-llama2fllama-3.3-70b-instruct23hyperbolic2ffp8": [],
+  "meta-llama2fllama-3.3-70b-instruct23klusterai2ffp8": [],
+  "meta-llama2fllama-3.3-70b-instruct23lambda2ffp8": [],
+  "meta-llama2fllama-3.3-70b-instruct23nebius2ffp8": [],
+  "meta-llama2fllama-4-maverick23klusterai2ffp8": [],
+  "meta-llama2fllama-4-maverick23lambda2ffp8": [
+    {
+      "endpoint": "meta-llama2fllama-4-maverick23lambda2ffp8",
+      "index": 311,
+      "date": "2025-07-10T21:00:25Z",
+      "sigma": 13.16432379500179,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "meta-llama2fllama-4-maverick3afree23chutes2ffp8": [],
+  "meta-llama2fllama-4-scout23klusterai": [],
+  "meta-llama2fllama-4-scout23lambda2ffp8": [],
+  "meta-llama2fllama-4-scout3afree23chutes2fbf16": [],
+  "meta-llama2fllama-guard-3-8b23fireworks": [],
+  "meta-llama2fllama-guard-3-8b23nebius": [],
+  "microsoft2fmai-ds-r123chutes2ffp8": [
+    {
+      "endpoint": "microsoft2fmai-ds-r123chutes2ffp8",
+      "index": 845,
+      "date": "2025-09-17T12:00:15Z",
+      "sigma": 73.26001555427733,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "microsoft2fphi-423nebius2ffp8": [],
+  "microsoft2fphi-423nextbit2fint4": [],
+  "minimax2fminimax-m13aextended23chutes": [],
+  "minimax2fminimax-m2.123fireworks": [
+    {
+      "endpoint": "minimax2fminimax-m2.123fireworks",
+      "index": 152,
+      "date": "2026-01-06T10:24:29Z",
+      "sigma": 43.68269827745182,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "minimax2fminimax-m2.123nebius2ffp8": [],
+  "minimax2fminimax-m2.523fireworks": [],
+  "minimax2fminimax-m2.523inceptron2ffp8": [],
+  "minimax2fminimax-m223fireworks": [
+    {
+      "endpoint": "minimax2fminimax-m223fireworks",
+      "index": 185,
+      "date": "2025-12-12T10:24:26Z",
+      "sigma": 190.87788888931354,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "mistralai2fdevstral-small-250523chutes": [
+    {
+      "endpoint": "mistralai2fdevstral-small-250523chutes",
+      "index": 594,
+      "date": "2025-09-06T14:00:16Z",
+      "sigma": 562.3170318335106,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "mistralai2fdevstral-small-250523nebius2ffp8": [],
+  "mistralai2fdevstral-small-25053afree23chutes": [
+    {
+      "endpoint": "mistralai2fdevstral-small-25053afree23chutes",
+      "index": 153,
+      "date": "2025-09-06T14:00:28Z",
+      "sigma": 591.5032486162677,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "mistralai2fdevstral-small23nebius2ffp8": [],
+  "mistralai2fdevstral-small3afree23chutes": [],
+  "mistralai2fministral-14b-251223nextbit2ffp8": [],
+  "mistralai2fministral-3b-251223nextbit2ffp8": [],
+  "mistralai2fministral-8b-251223nextbit2ffp8": [],
+  "mistralai2fmistral-nemo23chutes": [],
+  "mistralai2fmistral-nemo23klusterai": [],
+  "mistralai2fmistral-nemo23nebius2ffp8": [],
+  "mistralai2fmistral-nemo3afree23chutes": [],
+  "mistralai2fmistral-small-24b-instruct-250123chutes": [],
+  "mistralai2fmistral-small-24b-instruct-250123klusterai": [],
+  "mistralai2fmistral-small-24b-instruct-25013afree23chutes": [
+    {
+      "endpoint": "mistralai2fmistral-small-24b-instruct-25013afree23chutes",
+      "index": 660,
+      "date": "2025-08-03T12:00:24Z",
+      "sigma": 215.18840283808032,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "mistralai2fmistral-small-3.1-24b-instruct23chutes": [
+    {
+      "endpoint": "mistralai2fmistral-small-3.1-24b-instruct23chutes",
+      "index": 1336,
+      "date": "2025-10-09T23:00:22Z",
+      "sigma": 1623.1831536596428,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "mistralai2fmistral-small-3.1-24b-instruct23nebius2ffp8": [],
+  "mistralai2fmistral-small-3.1-24b-instruct3afree23chutes": [
+    {
+      "endpoint": "mistralai2fmistral-small-3.1-24b-instruct3afree23chutes",
+      "index": 682,
+      "date": "2025-08-04T08:01:22Z",
+      "sigma": 4.97885514228528e39,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "mistralai2fmistral-small-3.1-24b-instruct3afree23chutes",
+      "index": 1951,
+      "date": "2025-10-10T02:00:25Z",
+      "sigma": 2625.2070507009457,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "mistralai2fmistral-small-3.1-24b-instruct3afree23chutes",
+      "index": 1982,
+      "date": "2025-10-11T11:00:19Z",
+      "sigma": 1.2955450525813291e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "mistralai2fmistral-small-3.2-24b-instruct23chutes": [],
+  "mistralai2fmistral-small-3.2-24b-instruct3afree23chutes": [
+    {
+      "endpoint": "mistralai2fmistral-small-3.2-24b-instruct3afree23chutes",
+      "index": 652,
+      "date": "2025-08-03T13:02:33Z",
+      "sigma": 302.46694591503285,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "mistralai2fmistral-small-3.2-24b-instruct3afree23chutes",
+      "index": 1023,
+      "date": "2025-08-19T20:00:25Z",
+      "sigma": 9.766486677678248e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "mistralai2fmixtral-8x22b-instruct23fireworks": [
+    {
+      "endpoint": "mistralai2fmixtral-8x22b-instruct23fireworks",
+      "index": 1594,
+      "date": "2025-09-03T02:00:18Z",
+      "sigma": 105.35475704101898,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "mistralai2fpixtral-12b23hyperbolic2fbf16": [],
+  "moonshotai2fkimi-dev-72b3afree23chutes2fbf16": [],
+  "moonshotai2fkimi-k2-090523byteplus": [],
+  "moonshotai2fkimi-k2-090523fireworks2ffp8": [],
+  "moonshotai2fkimi-k2-thinking23nebius2ffp8": [],
+  "moonshotai2fkimi-k2-thinking23parasail2fint4": [],
+  "moonshotai2fkimi-k2.523inceptron2fint4": [],
+  "moonshotai2fkimi-k223chutes2ffp8": [],
+  "moonshotai2fkimi-k223fireworks2ffp8": [],
+  "moonshotai2fkimi-k223moonshotai2ffp8": [],
+  "moonshotai2fkimi-k223nebius2ffp4": [],
+  "moonshotai2fkimi-k23afree23chutes2ffp8": [],
+  "moonshotai2fkimi-linear-48b-a3b-instruct23parasail2fbf16": [],
+  "moonshotai2fkimi-vl-a3b-thinking23chutes": [],
+  "moonshotai2fkimi-vl-a3b-thinking3afree23chutes": [],
+  "neversleep2fllama-3.1-lumimaid-8b23mancer2ffp16": [],
+  "neversleep2fllama-3.1-lumimaid-8b23nextbit2fint4": [],
+  "neversleep2fnoromaid-20b23mancer2ffp8": [],
+  "nousresearch2fdeephermes-3-llama-3-8b-preview3afree23chutes2fbf16": [
+    {
+      "endpoint": "nousresearch2fdeephermes-3-llama-3-8b-preview3afree23chutes2fbf16",
+      "index": 1161,
+      "date": "2025-09-17T12:08:18Z",
+      "sigma": 300.38549712940585,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "nousresearch2fdeephermes-3-mistral-24b-preview23chutes": [],
+  "nousresearch2fhermes-2-pro-llama-3-8b23lambda2fbf16": [],
+  "nousresearch2fhermes-3-llama-3.1-405b23lambda2ffp8": [
+    {
+      "endpoint": "nousresearch2fhermes-3-llama-3.1-405b23lambda2ffp8",
+      "index": 462,
+      "date": "2025-07-17T01:00:07Z",
+      "sigma": 156.7117933398002,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "nousresearch2fhermes-3-llama-3.1-405b23nebius2ffp8": [],
+  "nousresearch2fhermes-3-llama-3.1-70b23hyperbolic2ffp8": [],
+  "nousresearch2fhermes-3-llama-3.1-70b23lambda2ffp8": [
+    {
+      "endpoint": "nousresearch2fhermes-3-llama-3.1-70b23lambda2ffp8",
+      "index": 462,
+      "date": "2025-07-16T23:10:13Z",
+      "sigma": 50.38328311066221,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "nousresearch2fhermes-3-llama-3.1-70b23nextbit2ffp8": [],
+  "nousresearch2fhermes-4-405b23chutes2ffp8": [],
+  "nousresearch2fhermes-4-405b23nebius2ffp8": [
+    {
+      "endpoint": "nousresearch2fhermes-4-405b23nebius2ffp8",
+      "index": 311,
+      "date": "2025-09-10T14:00:19Z",
+      "sigma": 30.69007660639337,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "nousresearch2fhermes-4-405b23nebius2ffp8",
+      "index": 672,
+      "date": "2025-09-25T17:00:20Z",
+      "sigma": 20.040199599084517,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "nousresearch2fhermes-4-405b23nebius2ffp8",
+      "index": 1157,
+      "date": "2025-10-15T22:00:18Z",
+      "sigma": 67.99237192506276,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "nousresearch2fhermes-4-70b23chutes": [],
+  "nousresearch2fhermes-4-70b23nebius2ffp8": [],
+  "nvidia2fllama-3.1-nemotron-70b-instruct23lambda2ffp8": [],
+  "nvidia2fllama-3.1-nemotron-ultra-253b-v123nebius2ffp8": [
+    {
+      "endpoint": "nvidia2fllama-3.1-nemotron-ultra-253b-v123nebius2ffp8",
+      "index": 1935,
+      "date": "2025-09-16T21:00:17Z",
+      "sigma": null,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "nvidia2fllama-3.3-nemotron-super-49b-v123nebius2ffp8": [],
+  "nvidia2fllama-3.3-nemotron-super-49b-v13afree23chutes2fbf16": [],
+  "openai2fchatgpt-4o-latest23openai": [],
+  "openai2fgpt-3.5-turbo-061323azure": [],
+  "openai2fgpt-3.5-turbo-16k23azure": [],
+  "openai2fgpt-3.5-turbo-16k23openai": [],
+  "openai2fgpt-3.5-turbo23openai": [],
+  "openai2fgpt-4.1-mini23openai": [],
+  "openai2fgpt-4.1-nano23openai": [],
+  "openai2fgpt-4.123openai": [],
+  "openai2fgpt-4o-2024-05-1323azure": [
+    {
+      "endpoint": "openai2fgpt-4o-2024-05-1323azure",
+      "index": 8045,
+      "date": "2026-05-21T05:40:50Z",
+      "sigma": 122.32991099578022,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "openai2fgpt-4o-2024-05-1323openai": [],
+  "openai2fgpt-4o-2024-08-0623azure": [
+    {
+      "endpoint": "openai2fgpt-4o-2024-08-0623azure",
+      "index": 2438,
+      "date": "2025-10-08T10:00:21Z",
+      "sigma": 24.16046579778009,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "openai2fgpt-4o-2024-08-0623azure",
+      "index": 8021,
+      "date": "2026-05-25T20:45:11Z",
+      "sigma": 13.514410073416965,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "openai2fgpt-4o-2024-08-0623openai": [],
+  "openai2fgpt-4o-2024-11-2023openai": [],
+  "openai2fgpt-4o-mini-2024-07-1823openai": [],
+  "openai2fgpt-4o-mini23azure": [],
+  "openai2fgpt-4o-mini23azure2fswedencentral": [],
+  "openai2fgpt-4o-mini23openai": [],
+  "openai2fgpt-4o23azure": [
+    {
+      "endpoint": "openai2fgpt-4o23azure",
+      "index": 2433,
+      "date": "2025-10-08T05:00:20Z",
+      "sigma": 28.74822434979985,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "openai2fgpt-4o23openai": [],
+  "openai2fgpt-4o3aextended23openai": [],
+  "openai2fgpt-oss-120b23chutes": [],
+  "openai2fgpt-oss-120b23crusoe": [],
+  "openai2fgpt-oss-120b23crusoe2fbf16": [],
+  "openai2fgpt-oss-120b23nebius2ffp4": [],
+  "openai2fgpt-oss-20b23nebius2ffp4": [],
+  "qwen2fqwen-2.5-72b-instruct23chutes2fbf16": [],
+  "qwen2fqwen-2.5-72b-instruct23fireworks": [],
+  "qwen2fqwen-2.5-72b-instruct23nebius2ffp8": [],
+  "qwen2fqwen-2.5-72b-instruct3afree23chutes2fbf16": [],
+  "qwen2fqwen-2.5-coder-32b-instruct23chutes": [],
+  "qwen2fqwen-2.5-coder-32b-instruct23hyperbolic2ffp8": [],
+  "qwen2fqwen-2.5-coder-32b-instruct23lambda2fbf16": [],
+  "qwen2fqwen-2.5-coder-32b-instruct23nebius2ffp8": [],
+  "qwen2fqwen-2.5-coder-32b-instruct3afree23chutes": [
+    {
+      "endpoint": "qwen2fqwen-2.5-coder-32b-instruct3afree23chutes",
+      "index": 363,
+      "date": "2025-07-22T02:02:16Z",
+      "sigma": 316.7143735692485,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "qwen2fqwen-2.5-vl-7b-instruct23hyperbolic2fbf16": [],
+  "qwen2fqwen-2.5-vl-7b-instruct23klusterai": [
+    {
+      "endpoint": "qwen2fqwen-2.5-vl-7b-instruct23klusterai",
+      "index": 148,
+      "date": "2025-07-03T21:00:07Z",
+      "sigma": 775.791237220719,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "qwen2fqwen2.5-vl-32b-instruct23chutes2fbf16": [],
+  "qwen2fqwen2.5-vl-32b-instruct23fireworks": [],
+  "qwen2fqwen2.5-vl-72b-instruct23chutes": [],
+  "qwen2fqwen2.5-vl-72b-instruct23hyperbolic": [],
+  "qwen2fqwen2.5-vl-72b-instruct23nebius2ffp8": [],
+  "qwen2fqwen3-14b23nebius2ffp8": [],
+  "qwen2fqwen3-14b3afree23chutes": [
+    {
+      "endpoint": "qwen2fqwen3-14b3afree23chutes",
+      "index": 685,
+      "date": "2025-08-04T17:01:24Z",
+      "sigma": 5.120436759691629e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "qwen2fqwen3-235b-a22b-250723cerebras": [],
+  "qwen2fqwen3-235b-a22b-250723cerebras2ffp16": [],
+  "qwen2fqwen3-235b-a22b-250723chutes": [
+    {
+      "endpoint": "qwen2fqwen3-235b-a22b-250723chutes",
+      "index": 879,
+      "date": "2025-09-18T12:00:26Z",
+      "sigma": 5.85340137338485e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "qwen2fqwen3-235b-a22b-250723chutes",
+      "index": 1385,
+      "date": "2025-10-09T16:00:18Z",
+      "sigma": 1.9160432656406393e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "qwen2fqwen3-235b-a22b-250723nebius2ffp8": [],
+  "qwen2fqwen3-235b-a22b23klusterai2ffp8": [],
+  "qwen2fqwen3-235b-a22b23nebius2ffp8": [],
+  "qwen2fqwen3-235b-a22b3afree23chutes": [],
+  "qwen2fqwen3-30b-a3b-instruct-250723nebius2ffp8": [],
+  "qwen2fqwen3-30b-a3b23chutes": [],
+  "qwen2fqwen3-30b-a3b23nebius2ffp8": [
+    {
+      "endpoint": "qwen2fqwen3-30b-a3b23nebius2ffp8",
+      "index": 1909,
+      "date": "2025-09-17T06:00:28Z",
+      "sigma": 15.767061771194193,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "qwen2fqwen3-30b-a3b3afree23chutes": [],
+  "qwen2fqwen3-32b23cerebras": [],
+  "qwen2fqwen3-32b23cerebras2ffp16": [],
+  "qwen2fqwen3-32b23chutes": [
+    {
+      "endpoint": "qwen2fqwen3-32b23chutes",
+      "index": 549,
+      "date": "2025-09-04T20:00:14Z",
+      "sigma": 1.2221813074930733e39,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "qwen2fqwen3-32b23lambda2ffp8": [],
+  "qwen2fqwen3-32b23nebius2fbase": [],
+  "qwen2fqwen3-32b23nebius2ffast": [],
+  "qwen2fqwen3-32b3afree23chutes": [],
+  "qwen2fqwen3-8b3afree23chutes": [],
+  "qwen2fqwen3-coder23chutes": [
+    {
+      "endpoint": "qwen2fqwen3-coder23chutes",
+      "index": 551,
+      "date": "2025-09-04T19:00:33Z",
+      "sigma": 1.4687725047654066e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "qwen2fqwen3-coder23chutes2ffp8": [],
+  "qwen2fqwen3-coder23fireworks": [
+    {
+      "endpoint": "qwen2fqwen3-coder23fireworks",
+      "index": 4199,
+      "date": "2026-02-05T06:35:00Z",
+      "sigma": 29.22544696675283,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "qwen2fqwen3-coder23hyperbolic2ffp8": [
+    {
+      "endpoint": "qwen2fqwen3-coder23hyperbolic2ffp8",
+      "index": 331,
+      "date": "2025-09-01T21:00:29Z",
+      "sigma": 2.1765879653509427e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "qwen2fqwen3-coder23nebius2ffp8": [],
+  "qwen2fqwen3-next-80b-a3b-thinking23nebius2ffp8": [],
+  "qwen2fqwq-32b23fireworks": [],
+  "qwen2fqwq-32b23hyperbolic2fbf16": [],
+  "qwen2fqwq-32b23nebius2ffp8": [
+    {
+      "endpoint": "qwen2fqwq-32b23nebius2ffp8",
+      "index": 3644,
+      "date": "2025-09-11T14:00:26Z",
+      "sigma": 76.72541018026035,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "qwen2fqwq-32b23nextbit2fint4": [],
+  "qwen2fqwq-32b3afree23chutes2fbf16": [],
+  "rekaai2freka-flash-33afree23chutes2fbf16": [],
+  "sao10k2fl3.1-euryale-70b23nextbit2ffp8": [],
+  "sao10k2fl3.3-euryale-70b23nextbit2fbf16": [],
+  "sarvamai2fsarvam-m3afree23chutes": [],
+  "sentientagi2fdobby-mini-unhinged-plus-llama-3.1-8b23fireworks": [],
+  "shisa-ai2fshisa-v2-llama3.3-70b23chutes": [],
+  "shisa-ai2fshisa-v2-llama3.3-70b3afree23chutes": [],
+  "tencent2fhunyuan-a13b-instruct23chutes2fbf16": [],
+  "tencent2fhunyuan-a13b-instruct3afree23chutes2fbf16": [],
+  "thedrummer2frocinante-12b23nextbit2fbf16": [],
+  "thedrummer2fskyfall-36b-v223chutes": [],
+  "thedrummer2funslopnemo-12b23nextbit2ffp8": [],
+  "thudm2fglm-4-32b3afree23chutes": [],
+  "thudm2fglm-z1-32b23chutes": [],
+  "thudm2fglm-z1-32b3afree23chutes": [
+    {
+      "endpoint": "thudm2fglm-z1-32b3afree23chutes",
+      "index": 350,
+      "date": "2025-07-21T10:01:10Z",
+      "sigma": 507.33120718235836,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "tngtech2fdeepseek-r1t-chimera23chutes": [
+    {
+      "endpoint": "tngtech2fdeepseek-r1t-chimera23chutes",
+      "index": 496,
+      "date": "2025-09-02T09:00:27Z",
+      "sigma": 1.9626852162833393e39,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "tngtech2fdeepseek-r1t-chimera23chutes",
+      "index": 817,
+      "date": "2025-09-15T23:00:24Z",
+      "sigma": 5.188466369468856e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "tngtech2fdeepseek-r1t-chimera3afree23chutes": [
+    {
+      "endpoint": "tngtech2fdeepseek-r1t-chimera3afree23chutes",
+      "index": 906,
+      "date": "2025-08-15T20:01:35Z",
+      "sigma": 7.492715604714699e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "tngtech2fdeepseek-r1t-chimera3afree23chutes",
+      "index": 933,
+      "date": "2025-08-16T23:01:30Z",
+      "sigma": 6.503490881187937e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "undi952fremm-slerp-l2-13b23mancer2ffp8": [],
+  "undi952fremm-slerp-l2-13b23nextbit2fbf16": [],
+  "x-ai2fgrok-2-121223xai": [],
+  "x-ai2fgrok-2-vision-121223xai": [],
+  "x-ai2fgrok-3-beta23xai": [],
+  "x-ai2fgrok-3-beta23xai2ffast": [],
+  "x-ai2fgrok-3-mini-beta23xai": [],
+  "x-ai2fgrok-3-mini-beta23xai2ffast": [],
+  "x-ai2fgrok-3-mini23xai": [],
+  "x-ai2fgrok-3-mini23xai2ffast": [],
+  "x-ai2fgrok-323xai": [],
+  "x-ai2fgrok-323xai2ffast": [],
+  "x-ai2fgrok-423xai": [
+    {
+      "endpoint": "x-ai2fgrok-423xai",
+      "index": 994,
+      "date": "2025-09-02T07:00:16Z",
+      "sigma": 277.5834354684721,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "x-ai2fgrok-423xai",
+      "index": 1656,
+      "date": "2025-09-30T04:00:33Z",
+      "sigma": 1.6774059797944101e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "x-ai2fgrok-beta23xai": [],
+  "x-ai2fgrok-code-fast-123xai": [],
+  "x-ai2fgrok-vision-beta23xai": [],
+  "z-ai2fglm-4.5-air3afree23chutes2fbf16": [
+    {
+      "endpoint": "z-ai2fglm-4.5-air3afree23chutes2fbf16",
+      "index": 530,
+      "date": "2025-09-28T05:01:30Z",
+      "sigma": 1.2565686996259116e39,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "z-ai2fglm-4.523chutes2ffp8": [
+    {
+      "endpoint": "z-ai2fglm-4.523chutes2ffp8",
+      "index": 225,
+      "date": "2025-08-23T00:00:24Z",
+      "sigma": 8.900763156641214e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "z-ai2fglm-4.523chutes2ffp8",
+      "index": 260,
+      "date": "2025-08-24T15:00:19Z",
+      "sigma": 9.227058486049974e38,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "z-ai2fglm-4.523chutes2ffp8",
+      "index": 481,
+      "date": "2025-09-03T11:00:25Z",
+      "sigma": 2.1062133370881697e39,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    },
+    {
+      "endpoint": "z-ai2fglm-4.523chutes2ffp8",
+      "index": 1195,
+      "date": "2025-10-03T07:00:14Z",
+      "sigma": 1.1155451751717129e39,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "z-ai2fglm-4.523mancer2ffp8": [],
+  "z-ai2fglm-4.623cerebras": [],
+  "z-ai2fglm-4.623fireworks": [],
+  "z-ai2fglm-4.623mancer2ffp8": [
+    {
+      "endpoint": "z-ai2fglm-4.623mancer2ffp8",
+      "index": 1225,
+      "date": "2026-01-27T03:53:09Z",
+      "sigma": 8161.451680385844,
+      "first_detected": "2026-06-11T17:41:46.966404Z"
+    }
+  ],
+  "z-ai2fglm-4.723cerebras": [],
+  "z-ai2fglm-4.723cerebras2ffp16": [],
+  "z-ai2fglm-4.723inceptron2ffp8": [],
+  "z-ai2fglm-4.723mancer2ffp4": [],
+  "z-ai2fglm-4.723mancer2ffp8": [],
+  "z-ai2fglm-523fireworks": []
+}
