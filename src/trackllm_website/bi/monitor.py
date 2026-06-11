@@ -1,6 +1,5 @@
 """Daily BI monitor: sample border inputs, detect changes, trigger re-init."""
 
-import asyncio
 from datetime import datetime, timezone
 from typing import Literal
 
@@ -24,6 +23,7 @@ from trackllm_website.bi.reinit import reinit
 from trackllm_website.bi.sampling import sample_prompts
 from trackllm_website.bi.state import EndpointBIState, RetiredInfo, load_all_states
 from trackllm_website.config import config, logger
+from trackllm_website.util import gather_with_concurrency
 
 
 class Decision(BaseModel):
@@ -146,21 +146,21 @@ async def monitor() -> None:
         )
 
     client = OpenRouterClient()
+
+    async def run_isolated(state: EndpointBIState) -> None:
+        try:
+            await run_endpoint(client, strategies[str(state.endpoint)], state, now)
+        except Exception:
+            logger.exception(f"Monitor run failed for {state.endpoint}")
+
     try:
         runnable = [s for s in monitoring if str(s.endpoint) in strategies]
-        outcomes = await asyncio.gather(
-            *(
-                run_endpoint(client, strategies[str(s.endpoint)], s, now)
-                for s in runnable
-            ),
-            return_exceptions=True,
+        await gather_with_concurrency(
+            config.bi.monitor.max_concurrent_endpoints,
+            *(run_isolated(s) for s in runnable),
         )
     finally:
         await client.close()
-
-    for state, outcome in zip(runnable, outcomes):
-        if isinstance(outcome, Exception):
-            logger.warning(f"{state.endpoint}: monitor run failed: {outcome!r}")
 
 
 if __name__ == "__main__":

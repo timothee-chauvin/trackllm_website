@@ -115,6 +115,10 @@ class ReinitConfig(BaseModel):
     onboard_concurrency: int
 
 
+class MonitorConfig(BaseModel):
+    max_concurrent_endpoints: int
+
+
 class BIConfig(BaseModel):
     data_dir: Path
     max_input_tokens: int
@@ -125,6 +129,7 @@ class BIConfig(BaseModel):
     prevalence: PrevalenceConfig
     detection: DetectionConfig
     reinit: ReinitConfig
+    monitor: MonitorConfig
 
     @property
     def tokenizers_dir(self) -> Path:

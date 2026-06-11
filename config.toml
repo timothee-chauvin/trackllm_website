@@ -70,6 +70,9 @@ stall_days = 7
 recheck_days = 14
 onboard_concurrency = 20
 
+[bi.monitor]
+max_concurrent_endpoints = 20
+
 [plotting]
 template = "plotly_white"
 font_family = "Spectral"
