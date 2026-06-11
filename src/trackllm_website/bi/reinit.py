@@ -81,9 +81,11 @@ async def reinit(
     if not candidates:
         return None
 
-    reference, _ = await sample_prompts(
+    reference, n_errors = await sample_prompts(
         client, endpoint, strategy, candidates, r.reference_samples
     )
+    if n_errors:
+        logger.warning(f"{endpoint}: {n_errors} errors during reference collection")
     reference = {p: s for p, s in reference.items() if s}
     keep = select_top_bis(reference, r.top_k_bis)
     if len(keep) < r.min_bis:

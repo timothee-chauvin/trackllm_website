@@ -4,3 +4,4 @@ __pycache__
 /website/index.html
 /website/endpoints/
 /website/node_modules/
+strategies_test_reasoning.json
