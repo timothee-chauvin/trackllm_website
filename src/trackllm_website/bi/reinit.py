@@ -12,6 +12,11 @@ import orjson
 from trackllm_website.bi.common import META_KEY, QueryStrategy
 from trackllm_website.bi.detection import select_top_bis
 from trackllm_website.bi.phase_1 import phase_1a
+from trackllm_website.bi.phase_2 import (
+    get_output_path,
+    load_existing_results,
+    save_results,
+)
 from trackllm_website.bi.sampling import sample_prompts
 from trackllm_website.bi.state import Epoch
 from trackllm_website.config import Endpoint, config, logger
@@ -93,8 +98,24 @@ async def reinit(
             f"{endpoint}: only {len(keep)} BIs after re-init, below min {r.min_bis}"
         )
         return None
-    return Epoch(
+    epoch = Epoch(
         start=now,
         border_inputs=keep,
         reference={p: reference[p] for p in keep},
     )
+    _persist_reference(endpoint, epoch)
+    return epoch
+
+
+def _persist_reference(endpoint: Endpoint, epoch: Epoch) -> None:
+    """Merge the epoch's reference batch into the endpoint's phase-2 monthly file.
+
+    Without this, epoch_tv_series would skip the first real detection day (it
+    treats the earliest timestamp in the file as the reference batch).
+    """
+    batch_key = epoch.start.replace(microsecond=0).isoformat()
+    path = get_output_path(endpoint, epoch.start.strftime("%Y-%m"))
+    existing = load_existing_results(path)
+    for prompt, samples in epoch.reference.items():
+        existing.setdefault(prompt, {})[batch_key] = samples
+    save_results(path, existing)
