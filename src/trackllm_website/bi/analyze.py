@@ -2,6 +2,7 @@
 
 import random
 from collections import Counter, defaultdict
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Literal
 
@@ -95,9 +96,9 @@ def compute_tv_distance(
 
 
 def get_distribution(
-    responses: list[list[str]],
+    responses: Sequence[Sequence[str]],
 ) -> Counter[str]:
-    """Get token distribution from responses."""
+    """Get token distribution from responses (each item is (timestamp, token))."""
     return Counter(token for _, token in responses)
 
 
