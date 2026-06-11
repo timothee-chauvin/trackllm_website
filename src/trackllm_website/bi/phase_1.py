@@ -126,7 +126,7 @@ async def phase_1b(temperature: float, base_dir: Path | None = None) -> None:
     logger.info(f"Running phase 1b with temperature={temperature:g}")
     tokenizer_index, fallback_tokens = load_tokenizers()
 
-    endpoints = config.endpoints_bi_phase_1
+    endpoints = config.endpoints_bi
     logger.info(f"Running phase 1b for {len(endpoints)} endpoints")
 
     requests_per_second = config.bi.phase_1.requests_per_second_per_endpoint
@@ -166,4 +166,4 @@ async def phase_1b(temperature: float, base_dir: Path | None = None) -> None:
 
 if __name__ == "__main__":
     TEMPERATURE = 0.0
-    asyncio.run(phase_1a(config.endpoints_bi_phase_1, TEMPERATURE, None))
+    asyncio.run(phase_1a(config.endpoints_bi, TEMPERATURE, None))
