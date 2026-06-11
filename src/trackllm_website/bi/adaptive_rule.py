@@ -10,7 +10,6 @@ import statistics
 from pathlib import Path
 
 import fire
-import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 from trackllm_website.bi.analyze import (
@@ -150,9 +149,7 @@ def eligibility() -> None:
     all_results = load_all_results()
     for n in N_GRID:
         eligible = {
-            slug: r
-            for slug, r in all_results.items()
-            if len(ref_distributions(r)) >= n
+            slug: r for slug, r in all_results.items() if len(ref_distributions(r)) >= n
         }
         detected: dict[str, list[Timestamp]] = {}
         for slug, results in eligible.items():
