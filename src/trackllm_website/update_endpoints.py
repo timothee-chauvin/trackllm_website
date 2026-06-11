@@ -482,9 +482,12 @@ async def update_endpoints_bi_lifecycle():
     async with OpenRouterClient(timeout=60.0) as probe_client:
         strategies, _ = await resolve_strategies(probe_client, [e for e, _ in to_init])
 
-    client = OpenRouterClient()
-    try:
-        for endpoint, is_recheck in to_init:
+    async def onboard_one(
+        client: OpenRouterClient, endpoint: Endpoint, is_recheck: bool
+    ) -> None:
+        """Onboard or re-check one endpoint; failures are logged and swallowed
+        so one bad endpoint never aborts the rest of the batch."""
+        try:
             slug = slugify(f"{endpoint.model}#{endpoint.provider}")
             state = states.get(slug)
 
@@ -494,8 +497,10 @@ async def update_endpoints_bi_lifecycle():
                 if is_recheck and state is not None:
                     state.retired.last_recheck = now
                     state.save(config.bi.state_dir)
-                continue
+                return
 
+            # old_bis=[]: rechecks intentionally rediscover BIs from scratch,
+            # since references from before the monitoring gap are stale.
             old_bis = []
             epoch = await reinit(
                 client, strategies[str(endpoint)], endpoint, old_bis, now
@@ -514,6 +519,15 @@ async def update_endpoints_bi_lifecycle():
                 state.retired = None
                 state.epochs.append(epoch)
             state.save(config.bi.state_dir)
+        except Exception:
+            logger.exception(f"BI onboarding failed for {endpoint}")
+
+    client = OpenRouterClient()
+    try:
+        await gather_with_concurrency(
+            config.bi.reinit.onboard_concurrency,
+            *(onboard_one(client, e, is_recheck) for e, is_recheck in to_init),
+        )
     finally:
         await client.close()
 
