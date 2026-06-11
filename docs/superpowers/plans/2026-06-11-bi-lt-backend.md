@@ -41,7 +41,6 @@ top_k_bis = 20
 min_bis = 10
 stall_days = 7
 recheck_days = 14
-max_onboard_per_run = 10
 ```
 
 - [ ] **Step 2: Add the pydantic models in `config.py`**
@@ -68,7 +67,6 @@ class ReinitConfig(BaseModel):
     min_bis: int
     stall_days: int
     recheck_days: int
-    max_onboard_per_run: int
 ```
 
 In `BIConfig`, add fields `detection: DetectionConfig` and `reinit: ReinitConfig`, plus:
@@ -1243,10 +1241,10 @@ def retired_state(model, reason, last_recheck):
     )
 
 
-def test_new_candidates_onboarded_up_to_cap():
+def test_all_new_candidates_onboarded():
     candidates = [ep(f"m/{i}") for i in range(20)]
     actions = select_lifecycle_actions(candidates, {}, NOW)
-    assert len(actions.onboard) == 10  # max_onboard_per_run
+    assert len(actions.onboard) == 20
 
 
 def test_recheck_due_only_after_interval():
@@ -1292,7 +1290,7 @@ def select_lifecycle_actions(
     onboard = [
         e for e in candidates
         if slugify(f"{e.model}#{e.provider}") not in known
-    ][: r.max_onboard_per_run]
+    ]
 
     recheck = [
         s for s in states.values()
@@ -1647,14 +1645,14 @@ git commit -m "schedule daily BI monitor from main; compute LT scores hourly"
 
 This runs once, after everything above is merged and the daily workflows are green.
 
-- [ ] **Step 1: Trigger the lifecycle manually** (all 53 historical endpoints are `retired` after migration; live candidates get re-onboarded through the capped daily lifecycle, ~10/day, or run it repeatedly):
+- [ ] **Step 1: Trigger the lifecycle manually** (all 53 historical endpoints are `retired` after migration; one run onboards every live candidate):
 
 Run: `uv run python -c "
 import asyncio
 from trackllm_website.update_endpoints import update_endpoints_bi_lifecycle
 asyncio.run(update_endpoints_bi_lifecycle())"`
 
-Repeat until `0 to onboard, 0 to re-check`. Expected over a few runs: ~23 recoverable endpoints back to `monitoring` with fresh epoch 1; truly delisted ones become `retired(no_bis)` or stay retired.
+Expected: ~23 recoverable endpoints back to `monitoring` with fresh epoch 1; truly delisted ones become `retired(no_bis)` or stay retired. Re-run to confirm it reports `0 to onboard, 0 to re-check`.
 
 - [ ] **Step 2: Verify the daily monitor runs clean**
 
@@ -1673,6 +1671,6 @@ git push
 
 ## Self-review notes
 
-- **Spec coverage**: state model (T3), facts-vs-derived (T3/T4/T9 — no detector state persisted), adaptive rule + instability (T4), phase 1b top-k (T4 `select_top_bis` + T8), hybrid re-init (T8), daily monitor + stall (T9), lifecycle incl. resurrection + delist + cap (T10), endpoints_bi_phase_1 retirement (T11), LT scoring + stable events (T12–13), workflows from main (T13), migration + resumption (T5, T14). **Not covered here by design**: website display (BI plots, changes feed, instability badge) — separate follow-up plan.
+- **Spec coverage**: state model (T3), facts-vs-derived (T3/T4/T9 — no detector state persisted), adaptive rule + instability (T4), phase 1b top-k (T4 `select_top_bis` + T8), hybrid re-init (T8), daily monitor + stall (T9), lifecycle incl. resurrection + delist (T10), endpoints_bi_phase_1 retirement (T11), LT scoring + stable events (T12–13), workflows from main (T13), migration + resumption (T5, T14). **Not covered here by design**: website display (BI plots, changes feed, instability badge) — separate follow-up plan.
 - **Known judgment calls for the implementer**: exact `extract_first_token` response shape (T6), phase 1a on-disk format parsing (T8), commit/push idiom in workflows (T13). Each is flagged inline with where to look.
 - Fixture-based date assertions may shift ±1 day from subsampling; tests pin the week, implementer adjusts the exact day after first run (T4 step 4 note).
