@@ -99,8 +99,8 @@ For each `monitoring` endpoint:
 
 - `update_endpoints_bi()` (existing) keeps vetting the candidate list
   (`endpoints_bi.yaml` + `bad_endpoints_bi.yaml`).
-- New: candidates with no state file are onboarded via the re-init path
-  (phase 1a → 1b → epoch 0), capped per run to bound phase-1 cost.
+- New: all candidates with no state file are onboarded via the re-init path
+  (phase 1a → 1b → epoch 0).
 - Endpoints gone from the OpenRouter catalog → `retired(delisted)`.
 - Retired endpoints are re-checked every 14 days: a stalled endpoint that
   responds again, a delisted one back in the catalog, or a no_bis one that now
