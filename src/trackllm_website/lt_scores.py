@@ -275,8 +275,4 @@ def compute_latest():
 
 
 if __name__ == "__main__":
-    # Re-import via the package path so module-level classes (LTScores, etc.)
-    # have a stable identity for beartype across module boundaries.
-    from trackllm_website.lt_scores import compute_all, compute_latest
-
     fire.Fire({"all": compute_all, "latest": compute_latest})

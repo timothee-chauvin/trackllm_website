@@ -33,6 +33,11 @@ jobs:
         OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
       run: uv run python src/trackllm_website/main.py
 
+    - name: Compute LT scores
+      env:
+        OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      run: uv run python -m trackllm_website.lt_scores latest
+
     - name: Commit and push results
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
