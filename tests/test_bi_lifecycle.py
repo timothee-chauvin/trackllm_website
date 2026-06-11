@@ -42,9 +42,7 @@ def test_recheck_due_only_after_interval():
 
 def test_delisted_when_absent_from_catalog():
     states = {
-        "gone": EndpointBIState(
-            endpoint=ep("m/gone"), status="monitoring", epochs=[]
-        )
+        "gone": EndpointBIState(endpoint=ep("m/gone"), status="monitoring", epochs=[])
     }
     actions = select_lifecycle_actions([], states, NOW)
     assert [s.endpoint.model for s in actions.delist] == ["m/gone"]
