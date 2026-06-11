@@ -1,5 +1,6 @@
 import asyncio
 from collections.abc import Iterable
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from typing import Literal
 
@@ -9,11 +10,15 @@ import yaml
 from pydantic import BaseModel
 
 from trackllm_website.api import OpenRouterClient
+from trackllm_website.bi.common import resolve_strategies
+from trackllm_website.bi.reinit import reinit
+from trackllm_website.bi.state import EndpointBIState, RetiredInfo, load_all_states
 from trackllm_website.config import Endpoint, config, logger, root
 from trackllm_website.storage import ResultsStorage
 from trackllm_website.util import (
     gather_with_concurrency,
     gather_with_concurrency_streaming,
+    slugify,
 )
 
 BAD_ENDPOINTS_BI_PATH = root / "bad_endpoints_bi.yaml"
@@ -416,9 +421,107 @@ async def update_endpoints_bi():
     )
 
 
+class LifecycleActions(BaseModel):
+    onboard: list[Endpoint]
+    recheck: list[EndpointBIState]
+    delist: list[EndpointBIState]
+
+
+def select_lifecycle_actions(
+    candidates: list[Endpoint],
+    states: dict[str, EndpointBIState],
+    now: datetime,
+) -> LifecycleActions:
+    """Pure selection of lifecycle actions; the caller performs them."""
+    r = config.bi.reinit
+    known = {s.slug for s in states.values()}
+    candidate_set = set(candidates)
+
+    onboard = [e for e in candidates if slugify(f"{e.model}#{e.provider}") not in known]
+    recheck = [
+        s
+        for s in states.values()
+        if s.status == "retired"
+        and s.endpoint in candidate_set
+        and now - s.retired.last_recheck >= timedelta(days=r.recheck_days)
+    ]
+    delist = [
+        s
+        for s in states.values()
+        if s.status == "monitoring" and s.endpoint not in candidate_set
+    ]
+    return LifecycleActions(onboard=onboard, recheck=recheck, delist=delist)
+
+
+async def update_endpoints_bi_lifecycle():
+    """Onboard new candidates, delist vanished endpoints, re-check retired ones."""
+    states = load_all_states(config.bi.state_dir)
+    candidates = config.endpoints_bi
+    now = datetime.now(tz=timezone.utc).replace(microsecond=0)
+    actions = select_lifecycle_actions(candidates, states, now)
+    logger.info(
+        f"BI lifecycle: {len(actions.onboard)} to onboard, "
+        f"{len(actions.recheck)} to re-check, {len(actions.delist)} to delist"
+    )
+
+    for state in actions.delist:
+        epoch = state.current_epoch
+        if epoch is not None:
+            epoch.end = now
+            epoch.end_reason = "gap"
+        state.status = "retired"
+        state.retired = RetiredInfo(reason="delisted", since=now, last_recheck=now)
+        state.save(config.bi.state_dir)
+
+    onboards = [(e, False) for e in actions.onboard]
+    rechecks = [(s.endpoint, True) for s in actions.recheck]
+    to_init = onboards + rechecks
+    if not to_init:
+        return
+
+    async with OpenRouterClient(timeout=60.0) as probe_client:
+        strategies, _ = await resolve_strategies(probe_client, [e for e, _ in to_init])
+
+    client = OpenRouterClient()
+    try:
+        for endpoint, is_recheck in to_init:
+            slug = slugify(f"{endpoint.model}#{endpoint.provider}")
+            state = states.get(slug)
+
+            if str(endpoint) not in strategies:
+                # Bump last_recheck so a permanently-hidden-reasoning endpoint isn't
+                # re-probed daily. Fresh onboards have no state yet: skip silently.
+                if is_recheck and state is not None:
+                    state.retired.last_recheck = now
+                    state.save(config.bi.state_dir)
+                continue
+
+            old_bis = []
+            epoch = await reinit(
+                client, strategies[str(endpoint)], endpoint, old_bis, now
+            )
+            if state is None:
+                state = EndpointBIState(
+                    endpoint=endpoint, status="monitoring", epochs=[]
+                )
+            if epoch is None:
+                state.status = "retired"
+                state.retired = RetiredInfo(
+                    reason="no_bis", since=now, last_recheck=now
+                )
+            else:
+                state.status = "monitoring"
+                state.retired = None
+                state.epochs.append(epoch)
+            state.save(config.bi.state_dir)
+    finally:
+        await client.close()
+
+
 async def main():
     await update_endpoints_lt()
     await update_endpoints_bi()
+    await update_endpoints_bi_lifecycle()
 
 
 if __name__ == "__main__":
