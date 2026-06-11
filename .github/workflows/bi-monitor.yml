@@ -12,6 +12,7 @@ permissions:
 jobs:
   bi-monitor:
     runs-on: ubuntu-latest
+    timeout-minutes: 300
 
     steps:
     - name: Checkout repository
@@ -39,4 +40,7 @@ jobs:
         git config --local user.name "github-actions[bot]"
         git add data_bi
         git diff --staged --quiet || git commit -m "[bot] Daily BI monitor run"
-        git push
+        for i in 1 2 3; do
+          git pull --rebase origin main && git push && break
+          sleep $((i * 10))
+        done
