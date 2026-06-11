@@ -112,6 +112,7 @@ class ReinitConfig(BaseModel):
     min_bis: int
     stall_days: int
     recheck_days: int
+    onboard_concurrency: int
 
 
 class BIConfig(BaseModel):
