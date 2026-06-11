@@ -1,7 +1,10 @@
 from datetime import datetime, timezone
 
+import pytest
+
 from trackllm_website.bi.state import Epoch, EndpointBIState, RetiredInfo
-from trackllm_website.config import Endpoint
+from trackllm_website.config import Endpoint, config
+from trackllm_website.util import endpoint_from_slug
 
 
 def make_state() -> EndpointBIState:
@@ -42,3 +45,30 @@ def test_retired_requires_info():
         last_recheck=datetime(2026, 2, 1, tzinfo=timezone.utc),
     )
     assert state.retired.reason == "stalled"
+
+
+def test_endpoint_from_slug_falls_back_to_state_files(tmp_path, monkeypatch):
+    monkeypatch.setattr(config.bi, "data_dir", tmp_path)
+    endpoint = Endpoint(
+        api="openrouter",
+        model="made-up/model-not-in-config",
+        provider="nowhere",
+        cost=(3, 4),
+    )
+    state = EndpointBIState(
+        endpoint=endpoint,
+        status="monitoring",
+        epochs=[
+            Epoch(
+                start=datetime(2026, 1, 14, tzinfo=timezone.utc),
+                border_inputs=["a"],
+                reference={},
+            )
+        ],
+    )
+    state.save(config.bi.state_dir)
+
+    assert endpoint_from_slug(state.slug) == state.endpoint
+
+    with pytest.raises(ValueError):
+        endpoint_from_slug("this-slug-does-not-exist")
