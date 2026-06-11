@@ -82,6 +82,9 @@ async def reinit(
         candidates = candidates + await discover_candidates(
             endpoint, exclude=candidates
         )
+    # Rank the top-k among at most target_border_inputs candidates; collecting
+    # references for more would roughly double onboarding cost for nothing.
+    candidates = candidates[: config.bi.phase_1.target_border_inputs]
 
     if not candidates:
         return None
@@ -117,5 +120,8 @@ def _persist_reference(endpoint: Endpoint, epoch: Epoch) -> None:
     path = get_output_path(endpoint, epoch.start.strftime("%Y-%m"))
     existing = load_existing_results(path)
     for prompt, samples in epoch.reference.items():
+        # On a change-firing day this intentionally overwrites the monitor's
+        # 10-sample batch at the same key for surviving BIs: the old epoch is
+        # already closed, and the new epoch needs the reference here.
         existing.setdefault(prompt, {})[batch_key] = samples
     save_results(path, existing)
