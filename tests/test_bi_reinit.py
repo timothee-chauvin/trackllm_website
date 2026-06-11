@@ -30,7 +30,7 @@ def fake_sampler(distributions):
     return sample
 
 
-def test_reinit_keeps_survivors_and_ranks(monkeypatch):
+def test_reinit_keeps_survivors_and_ranks(monkeypatch, tmp_path):
     # old BI "dead" collapsed to one token; "alive" still has two
     monkeypatch.setattr(
         reinit_mod,
@@ -44,11 +44,22 @@ def test_reinit_keeps_survivors_and_ranks(monkeypatch):
     monkeypatch.setattr(reinit_mod, "discover_candidates", fake_discover)
     monkeypatch.setattr(reinit_mod.config.bi.reinit, "top_k_bis", 2)
     monkeypatch.setattr(reinit_mod.config.bi.reinit, "min_bis", 2)
+    phase2_path = tmp_path / "phase2.json"
+    monkeypatch.setattr(reinit_mod, "get_output_path", lambda ep, ym: phase2_path)
 
     epoch = asyncio.run(reinit_mod.reinit(None, None, ENDPOINT, ["alive", "dead"], NOW))
     assert epoch is not None
     assert sorted(epoch.border_inputs) == ["alive", "new1"]
     assert set(epoch.reference) == {"alive", "new1"}
+
+    # Addendum 1: the reference batch is persisted to the phase-2 monthly file,
+    # keyed by the microsecond-stripped epoch start, so detection won't skip the
+    # first real day.
+    persisted = orjson.loads(phase2_path.read_bytes())
+    batch_key = NOW.replace(microsecond=0).isoformat()
+    assert set(persisted) == {"alive", "new1"}
+    assert all(batch_key in batches for batches in persisted.values())
+    assert persisted["alive"][batch_key] == [list(s) for s in epoch.reference["alive"]]
 
 
 def test_reinit_returns_none_below_min_bis(monkeypatch):
