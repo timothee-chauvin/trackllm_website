@@ -118,4 +118,15 @@ def endpoint_from_slug(slug: str) -> Endpoint:
     for endpoint in all_endpoints:
         if slugify(f"{endpoint.model}#{endpoint.provider}") == slug:
             return endpoint
+
+    # Fall back to the state files, which form the registry of historically
+    # monitored endpoints that may no longer be in the live OpenRouter catalog
+    # (and hence dropped from the config lists). Lazy-imported to avoid a cycle:
+    # state.py imports slugify from this module.
+    from trackllm_website.bi.state import load_all_states
+
+    state = load_all_states(config.bi.state_dir).get(slug)
+    if state is not None:
+        return state.endpoint
+
     raise ValueError(f"No endpoint found for slug: {slug}")

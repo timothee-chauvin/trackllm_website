@@ -716,8 +716,13 @@ def compute_phase1_cost(
 
         slug = json_path.stem
         if slug not in endpoint_costs:
-            logger.warning(f"No cost info for endpoint: {slug}")
-            continue
+            # Historical endpoints may be absent from config.endpoints_bi but still
+            # resolvable via the state-file registry (see endpoint_from_slug).
+            try:
+                endpoint_costs[slug] = endpoint_from_slug(slug).cost
+            except ValueError:
+                logger.warning(f"No cost info for endpoint: {slug}")
+                continue
 
         with open(json_path, "rb") as f:
             data = orjson.loads(f.read())
