@@ -129,7 +129,9 @@ def noise() -> None:
         if max(vals) >= THRESHOLD:
             continue  # endpoint may have changed; keep only clearly stable ones
 
-        predicted = statistics.mean(predicted_tv(d, round(m), 50) for d in refs.values())
+        predicted = statistics.mean(
+            predicted_tv(d, round(m), 50) for d in refs.values()
+        )
         observed = statistics.median(vals)
 
         within_days: list[float] = []
@@ -168,8 +170,12 @@ def noise() -> None:
 
     med = lambda key: statistics.median(r[key] for r in rows)  # noqa: E731
     print(f"{len(rows)} stable endpoints (max TV < {THRESHOLD} at 50 samples/day)")
-    print(f"day-vs-reference TV @ n=50, m~100: predicted {med('predicted'):.3f}, observed {med('observed'):.3f}")
-    print(f"within-day split-half TV @ 25v25:  predicted {med('predicted_within'):.3f}, observed {med('observed_within'):.3f}")
+    print(
+        f"day-vs-reference TV @ n=50, m~100: predicted {med('predicted'):.3f}, observed {med('observed'):.3f}"
+    )
+    print(
+        f"within-day split-half TV @ 25v25:  predicted {med('predicted_within'):.3f}, observed {med('observed_within'):.3f}"
+    )
     print()
     print("largest observed-minus-predicted gaps (drifting endpoints):")
     for r in sorted(rows, key=lambda r: r["predicted"] - r["observed"])[:10]:
@@ -186,15 +192,25 @@ def noise() -> None:
             y=[r["observed"] for r in rows],
             mode="markers",
             text=[get_endpoint_legend_name(r["slug"]) for r in rows],
-            marker=dict(size=8, color=[r["n_bis"] for r in rows], colorscale="Viridis",
-                        colorbar=dict(title="# BIs"), cmin=0),
+            marker=dict(
+                size=8,
+                color=[r["n_bis"] for r in rows],
+                colorscale="Viridis",
+                colorbar=dict(title="# BIs"),
+                cmin=0,
+            ),
             showlegend=False,
         )
     )
     lim = max(max(r["predicted"] for r in rows), max(r["observed"] for r in rows)) * 1.1
     fig.add_trace(
-        go.Scatter(x=[0, lim], y=[0, lim], mode="lines",
-                   line=dict(color="grey", dash="dash"), showlegend=False)
+        go.Scatter(
+            x=[0, lim],
+            y=[0, lim],
+            mode="lines",
+            line=dict(color="grey", dash="dash"),
+            showlegend=False,
+        )
     )
     fig.update_layout(
         template=config.plotting.template,
@@ -265,8 +281,12 @@ def quality() -> None:
         row, col = i // cols + 1, i % cols + 1
         add_series_traces(fig, series, detected, row=row, col=col)
         fig.add_hline(
-            y=THRESHOLD, line_dash="dash", line_color="gray", opacity=0.5,
-            row=row, col=col,
+            y=THRESHOLD,
+            line_dash="dash",
+            line_color="gray",
+            opacity=0.5,
+            row=row,
+            col=col,
         )
     fig.update_layout(
         template=config.plotting.template,

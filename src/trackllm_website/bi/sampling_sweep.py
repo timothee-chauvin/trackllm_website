@@ -99,8 +99,7 @@ def yearly_cost(
     avg_input_tokens = statistics.mean(token_counts.values())
     input_cost, output_cost = costs[slug]
     per_call = (
-        avg_input_tokens * input_cost / 1e6
-        + OUTPUT_TOKENS_PER_CALL * output_cost / 1e6
+        avg_input_tokens * input_cost / 1e6 + OUTPUT_TOKENS_PER_CALL * output_cost / 1e6
     )
     n_used = n_available if n_prompts is None else min(n_prompts, n_available)
     return per_call * n_used * n_samples * RUNS_PER_YEAR
@@ -204,15 +203,17 @@ def plot_grid(config_results: list[ConfigResult], output_path: Path) -> None:
         f"{r.label} — {len(r.detected)} detected, avg ${r.avg_cost:.2f}/yr"
         for r in config_results
     ]
-    fig = make_subplots(
-        rows=rows, cols=cols, subplot_titles=titles, shared_xaxes=True
-    )
+    fig = make_subplots(rows=rows, cols=cols, subplot_titles=titles, shared_xaxes=True)
     for i, res in enumerate(config_results):
         row, col = i // cols + 1, i % cols + 1
         add_series_traces(fig, res.series, res.detected, row=row, col=col)
         fig.add_hline(
-            y=THRESHOLD, line_dash="dash", line_color="gray", opacity=0.5,
-            row=row, col=col,
+            y=THRESHOLD,
+            line_dash="dash",
+            line_color="gray",
+            opacity=0.5,
+            row=row,
+            col=col,
         )
     fig.update_layout(
         template=config.plotting.template,
@@ -281,7 +282,9 @@ def write_report(config_results: list[ConfigResult], report_path: Path) -> None:
         for r in config_results:
             dates = r.detected.get(slug)
             cells.append(", ".join(ts[:10] for ts in dates) if dates else "—")
-        lines.append(f"| {get_endpoint_legend_name(slug)} | " + " | ".join(cells) + " |")
+        lines.append(
+            f"| {get_endpoint_legend_name(slug)} | " + " | ".join(cells) + " |"
+        )
 
     lines += [
         "",
