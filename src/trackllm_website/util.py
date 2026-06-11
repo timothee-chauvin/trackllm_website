@@ -1,9 +1,21 @@
 import asyncio
 import hashlib
+import os
+import tempfile
 from collections.abc import AsyncIterator, Coroutine
+from pathlib import Path
 from typing import Any
 
 from trackllm_website.config import Endpoint
+
+
+def atomic_write_bytes(path: Path, data: bytes) -> None:
+    """Write bytes to path atomically via a tempfile in the same directory + os.replace."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile("wb", delete=False, dir=path.parent) as tmp_file:
+        tmp_file.write(data)
+        temp_name = tmp_file.name
+    os.replace(temp_name, path)
 
 
 async def gather_with_concurrency(

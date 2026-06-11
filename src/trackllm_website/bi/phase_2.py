@@ -18,7 +18,7 @@ from trackllm_website.bi.common import (
     strategy_to_query_args,
 )
 from trackllm_website.config import Endpoint, config, logger
-from trackllm_website.util import slugify
+from trackllm_website.util import atomic_write_bytes, slugify
 
 Prompt = NewType("Prompt", str)
 Timestamp = NewType("Timestamp", str)
@@ -49,9 +49,7 @@ def save_results(
     results: dict[Prompt, dict[Timestamp, list[tuple[Timestamp, ResponseToken]]]],
 ) -> None:
     """Save results to JSON file."""
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, "wb") as f:
-        f.write(orjson.dumps(results))
+    atomic_write_bytes(path, orjson.dumps(results))
 
 
 def load_border_inputs(temperature: float) -> dict[str, list[Prompt]]:

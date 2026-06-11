@@ -128,6 +128,9 @@ async def run_endpoint(
             state.retired = RetiredInfo(reason="no_bis", since=now, last_recheck=now)
         else:
             state.epochs.append(new_epoch)
+    # State is deliberately saved once, after reinit completes. A crash mid-reinit
+    # persists nothing; the next daily run idempotently re-detects the change and
+    # retries (facts-vs-derivations design: state files record only committed facts).
     state.save(config.bi.state_dir)
 
 
