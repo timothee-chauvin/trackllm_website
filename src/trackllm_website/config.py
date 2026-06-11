@@ -93,6 +93,27 @@ class PrevalenceConfig(BaseModel):
     tokens_per_endpoint: int
 
 
+class DetectionConfig(BaseModel):
+    window: int
+    exclusion: int
+    min_baseline: int
+    sigma_k: float
+    abs_delta: float
+    persistence: int
+    cooldown: int
+    instability_window: int
+    instability_threshold: float
+
+
+class ReinitConfig(BaseModel):
+    reprobe_samples: int
+    reference_samples: int
+    top_k_bis: int
+    min_bis: int
+    stall_days: int
+    recheck_days: int
+
+
 class BIConfig(BaseModel):
     data_dir: Path
     max_input_tokens: int
@@ -101,10 +122,16 @@ class BIConfig(BaseModel):
     phase_1: Phase1Config
     phase_2: Phase2Config
     prevalence: PrevalenceConfig
+    detection: DetectionConfig
+    reinit: ReinitConfig
 
     @property
     def tokenizers_dir(self) -> Path:
         return self.data_dir / "tokenizers"
+
+    @property
+    def state_dir(self) -> Path:
+        return self.data_dir / "state"
 
     def get_phase_1_dir(
         self, temperature: float | int, base_dir: Path | None = None
