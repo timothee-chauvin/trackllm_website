@@ -90,6 +90,12 @@ endpoints_lt:
   - 0.4
   - 0.4
 - api: openrouter
+  model: google/gemma-4-31b-it
+  provider: ambient
+  cost:
+  - 0.2
+  - 0.8
+- api: openrouter
   model: undi95/remm-slerp-l2-13b
   provider: nextbit/bf16
   cost:
