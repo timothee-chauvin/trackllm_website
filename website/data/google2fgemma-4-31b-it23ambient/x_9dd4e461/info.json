@@ -1,0 +1,13 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "google/gemma-4-31b-it",
+    "provider": "ambient",
+    "cost": [
+      0.2,
+      0.8
+    ],
+    "max_logprobs": null
+  }
+}
