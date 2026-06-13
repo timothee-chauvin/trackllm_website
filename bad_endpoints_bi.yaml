@@ -1501,6 +1501,13 @@ bad_endpoints_bi:
     - 39
     - 1
 - api: openrouter
+  model: minimax/minimax-m3
+  provider: novita
+  reason:
+    token_usage:
+    - 164
+    - 1
+- api: openrouter
   model: mistralai/ministral-14b-2512
   provider: together
   reason:
@@ -1942,6 +1949,13 @@ bad_endpoints_bi:
     - 17
     - 1
 - api: openrouter
+  model: nvidia/nemotron-3-nano-30b-a3b
+  provider: nebius/fp8
+  reason:
+    token_usage:
+    - 17
+    - 1
+- api: openrouter
   model: nvidia/nemotron-3-super-120b-a12b
   provider: deepinfra/bf16
   reason:
@@ -1979,6 +1993,13 @@ bad_endpoints_bi:
 - api: openrouter
   model: nvidia/nemotron-3-ultra-550b-a55b
   provider: deepinfra/bf16
+  reason:
+    token_usage:
+    - 17
+    - 1
+- api: openrouter
+  model: nvidia/nemotron-3-ultra-550b-a55b
+  provider: together
   reason:
     token_usage:
     - 17
