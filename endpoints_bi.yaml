@@ -438,6 +438,12 @@ endpoints_bi:
   - 0.1
   - 0.15
 - api: openrouter
+  model: deepseek/deepseek-v4-flash
+  provider: wafer/fp4
+  cost:
+  - 0.09
+  - 0.18
+- api: openrouter
   model: nvidia/nemotron-nano-12b-v2-vl
   provider: nebius/bf16
   cost:
@@ -764,6 +770,12 @@ endpoints_bi:
 - api: openrouter
   model: google/gemma-3-27b-it
   provider: nebius/fp8
+  cost:
+  - 0.1
+  - 0.3
+- api: openrouter
+  model: google/gemma-4-26b-a4b-it
+  provider: ambient
   cost:
   - 0.1
   - 0.3
@@ -4308,6 +4320,12 @@ endpoints_bi:
   - 0.325
   - 3.25
 - api: openrouter
+  model: deepseek/deepseek-v4-pro
+  provider: wafer/fp4
+  cost:
+  - 1.2
+  - 2.4
+- api: openrouter
   model: moonshotai/kimi-k2.5
   provider: baseten/fp4
   cost:
@@ -4662,6 +4680,18 @@ endpoints_bi:
   - 0.75
   - 3.5
 - api: openrouter
+  model: moonshotai/kimi-k2.7-code
+  provider: ambient/int4
+  cost:
+  - 0.75
+  - 3.5
+- api: openrouter
+  model: moonshotai/kimi-k2.7-code
+  provider: parasail/int4
+  cost:
+  - 0.75
+  - 3.5
+- api: openrouter
   model: switchpoint/router
   provider: switchpoint
   cost:
@@ -4819,6 +4849,24 @@ endpoints_bi:
   - 4.0
 - api: openrouter
   model: moonshotai/kimi-k2.7-code
+  provider: atlas-cloud/int4
+  cost:
+  - 0.95
+  - 4.0
+- api: openrouter
+  model: moonshotai/kimi-k2.7-code
+  provider: cloudflare
+  cost:
+  - 0.95
+  - 4.0
+- api: openrouter
+  model: moonshotai/kimi-k2.7-code
+  provider: io-net/int4
+  cost:
+  - 0.95
+  - 4.0
+- api: openrouter
+  model: moonshotai/kimi-k2.7-code
   provider: moonshotai/int4
   cost:
   - 0.95
@@ -4826,6 +4874,12 @@ endpoints_bi:
 - api: openrouter
   model: moonshotai/kimi-k2.7-code
   provider: novita
+  cost:
+  - 0.95
+  - 4.0
+- api: openrouter
+  model: moonshotai/kimi-k2.7-code
+  provider: together
   cost:
   - 0.95
   - 4.0
