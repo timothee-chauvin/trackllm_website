@@ -1,1 +1,1 @@
-{"seen_errors":[]}
+{"seen_errors":[{"http_code":403,"message":"{\"message\":\"Provider returned error\",\"code\":403,\"metadata\":{\"raw\":\"error code: 1000\",\"provider_name\":\"NextBit\",\"is_byok\":false}}"}]}
