@@ -4513,6 +4513,12 @@ endpoints_bi:
   - 3.08
 - api: openrouter
   model: moonshotai/kimi-k2.6
+  provider: decart/fp4
+  cost:
+  - 0.68
+  - 3.41
+- api: openrouter
+  model: moonshotai/kimi-k2.6
   provider: io-net/int4
   cost:
   - 0.68
@@ -4643,12 +4649,6 @@ endpoints_bi:
   cost:
   - 0.8075
   - 3.4
-- api: openrouter
-  model: moonshotai/kimi-k2.6
-  provider: decart/fp4
-  cost:
-  - 0.74
-  - 3.49
 - api: openrouter
   model: moonshotai/kimi-k2.6
   provider: inceptron/int4
