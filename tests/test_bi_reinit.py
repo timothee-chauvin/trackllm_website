@@ -5,7 +5,7 @@ from pathlib import Path
 import orjson
 
 from trackllm_website.bi import reinit as reinit_mod
-from trackllm_website.bi.reinit import parse_phase_1_candidates
+from trackllm_website.bi.reinit import parse_phase_1_results
 from trackllm_website.config import Endpoint
 
 ENDPOINT = Endpoint(api="openrouter", model="m/x", provider="p", cost=(1, 1))
@@ -128,5 +128,7 @@ def test_parse_phase_1_candidates_skips_meta_and_decoy(tmp_path: Path):
     )
     (tmp_path / "border_inputs.json").write_bytes(orjson.dumps({"decoy": ["a", "b"]}))
 
-    assert parse_phase_1_candidates(tmp_path, []) == ["bi_prompt"]
-    assert parse_phase_1_candidates(tmp_path, ["bi_prompt"]) == []
+    # Denominator counts distinct real prompts (bi_prompt, boring), not _meta or
+    # token-count keys.
+    assert parse_phase_1_results(tmp_path, []) == (["bi_prompt"], 2)
+    assert parse_phase_1_results(tmp_path, ["bi_prompt"]) == ([], 2)

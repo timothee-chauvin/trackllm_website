@@ -37,18 +37,20 @@ class ReinitResult(BaseModel):
     reason: Literal["ok", "no_bis", "bad_temperature"]
 
 
-def parse_phase_1_candidates(results_dir: Path, exclude: list[str]) -> list[str]:
-    """Parse phase-1a output files into BI candidates.
+def parse_phase_1_results(
+    results_dir: Path, exclude: list[str]
+) -> tuple[list[str], int]:
+    """Parse phase-1a output once: (border-input candidates, distinct prompts sampled).
 
-    Phase 1a writes one file per endpoint with structure
-    {token_count: {prompt: [outputs]}}, plus a top-level META_KEY entry when
-    meta tracking is on; a prompt is a border input when it has at least two
-    distinct non-empty outputs. The border_inputs.json file (phase 1b) and the
-    META_KEY top-level key are skipped.
+    Files: {token_count: {prompt: [outputs]}} plus a META_KEY entry; a prompt is a
+    border input with >=2 distinct non-empty outputs. border_inputs.json and the
+    META_KEY top-level key are skipped. `exclude` filters the candidate list (not
+    the denominator).
     """
     excluded = set(exclude)
     candidates: list[str] = []
-    for f in results_dir.glob("*.json"):
+    sampled: set[str] = set()
+    for f in sorted(results_dir.glob("*.json")):  # sorted for deterministic ordering
         if f.name == "border_inputs.json":
             continue
         data = orjson.loads(f.read_bytes())
@@ -56,26 +58,12 @@ def parse_phase_1_candidates(results_dir: Path, exclude: list[str]) -> list[str]
             if token_count == META_KEY:
                 continue
             for prompt, outputs in prompts_dict.items():
+                sampled.add(prompt)
                 if prompt in excluded:
                     continue
                 if len({o for o in outputs if o}) >= 2:
                     candidates.append(prompt)
-    return candidates
-
-
-def count_prompts_sampled(results_dir: Path) -> int:
-    """Total distinct prompts probed across phase-1a output files (the prevalence
-    denominator). Mirrors parse_phase_1_candidates' file/key skipping."""
-    prompts: set[str] = set()
-    for f in results_dir.glob("*.json"):
-        if f.name == "border_inputs.json":
-            continue
-        data = orjson.loads(f.read_bytes())
-        for token_count, prompts_dict in data.items():
-            if token_count == META_KEY:
-                continue
-            prompts.update(prompts_dict)
-    return len(prompts)
+    return candidates, len(sampled)
 
 
 async def discover_candidates(
@@ -90,8 +78,7 @@ async def discover_candidates(
         base_dir = Path(tmp)
         await phase_1a([endpoint], 0.0, base_dir)
         results_dir = config.bi.get_phase_1_dir(0.0, base_dir)
-        candidates = parse_phase_1_candidates(results_dir, exclude)
-        n_sampled = count_prompts_sampled(results_dir)
+        candidates, n_sampled = parse_phase_1_results(results_dir, exclude)
         prevalence = len(candidates) / n_sampled if n_sampled else 0.0
         return candidates, prevalence
 

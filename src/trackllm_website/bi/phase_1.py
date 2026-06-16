@@ -189,6 +189,10 @@ async def check_temperature(
     output. Endpoints that ignore temperature (e.g. some reasoning models) produce
     fake border inputs with no detection power, so this gate excludes them.
     """
+    # Worst case config.bi.temperature_gate.check_prompts * check_samples * 2 queries
+    # (T=0 and T=1). For reasoning endpoints each query bills the full reasoning
+    # budget as output, so this one-time onboarding probe can be the expensive path
+    # for exactly the endpoints it targets (reasoning models that ignore temperature).
     gate = config.bi.temperature_gate
     prompts = border_prompts[: gate.check_prompts]
 
