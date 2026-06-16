@@ -1,9 +1,9 @@
 import asyncio
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from trackllm_website.bi.common import PlainStrategy
 from trackllm_website.bi.selection import Rule, SelectionPolicy
-from trackllm_website.bi.vetting import EndpointCache, vet_endpoint
+from trackllm_website.bi.vetting import EndpointCache, should_recheck, vet_endpoint
 from trackllm_website.config import Endpoint
 from trackllm_website.storage import Response, ResponseError
 from trackllm_website.update_endpoints import exceeds_ceiling, merge_goods
@@ -136,3 +136,49 @@ def test_cache_round_trip(tmp_path):
     loaded = EndpointCache.load(path)
     assert loaded.is_cached(EP)
     assert loaded.bucket_of(EP) == "liar"
+
+
+def test_cache_round_trips_last_recheck(tmp_path):
+    when = datetime(2026, 6, 1, 12, 0, tzinfo=timezone.utc)
+    cache = EndpointCache(
+        liars=[], too_expensive=[], bad_temperature=[], last_recheck=when
+    )
+    path = tmp_path / "endpoints_cache_bi.yaml"
+    cache.save(path)
+    loaded = EndpointCache.load(path)
+    assert loaded.last_recheck == when
+
+
+def test_cache_round_trips_none_last_recheck(tmp_path):
+    cache = EndpointCache(liars=[], too_expensive=[], bad_temperature=[])
+    path = tmp_path / "endpoints_cache_bi.yaml"
+    cache.save(path)
+    assert EndpointCache.load(path).last_recheck is None
+
+
+NOW = datetime(2026, 6, 16, tzinfo=timezone.utc)
+
+
+def test_should_recheck_when_never_rechecked():
+    cache = EndpointCache(liars=[], too_expensive=[], bad_temperature=[])
+    assert should_recheck(cache, NOW, recheck_days=14) is True
+
+
+def test_should_recheck_when_interval_elapsed():
+    cache = EndpointCache(
+        liars=[],
+        too_expensive=[],
+        bad_temperature=[],
+        last_recheck=NOW - timedelta(days=14),
+    )
+    assert should_recheck(cache, NOW, recheck_days=14) is True
+
+
+def test_should_not_recheck_when_recent():
+    cache = EndpointCache(
+        liars=[],
+        too_expensive=[],
+        bad_temperature=[],
+        last_recheck=NOW - timedelta(days=2),
+    )
+    assert should_recheck(cache, NOW, recheck_days=14) is False

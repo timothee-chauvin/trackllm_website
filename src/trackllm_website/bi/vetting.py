@@ -6,6 +6,7 @@ bad_temperature (set by phase 1 when T=0 is ignored). Only liars are permanent;
 the others are rechecked periodically since prices / providers change.
 """
 
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Literal
 
@@ -64,6 +65,7 @@ class EndpointCache(BaseModel):
     liars: list[Endpoint]
     too_expensive: list[Endpoint]
     bad_temperature: list[Endpoint]
+    last_recheck: datetime | None = None
 
     def is_cached(self, endpoint: Endpoint) -> bool:
         return self.bucket_of(endpoint) is not None
@@ -102,6 +104,9 @@ class EndpointCache(BaseModel):
             ]
 
         data = {
+            "last_recheck": self.last_recheck.isoformat()
+            if self.last_recheck is not None
+            else None,
             "liars": dump(self.liars),
             "too_expensive": dump(self.too_expensive),
             "bad_temperature": dump(self.bad_temperature),
@@ -128,8 +133,21 @@ class EndpointCache(BaseModel):
                 for e in data.get(key, [])
             ]
 
+        raw_recheck = data.get("last_recheck")
         return cls(
             liars=parse("liars"),
             too_expensive=parse("too_expensive"),
             bad_temperature=parse("bad_temperature"),
+            last_recheck=datetime.fromisoformat(raw_recheck) if raw_recheck else None,
         )
+
+
+def should_recheck(cache: EndpointCache, now: datetime, recheck_days: int) -> bool:
+    """Whether the too_expensive / bad_temperature buckets are due for re-vetting.
+
+    Prices drop and providers fix temperature, so these rejects are cleared and
+    re-probed periodically (liars stay permanent).
+    """
+    if cache.last_recheck is None:
+        return True
+    return now - cache.last_recheck >= timedelta(days=recheck_days)

@@ -11,9 +11,14 @@ from pydantic import BaseModel
 from trackllm_website.api import OpenRouterClient
 from trackllm_website.bi.common import resolve_strategies
 from trackllm_website.bi.reinit import reinit
-from trackllm_website.bi.selection import SelectionPolicy, _matches_any, load_policy
+from trackllm_website.bi.selection import (
+    SelectionPolicy,
+    _matches_any,
+    load_policy,
+    select_monitoring_targets,
+)
 from trackllm_website.bi.state import EndpointBIState, RetiredInfo, load_all_states
-from trackllm_website.bi.vetting import EndpointCache, vet_endpoint
+from trackllm_website.bi.vetting import EndpointCache, should_recheck, vet_endpoint
 from trackllm_website.config import Endpoint, config, logger, root
 from trackllm_website.storage import ResultsStorage
 from trackllm_website.util import (
@@ -307,6 +312,16 @@ async def update_endpoints_bi() -> list[Endpoint]:
     policy = load_policy(root / config.bi.selection_path)
     cache = EndpointCache.load(ENDPOINTS_CACHE_BI_PATH)
 
+    # Periodically re-vet too_expensive / bad_temperature rejects: prices drop and
+    # providers fix temperature, so clear those buckets to re-probe them this run.
+    now = datetime.now(tz=timezone.utc)
+    if should_recheck(cache, now, config.bi.reinit.recheck_days):
+        n_cleared = len(cache.too_expensive) + len(cache.bad_temperature)
+        cache.too_expensive = []
+        cache.bad_temperature = []
+        cache.last_recheck = now
+        logger.info(f"Recheck due: cleared {n_cleared} too_expensive/bad_temperature")
+
     # Re-vet known-good and new endpoints alike (to refresh cost_per_request); skip
     # only those already in a reject bucket.
     to_vet = [e for e in all_endpoints if not cache.is_cached(e)]
@@ -395,10 +410,20 @@ def select_lifecycle_actions(
 
 
 async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
-    """Onboard new candidates, delist vanished endpoints, re-check retired ones."""
+    """Onboard new candidates, delist vanished endpoints, re-check retired ones.
+
+    Runs the budget policy over the vetted candidates first, so only the selected
+    subset is monitored.
+    """
+    policy = load_policy(root / config.bi.selection_path)
+    selected, _breakdown = select_monitoring_targets(candidates, policy)
+    logger.info(
+        f"Selection: monitoring {len(selected)} of {len(candidates)} candidates"
+    )
+
     states = load_all_states(config.bi.state_dir)
     now = datetime.now(tz=timezone.utc).replace(microsecond=0)
-    actions = select_lifecycle_actions(candidates, states, now)
+    actions = select_lifecycle_actions(selected, states, now)
     logger.info(
         f"BI lifecycle: {len(actions.onboard)} to onboard, "
         f"{len(actions.recheck)} to re-check, {len(actions.delist)} to delist"

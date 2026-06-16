@@ -66,10 +66,8 @@ class _FakeClient:
         await self.close()
 
 
-def test_onboarding_failure_does_not_abort_others(monkeypatch, tmp_path):
-    good = ep("m/good")
-    bad = ep("m/bad")
-
+def _patch_lifecycle_deps(monkeypatch, tmp_path, *, select, reinit):
+    """Wire the non-networked lifecycle dependencies for an in-process run."""
     monkeypatch.setattr(config.bi, "data_dir", tmp_path)
     monkeypatch.setattr(
         "trackllm_website.update_endpoints.OpenRouterClient", _FakeClient
@@ -82,6 +80,15 @@ def test_onboarding_failure_does_not_abort_others(monkeypatch, tmp_path):
         "trackllm_website.update_endpoints.resolve_strategies",
         fake_resolve_strategies,
     )
+    monkeypatch.setattr(
+        "trackllm_website.update_endpoints.select_monitoring_targets", select
+    )
+    monkeypatch.setattr("trackllm_website.update_endpoints.reinit", reinit)
+
+
+def test_onboarding_failure_does_not_abort_others(monkeypatch, tmp_path):
+    good = ep("m/good")
+    bad = ep("m/bad")
 
     async def fake_reinit(client, strategy, endpoint, old_bis, now):
         if endpoint == bad:
@@ -90,7 +97,11 @@ def test_onboarding_failure_does_not_abort_others(monkeypatch, tmp_path):
             start=now, border_inputs=["x"], reference={"x": [(now.isoformat(), "t")]}
         )
 
-    monkeypatch.setattr("trackllm_website.update_endpoints.reinit", fake_reinit)
+    # Selection is a no-op here: every candidate is monitored.
+    def select_all(candidates, policy):
+        return list(candidates), {e: "test" for e in candidates}
+
+    _patch_lifecycle_deps(monkeypatch, tmp_path, select=select_all, reinit=fake_reinit)
 
     asyncio.run(update_endpoints_bi_lifecycle([good, bad]))
 
@@ -100,6 +111,37 @@ def test_onboarding_failure_does_not_abort_others(monkeypatch, tmp_path):
     assert len(good_state.epochs) == 1
     # The failing endpoint must not have produced a state file.
     assert not (state_dir / f"{slugify_eq(bad)}.json").exists()
+
+
+def test_only_selected_candidates_are_onboarded(monkeypatch, tmp_path):
+    chosen_a, chosen_b = ep("m/a"), ep("m/b")
+    rejected = ep("m/c")
+    candidates = [chosen_a, chosen_b, rejected]
+
+    # Selection keeps only the first two of the three candidates.
+    def select_subset(cands, policy):
+        selected = [chosen_a, chosen_b]
+        return selected, {e: "test" for e in selected}
+
+    onboarded = []
+
+    async def fake_reinit(client, strategy, endpoint, old_bis, now):
+        onboarded.append(endpoint)
+        return Epoch(
+            start=now, border_inputs=["x"], reference={"x": [(now.isoformat(), "t")]}
+        )
+
+    _patch_lifecycle_deps(
+        monkeypatch, tmp_path, select=select_subset, reinit=fake_reinit
+    )
+
+    asyncio.run(update_endpoints_bi_lifecycle(candidates))
+
+    assert {e.model for e in onboarded} == {"m/a", "m/b"}
+    state_dir = config.bi.state_dir
+    assert (state_dir / f"{slugify_eq(chosen_a)}.json").exists()
+    assert (state_dir / f"{slugify_eq(chosen_b)}.json").exists()
+    assert not (state_dir / f"{slugify_eq(rejected)}.json").exists()
 
 
 def slugify_eq(endpoint):
