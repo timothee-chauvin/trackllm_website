@@ -799,7 +799,7 @@ Rewrite `update_endpoints_bi()`:
 - `known_good = {str(e): e for e in config.endpoints_bi}`
 - For endpoints not in `known_good` and not `cache.is_cached(e)`: resolve strategy (use `resolve_strategies`), then `vet_endpoint`. Route by bucket: `candidate` → set `e.cost_per_request`, then if `exceeds_ceiling(...)` → `cache.add_too_expensive(e)` else keep as good; `liar` → `cache.add_liar(e)`; `too_expensive` never returned by vet (ceiling is applied here); `transient` → skip (don't cache).
 - Refresh `cost_per_request` for still-good endpoints by re-vetting them too (prices change) — but to bound cost, re-vet good endpoints only every run is acceptable (one cheap probe each). Keep it simple: re-vet all (good ∪ new) that aren't cached.
-- Write `endpoints_bi.yaml` entries WITH `cost_per_request` (extend the dump to include it).
+- Write `endpoints_bi.yaml` entries WITH `cost_per_request`. Factor the dump into a module-level `save_endpoints_bi(endpoints: list[Endpoint]) -> None` (writes `{api, model, provider, cost, cost_per_request}` per entry, sorted) and have `update_endpoints_bi` call it — Task 10's preview reuses this exact writer.
 - `cache.save(ENDPOINTS_CACHE_BI_PATH)`.
 
 Migration: on first run, if `bad_endpoints_bi.yaml` exists and `endpoints_cache_bi.yaml` does not, convert old `price_mismatch` entries → `liars`, drop `token_usage` entries (those were token-count rejects, no longer a reason — let them be re-vetted). Add a one-shot `migrate_bad_endpoints()` helper and call it at the top of `update_endpoints_bi`. Delete `bad_endpoints_bi.yaml` via `git rm` once converted (do this in the commit).
@@ -1059,7 +1059,157 @@ git commit -m "emit BI cost summary JSON for the costs page"
 
 ---
 
-### Task 10: Resumption — re-vet, select, onboard (one-off, local)
+### Task 10: `cost-preview` CLI — price a `bi_selection.toml` without monitoring
+
+**Files:**
+- Modify: `src/trackllm_website/bi/costs.py` (add lazy cost-fill + a `preview` entrypoint)
+- Test: extend `tests/test_bi_costs.py`
+
+Lets the user iterate on `bi_selection.toml` cheaply: fill in any missing measured `cost_per_request` (probe once, cache to `endpoints_bi.yaml`), run selection, and print per-model / per-tier $/mo contributions and the total vs budget — before any real monitoring. Costs come from stored data when present; otherwise a one-time cheap probe per endpoint fills and caches them.
+
+- [ ] **Step 1: Write the failing tests**
+
+```python
+import asyncio
+from trackllm_website.bi.costs import ensure_costs, format_preview, build_cost_summary
+from trackllm_website.bi.selection import SelectionPolicy, Rule
+from trackllm_website.config import Endpoint
+
+
+def ep(m, p, cpr=None):
+    return Endpoint(api="openrouter", model=m, provider=p, cost=(1, 1), cost_per_request=cpr)
+
+
+def test_ensure_costs_only_probes_missing(monkeypatch):
+    probed = []
+
+    async def fake_measure(client, endpoint, strategy):
+        probed.append(str(endpoint))
+        from trackllm_website.bi.vetting import VetResult
+        return VetResult(bucket="candidate", cost_per_request=0.00002)
+
+    monkeypatch.setattr("trackllm_website.bi.costs.vet_endpoint", fake_measure)
+    monkeypatch.setattr("trackllm_website.bi.costs.resolve_strategies",
+                        lambda client, eps: asyncio.sleep(0, result=({str(e): None for e in eps}, [])))
+    cands = [ep("m/a", "p", cpr=0.00001), ep("m/b", "p")]  # b is missing
+    filled = asyncio.run(ensure_costs(cands, save=False))
+    assert [str(e) for e in probed] == ["openrouter#m/b#p"]  # only the missing one probed
+    assert all(e.cost_per_request is not None for e in filled)
+
+
+def test_format_preview_groups_by_model_and_totals():
+    policy = SelectionPolicy(budget_per_month=10, max_endpoint_cost=10, exclude=[],
+        rules=[Rule(name="long-tail", kind="models", patterns=["*"],
+                    providers_per_model=1, max_monthly_cost=10)])
+    cands = [ep("m/a", "p", 0.00001), ep("m/b", "p", 0.00005)]
+    text = format_preview(build_cost_summary(cands, policy))
+    assert "m/b" in text and "m/a" in text
+    assert "/mo" in text
+    assert "10.00" in text  # budget shown
+```
+
+Confirm the real `resolve_strategies` signature/return shape in `bi/common.py` and adjust the monkeypatch (it returns `(strategies_by_str, failed)`).
+
+- [ ] **Step 2: Run tests — expect ImportError**
+
+Run: `uv run pytest tests/test_bi_costs.py -v`
+
+- [ ] **Step 3: Implement in `bi/costs.py`**
+
+```python
+from trackllm_website.api import OpenRouterClient
+from trackllm_website.bi.common import resolve_strategies
+from trackllm_website.bi.vetting import vet_endpoint
+from trackllm_website.config import logger, root
+
+
+async def ensure_costs(candidates: list[Endpoint], *, save: bool) -> list[Endpoint]:
+    """Return candidates with cost_per_request filled, probing only those missing it.
+
+    Probed costs are written back to endpoints_bi.yaml when save=True so repeated
+    previews don't re-probe. Endpoints that fail vetting (liar/transient) are dropped.
+    """
+    missing = [e for e in candidates if e.cost_per_request is None]
+    if missing:
+        logger.info(f"cost-preview: measuring {len(missing)} endpoints missing a cost")
+        async with OpenRouterClient(timeout=60.0) as probe:
+            strategies, _ = await resolve_strategies(probe, missing)
+        async with OpenRouterClient() as client:
+            for e in missing:
+                strat = strategies.get(str(e))
+                if strat is None:
+                    continue
+                res = await vet_endpoint(client, e, strat)
+                if res.bucket == "candidate":
+                    e.cost_per_request = res.cost_per_request
+    priced = [e for e in candidates if e.cost_per_request is not None]
+    if save:
+        from trackllm_website.update_endpoints import save_endpoints_bi  # written in Task 6
+        save_endpoints_bi(priced)
+    return priced
+
+
+def format_preview(summary: dict) -> str:
+    lines = [
+        f"Budget:   ${summary['budget_per_month']:.2f}/mo",
+        f"Run-rate: ${summary['run_rate_per_month']:.2f}/mo  ({summary['n_selected']} endpoints)",
+        "",
+        "By rule:",
+    ]
+    for rule, info in sorted(summary["by_rule"].items(), key=lambda kv: -kv[1]["monthly_cost"]):
+        lines.append(f"  {rule:18s} {info['count']:4d} endpoints  ${info['monthly_cost']:.2f}/mo")
+    lines += ["", "Most expensive selected endpoints:"]
+    for r in summary["endpoints"][:25]:
+        lines.append(f"  ${r['monthly_cost']:6.2f}/mo  [{r['rule']:16s}] {r['model']} ({r['provider']})")
+    return "\n".join(lines)
+
+
+async def preview(policy_path: str | None = None) -> None:
+    """Price a bi_selection.toml (default: the configured one) without monitoring."""
+    from trackllm_website.bi.selection import load_policy, select_monitoring_targets  # noqa: F401
+
+    path = root / (policy_path or config.bi.selection_path)
+    policy = load_policy(path)
+    candidates = await ensure_costs(list(config.endpoints_bi), save=True)
+    summary = build_cost_summary(candidates, policy)
+    print(format_preview(summary))
+```
+
+Add a `fire` entrypoint at the bottom of `costs.py`:
+
+```python
+if __name__ == "__main__":
+    import asyncio
+    import fire
+
+    fire.Fire({
+        "preview": lambda policy_path=None: asyncio.run(preview(policy_path)),
+        "write": write_cost_summary,
+    })
+```
+
+Note: `save_endpoints_bi(endpoints)` must be factored out of `update_endpoints_bi` in Task 6 (the block that dumps `endpoints_bi.yaml` including `cost_per_request`) so both the refresh and the preview write the same format. If Task 6 didn't extract it, extract it now as part of this task and have `update_endpoints_bi` call it.
+
+- [ ] **Step 4: Run tests — expect PASS**
+
+Run: `uv run pytest tests/test_bi_costs.py -v`
+
+- [ ] **Step 5: Real dry-run against the catalog**
+
+Run: `uv run python -m trackllm_website.bi.costs preview 2>&1 | grep -v "PyTorch\|INFO"`
+This fills any missing costs (cheap probes) and prints the priced selection. Report the by-rule totals and run-rate. Try a second run to confirm it's instant (costs cached, no re-probe). **This is the tool the user will use to tune `bi_selection.toml`.**
+
+- [ ] **Step 6: Full suite + prek, commit**
+
+```bash
+uv run pytest tests/ -q && prek run --all-files
+git add src/trackllm_website/bi/costs.py tests/test_bi_costs.py endpoints_bi.yaml
+git commit -m "add cost-preview CLI: price a selection policy from cached/probed costs"
+```
+
+---
+
+### Task 11: Resumption — re-vet, select, onboard (one-off, local)
 
 Runs once, locally (not GHA), after Tasks 1–9 are merged. ~hours of wall clock.
 
@@ -1094,7 +1244,7 @@ git push
 
 ## Self-review notes
 
-- **Spec coverage:** measured cost/request (T3); drop `$30/Mtok` for BI (T2) + drop token-count knobs (T1); three+ bucket cache candidate/liar/too_expensive/bad_temperature (T3 + T6 ceiling + T8 temperature); `bi_selection.toml` with pins-via-flagships/flagships/corroboration/provider-coverage/long-tail + budget + explicit `max_endpoint_cost` flagships-exempt (T4/T5); selection feeds lifecycle (T7); conditional T=0-vs-T=1 gate triggered by prevalence (T8); costs data top-N + full list + per-rule + run-rate (T9, page deferred to website plan); resumption through new selection (T10). **Gap intentionally deferred:** actual-account-spend line and phase-1-vs-phase-2 split (website plan / a later cost-history task); costs *page* HTML.
+- **Spec coverage:** measured cost/request (T3); drop `$30/Mtok` for BI (T2) + drop token-count knobs (T1); three+ bucket cache candidate/liar/too_expensive/bad_temperature (T3 + T6 ceiling + T8 temperature); `bi_selection.toml` with pins-via-flagships/flagships/corroboration/provider-coverage/long-tail + budget + explicit `max_endpoint_cost` flagships-exempt (T4/T5); selection feeds lifecycle (T7); conditional T=0-vs-T=1 gate triggered by prevalence (T8); costs data top-N + full list + per-rule + run-rate (T9); `cost-preview` CLI to price a policy from cached/probed costs before any monitoring (T10); resumption through new selection (T11). **Gap intentionally deferred:** actual-account-spend line and phase-1-vs-phase-2 split (website plan / a later cost-history task); costs *page* HTML.
 - **Pins:** the design mentioned a separate `pins` rule (specific model#provider). It's representable as a `flagship` rule whose patterns include `model#provider` strings (the engine matches both `model` and `model#provider`). No separate rule kind needed; if the user wants an explicit `[[rule]] name="pins"`, it's just another flagship-flagged `models` rule.
 - **Contradiction resolved (T5 step 3):** flagships are budget-exempt, so a flagship total over budget is a logged warning, not a `ValueError`; only non-flagship named-rule overruns raise. The draft test was corrected to match the design.
 - **Known judgment calls for the implementer, flagged inline:** exact `Response`/`ResponseError` constructor fields (T3); whether `get_endpoints` lives in `api.py` or `update_endpoints.py` (T2); adding a required `temperature` param to `sample_prompts` and updating its callers (T8); the phase-1 prevalence denominator (`n_prompts_sampled`) — confirm against `EndpointState` in `bi/common.py`.
