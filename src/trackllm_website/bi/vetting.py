@@ -47,6 +47,7 @@ async def vet_endpoint(
     expected = response.cost  # compute_cost(usage): token math at advertised price
     if not response.generation_id:
         return VetResult(bucket="transient")
+    # Blocks 5-75s by design (get_generation_cost backoff); callers fan out concurrently.
     actual = await client.get_generation_cost(response.generation_id)
     if actual is None:
         return VetResult(bucket="transient")  # couldn't price it; retry later
