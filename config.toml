@@ -45,6 +45,11 @@ queries_per_candidate = 100
 queries_per_token = 3
 tokens_per_endpoint = 1000
 
+[bi.temperature_gate]
+prevalence_trigger = 0.30   # if > this fraction of sampled prompts are border inputs, run the check
+check_prompts = 8           # how many border prompts to re-sample at T=1
+check_samples = 8           # samples per prompt at each temperature
+
 [bi.phase_2]
 queries_per_token = 10
 requests_per_second_per_endpoint = 5

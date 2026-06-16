@@ -7,11 +7,14 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 
+from typing import Literal
+
 import orjson
+from pydantic import BaseModel
 
 from trackllm_website.bi.common import META_KEY, QueryStrategy
 from trackllm_website.bi.detection import select_top_bis
-from trackllm_website.bi.phase_1 import phase_1a
+from trackllm_website.bi.phase_1 import check_temperature, phase_1a
 from trackllm_website.bi.phase_2 import (
     get_output_path,
     load_existing_results,
@@ -20,6 +23,18 @@ from trackllm_website.bi.phase_2 import (
 from trackllm_website.bi.sampling import sample_prompts
 from trackllm_website.bi.state import Epoch
 from trackllm_website.config import Endpoint, config, logger
+
+
+class ReinitResult(BaseModel):
+    """Outcome of a re-init / onboarding attempt.
+
+    reason distinguishes a normal failure to find enough BIs (no_bis) from an
+    endpoint that ignores temperature (bad_temperature), so the caller can cache
+    the latter instead of retiring it as a normal no_bis.
+    """
+
+    epoch: Epoch | None
+    reason: Literal["ok", "no_bis", "bad_temperature"]
 
 
 def parse_phase_1_candidates(results_dir: Path, exclude: list[str]) -> list[str]:
@@ -48,13 +63,37 @@ def parse_phase_1_candidates(results_dir: Path, exclude: list[str]) -> list[str]
     return candidates
 
 
-async def discover_candidates(endpoint: Endpoint, exclude: list[str]) -> list[str]:
-    """Run phase 1a discovery for one endpoint, returning new BI candidates."""
+def count_prompts_sampled(results_dir: Path) -> int:
+    """Total distinct prompts probed across phase-1a output files (the prevalence
+    denominator). Mirrors parse_phase_1_candidates' file/key skipping."""
+    prompts: set[str] = set()
+    for f in results_dir.glob("*.json"):
+        if f.name == "border_inputs.json":
+            continue
+        data = orjson.loads(f.read_bytes())
+        for token_count, prompts_dict in data.items():
+            if token_count == META_KEY:
+                continue
+            prompts.update(prompts_dict)
+    return len(prompts)
+
+
+async def discover_candidates(
+    endpoint: Endpoint, exclude: list[str]
+) -> tuple[list[str], float]:
+    """Run phase 1a discovery for one endpoint.
+
+    Returns (candidates, prevalence) where prevalence = n_border / n_prompts_sampled,
+    so the caller can decide whether to run the temperature gate.
+    """
     with tempfile.TemporaryDirectory() as tmp:
         base_dir = Path(tmp)
         await phase_1a([endpoint], 0.0, base_dir)
         results_dir = config.bi.get_phase_1_dir(0.0, base_dir)
-        return parse_phase_1_candidates(results_dir, exclude)
+        candidates = parse_phase_1_candidates(results_dir, exclude)
+        n_sampled = count_prompts_sampled(results_dir)
+        prevalence = len(candidates) / n_sampled if n_sampled else 0.0
+        return candidates, prevalence
 
 
 async def reinit(
@@ -63,14 +102,19 @@ async def reinit(
     endpoint: Endpoint,
     old_bis: list[str],
     now: datetime,
-) -> Epoch | None:
-    """Returns the new epoch, or None if fewer than min_bis BIs were found."""
+) -> ReinitResult:
+    """Re-init / onboard one endpoint.
+
+    On the onboarding path (old_bis empty), a suspiciously high border-input
+    prevalence triggers a T=0-vs-T=1 check; an endpoint that ignores temperature
+    is reported as bad_temperature so the caller can cache it.
+    """
     r = config.bi.reinit
 
     survivors: list[str] = []
     if old_bis:
         reprobe, _ = await sample_prompts(
-            client, endpoint, strategy, old_bis, r.reprobe_samples
+            client, endpoint, strategy, old_bis, r.reprobe_samples, temperature=0.0
         )
         survivors = [p for p, s in reprobe.items() if len({tok for _, tok in s}) > 1]
         logger.info(
@@ -79,18 +123,25 @@ async def reinit(
 
     candidates = survivors
     if len(candidates) < r.top_k_bis:
-        candidates = candidates + await discover_candidates(
-            endpoint, exclude=candidates
-        )
+        discovered, prevalence = await discover_candidates(endpoint, exclude=candidates)
+        # The gate only makes sense on discovery (old_bis empty): if T=0 doesn't
+        # pin the output, the discovered "border inputs" are fake.
+        if (
+            not old_bis
+            and prevalence > config.bi.temperature_gate.prevalence_trigger
+            and await check_temperature(client, endpoint, strategy, discovered)
+        ):
+            return ReinitResult(epoch=None, reason="bad_temperature")
+        candidates = candidates + discovered
     # Rank the top-k among at most target_border_inputs candidates; collecting
     # references for more would roughly double onboarding cost for nothing.
     candidates = candidates[: config.bi.phase_1.target_border_inputs]
 
     if not candidates:
-        return None
+        return ReinitResult(epoch=None, reason="no_bis")
 
     reference, n_errors = await sample_prompts(
-        client, endpoint, strategy, candidates, r.reference_samples
+        client, endpoint, strategy, candidates, r.reference_samples, temperature=0.0
     )
     if n_errors:
         logger.warning(f"{endpoint}: {n_errors} errors during reference collection")
@@ -100,14 +151,14 @@ async def reinit(
         logger.warning(
             f"{endpoint}: only {len(keep)} BIs after re-init, below min {r.min_bis}"
         )
-        return None
+        return ReinitResult(epoch=None, reason="no_bis")
     epoch = Epoch(
         start=now,
         border_inputs=keep,
         reference={p: reference[p] for p in keep},
     )
     _persist_reference(endpoint, epoch)
-    return epoch
+    return ReinitResult(epoch=epoch, reason="ok")
 
 
 def _persist_reference(endpoint: Endpoint, epoch: Epoch) -> None:

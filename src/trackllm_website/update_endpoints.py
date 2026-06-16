@@ -421,6 +421,7 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
         f"Selection: monitoring {len(selected)} of {len(candidates)} candidates"
     )
 
+    cache = EndpointCache.load(ENDPOINTS_CACHE_BI_PATH)
     states = load_all_states(config.bi.state_dir)
     now = datetime.now(tz=timezone.utc).replace(microsecond=0)
     actions = select_lifecycle_actions(selected, states, now)
@@ -467,14 +468,20 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
             # old_bis=[]: rechecks intentionally rediscover BIs from scratch,
             # since references from before the monitoring gap are stale.
             old_bis = []
-            epoch = await reinit(
+            result = await reinit(
                 client, strategies[str(endpoint)], endpoint, old_bis, now
             )
+            if result.reason == "bad_temperature":
+                # T=0 is a no-op for this endpoint: cache it so it's excluded and
+                # not re-onboarded every run (rechecked on the cache schedule).
+                cache.add_bad_temperature(endpoint)
+                logger.warning(f"{endpoint}: cached bad_temperature (T=0 ignored)")
+                return
             if state is None:
                 state = EndpointBIState(
                     endpoint=endpoint, status="monitoring", epochs=[]
                 )
-            if epoch is None:
+            if result.epoch is None:
                 state.status = "retired"
                 state.retired = RetiredInfo(
                     reason="no_bis", since=now, last_recheck=now
@@ -482,7 +489,7 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
             else:
                 state.status = "monitoring"
                 state.retired = None
-                state.epochs.append(epoch)
+                state.epochs.append(result.epoch)
             state.save(config.bi.state_dir)
         except Exception:
             logger.exception(f"BI onboarding failed for {endpoint}")
@@ -495,6 +502,7 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
         )
     finally:
         await client.close()
+    cache.save(ENDPOINTS_CACHE_BI_PATH)
 
 
 async def main():

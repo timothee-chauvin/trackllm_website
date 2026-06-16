@@ -35,7 +35,9 @@ def test_sample_prompts_collects_n_per_prompt(monkeypatch):
     endpoint = Endpoint(api="openrouter", model="m/x", provider="p", cost=(1, 1))
     client = FakeClient({"a": iter("xyxyx"), "b": iter("zzzzz")})
     samples, n_errors = asyncio.run(
-        sample_prompts(client, endpoint, PlainStrategy(), ["a", "b"], 3)
+        sample_prompts(
+            client, endpoint, PlainStrategy(), ["a", "b"], 3, temperature=0.0
+        )
     )
     assert n_errors == 0
     assert [tok for _, tok in samples["a"]] == ["x", "y", "x"]
@@ -60,7 +62,9 @@ def test_sample_prompts_survives_per_prompt_exception(monkeypatch):
     endpoint = Endpoint(api="openrouter", model="m/x", provider="p", cost=(1, 1))
     client = RaisingClient({"a": iter("xyxyx")}, raising_prompt="b")
     samples, n_errors = asyncio.run(
-        sample_prompts(client, endpoint, PlainStrategy(), ["a", "b"], 3)
+        sample_prompts(
+            client, endpoint, PlainStrategy(), ["a", "b"], 3, temperature=0.0
+        )
     )
     assert [tok for _, tok in samples["a"]] == ["x", "y", "x"]
     assert n_errors > 0

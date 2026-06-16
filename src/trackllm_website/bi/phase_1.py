@@ -10,11 +10,13 @@ from aiolimiter import AsyncLimiter
 from trackllm_website.api import OpenRouterClient
 from trackllm_website.bi.common import (
     EndpointState,
+    QueryStrategy,
     get_input_tokens,
     load_tokenizers,
     resolve_strategies,
     run_queries,
 )
+from trackllm_website.bi.sampling import sample_prompts
 from trackllm_website.config import Endpoint, config, logger
 
 
@@ -162,6 +164,48 @@ async def phase_1b(temperature: float, base_dir: Path | None = None) -> None:
     output_path.mkdir(parents=True, exist_ok=True)
     with open(output_path / "border_inputs.json", "wb") as f:
         f.write(orjson.dumps(results))
+
+
+def temperature_is_ignored(
+    t0_distinct: dict[str, int], t1_distinct: dict[str, int]
+) -> bool:
+    """True if raising temperature 0->1 does NOT broaden the output distribution.
+
+    Honored endpoints show strictly more diversity at T=1 on at least some prompts;
+    if T=1 never exceeds T=0, temperature is a no-op.
+    """
+    return all(t1_distinct.get(p, 0) <= n for p, n in t0_distinct.items())
+
+
+async def check_temperature(
+    client,
+    endpoint: Endpoint,
+    strategy: QueryStrategy | None,
+    border_prompts: list[str],
+) -> bool:
+    """Re-sample border prompts at T=0 and T=1; True if temperature is ignored.
+
+    A high border-input prevalence is only meaningful if T=0 actually pins the
+    output. Endpoints that ignore temperature (e.g. some reasoning models) produce
+    fake border inputs with no detection power, so this gate excludes them.
+    """
+    gate = config.bi.temperature_gate
+    prompts = border_prompts[: gate.check_prompts]
+
+    async def distinct_at(temperature: float) -> dict[str, int]:
+        samples, _ = await sample_prompts(
+            client, endpoint, strategy, prompts, gate.check_samples, temperature
+        )
+        return {p: len({tok for _, tok in samples[p]}) for p in samples}
+
+    t0_distinct = await distinct_at(0.0)
+    t1_distinct = await distinct_at(1.0)
+    ignored = temperature_is_ignored(t0_distinct, t1_distinct)
+    if ignored:
+        logger.warning(
+            f"{endpoint}: temperature ignored (T=0 {t0_distinct} >= T=1 {t1_distinct})"
+        )
+    return ignored
 
 
 if __name__ == "__main__":

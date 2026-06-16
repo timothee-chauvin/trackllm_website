@@ -122,6 +122,12 @@ class MonitorConfig(BaseModel):
     max_concurrent_endpoints: int
 
 
+class TemperatureGateConfig(BaseModel):
+    prevalence_trigger: float
+    check_prompts: int
+    check_samples: int
+
+
 class BIConfig(BaseModel):
     data_dir: Path
     selection_path: str
@@ -134,6 +140,7 @@ class BIConfig(BaseModel):
     detection: DetectionConfig
     reinit: ReinitConfig
     monitor: MonitorConfig
+    temperature_gate: TemperatureGateConfig
 
     @property
     def samples_per_month(self) -> int:

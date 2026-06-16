@@ -15,7 +15,7 @@ NOW = datetime(2026, 6, 15, tzinfo=timezone.utc)
 def fake_sampler(distributions):
     """distributions: prompt -> list of tokens to cycle through."""
 
-    async def sample(client, endpoint, strategy, prompts, n):
+    async def sample(client, endpoint, strategy, prompts, n, temperature):
         return (
             {
                 p: [
@@ -39,7 +39,7 @@ def test_reinit_keeps_survivors_and_ranks(monkeypatch, tmp_path):
     )
 
     async def fake_discover(endpoint, exclude):
-        return ["new1"]
+        return ["new1"], 0.0
 
     monkeypatch.setattr(reinit_mod, "discover_candidates", fake_discover)
     monkeypatch.setattr(reinit_mod.config.bi.reinit, "top_k_bis", 2)
@@ -47,7 +47,11 @@ def test_reinit_keeps_survivors_and_ranks(monkeypatch, tmp_path):
     phase2_path = tmp_path / "phase2.json"
     monkeypatch.setattr(reinit_mod, "get_output_path", lambda ep, ym: phase2_path)
 
-    epoch = asyncio.run(reinit_mod.reinit(None, None, ENDPOINT, ["alive", "dead"], NOW))
+    result = asyncio.run(
+        reinit_mod.reinit(None, None, ENDPOINT, ["alive", "dead"], NOW)
+    )
+    epoch = result.epoch
+    assert result.reason == "ok"
     assert epoch is not None
     assert sorted(epoch.border_inputs) == ["alive", "new1"]
     assert set(epoch.reference) == {"alive", "new1"}
@@ -66,10 +70,51 @@ def test_reinit_returns_none_below_min_bis(monkeypatch):
     monkeypatch.setattr(reinit_mod, "sample_prompts", fake_sampler({"dead": ["a"]}))
 
     async def fake_discover(endpoint, exclude):
-        return []
+        return [], 0.0
 
     monkeypatch.setattr(reinit_mod, "discover_candidates", fake_discover)
-    assert asyncio.run(reinit_mod.reinit(None, None, ENDPOINT, ["dead"], NOW)) is None
+    result = asyncio.run(reinit_mod.reinit(None, None, ENDPOINT, ["dead"], NOW))
+    assert result.epoch is None
+    assert result.reason == "no_bis"
+
+
+def test_reinit_bad_temperature_on_high_prevalence(monkeypatch):
+    # onboarding (old_bis empty), discovery yields high prevalence, and the
+    # temperature gate confirms T=0 is ignored -> bad_temperature, no epoch.
+    async def fake_discover(endpoint, exclude):
+        return ["p1", "p2", "p3"], 0.9  # above the 0.30 trigger
+
+    async def fake_check(client, endpoint, strategy, prompts):
+        return True
+
+    monkeypatch.setattr(reinit_mod, "discover_candidates", fake_discover)
+    monkeypatch.setattr(reinit_mod, "check_temperature", fake_check)
+
+    result = asyncio.run(reinit_mod.reinit(None, None, ENDPOINT, [], NOW))
+    assert result.epoch is None
+    assert result.reason == "bad_temperature"
+
+
+def test_reinit_no_gate_when_prevalence_low(monkeypatch, tmp_path):
+    # Low prevalence -> gate never runs; check_temperature would raise if called.
+    monkeypatch.setattr(reinit_mod, "sample_prompts", fake_sampler({"p1": ["a", "b"]}))
+    monkeypatch.setattr(
+        reinit_mod, "get_output_path", lambda ep, ym: tmp_path / "phase2.json"
+    )
+
+    async def fake_discover(endpoint, exclude):
+        return ["p1"], 0.1  # below trigger
+
+    async def boom(*a, **k):
+        raise AssertionError("temperature gate should not run at low prevalence")
+
+    monkeypatch.setattr(reinit_mod, "discover_candidates", fake_discover)
+    monkeypatch.setattr(reinit_mod, "check_temperature", boom)
+    monkeypatch.setattr(reinit_mod.config.bi.reinit, "top_k_bis", 1)
+    monkeypatch.setattr(reinit_mod.config.bi.reinit, "min_bis", 1)
+
+    result = asyncio.run(reinit_mod.reinit(None, None, ENDPOINT, [], NOW))
+    assert result.reason == "ok"
 
 
 def test_parse_phase_1_candidates_skips_meta_and_decoy(tmp_path: Path):

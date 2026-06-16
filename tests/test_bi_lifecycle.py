@@ -1,6 +1,7 @@
 import asyncio
 from datetime import datetime, timedelta, timezone
 
+from trackllm_website.bi.reinit import ReinitResult
 from trackllm_website.bi.state import EndpointBIState, Epoch, RetiredInfo
 from trackllm_website.config import Endpoint, config
 from trackllm_website.update_endpoints import (
@@ -84,6 +85,10 @@ def _patch_lifecycle_deps(monkeypatch, tmp_path, *, select, reinit):
         "trackllm_website.update_endpoints.select_monitoring_targets", select
     )
     monkeypatch.setattr("trackllm_website.update_endpoints.reinit", reinit)
+    monkeypatch.setattr(
+        "trackllm_website.update_endpoints.ENDPOINTS_CACHE_BI_PATH",
+        tmp_path / "endpoints_cache_bi.yaml",
+    )
 
 
 def test_onboarding_failure_does_not_abort_others(monkeypatch, tmp_path):
@@ -93,8 +98,13 @@ def test_onboarding_failure_does_not_abort_others(monkeypatch, tmp_path):
     async def fake_reinit(client, strategy, endpoint, old_bis, now):
         if endpoint == bad:
             raise RuntimeError("onboarding blew up")
-        return Epoch(
-            start=now, border_inputs=["x"], reference={"x": [(now.isoformat(), "t")]}
+        return ReinitResult(
+            epoch=Epoch(
+                start=now,
+                border_inputs=["x"],
+                reference={"x": [(now.isoformat(), "t")]},
+            ),
+            reason="ok",
         )
 
     # Selection is a no-op here: every candidate is monitored.
@@ -113,6 +123,28 @@ def test_onboarding_failure_does_not_abort_others(monkeypatch, tmp_path):
     assert not (state_dir / f"{slugify_eq(bad)}.json").exists()
 
 
+def test_bad_temperature_is_cached_not_monitored(monkeypatch, tmp_path):
+    bad_temp = ep("m/badtemp")
+
+    def select_all(candidates, policy):
+        return list(candidates), {e: "test" for e in candidates}
+
+    async def fake_reinit(client, strategy, endpoint, old_bis, now):
+        return ReinitResult(epoch=None, reason="bad_temperature")
+
+    _patch_lifecycle_deps(monkeypatch, tmp_path, select=select_all, reinit=fake_reinit)
+
+    asyncio.run(update_endpoints_bi_lifecycle([bad_temp]))
+
+    from trackllm_website.bi.vetting import EndpointCache
+    from trackllm_website.update_endpoints import ENDPOINTS_CACHE_BI_PATH
+
+    cache = EndpointCache.load(ENDPOINTS_CACHE_BI_PATH)
+    assert cache.bucket_of(bad_temp) == "bad_temperature"
+    # No monitoring state file for a temperature-ignoring endpoint.
+    assert not (config.bi.state_dir / f"{slugify_eq(bad_temp)}.json").exists()
+
+
 def test_only_selected_candidates_are_onboarded(monkeypatch, tmp_path):
     chosen_a, chosen_b = ep("m/a"), ep("m/b")
     rejected = ep("m/c")
@@ -127,8 +159,13 @@ def test_only_selected_candidates_are_onboarded(monkeypatch, tmp_path):
 
     async def fake_reinit(client, strategy, endpoint, old_bis, now):
         onboarded.append(endpoint)
-        return Epoch(
-            start=now, border_inputs=["x"], reference={"x": [(now.isoformat(), "t")]}
+        return ReinitResult(
+            epoch=Epoch(
+                start=now,
+                border_inputs=["x"],
+                reference={"x": [(now.isoformat(), "t")]},
+            ),
+            reason="ok",
         )
 
     _patch_lifecycle_deps(
