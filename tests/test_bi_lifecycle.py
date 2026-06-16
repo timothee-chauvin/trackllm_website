@@ -71,7 +71,6 @@ def test_onboarding_failure_does_not_abort_others(monkeypatch, tmp_path):
     bad = ep("m/bad")
 
     monkeypatch.setattr(config.bi, "data_dir", tmp_path)
-    monkeypatch.setattr(config, "endpoints_bi", [good, bad])
     monkeypatch.setattr(
         "trackllm_website.update_endpoints.OpenRouterClient", _FakeClient
     )
@@ -93,7 +92,7 @@ def test_onboarding_failure_does_not_abort_others(monkeypatch, tmp_path):
 
     monkeypatch.setattr("trackllm_website.update_endpoints.reinit", fake_reinit)
 
-    asyncio.run(update_endpoints_bi_lifecycle())
+    asyncio.run(update_endpoints_bi_lifecycle([good, bad]))
 
     state_dir = config.bi.state_dir
     good_state = EndpointBIState.load(state_dir / f"{slugify_eq(good)}.json")

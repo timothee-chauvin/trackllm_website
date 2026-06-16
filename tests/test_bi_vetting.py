@@ -6,7 +6,7 @@ from trackllm_website.bi.selection import Rule, SelectionPolicy
 from trackllm_website.bi.vetting import EndpointCache, vet_endpoint
 from trackllm_website.config import Endpoint
 from trackllm_website.storage import Response, ResponseError
-from trackllm_website.update_endpoints import exceeds_ceiling
+from trackllm_website.update_endpoints import exceeds_ceiling, merge_goods
 
 EP = Endpoint(api="openrouter", model="m/x", provider="p", cost=(1.0, 2.0))
 
@@ -105,6 +105,27 @@ def test_non_flagship_above_ceiling_is_too_expensive():
 def test_flagship_above_ceiling_is_kept():
     pol = _ceiling_policy(0.5, ["m/flag"])
     assert exceeds_ceiling(0.0001, "m/flag", "p", pol) is False
+
+
+def test_merge_goods_carries_forward_transient_flakes():
+    # A re-measured this run (fresh cpr), B cached as a liar, C flaked transiently
+    # (not freshly good, not cached) => carried forward with its prior cpr.
+    def mk(model, cpr):
+        e = Endpoint(api="openrouter", model=model, provider="p", cost=(1, 1))
+        e.cost_per_request = cpr
+        return e
+
+    prior = [mk("m/a", 0.1), mk("m/b", 0.2), mk("m/c", 0.3)]
+    freshly_good = [mk("m/a", 0.15)]
+    cache = EndpointCache(liars=[], too_expensive=[], bad_temperature=[])
+    cache.add_liar(mk("m/b", 0.2))
+
+    result = merge_goods(prior, freshly_good, cache)
+    by_model = {e.model: e for e in result}
+
+    assert set(by_model) == {"m/a", "m/c"}  # B (cached liar) excluded
+    assert by_model["m/a"].cost_per_request == 0.15  # fresh measurement wins
+    assert by_model["m/c"].cost_per_request == 0.3  # carried with prior cpr
 
 
 def test_cache_round_trip(tmp_path):

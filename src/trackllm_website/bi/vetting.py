@@ -14,6 +14,7 @@ from pydantic import BaseModel
 
 from trackllm_website.bi.common import QueryStrategy, strategy_to_query_args
 from trackllm_website.config import Endpoint, logger
+from trackllm_website.util import atomic_write_bytes
 
 PRICE_TOLERANCE = 0.01
 Bucket = Literal["candidate", "liar", "too_expensive", "bad_temperature", "transient"]
@@ -105,8 +106,9 @@ class EndpointCache(BaseModel):
             "too_expensive": dump(self.too_expensive),
             "bad_temperature": dump(self.bad_temperature),
         }
-        with open(path, "w") as f:
-            yaml.dump(data, f, default_flow_style=False, sort_keys=False)
+        atomic_write_bytes(
+            path, yaml.dump(data, default_flow_style=False, sort_keys=False).encode()
+        )
 
     @classmethod
     def load(cls, path: Path) -> "EndpointCache":

@@ -17,6 +17,7 @@ from trackllm_website.bi.vetting import EndpointCache, vet_endpoint
 from trackllm_website.config import Endpoint, config, logger, root
 from trackllm_website.storage import ResultsStorage
 from trackllm_website.util import (
+    atomic_write_bytes,
     gather_with_concurrency,
     gather_with_concurrency_streaming,
     slugify,
@@ -61,11 +62,31 @@ def save_endpoints_bi(endpoints: list[Endpoint]) -> None:
             for e in sorted_endpoints
         ]
     }
-    with open(config.endpoints_yaml_path_bi, "w") as f:
-        yaml.dump(output_data, f, default_flow_style=False, sort_keys=False)
+    atomic_write_bytes(
+        config.endpoints_yaml_path_bi,
+        yaml.dump(output_data, default_flow_style=False, sort_keys=False).encode(),
+    )
     logger.info(
         f"Updated {config.endpoints_yaml_path_bi} with {len(sorted_endpoints)} endpoints"
     )
+
+
+def merge_goods(
+    prior_goods: list[Endpoint],
+    freshly_good: list[Endpoint],
+    cache: EndpointCache,
+) -> list[Endpoint]:
+    """Merge this run's good endpoints with prior goods that flaked transiently.
+
+    A prior good that didn't vet as a candidate this run AND isn't in a reject
+    bucket either has flaked transiently (network / 5xx / un-priceable). We carry
+    it forward with its PRIOR cost_per_request so a flaky API day doesn't shrink
+    the monitored set. Endpoints explicitly moved to liar / too_expensive are
+    excluded (they live in the cache now). Fresh measurements win on overlap.
+    """
+    fresh_set = set(freshly_good)
+    carried = [e for e in prior_goods if e not in fresh_set and not cache.is_cached(e)]
+    return freshly_good + carried
 
 
 def migrate_bad_endpoints() -> None:
@@ -268,7 +289,7 @@ async def update_endpoints_lt():
     logger.info(f"Updated {config.endpoints_yaml_path_lt}")
 
 
-async def update_endpoints_bi():
+async def update_endpoints_bi() -> list[Endpoint]:
     """Refresh the BI candidate catalog via cost-based vetting.
 
     Pulls the full catalog (no cost cap), skips endpoints already in the bucketed
@@ -281,6 +302,7 @@ async def update_endpoints_bi():
     """
     migrate_bad_endpoints()
 
+    prior_goods = config.endpoints_bi  # prior registry, carries prior cost_per_request
     all_endpoints = await get_endpoints(logprob_filter=False, max_cost_mtok=None)
     policy = load_policy(root / config.bi.selection_path)
     cache = EndpointCache.load(ENDPOINTS_CACHE_BI_PATH)
@@ -327,14 +349,17 @@ async def update_endpoints_bi():
     finally:
         await client.close()
 
-    good = [e for e in results if e is not None]
+    freshly_good = [e for e in results if e is not None]
+    good = merge_goods(prior_goods, freshly_good, cache)
     logger.info(
-        f"Vetting results: {len(good)} good, {len(cache.liars)} liars, "
-        f"{len(cache.too_expensive)} too expensive"
+        f"Vetting results: {len(freshly_good)} freshly good, "
+        f"{len(good) - len(freshly_good)} carried (transient flakes), "
+        f"{len(cache.liars)} liars, {len(cache.too_expensive)} too expensive"
     )
 
     save_endpoints_bi(good)
     cache.save(ENDPOINTS_CACHE_BI_PATH)
+    return good
 
 
 class LifecycleActions(BaseModel):
@@ -369,10 +394,9 @@ def select_lifecycle_actions(
     return LifecycleActions(onboard=onboard, recheck=recheck, delist=delist)
 
 
-async def update_endpoints_bi_lifecycle():
+async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
     """Onboard new candidates, delist vanished endpoints, re-check retired ones."""
     states = load_all_states(config.bi.state_dir)
-    candidates = config.endpoints_bi
     now = datetime.now(tz=timezone.utc).replace(microsecond=0)
     actions = select_lifecycle_actions(candidates, states, now)
     logger.info(
@@ -450,8 +474,8 @@ async def update_endpoints_bi_lifecycle():
 
 async def main():
     await update_endpoints_lt()
-    await update_endpoints_bi()
-    await update_endpoints_bi_lifecycle()
+    good = await update_endpoints_bi()
+    await update_endpoints_bi_lifecycle(good)
 
 
 if __name__ == "__main__":
