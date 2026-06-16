@@ -28,7 +28,6 @@ from trackllm_website.util import (
     slugify,
 )
 
-BAD_ENDPOINTS_BI_PATH = root / "bad_endpoints_bi.yaml"
 ENDPOINTS_CACHE_BI_PATH = root / "endpoints_cache_bi.yaml"
 
 
@@ -90,36 +89,14 @@ def merge_goods(
     excluded (they live in the cache now). Fresh measurements win on overlap.
     """
     fresh_set = set(freshly_good)
-    carried = [e for e in prior_goods if e not in fresh_set and not cache.is_cached(e)]
+    carried = [
+        e
+        for e in prior_goods
+        if e not in fresh_set
+        and not cache.is_cached(e)
+        and e.cost_per_request is not None
+    ]
     return freshly_good + carried
-
-
-def migrate_bad_endpoints() -> None:
-    """One-shot migration of the old bad_endpoints_bi.yaml into the bucketed cache.
-
-    Old price_mismatch entries become liars; token_usage entries are dropped (token
-    counts are no longer a rejection reason — they get re-vetted on cost). Runs only
-    when the old file exists and the new cache file does not.
-    """
-    if not BAD_ENDPOINTS_BI_PATH.exists() or ENDPOINTS_CACHE_BI_PATH.exists():
-        return
-    with open(BAD_ENDPOINTS_BI_PATH) as f:
-        data = yaml.safe_load(f) or {}
-    cache = EndpointCache(liars=[], too_expensive=[], bad_temperature=[])
-    for e in data.get("bad_endpoints_bi", []):
-        if e.get("reason", {}).get("price_mismatch") is not None:
-            cache.add_liar(
-                Endpoint(
-                    api=e["api"],
-                    model=e["model"],
-                    provider=e.get("provider"),
-                    cost=(0, 0),
-                )
-            )
-    cache.save(ENDPOINTS_CACHE_BI_PATH)
-    logger.info(
-        f"Migrated {len(cache.liars)} price-mismatch liars from {BAD_ENDPOINTS_BI_PATH}"
-    )
 
 
 async def get_model_endpoints(
@@ -305,8 +282,6 @@ async def update_endpoints_bi() -> list[Endpoint]:
     liar (cached), transient (skipped, retried next run). Writes endpoints_bi.yaml with
     measured cost_per_request and saves the cache.
     """
-    migrate_bad_endpoints()
-
     prior_goods = config.endpoints_bi  # prior registry, carries prior cost_per_request
     all_endpoints = await get_endpoints(logprob_filter=False, max_cost_mtok=None)
     policy = load_policy(root / config.bi.selection_path)

@@ -14,6 +14,7 @@ EP = Endpoint(api="openrouter", model="m/x", provider="p", cost=(1.0, 2.0))
 class FakeClient:
     def __init__(self, response, gen_cost):
         self._response, self._gen_cost = response, gen_cost
+        self.session = None
 
     async def query(self, endpoint, prompt, **kwargs):
         return self._response
@@ -126,6 +127,21 @@ def test_merge_goods_carries_forward_transient_flakes():
     assert set(by_model) == {"m/a", "m/c"}  # B (cached liar) excluded
     assert by_model["m/a"].cost_per_request == 0.15  # fresh measurement wins
     assert by_model["m/c"].cost_per_request == 0.3  # carried with prior cpr
+
+
+def test_merge_goods_drops_carried_without_cost():
+    # D flaked transiently (not freshly good, not cached) but has no prior
+    # cost_per_request => can't be priced/selected, so it's dropped.
+    def mk(model, cpr):
+        e = Endpoint(api="openrouter", model=model, provider="p", cost=(1, 1))
+        e.cost_per_request = cpr
+        return e
+
+    prior = [mk("m/a", 0.1), mk("m/d", None)]
+    cache = EndpointCache(liars=[], too_expensive=[], bad_temperature=[])
+
+    result = merge_goods(prior, freshly_good=[], cache=cache)
+    assert {e.model for e in result} == {"m/a"}
 
 
 def test_cache_round_trip(tmp_path):
