@@ -143,11 +143,15 @@ async def get_model_endpoints(
         return []
 
 
-async def get_endpoints(logprob_filter: bool = False) -> list[Endpoint]:
+async def get_endpoints(
+    logprob_filter: bool, max_cost_mtok: float | None
+) -> list[Endpoint]:
     """Get all endpoints for all models.
 
     Args:
         logprob_filter: If True, only return endpoints that claim to support logprobs
+        max_cost_mtok: If not None, only keep endpoints whose combined input+output
+            cost is below this cap (in $/Mtok)
     """
     response = requests.get("https://openrouter.ai/api/v1/models")
     model_ids = [model["id"] for model in response.json()["data"]]
@@ -162,9 +166,11 @@ async def get_endpoints(logprob_filter: bool = False) -> list[Endpoint]:
         ):
             all_endpoints.extend(result)
 
-    filtered_endpoints = [
-        e for e in all_endpoints if e.cost[0] + e.cost[1] < config.api.max_cost_mtok
-    ]
+    filtered_endpoints = all_endpoints
+    if max_cost_mtok is not None:
+        filtered_endpoints = [
+            e for e in filtered_endpoints if e.cost[0] + e.cost[1] < max_cost_mtok
+        ]
 
     if config.api.openrouter_avoid_free_endpoints:
         filtered_endpoints = [
@@ -173,8 +179,10 @@ async def get_endpoints(logprob_filter: bool = False) -> list[Endpoint]:
 
     log_msg = (
         f"Found {len(all_endpoints)} {'endpoints claiming logprobs support' if logprob_filter else 'total endpoints'}, "
-        f"keeping {len(filtered_endpoints)} within max cost of ${config.api.max_cost_mtok}/Mtok"
+        f"keeping {len(filtered_endpoints)}"
     )
+    if max_cost_mtok is not None:
+        log_msg += f" within max cost of ${max_cost_mtok}/Mtok"
     if config.api.openrouter_avoid_free_endpoints:
         log_msg += " and excluding free endpoints"
     logger.info(log_msg)
@@ -299,7 +307,9 @@ async def update_endpoints_lt():
     logger.info(
         f"Keeping {len(endpoints_to_keep)}/{len(current_endpoints)} non-stalled endpoints"
     )
-    endpoints_claiming_logprobs = await get_endpoints(logprob_filter=True)
+    endpoints_claiming_logprobs = await get_endpoints(
+        logprob_filter=True, max_cost_mtok=config.api.max_cost_mtok
+    )
 
     # Update costs with latest values
     for endpoint in endpoints_to_keep:
@@ -346,7 +356,7 @@ async def update_endpoints_bi():
     Good endpoints are stored in endpoints_bi.yaml and also skipped on re-runs.
     Only new endpoints (not in good or bad lists) are tested.
     """
-    all_endpoints = await get_endpoints(logprob_filter=False)
+    all_endpoints = await get_endpoints(logprob_filter=False, max_cost_mtok=None)
     all_endpoints_set = set(all_endpoints)
 
     known_bad = load_bad_endpoints_bi()
