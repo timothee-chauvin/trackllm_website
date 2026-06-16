@@ -2,7 +2,6 @@ import asyncio
 from collections.abc import Iterable
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
-from typing import Literal
 
 import aiohttp
 import requests
@@ -12,7 +11,9 @@ from pydantic import BaseModel
 from trackllm_website.api import OpenRouterClient
 from trackllm_website.bi.common import resolve_strategies
 from trackllm_website.bi.reinit import reinit
+from trackllm_website.bi.selection import SelectionPolicy, _matches_any, load_policy
 from trackllm_website.bi.state import EndpointBIState, RetiredInfo, load_all_states
+from trackllm_website.bi.vetting import EndpointCache, vet_endpoint
 from trackllm_website.config import Endpoint, config, logger, root
 from trackllm_website.storage import ResultsStorage
 from trackllm_website.util import (
@@ -22,79 +23,77 @@ from trackllm_website.util import (
 )
 
 BAD_ENDPOINTS_BI_PATH = root / "bad_endpoints_bi.yaml"
-
-# Temporary shim: test_endpoint_token_usage is rewritten in a later task.
-MAX_INPUT_TOKENS = 10
-MAX_OUTPUT_TOKENS = 1
+ENDPOINTS_CACHE_BI_PATH = root / "endpoints_cache_bi.yaml"
 
 
-class BadEndpointReason(BaseModel):
-    token_usage: list[int] | None = None
-    price_mismatch: str | None = None
+def exceeds_ceiling(
+    cost_per_request: float, model: str, provider: str, policy: SelectionPolicy
+) -> bool:
+    """A non-flagship endpoint above the monthly ceiling is too_expensive to keep probing.
+
+    Flagships (selection's flagship-rule patterns) are exempt — they're monitored
+    regardless of cost.
+    """
+    fake = Endpoint(api="openrouter", model=model, provider=provider, cost=(0, 0))
+    if _matches_any(fake, policy.flagship_patterns()):
+        return False
+    return cost_per_request * config.bi.samples_per_month > policy.max_endpoint_cost
 
 
-class BadEndpoint(BaseModel):
-    api: Literal["openrouter"]
-    model: str
-    provider: str | None = None
-    reason: BadEndpointReason
+def save_endpoints_bi(endpoints: list[Endpoint]) -> None:
+    """Dump BI candidate endpoints (with measured cost_per_request) to endpoints_bi.yaml.
 
-    @classmethod
-    def from_endpoint(
-        cls, endpoint: Endpoint, reason: BadEndpointReason
-    ) -> "BadEndpoint":
-        return cls(
-            api=endpoint.api,
-            model=endpoint.model,
-            provider=endpoint.provider,
-            reason=reason,
-        )
-
-    def matches(self, endpoint: Endpoint) -> bool:
-        return (
-            self.api == endpoint.api
-            and self.model == endpoint.model
-            and self.provider == endpoint.provider
-        )
-
-
-def load_bad_endpoints_bi() -> list[BadEndpoint]:
-    """Load the set of known bad BI endpoints from disk."""
-    if not BAD_ENDPOINTS_BI_PATH.exists():
-        return []
-    with open(BAD_ENDPOINTS_BI_PATH) as f:
-        data = yaml.safe_load(f) or {}
-    return [
-        BadEndpoint(
-            api=e["api"],
-            model=e["model"],
-            provider=e.get("provider"),
-            reason=BadEndpointReason(**e.get("reason", {})),
-        )
-        for e in data.get("bad_endpoints_bi", [])
-    ]
-
-
-def save_bad_endpoints_bi(bad_endpoints: Iterable[BadEndpoint]) -> None:
-    """Save the list of bad BI endpoints to disk."""
-    sorted_bad = sorted(
-        bad_endpoints,
-        key=lambda b: (b.api, b.model, b.provider or ""),
+    Sorted by (total advertised cost, api, model, provider). Task 10's cost-preview
+    reuses this exact writer.
+    """
+    sorted_endpoints = sorted(
+        endpoints, key=lambda e: (sum(e.cost), e.api, e.model, e.provider)
     )
     output_data = {
-        "bad_endpoints_bi": [
+        "endpoints_bi": [
             {
-                "api": b.api,
-                "model": b.model,
-                "provider": b.provider,
-                "reason": b.reason.model_dump(exclude_none=True),
+                "api": e.api,
+                "model": e.model,
+                "provider": e.provider,
+                "cost": list(e.cost),
+                "cost_per_request": e.cost_per_request,
             }
-            for b in sorted_bad
+            for e in sorted_endpoints
         ]
     }
-    with open(BAD_ENDPOINTS_BI_PATH, "w") as f:
-        # default_flow_style=False for consistent dumping
+    with open(config.endpoints_yaml_path_bi, "w") as f:
         yaml.dump(output_data, f, default_flow_style=False, sort_keys=False)
+    logger.info(
+        f"Updated {config.endpoints_yaml_path_bi} with {len(sorted_endpoints)} endpoints"
+    )
+
+
+def migrate_bad_endpoints() -> None:
+    """One-shot migration of the old bad_endpoints_bi.yaml into the bucketed cache.
+
+    Old price_mismatch entries become liars; token_usage entries are dropped (token
+    counts are no longer a rejection reason — they get re-vetted on cost). Runs only
+    when the old file exists and the new cache file does not.
+    """
+    if not BAD_ENDPOINTS_BI_PATH.exists() or ENDPOINTS_CACHE_BI_PATH.exists():
+        return
+    with open(BAD_ENDPOINTS_BI_PATH) as f:
+        data = yaml.safe_load(f) or {}
+    cache = EndpointCache(liars=[], too_expensive=[], bad_temperature=[])
+    for e in data.get("bad_endpoints_bi", []):
+        if e.get("reason", {}).get("price_mismatch") is not None:
+            cache.add_liar(
+                Endpoint(
+                    api=e["api"],
+                    model=e["model"],
+                    provider=e.get("provider"),
+                    cost=(0, 0),
+                )
+            )
+    cache.save(ENDPOINTS_CACHE_BI_PATH)
+    logger.info(
+        f"Migrated {len(cache.liars)} price-mismatch liars from {BAD_ENDPOINTS_BI_PATH}"
+    )
 
 
 async def get_model_endpoints(
@@ -190,85 +189,6 @@ async def get_endpoints(
     return filtered_endpoints
 
 
-def compute_expected_cost(
-    input_tokens: int, output_tokens: int, endpoint: Endpoint
-) -> float:
-    return (
-        input_tokens * endpoint.cost[0] / 1e6 + output_tokens * endpoint.cost[1] / 1e6
-    )
-
-
-async def test_endpoint_token_usage(
-    endpoint: Endpoint,
-    price_tolerance: float = 0.01,
-) -> tuple[Endpoint | None, BadEndpoint | None]:
-    """Test if an endpoint uses acceptable token counts and correct pricing.
-
-    Returns:
-        (valid_endpoint, bad_endpoint) - at least one will be None.
-    """
-    async with OpenRouterClient() as client:
-        try:
-            response = await client.query(endpoint, "a", logprobs=False, temperature=0)
-            if response.error:
-                logger.info(
-                    f"{endpoint} token test: ❌ (error: {response.error.message})"
-                )
-                return None, None  # Don't mark as bad on error, might be transient
-            max_input_tokens = MAX_INPUT_TOKENS
-            max_output_tokens = MAX_OUTPUT_TOKENS
-            if response.input_tokens > max_input_tokens or (
-                max_output_tokens is not None
-                and response.output_tokens > max_output_tokens
-            ):
-                logger.info(
-                    f"{endpoint} token test: ❌ "
-                    f"(input={response.input_tokens}, output={response.output_tokens})"
-                )
-                bad = BadEndpoint.from_endpoint(
-                    endpoint,
-                    BadEndpointReason(
-                        token_usage=[response.input_tokens, response.output_tokens]
-                    ),
-                )
-                return None, bad
-
-            # Verify pricing matches advertised cost using the generation endpoint
-            expected_cost = compute_expected_cost(
-                response.input_tokens, response.output_tokens, endpoint
-            )
-            if expected_cost > 0:
-                if not response.generation_id:
-                    logger.info(f"{endpoint} price test: ⏭️ (no generation_id)")
-                    return None, None
-                actual_cost = await client.get_generation_cost(response.generation_id)
-                if actual_cost is None:
-                    logger.info(
-                        f"{endpoint} price test: ⏭️ (couldn't fetch generation cost for id {response.generation_id})"
-                    )
-                    return None, None
-                if actual_cost > expected_cost * (1 + price_tolerance):
-                    ratio = actual_cost / expected_cost
-                    logger.info(
-                        f"{endpoint} price test: ❌ "
-                        f"(actual={actual_cost:.8f}, expected={expected_cost:.8f}, ratio={ratio:.2f})"
-                    )
-                    bad = BadEndpoint.from_endpoint(
-                        endpoint,
-                        BadEndpointReason(price_mismatch=f"{ratio:.2f}"),
-                    )
-                    return None, bad
-
-            logger.info(
-                f"{endpoint} token test: ✅ "
-                f"(input={response.input_tokens}, output={response.output_tokens})"
-            )
-            return endpoint, None
-        except Exception:
-            logger.exception(f"Error testing token usage for {endpoint}")
-            return None, None  # Don't mark as bad on exception, might be transient
-
-
 async def test_endpoint_logprobs(endpoint: Endpoint) -> Endpoint | None:
     """Test if an endpoint actually returns logprobs when queried with 'x'"""
     async with OpenRouterClient() as client:
@@ -349,90 +269,72 @@ async def update_endpoints_lt():
 
 
 async def update_endpoints_bi():
-    """Update the BI endpoints with all providers for all models.
+    """Refresh the BI candidate catalog via cost-based vetting.
 
-    Filters out endpoints that use too many tokens (>10 input or >1 output).
-    Bad endpoints are stored in bad_endpoints_bi.yaml to avoid re-testing.
-    Good endpoints are stored in endpoints_bi.yaml and also skipped on re-runs.
-    Only new endpoints (not in good or bad lists) are tested.
+    Pulls the full catalog (no cost cap), skips endpoints already in the bucketed
+    cache (liars / too_expensive / bad_temperature), then vets the rest — known-good
+    endpoints included, to refresh their measured cost_per_request since prices move.
+    Each vet runs one real query and measures the billed cost; results are routed:
+    candidate (kept, with measured cost; or cached too_expensive if over the ceiling),
+    liar (cached), transient (skipped, retried next run). Writes endpoints_bi.yaml with
+    measured cost_per_request and saves the cache.
     """
+    migrate_bad_endpoints()
+
     all_endpoints = await get_endpoints(logprob_filter=False, max_cost_mtok=None)
-    all_endpoints_set = set(all_endpoints)
+    policy = load_policy(root / config.bi.selection_path)
+    cache = EndpointCache.load(ENDPOINTS_CACHE_BI_PATH)
 
-    known_bad = load_bad_endpoints_bi()
-    known_good = set(config.endpoints_bi)
+    # Re-vet known-good and new endpoints alike (to refresh cost_per_request); skip
+    # only those already in a reject bucket.
+    to_vet = [e for e in all_endpoints if not cache.is_cached(e)]
     logger.info(
-        f"Loaded {len(known_good)} known good endpoints, "
-        f"{len(known_bad)} known bad endpoints"
+        f"Vetting {len(to_vet)} of {len(all_endpoints)} endpoints "
+        f"(skipping {len(all_endpoints) - len(to_vet)} cached rejects)"
     )
 
-    # Update costs for known good endpoints if they're still in the API response
-    still_good = []
-    for good_endpoint in known_good:
-        if good_endpoint in all_endpoints_set:
-            updated = next(e for e in all_endpoints if e == good_endpoint)
-            still_good.append(updated)
-        else:
-            still_good.append(good_endpoint)
-    logger.info(f"Keeping all {len(still_good)} known good endpoints")
-
-    # Filter out known bad and known good endpoints - only test new ones
-    endpoints_to_test = [
-        e
-        for e in all_endpoints
-        if not any(b.matches(e) for b in known_bad) and e not in known_good
-    ]
-    skipped_bad = len(
-        [e for e in all_endpoints if any(b.matches(e) for b in known_bad)]
-    )
-    skipped_good = len([e for e in all_endpoints if e in known_good])
+    async with OpenRouterClient(timeout=60.0) as probe_client:
+        strategies, failed = await resolve_strategies(probe_client, to_vet)
     logger.info(
-        f"Testing {len(endpoints_to_test)} new endpoints "
-        f"(skipping {skipped_bad} known bad, {skipped_good} known good)"
+        f"Resolved strategies for {len(strategies)} endpoints "
+        f"({len(failed)} failed probing)"
     )
 
-    # Test token usage for each new endpoint
-    tasks = [test_endpoint_token_usage(e) for e in endpoints_to_test]
-    results = await gather_with_concurrency(config.api.max_workers, *tasks)
+    async def vet_one(client: OpenRouterClient, endpoint: Endpoint) -> Endpoint | None:
+        """Vet one endpoint; route to the cache or return it (kept good)."""
+        strategy = strategies.get(str(endpoint))
+        if strategy is None:
+            return None  # couldn't resolve a strategy; skip (not cached)
+        res = await vet_endpoint(client, endpoint, strategy)
+        if res.bucket == "candidate":
+            endpoint.cost_per_request = res.cost_per_request
+            if exceeds_ceiling(
+                res.cost_per_request, endpoint.model, endpoint.provider, policy
+            ):
+                cache.add_too_expensive(endpoint)
+                return None
+            return endpoint
+        if res.bucket == "liar":
+            cache.add_liar(endpoint)
+        return None  # liar (cached above) or transient (retry next run)
 
-    newly_valid = [r[0] for r in results if r[0] is not None]
-    new_bad = [r[1] for r in results if r[1] is not None]
-
-    logger.info(
-        f"Token test results: {len(newly_valid)} valid, "
-        f"{len(new_bad)} new bad endpoints"
-    )
-
-    # Update bad endpoints list
-    all_bad = known_bad + new_bad
-    save_bad_endpoints_bi(all_bad)
-    logger.info(f"Saved {len(all_bad)} total bad endpoints to {BAD_ENDPOINTS_BI_PATH}")
-
-    # Combine still-good and newly-valid endpoints, deduplicating by identity
-    all_good = list({e: e for e in still_good + newly_valid}.values())
-
-    # Sort and save valid endpoints to endpoints_bi.yaml
-    sorted_endpoints = sorted(
-        all_good, key=lambda e: (sum(e.cost), e.api, e.model, e.provider)
-    )
-
-    output_data = {"endpoints_bi": []}
-    for e in sorted_endpoints:
-        output_data["endpoints_bi"].append(
-            {
-                "api": e.api,
-                "model": e.model,
-                "provider": e.provider,
-                "cost": list(e.cost),
-            }
+    client = OpenRouterClient()
+    try:
+        results = await gather_with_concurrency(
+            config.api.max_workers,
+            *(vet_one(client, e) for e in to_vet),
         )
+    finally:
+        await client.close()
 
-    with open(config.endpoints_yaml_path_bi, "w") as f:
-        yaml.dump(output_data, f, default_flow_style=False, sort_keys=False)
-
+    good = [e for e in results if e is not None]
     logger.info(
-        f"Updated {config.endpoints_yaml_path_bi} with {len(sorted_endpoints)} endpoints"
+        f"Vetting results: {len(good)} good, {len(cache.liars)} liars, "
+        f"{len(cache.too_expensive)} too expensive"
     )
+
+    save_endpoints_bi(good)
+    cache.save(ENDPOINTS_CACHE_BI_PATH)
 
 
 class LifecycleActions(BaseModel):

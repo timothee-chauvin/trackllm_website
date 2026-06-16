@@ -2,9 +2,11 @@ import asyncio
 from datetime import datetime, timezone
 
 from trackllm_website.bi.common import PlainStrategy
+from trackllm_website.bi.selection import Rule, SelectionPolicy
 from trackllm_website.bi.vetting import EndpointCache, vet_endpoint
 from trackllm_website.config import Endpoint
 from trackllm_website.storage import Response, ResponseError
+from trackllm_website.update_endpoints import exceeds_ceiling
 
 EP = Endpoint(api="openrouter", model="m/x", provider="p", cost=(1.0, 2.0))
 
@@ -75,6 +77,34 @@ def test_vet_transient_error_is_not_cached():
     client = FakeClient(resp, gen_cost=None)
     res = asyncio.run(vet_endpoint(client, EP, PlainStrategy()))
     assert res.bucket == "transient"  # don't cache; retry next run
+
+
+def _ceiling_policy(ceiling, flagships):
+    return SelectionPolicy(
+        budget_per_month=10,
+        max_endpoint_cost=ceiling,
+        exclude=[],
+        rules=[
+            Rule(
+                name="flagships",
+                kind="models",
+                patterns=flagships,
+                providers_per_model=1,
+                flagship=True,
+            )
+        ],
+    )
+
+
+def test_non_flagship_above_ceiling_is_too_expensive():
+    pol = _ceiling_policy(0.5, ["m/flag"])
+    # 0.0001 * 6000 = 0.6 > 0.5 ceiling
+    assert exceeds_ceiling(0.0001, "m/other", "p", pol) is True
+
+
+def test_flagship_above_ceiling_is_kept():
+    pol = _ceiling_policy(0.5, ["m/flag"])
+    assert exceeds_ceiling(0.0001, "m/flag", "p", pol) is False
 
 
 def test_cache_round_trip(tmp_path):
