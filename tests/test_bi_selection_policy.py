@@ -1,6 +1,4 @@
-from pathlib import Path
-
-from trackllm_website.bi.selection import SelectionPolicy, load_policy
+from trackllm_website.bi.selection import load_policy
 
 
 def test_loads_policy(tmp_path):
