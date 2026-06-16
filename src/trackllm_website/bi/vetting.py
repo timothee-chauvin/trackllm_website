@@ -24,19 +24,15 @@ class VetResult(BaseModel):
     cost_per_request: float | None = None
 
 
-def _advertised_cost(
-    input_tokens: int, output_tokens: int, endpoint: Endpoint
-) -> float:
-    return (
-        input_tokens * endpoint.cost[0] / 1e6 + output_tokens * endpoint.cost[1] / 1e6
-    )
-
-
-async def vet_endpoint(client, endpoint: Endpoint, strategy: QueryStrategy) -> VetResult:
+async def vet_endpoint(
+    client, endpoint: Endpoint, strategy: QueryStrategy
+) -> VetResult:
     """Probe one endpoint with its resolved strategy; classify it.
 
-    A transient error (network / 5xx) returns bucket="transient" so the caller
-    does NOT cache it — it will be retried next run.
+    expected = response.cost (token math at advertised price, incl. reasoning).
+    actual = OpenRouter's real charge for the generation. A liar bills more than
+    the token math implies. A transient error (network / 5xx) or an un-priceable
+    response returns bucket="transient" so the caller does NOT cache it.
     """
     response = await client.query(
         endpoint,
@@ -48,23 +44,18 @@ async def vet_endpoint(client, endpoint: Endpoint, strategy: QueryStrategy) -> V
     if response.error:
         logger.info(f"{endpoint} vet: transient error {response.error.message[:80]}")
         return VetResult(bucket="transient")
-
-    advertised = _advertised_cost(
-        response.input_tokens, response.output_tokens, endpoint
-    )
-    measured = response.cost
-    if measured is None and response.generation_id:
-        measured = await client.get_generation_cost(response.generation_id)
-    if measured is None:
+    expected = response.cost  # compute_cost(usage): token math at advertised price
+    if not response.generation_id:
+        return VetResult(bucket="transient")
+    actual = await client.get_generation_cost(response.generation_id)
+    if actual is None:
         return VetResult(bucket="transient")  # couldn't price it; retry later
-
-    if advertised > 0 and measured > advertised * (1 + PRICE_TOLERANCE):
+    if expected > 0 and actual > expected * (1 + PRICE_TOLERANCE):
         logger.info(
-            f"{endpoint} vet: liar (billed {measured:.8f} vs {advertised:.8f})"
+            f"{endpoint} vet: liar (billed {actual:.8f} vs expected {expected:.8f})"
         )
         return VetResult(bucket="liar")
-
-    return VetResult(bucket="candidate", cost_per_request=measured)
+    return VetResult(bucket="candidate", cost_per_request=actual)
 
 
 class EndpointCache(BaseModel):

@@ -37,18 +37,26 @@ def ok_response(cost, gen_id="g1"):
 
 
 def test_vet_records_measured_cost():
-    # advertised = (7*1 + 1*2)/1e6 = 9e-6; billed matches => candidate.
-    client = FakeClient(ok_response(cost=9e-6), gen_cost=9e-6)
+    # expected (response.cost) = 0.00001; actual billed matches => candidate,
+    # and cost_per_request is the ACTUAL billed cost.
+    client = FakeClient(ok_response(cost=0.00001), gen_cost=0.00001)
     res = asyncio.run(vet_endpoint(client, EP, PlainStrategy()))
     assert res.bucket == "candidate"
-    assert abs(res.cost_per_request - 9e-6) < 1e-12
+    assert abs(res.cost_per_request - 0.00001) < 1e-12
 
 
 def test_vet_flags_pricing_liar():
-    # advertised ~ (7*1 + 1*2)/1e6 = 9e-6; billed 10x that
-    client = FakeClient(ok_response(cost=9e-5, gen_id="g1"), gen_cost=9e-5)
+    # expected = 0.00001 but provider bills 0.0002 (20x) => liar.
+    client = FakeClient(ok_response(cost=0.00001), gen_cost=0.0002)
     res = asyncio.run(vet_endpoint(client, EP, PlainStrategy()))
     assert res.bucket == "liar"
+
+
+def test_vet_transient_when_no_generation_cost():
+    # Honest response but the actual billed cost can't be fetched => transient.
+    client = FakeClient(ok_response(cost=0.00001), gen_cost=None)
+    res = asyncio.run(vet_endpoint(client, EP, PlainStrategy()))
+    assert res.bucket == "transient"
 
 
 def test_vet_transient_error_is_not_cached():
