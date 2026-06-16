@@ -804,6 +804,11 @@ Rewrite `update_endpoints_bi()`:
 
 Migration: on first run, if `bad_endpoints_bi.yaml` exists and `endpoints_cache_bi.yaml` does not, convert old `price_mismatch` entries → `liars`, drop `token_usage` entries (those were token-count rejects, no longer a reason — let them be re-vetted). Add a one-shot `migrate_bad_endpoints()` helper and call it at the top of `update_endpoints_bi`. Delete `bad_endpoints_bi.yaml` via `git rm` once converted (do this in the commit).
 
+**Carry-forwards from the T3 review (handle in this task):**
+- **Shared aiohttp session:** `vet_endpoint` → `get_generation_cost` opens a fresh `ClientSession` per honest endpoint. When fanning out vetting concurrently here, pass the client's session into `get_generation_cost` (its `session=` param exists) to avoid connection-pool churn across hundreds of endpoints.
+- **Tolerance single-source:** the deleted `test_endpoint_token_usage` held `price_tolerance` and the `MAX_INPUT_TOKENS/MAX_OUTPUT_TOKENS` shim constants — delete all three; `PRICE_TOLERANCE` now lives only in `bi/vetting.py`.
+- **Concurrency:** vet new endpoints via `gather_with_concurrency(config.api.max_workers, ...)` (each `vet_endpoint` blocks 5–75s on the generation-cost backoff, so concurrency is essential).
+
 Update the dump block that writes `endpoints_bi.yaml` to include `"cost_per_request": e.cost_per_request`.
 
 - [ ] **Step 4: Run tests — expect PASS**
