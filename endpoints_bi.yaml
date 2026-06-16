@@ -570,12 +570,6 @@ endpoints_bi:
   - 0.06
   - 0.25
 - api: openrouter
-  model: deepseek/deepseek-v4-flash
-  provider: digitalocean
-  cost:
-  - 0.105
-  - 0.21
-- api: openrouter
   model: google/gemma-3-27b-it
   provider: novita/bf16
   cost:
@@ -605,6 +599,12 @@ endpoints_bi:
   cost:
   - 0.066
   - 0.26
+- api: openrouter
+  model: deepseek/deepseek-v4-flash
+  provider: digitalocean
+  cost:
+  - 0.112
+  - 0.224
 - api: openrouter
   model: qwen/qwen3-14b
   provider: nextbit/int4
@@ -3978,6 +3978,12 @@ endpoints_bi:
   - 0.6
   - 2.2
 - api: openrouter
+  model: qwen/qwen3.5-397b-a17b
+  provider: digitalocean
+  cost:
+  - 0.385
+  - 2.45
+- api: openrouter
   model: qwen/qwen3.5-27b
   provider: deepinfra/fp8
   cost:
@@ -4164,6 +4170,12 @@ endpoints_bi:
   - 0.6
   - 2.5
 - api: openrouter
+  model: z-ai/glm-5
+  provider: digitalocean
+  cost:
+  - 0.75
+  - 2.4
+- api: openrouter
   model: qwen/qwen3.6-27b
   provider: alibaba
   cost:
@@ -4308,12 +4320,6 @@ endpoints_bi:
   - 0.32
   - 3.2
 - api: openrouter
-  model: z-ai/glm-5
-  provider: digitalocean
-  cost:
-  - 0.85
-  - 2.72
-- api: openrouter
   model: qwen/qwen3.6-27b
   provider: venice/fp8
   cost:
@@ -4391,6 +4397,12 @@ endpoints_bi:
   cost:
   - 0.45
   - 3.5
+- api: openrouter
+  model: moonshotai/kimi-k2.6
+  provider: digitalocean
+  cost:
+  - 0.76
+  - 3.2
 - api: openrouter
   model: amazon/nova-pro-v1
   provider: amazon-bedrock
@@ -4477,12 +4489,6 @@ endpoints_bi:
   - 3.5
 - api: openrouter
   model: qwen/qwen3.5-397b-a17b
-  provider: digitalocean
-  cost:
-  - 0.55
-  - 3.5
-- api: openrouter
-  model: qwen/qwen3.5-397b-a17b
   provider: phala
   cost:
   - 0.55
@@ -4547,6 +4553,12 @@ endpoints_bi:
   cost:
   - 0.85
   - 3.3
+- api: openrouter
+  model: deepseek/deepseek-v4-pro
+  provider: digitalocean
+  cost:
+  - 1.392
+  - 2.784
 - api: openrouter
   model: arcee-ai/maestro-reasoning
   provider: together
@@ -4645,12 +4657,6 @@ endpoints_bi:
   - 3.2
 - api: openrouter
   model: moonshotai/kimi-k2.6
-  provider: digitalocean
-  cost:
-  - 0.8075
-  - 3.4
-- api: openrouter
-  model: moonshotai/kimi-k2.6
   provider: inceptron/int4
   cost:
   - 0.73
@@ -4697,18 +4703,6 @@ endpoints_bi:
   cost:
   - 0.85
   - 3.4
-- api: openrouter
-  model: deepseek/deepseek-v4-pro
-  provider: nextbit/fp8
-  cost:
-  - 1.3
-  - 3.0
-- api: openrouter
-  model: deepseek/deepseek-v4-pro
-  provider: digitalocean
-  cost:
-  - 1.479
-  - 2.958
 - api: openrouter
   model: moonshotai/kimi-k2.6
   provider: streamlake
@@ -4849,6 +4843,12 @@ endpoints_bi:
   - 4.0
 - api: openrouter
   model: moonshotai/kimi-k2.7-code
+  provider: akashml/int4
+  cost:
+  - 0.95
+  - 4.0
+- api: openrouter
+  model: moonshotai/kimi-k2.7-code
   provider: atlas-cloud/int4
   cost:
   - 0.95
@@ -4883,6 +4883,12 @@ endpoints_bi:
   cost:
   - 0.95
   - 4.0
+- api: openrouter
+  model: deepseek/deepseek-v4-pro
+  provider: nextbit/fp8
+  cost:
+  - 1.8
+  - 3.2
 - api: openrouter
   model: qwen/qwen3.7-max
   provider: alibaba
