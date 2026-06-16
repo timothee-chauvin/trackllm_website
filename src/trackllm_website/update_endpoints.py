@@ -23,6 +23,10 @@ from trackllm_website.util import (
 
 BAD_ENDPOINTS_BI_PATH = root / "bad_endpoints_bi.yaml"
 
+# Temporary shim: test_endpoint_token_usage is rewritten in a later task.
+MAX_INPUT_TOKENS = 10
+MAX_OUTPUT_TOKENS = 1
+
 
 class BadEndpointReason(BaseModel):
     token_usage: list[int] | None = None
@@ -203,8 +207,8 @@ async def test_endpoint_token_usage(
                     f"{endpoint} token test: ❌ (error: {response.error.message})"
                 )
                 return None, None  # Don't mark as bad on error, might be transient
-            max_input_tokens = config.bi.max_input_tokens
-            max_output_tokens = config.bi.max_output_tokens
+            max_input_tokens = MAX_INPUT_TOKENS
+            max_output_tokens = MAX_OUTPUT_TOKENS
             if response.input_tokens > max_input_tokens or (
                 max_output_tokens is not None
                 and response.output_tokens > max_output_tokens

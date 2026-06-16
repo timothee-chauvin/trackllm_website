@@ -23,6 +23,9 @@ class Endpoint(BaseModel):
     provider: str | None = None
     cost: tuple[int | float, int | float]
     max_logprobs: int | None = None
+    cost_per_request: float | None = (
+        None  # measured $/monitoring-query; set by BI vetting
+    )
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Endpoint):
@@ -121,8 +124,9 @@ class MonitorConfig(BaseModel):
 
 class BIConfig(BaseModel):
     data_dir: Path
-    max_input_tokens: int
-    max_output_tokens: int | None = None
+    selection_path: str
+    samples_per_day: int
+    days_per_month: int
     probe: ProbeConfig
     phase_1: Phase1Config
     phase_2: Phase2Config
@@ -130,6 +134,10 @@ class BIConfig(BaseModel):
     detection: DetectionConfig
     reinit: ReinitConfig
     monitor: MonitorConfig
+
+    @property
+    def samples_per_month(self) -> int:
+        return self.samples_per_day * self.days_per_month
 
     @property
     def tokenizers_dir(self) -> Path:
