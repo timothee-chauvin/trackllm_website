@@ -1502,6 +1502,13 @@ bad_endpoints_bi:
     - 1
 - api: openrouter
   model: minimax/minimax-m3
+  provider: morph
+  reason:
+    token_usage:
+    - 174
+    - 1
+- api: openrouter
+  model: minimax/minimax-m3
   provider: novita
   reason:
     token_usage:
