@@ -13,7 +13,11 @@ from trackllm_website.config import Endpoint
 
 def ep(model, provider, cpr):
     return Endpoint(
-        api="openrouter", model=model, provider=provider, cost=(1, 1), cost_per_request=cpr
+        api="openrouter",
+        model=model,
+        provider=provider,
+        cost=(1, 1),
+        cost_per_request=cpr,
     )
 
 
@@ -167,3 +171,91 @@ def test_nonflagship_named_rule_over_budget_raises():
     cands = [ep("m/a", "p", 0.001), ep("m/b", "p", 0.001)]  # 6.0/mo each => 12.0 total
     with pytest.raises(ValueError, match="exceeds budget"):
         select_monitoring_targets(cands, policy)
+
+
+def test_nonflagship_overshoot_then_wildcard_still_raises():
+    # a non-flagship named rule overshoots budget, then a trailing wildcard fill rule.
+    # the wildcard must NOT swallow the over-budget error via an early return.
+    policy = SelectionPolicy(
+        budget_per_month=10.0,
+        max_endpoint_cost=100.0,
+        exclude=[],
+        rules=[
+            Rule(
+                name="named",
+                kind="models",
+                patterns=["m/a", "m/b"],
+                providers_per_model=1,
+            ),
+            Rule(
+                name="long-tail",
+                kind="models",
+                patterns=["*"],
+                providers_per_model=1,
+                max_monthly_cost=10.0,
+            ),
+        ],
+    )
+    # m/a, m/b: 6.0/mo each => named rule selects both (12.0 > budget). m/c is an
+    # unselected wildcard candidate: with the buggy in-loop return, the wildcard
+    # early-returns on m/c and the post-loop ValueError never fires.
+    cands = [
+        ep("m/a", "p", 0.001),
+        ep("m/b", "p", 0.001),
+        ep("m/c", "p", 0.001),
+    ]
+    with pytest.raises(ValueError, match="exceeds budget"):
+        select_monitoring_targets(cands, policy)
+
+
+def test_providers_branch_covers_and_skips_pricey():
+    policy = SelectionPolicy(
+        budget_per_month=100.0,
+        max_endpoint_cost=100.0,
+        exclude=[],
+        rules=[
+            Rule(
+                name="providers",
+                kind="providers",
+                patterns=["*"],
+                endpoints_per_provider=1,
+                max_monthly_cost=0.25,
+            )
+        ],
+    )
+    # provA cheapest 0.12/mo (under cap), provB cheapest 0.6/mo (over cap)
+    cands = [
+        ep("m/a", "provA", 0.00002),  # 0.12/mo
+        ep("m/b", "provA", 0.0001),  # 0.6/mo
+        ep("m/c", "provB", 0.0001),  # 0.6/mo
+    ]
+    selected, _ = select_monitoring_targets(cands, policy)
+    assert [e.provider for e in selected] == ["provA"]
+
+
+def test_selection_is_deterministic():
+    policy = SelectionPolicy(
+        budget_per_month=100.0,
+        max_endpoint_cost=100.0,
+        exclude=[],
+        rules=[
+            Rule(
+                name="long-tail",
+                kind="models",
+                patterns=["*"],
+                providers_per_model="all",
+                max_monthly_cost=100.0,
+            )
+        ],
+    )
+    # equal cost_per_request across several providers/models => order must be stable
+    cands = [
+        ep("m/a", "p2", 0.0001),
+        ep("m/a", "p1", 0.0001),
+        ep("m/b", "p1", 0.0001),
+        ep("m/c", "p3", 0.0001),
+    ]
+    selected1, labels1 = select_monitoring_targets(list(cands), policy)
+    selected2, labels2 = select_monitoring_targets(list(cands), policy)
+    assert selected1 == selected2
+    assert labels1 == labels2

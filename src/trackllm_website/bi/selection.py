@@ -67,7 +67,7 @@ def select_monitoring_targets(
         by_provider[e.provider_without_suffix].append(e)
     for d in (by_model, by_provider):
         for k in d:
-            d[k].sort(key=monthly_cost)
+            d[k].sort(key=lambda e: (monthly_cost(e), str(e)))
 
     selected: dict[Endpoint, str] = {}
     spent = 0.0
@@ -85,7 +85,8 @@ def select_monitoring_targets(
             model_keys = [
                 m for m in by_model if _matches_any(by_model[m][0], rule.patterns)
             ]
-            model_keys.sort(key=lambda m: monthly_cost(by_model[m][0]))
+            model_keys.sort(key=lambda m: (monthly_cost(by_model[m][0]), m))
+            stop = False
             for m in model_keys:
                 eps = by_model[m]
                 n = (
@@ -106,8 +107,11 @@ def select_monitoring_targets(
                         and is_wildcard
                         and spent + monthly_cost(e) > policy.budget_per_month
                     ):
-                        return list(selected), selected  # budget reached, stop fill
+                        stop = True  # budget reached; remaining eps are costlier
+                        break
                     add(e, rule.name)
+                if stop:
+                    break
         else:  # providers
             for prov, eps in sorted(by_provider.items()):
                 for e in eps[: rule.endpoints_per_provider]:
