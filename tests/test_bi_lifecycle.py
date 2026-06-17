@@ -99,6 +99,10 @@ def _patch_lifecycle_deps(monkeypatch, tmp_path, *, select, reinit):
         "trackllm_website.update_endpoints.select_monitoring_targets", select
     )
     monkeypatch.setattr("trackllm_website.update_endpoints.reinit", reinit)
+    # Don't hit the live rankings API in lifecycle tests.
+    monkeypatch.setattr(
+        "trackllm_website.update_endpoints.fetch_popular_models_safe", lambda top_n: []
+    )
     monkeypatch.setattr(
         "trackllm_website.update_endpoints.ENDPOINTS_CACHE_BI_PATH",
         tmp_path / "endpoints_cache_bi.yaml",
