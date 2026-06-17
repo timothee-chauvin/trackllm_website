@@ -45,12 +45,26 @@ def test_recheck_due_only_after_interval():
     assert [s.endpoint.model for s in actions.recheck] == ["m/due"]
 
 
-def test_delisted_when_absent_from_catalog():
+def test_delisted_only_after_grace_period():
+    grace = config.bi.reinit.deselection_grace_days
     states = {
-        "gone": EndpointBIState(endpoint=ep("m/gone"), status="monitoring", epochs=[])
+        # Just fell out this run: still within grace, not delisted yet.
+        "fresh": EndpointBIState(
+            endpoint=ep("m/fresh"),
+            status="monitoring",
+            epochs=[],
+            deselected_since=NOW,
+        ),
+        # Dropped out long ago: past grace, delisted.
+        "stale": EndpointBIState(
+            endpoint=ep("m/stale"),
+            status="monitoring",
+            epochs=[],
+            deselected_since=NOW - timedelta(days=grace + 1),
+        ),
     }
     actions = select_lifecycle_actions([], states, NOW)
-    assert [s.endpoint.model for s in actions.delist] == ["m/gone"]
+    assert [s.endpoint.model for s in actions.delist] == ["m/stale"]
 
 
 class _FakeClient:
@@ -179,6 +193,42 @@ def test_only_selected_candidates_are_onboarded(monkeypatch, tmp_path):
     assert (state_dir / f"{slugify_eq(chosen_a)}.json").exists()
     assert (state_dir / f"{slugify_eq(chosen_b)}.json").exists()
     assert not (state_dir / f"{slugify_eq(rejected)}.json").exists()
+
+
+def test_executor_stamps_and_clears_deselected_since(monkeypatch, tmp_path):
+    """A monitored endpoint dropping out of selection gets deselected_since stamped
+    (but not delisted within grace); one returning to selection gets it cleared."""
+    dropped, returning = ep("m/dropped"), ep("m/returning")
+
+    # Selection keeps only `returning`; `dropped` falls out of the selected set.
+    def select_returning(candidates, policy, popular_models):
+        return [returning], {returning: "test"}
+
+    async def fake_reinit(client, strategy, endpoint, old_bis, now):
+        raise AssertionError("no onboarding expected")
+
+    _patch_lifecycle_deps(
+        monkeypatch, tmp_path, select=select_returning, reinit=fake_reinit
+    )
+
+    state_dir = config.bi.state_dir
+    EndpointBIState(endpoint=dropped, status="monitoring", epochs=[]).save(state_dir)
+    EndpointBIState(
+        endpoint=returning,
+        status="monitoring",
+        epochs=[],
+        deselected_since=NOW - timedelta(days=5),
+    ).save(state_dir)
+
+    asyncio.run(update_endpoints_bi_lifecycle([returning]))
+
+    dropped_state = EndpointBIState.load(state_dir / f"{slugify_eq(dropped)}.json")
+    returning_state = EndpointBIState.load(state_dir / f"{slugify_eq(returning)}.json")
+    # dropped: now out of the selected set, clock just started, still monitoring.
+    assert dropped_state.deselected_since is not None
+    assert dropped_state.status == "monitoring"
+    # returning: back in the selected set, clock cleared.
+    assert returning_state.deselected_since is None
 
 
 def slugify_eq(endpoint):

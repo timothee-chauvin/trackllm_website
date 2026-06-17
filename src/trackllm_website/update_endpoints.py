@@ -404,6 +404,14 @@ class LifecycleActions(BaseModel):
     delist: list[EndpointBIState]
 
 
+def should_delist(state: EndpointBIState, now: datetime, grace_days: int) -> bool:
+    """A monitoring endpoint that's no longer selected delists only after the grace
+    period since it dropped out. Caller sets deselected_since when it leaves the set."""
+    if state.deselected_since is None:
+        return False
+    return now - state.deselected_since >= timedelta(days=grace_days)
+
+
 def select_lifecycle_actions(
     candidates: list[Endpoint],
     states: dict[str, EndpointBIState],
@@ -422,10 +430,14 @@ def select_lifecycle_actions(
         and s.endpoint in candidate_set
         and now - s.retired.last_recheck >= timedelta(days=r.recheck_days)
     ]
+    # Deselected monitoring endpoints are only delisted once past the grace period;
+    # the executor maintains deselected_since on the states beforehand.
     delist = [
         s
         for s in states.values()
-        if s.status == "monitoring" and s.endpoint not in candidate_set
+        if s.status == "monitoring"
+        and s.endpoint not in candidate_set
+        and should_delist(s, now, r.deselection_grace_days)
     ]
     return LifecycleActions(onboard=onboard, recheck=recheck, delist=delist)
 
@@ -445,6 +457,21 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
     cache = EndpointCache.load(ENDPOINTS_CACHE_BI_PATH)
     states = load_all_states(config.bi.state_dir)
     now = datetime.now(tz=timezone.utc).replace(microsecond=0)
+
+    # Maintain the deselection clock before deciding actions: stamp the moment a
+    # monitored endpoint leaves the selected set, and clear it if it returns.
+    selected_set = set(selected)
+    for state in states.values():
+        if state.status != "monitoring":
+            continue
+        in_set = state.endpoint in selected_set
+        if not in_set and state.deselected_since is None:
+            state.deselected_since = now
+            state.save(config.bi.state_dir)
+        elif in_set and state.deselected_since is not None:
+            state.deselected_since = None
+            state.save(config.bi.state_dir)
+
     actions = select_lifecycle_actions(selected, states, now)
     logger.info(
         f"BI lifecycle: {len(actions.onboard)} to onboard, "
