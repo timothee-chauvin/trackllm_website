@@ -152,12 +152,14 @@ def select_monitoring_targets(
                         and monthly_cost(e) > rule.max_monthly_cost
                     ):
                         continue
+                    # popular is a fill rule (popularity feed, not a curated family):
+                    # stop gracefully at budget rather than aborting via the post-loop
+                    # ValueError. Flagship popular rules stay budget-exempt.
                     if (
                         not rule.flagship
-                        and is_wildcard
                         and spent + monthly_cost(e) > policy.budget_per_month
                     ):
-                        stop = True  # budget reached; remaining eps are costlier
+                        stop = True
                         break
                     add(e, rule.name)
                 if stop:
