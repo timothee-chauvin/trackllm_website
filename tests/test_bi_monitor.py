@@ -72,7 +72,9 @@ def test_run_endpoint_reinit_retires_and_persists(tmp_path, monkeypatch):
         return daily_batch, 0
 
     async def fake_reinit(*args, **kwargs):
-        return None  # no new BIs -> retired with reason "no_bis"
+        from trackllm_website.bi.reinit import ReinitResult
+
+        return ReinitResult(epoch=None, reason="no_bis")  # retired "no_bis"
 
     monkeypatch.setattr(monitor_mod.config.bi, "data_dir", tmp_path)
     state_dir = monitor_mod.config.bi.state_dir
