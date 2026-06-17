@@ -1,4 +1,4 @@
-"""Reusable BI sampler: query an endpoint's prompts n times each at T=0."""
+"""Reusable BI sampler: query an endpoint's prompts n times each at a given temperature."""
 
 import asyncio
 from datetime import datetime, timezone
@@ -19,6 +19,7 @@ async def sample_prompts(
     strategy: QueryStrategy,
     prompts: list[str],
     n_per_prompt: int,
+    temperature: float,
 ) -> tuple[dict[str, list[tuple[str, str]]], int]:
     """Returns ({prompt: [(timestamp, token), ...]}, n_errors).
 
@@ -40,7 +41,7 @@ async def sample_prompts(
                 response = await client.query(
                     endpoint,
                     prompt,
-                    temperature=0.0,
+                    temperature=temperature,
                     logprobs=False,
                     **strategy_to_query_args(strategy),
                 )

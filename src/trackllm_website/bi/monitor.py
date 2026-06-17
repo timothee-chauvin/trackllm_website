@@ -95,6 +95,7 @@ async def run_endpoint(
         strategy,
         epoch.border_inputs,
         config.bi.phase_2.queries_per_token,
+        temperature=0.0,
     )
     path = get_output_path(state.endpoint, now.strftime("%Y-%m"))
     existing = load_existing_results(path)
@@ -120,14 +121,16 @@ async def run_endpoint(
         logger.warning(
             f"{state.endpoint}: change detected (onset {decision.change_date})"
         )
-        new_epoch = await reinit(
+        result = await reinit(
             client, strategy, state.endpoint, epoch.border_inputs, now
         )
-        if new_epoch is None:
+        if result.epoch is None:
+            # The temperature gate runs only on discovery (old_bis empty); a monitor
+            # reinit always has old_bis, so reason is no_bis here. Retire either way.
             state.status = "retired"
             state.retired = RetiredInfo(reason="no_bis", since=now, last_recheck=now)
         else:
-            state.epochs.append(new_epoch)
+            state.epochs.append(result.epoch)
     # State is deliberately saved once, after reinit completes. A crash mid-reinit
     # persists nothing; the next daily run idempotently re-detects the change and
     # retries (facts-vs-derivations design: state files record only committed facts).
