@@ -92,9 +92,14 @@ def select_monitoring_targets(
                     m for m in by_model if _matches_any(by_model[m][0], [pattern])
                 ]
                 if rule.latest_n is not None:
+                    # Sort newest-first; model name is a deterministic tiebreak so a
+                    # created-tie for the last slot doesn't flap with candidate order.
                     pat_models.sort(
-                        key=lambda m: by_model[m][0].created
-                        or datetime.min.replace(tzinfo=timezone.utc),
+                        key=lambda m: (
+                            by_model[m][0].created
+                            or datetime.min.replace(tzinfo=timezone.utc),
+                            m,
+                        ),
                         reverse=True,
                     )
                     pat_models = pat_models[: rule.latest_n]
