@@ -62,6 +62,7 @@ def save_endpoints_bi(endpoints: list[Endpoint]) -> None:
                 "provider": e.provider,
                 "cost": list(e.cost),
                 "cost_per_request": e.cost_per_request,
+                "created": e.created.isoformat() if e.created else None,
             }
             for e in sorted_endpoints
         ]
@@ -100,13 +101,14 @@ def merge_goods(
 
 
 async def get_model_endpoints(
-    session, model_id, logprob_filter: bool = False
+    session, model_id, created: datetime | None, logprob_filter: bool = False
 ) -> list[Endpoint]:
     """Fetch endpoints for a model.
 
     Args:
         session: aiohttp session
         model_id: OpenRouter model ID
+        created: model release date from the /models list, stamped onto each Endpoint
         logprob_filter: If True, only return endpoints that claim to support logprobs
     """
     url = f"https://openrouter.ai/api/v1/models/{model_id}/endpoints"
@@ -137,6 +139,7 @@ async def get_model_endpoints(
                             ).normalize()
                         ),
                     ),
+                    created=created,
                 )
                 filtered_endpoints.append(endpoint_data)
             return filtered_endpoints
@@ -156,11 +159,22 @@ async def get_endpoints(
             cost is below this cap (in $/Mtok)
     """
     response = requests.get("https://openrouter.ai/api/v1/models")
-    model_ids = [model["id"] for model in response.json()["data"]]
+    models = response.json()["data"]
+    model_ids = [model["id"] for model in models]
+    created_by_id = {
+        model["id"]: datetime.fromtimestamp(model["created"], tz=timezone.utc)
+        for model in models
+        if model.get("created") is not None
+    }
     all_endpoints = []
     async with aiohttp.ClientSession() as session:
         tasks = [
-            get_model_endpoints(session, model_id, logprob_filter=logprob_filter)
+            get_model_endpoints(
+                session,
+                model_id,
+                created_by_id.get(model_id),
+                logprob_filter=logprob_filter,
+            )
             for model_id in model_ids
         ]
         async for result in gather_with_concurrency_streaming(
