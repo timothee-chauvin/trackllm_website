@@ -14,7 +14,7 @@ from trackllm_website.config import Endpoint, config, logger
 
 class Rule(BaseModel):
     name: str
-    kind: Literal["models", "providers"]
+    kind: Literal["models", "providers", "popular"]
     patterns: list[str]
     providers_per_model: int | Literal["all"] | None = None
     endpoints_per_provider: int | None = None
@@ -129,6 +129,37 @@ def select_monitoring_targets(
                         add(e, rule.name)
                     if stop:
                         break
+                if stop:
+                    break
+        elif rule.kind == "popular":
+            stop = False
+            # popular_models is already popularity-ranked (top first); select those
+            # present among candidates, cheapest provider first, like the models branch.
+            for m in popular_models:
+                if m not in by_model:
+                    continue
+                eps = by_model[m]
+                n = (
+                    len(eps)
+                    if rule.providers_per_model == "all"
+                    else rule.providers_per_model
+                )
+                for e in eps[:n]:
+                    if e in selected:
+                        continue
+                    if (
+                        rule.max_monthly_cost is not None
+                        and monthly_cost(e) > rule.max_monthly_cost
+                    ):
+                        continue
+                    if (
+                        not rule.flagship
+                        and is_wildcard
+                        and spent + monthly_cost(e) > policy.budget_per_month
+                    ):
+                        stop = True  # budget reached; remaining eps are costlier
+                        break
+                    add(e, rule.name)
                 if stop:
                     break
         else:  # providers
