@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 from trackllm_website.api import OpenRouterClient
 from trackllm_website.bi.common import resolve_strategies
-from trackllm_website.bi.popularity import fetch_popular_models
+from trackllm_website.bi.popularity import fetch_popular_models_safe
 from trackllm_website.bi.reinit import reinit
 from trackllm_website.bi.selection import (
     SelectionPolicy,
@@ -450,11 +450,7 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
     subset is monitored.
     """
     policy = load_policy(root / config.bi.selection_path)
-    try:
-        popular_models = fetch_popular_models(config.bi.popularity.top_n)
-    except Exception as e:  # best-effort: a rankings hiccup must not abort the run
-        logger.warning(f"popularity fetch failed, proceeding without it: {e}")
-        popular_models = []
+    popular_models = fetch_popular_models_safe(config.bi.popularity.top_n)
     selected, _breakdown = select_monitoring_targets(candidates, policy, popular_models)
     logger.info(
         f"Selection: monitoring {len(selected)} of {len(candidates)} candidates"

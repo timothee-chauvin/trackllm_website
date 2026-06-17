@@ -11,7 +11,7 @@ from collections import Counter
 
 import requests
 
-from trackllm_website.config import config
+from trackllm_website.config import config, logger
 
 RANKINGS_URL = "https://openrouter.ai/api/v1/datasets/rankings-daily"
 MODELS_URL = "https://openrouter.ai/api/v1/models"
@@ -62,3 +62,13 @@ def fetch_popular_models(top_n: int) -> list[str]:
     ranked = aggregate_rankings(rows)
     ids = map_to_model_ids([p for p, _ in ranked], canonical_to_id)
     return ids[:top_n]
+
+
+def fetch_popular_models_safe(top_n: int) -> list[str]:
+    """Best-effort wrapper: popularity is advisory, so a rankings outage degrades
+    to [] (the popular rule then adds nothing) rather than aborting the caller."""
+    try:
+        return fetch_popular_models(top_n)
+    except Exception as e:
+        logger.warning(f"popularity fetch failed, proceeding without it: {e}")
+        return []
