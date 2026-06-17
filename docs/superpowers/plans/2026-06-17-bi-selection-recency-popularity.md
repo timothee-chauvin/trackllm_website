@@ -458,7 +458,7 @@ git commit -m "lifecycle: 1-month grace before delisting a deselected model"
 **Files:** `bi_selection.toml`, `src/trackllm_website/update_endpoints.py`, `src/trackllm_website/bi/costs.py`, test updates
 
 - [ ] **Step 1: rewrite `bi_selection.toml`.**
-- `exclude`: keep `*image*`, `*-fast`, `*customtools*`; **add** `*search*`; **remove** `*-beta` is optional — leave existing entries except ensure no `-preview` exclude exists (it doesn't). Final exclude (confirm): `["*image*", "*-fast", "*search*", "*customtools*"]`.
+- `exclude`: keep `*image*`, `*-fast`, `*customtools*`; **add** `*search*`; **add** `openrouter/*` (OpenRouter stealth/rotating aliases like `owl-alpha` that surface in popularity but aren't stable endpoints — defense-in-depth for the popular rule). Ensure no `-preview` exclude exists (it doesn't). Final exclude (confirm): `["*image*", "*-fast", "*search*", "*customtools*", "openrouter/*"]`.
 - Rewrite the `flagships` rule to use `latest_n = 2` with family globs:
 ```toml
 [[rule]]
