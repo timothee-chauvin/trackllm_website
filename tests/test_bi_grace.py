@@ -18,7 +18,9 @@ def state(model, deselected_since):
 
 def test_grace_logic():
     grace = 30
-    assert should_delist(state("a", None), NOW, grace) is False  # just fell out this run
+    assert (
+        should_delist(state("a", None), NOW, grace) is False
+    )  # just fell out this run
     assert (
         should_delist(state("b", NOW - timedelta(days=10)), NOW, grace) is False
     )  # within grace

@@ -8,31 +8,39 @@ budget_per_month = 10.0
 # vetting (cached too_expensive). Flagships (pins + flagship rule models) are exempt.
 max_endpoint_cost = 0.50
 
-# Never selected anywhere (globs match "model" or "model#provider").
-exclude = [
-    "*image*", "*-fast", "*:extended", "*customtools*", "*-beta",
-    "switchpoint/router",
-]
+# Never selected anywhere (globs match "model" or "model#provider"). openrouter/*
+# excludes stealth/rotating aliases (e.g. owl-alpha) that surface in popularity but
+# aren't stable endpoints. We keep -preview variants.
+exclude = ["*image*", "*-fast", "*search*", "*customtools*", "openrouter/*"]
 
 [[rule]]
-name = "flagships"           # models people care about, cheapest provider each
+name = "flagships"           # newest 2 versions per family, cheapest provider each
 kind = "models"
+latest_n = 2
 patterns = [
-    "anthropic/claude-fable-5", "anthropic/claude-opus-4.8", "anthropic/claude-opus-4.7",
-    "anthropic/claude-sonnet-4.6", "anthropic/claude-sonnet-4.5", "anthropic/claude-haiku-4.5",
+    "anthropic/claude-opus-*", "anthropic/claude-sonnet-*", "anthropic/claude-haiku-*",
+    "anthropic/claude-fable-*",
     "openai/gpt-4o", "openai/gpt-4o-mini",
-    "google/gemini-3-flash*", "google/gemini-2.5-flash*",
-    "deepseek/deepseek-v3.2", "deepseek/deepseek-chat*",
-    "qwen/qwen3-235b*", "moonshotai/kimi-k2*", "z-ai/glm-4.7",
-    "meta-llama/llama-4*", "mistralai/mistral-large*", "minimax/minimax-m2",
+    "google/gemini-*-flash*",
+    "deepseek/deepseek-v*", "deepseek/deepseek-chat*",
+    "qwen/qwen3*", "z-ai/glm-*", "moonshotai/kimi-*",
+    "x-ai/grok-*", "minimax/minimax-m*",
+    "meta-llama/llama-4*", "mistralai/mistral-large*",
 ]
 providers_per_model = 1
 flagship = true              # exempt from max_endpoint_cost
 
 [[rule]]
-name = "corroboration"       # extra providers for swap-prone models, where cheap
+name = "popular"             # top-N models by OpenRouter token usage, where cheap
+kind = "popular"
+patterns = []
+providers_per_model = 1
+max_monthly_cost = 0.25
+
+[[rule]]
+name = "corroboration"       # extra providers for swap-prone families, where cheap
 kind = "models"
-patterns = ["deepseek/deepseek-v3.2", "z-ai/glm-4.7", "qwen/qwen3-235b*", "moonshotai/kimi-k2*"]
+patterns = ["deepseek/deepseek-v*", "z-ai/glm-*", "moonshotai/kimi-*"]
 providers_per_model = "all"
 max_monthly_cost = 0.10
 
