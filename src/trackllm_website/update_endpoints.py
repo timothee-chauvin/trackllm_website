@@ -101,7 +101,11 @@ def merge_goods(
 
 
 async def get_model_endpoints(
-    session, model_id, created: datetime | None, logprob_filter: bool = False
+    session,
+    model_id,
+    created: datetime | None,
+    supports_temperature: bool,
+    logprob_filter: bool = False,
 ) -> list[Endpoint]:
     """Fetch endpoints for a model.
 
@@ -109,6 +113,8 @@ async def get_model_endpoints(
         session: aiohttp session
         model_id: OpenRouter model ID
         created: model release date from the /models list, stamped onto each Endpoint
+        supports_temperature: whether the model's /models supported_parameters lists
+            temperature; stamped onto each Endpoint for the vetting temp pre-filter
         logprob_filter: If True, only return endpoints that claim to support logprobs
     """
     url = f"https://openrouter.ai/api/v1/models/{model_id}/endpoints"
@@ -140,6 +146,7 @@ async def get_model_endpoints(
                         ),
                     ),
                     created=created,
+                    supports_temperature=supports_temperature,
                 )
                 filtered_endpoints.append(endpoint_data)
             return filtered_endpoints
@@ -166,6 +173,10 @@ async def get_endpoints(
         for model in models
         if model.get("created") is not None
     }
+    supports_temperature_by_id = {
+        model["id"]: "temperature" in (model.get("supported_parameters") or [])
+        for model in models
+    }
     all_endpoints = []
     async with aiohttp.ClientSession() as session:
         tasks = [
@@ -173,6 +184,7 @@ async def get_endpoints(
                 session,
                 model_id,
                 created_by_id.get(model_id),
+                supports_temperature_by_id.get(model_id, True),
                 logprob_filter=logprob_filter,
             )
             for model_id in model_ids
@@ -285,6 +297,16 @@ async def update_endpoints_lt():
     logger.info(f"Updated {config.endpoints_yaml_path_lt}")
 
 
+def partition_temperature(
+    endpoints: list[Endpoint],
+) -> tuple[list[Endpoint], list[Endpoint]]:
+    """(to_probe, to_skip): skip endpoints that explicitly declare no temperature
+    support (supports_temperature is False); probe unknown (None) and True."""
+    probe = [e for e in endpoints if e.supports_temperature is not False]
+    skip = [e for e in endpoints if e.supports_temperature is False]
+    return probe, skip
+
+
 async def update_endpoints_bi() -> list[Endpoint]:
     """Refresh the BI candidate catalog via cost-based vetting.
 
@@ -314,6 +336,16 @@ async def update_endpoints_bi() -> list[Endpoint]:
     # Re-vet known-good and new endpoints alike (to refresh cost_per_request); skip
     # only those already in a reject bucket.
     to_vet = [e for e in all_endpoints if not cache.is_cached(e)]
+
+    # Pre-filter models whose /models supported_parameters omits temperature: they
+    # provably ignore T=0, so route them straight to bad_temperature without probing.
+    to_vet, temp_skip = partition_temperature(to_vet)
+    for endpoint in temp_skip:
+        cache.add_bad_temperature(endpoint)
+    logger.info(
+        f"Skipping {len(temp_skip)} temperature-unsupported endpoints (temp:NO)"
+    )
+
     logger.info(
         f"Vetting {len(to_vet)} of {len(all_endpoints)} endpoints "
         f"(skipping {len(all_endpoints) - len(to_vet)} cached rejects)"

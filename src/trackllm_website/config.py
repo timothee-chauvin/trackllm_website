@@ -28,6 +28,9 @@ class Endpoint(BaseModel):
         None  # measured $/monitoring-query; set by BI vetting
     )
     created: datetime | None = None  # model release date from OpenRouter /models
+    supports_temperature: bool | None = (
+        None  # from /models supported_parameters; transient (not persisted)
+    )
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Endpoint):
