@@ -3,6 +3,7 @@
 import fnmatch
 import tomllib
 from collections import defaultdict
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Literal
 
@@ -18,6 +19,7 @@ class Rule(BaseModel):
     providers_per_model: int | Literal["all"] | None = None
     endpoints_per_provider: int | None = None
     max_monthly_cost: float | None = None
+    latest_n: int | None = None
     flagship: bool = False
 
 
@@ -50,7 +52,7 @@ def _matches_any(endpoint: Endpoint, patterns: list[str]) -> bool:
 
 
 def select_monitoring_targets(
-    candidates: list[Endpoint], policy: SelectionPolicy
+    candidates: list[Endpoint], policy: SelectionPolicy, popular_models: list[str]
 ) -> tuple[list[Endpoint], dict[Endpoint, str]]:
     """Pure: apply rules in order within budget. Returns (selected, rule-label-by-endpoint).
 
@@ -82,34 +84,46 @@ def select_monitoring_targets(
     for rule in policy.rules:
         is_wildcard = rule.patterns == ["*"]
         if rule.kind == "models":
-            model_keys = [
-                m for m in by_model if _matches_any(by_model[m][0], rule.patterns)
-            ]
-            model_keys.sort(key=lambda m: (monthly_cost(by_model[m][0]), m))
             stop = False
-            for m in model_keys:
-                eps = by_model[m]
-                n = (
-                    len(eps)
-                    if rule.providers_per_model == "all"
-                    else rule.providers_per_model
-                )
-                for e in eps[:n]:
-                    if e in selected:
-                        continue
-                    if (
-                        rule.max_monthly_cost is not None
-                        and monthly_cost(e) > rule.max_monthly_cost
-                    ):
-                        continue
-                    if (
-                        not rule.flagship
-                        and is_wildcard
-                        and spent + monthly_cost(e) > policy.budget_per_month
-                    ):
-                        stop = True  # budget reached; remaining eps are costlier
+            # Each pattern is its own family: latest_n picks the newest versions
+            # within that pattern before the per-model provider selection runs.
+            for pattern in rule.patterns:
+                pat_models = [
+                    m for m in by_model if _matches_any(by_model[m][0], [pattern])
+                ]
+                if rule.latest_n is not None:
+                    pat_models.sort(
+                        key=lambda m: by_model[m][0].created
+                        or datetime.min.replace(tzinfo=timezone.utc),
+                        reverse=True,
+                    )
+                    pat_models = pat_models[: rule.latest_n]
+                pat_models.sort(key=lambda m: (monthly_cost(by_model[m][0]), m))
+                for m in pat_models:
+                    eps = by_model[m]
+                    n = (
+                        len(eps)
+                        if rule.providers_per_model == "all"
+                        else rule.providers_per_model
+                    )
+                    for e in eps[:n]:
+                        if e in selected:
+                            continue
+                        if (
+                            rule.max_monthly_cost is not None
+                            and monthly_cost(e) > rule.max_monthly_cost
+                        ):
+                            continue
+                        if (
+                            not rule.flagship
+                            and is_wildcard
+                            and spent + monthly_cost(e) > policy.budget_per_month
+                        ):
+                            stop = True  # budget reached; remaining eps are costlier
+                            break
+                        add(e, rule.name)
+                    if stop:
                         break
-                    add(e, rule.name)
                 if stop:
                     break
         else:  # providers

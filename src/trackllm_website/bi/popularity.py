@@ -29,7 +29,9 @@ def aggregate_rankings(rows: list[dict]) -> list[tuple[str, int]]:
     return agg.most_common()
 
 
-def map_to_model_ids(permaslugs: list[str], canonical_to_id: dict[str, str]) -> list[str]:
+def map_to_model_ids(
+    permaslugs: list[str], canonical_to_id: dict[str, str]
+) -> list[str]:
     """Map ranking permaslugs to /models ids, preserving order, skipping unmatched.
 
     A permaslug looks like ``provider/name-YYYYMMDD[:variant]``. We strip the

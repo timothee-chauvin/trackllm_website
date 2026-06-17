@@ -20,7 +20,7 @@ COSTS_FILENAME = "bi_costs.json"
 
 
 def build_cost_summary(candidates: list[Endpoint], policy: SelectionPolicy) -> dict:
-    selected, breakdown = select_monitoring_targets(candidates, policy)
+    selected, breakdown = select_monitoring_targets(candidates, policy, [])
     rows = sorted(
         (
             {

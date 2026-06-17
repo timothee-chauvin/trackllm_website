@@ -437,7 +437,7 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
     subset is monitored.
     """
     policy = load_policy(root / config.bi.selection_path)
-    selected, _breakdown = select_monitoring_targets(candidates, policy)
+    selected, _breakdown = select_monitoring_targets(candidates, policy, [])
     logger.info(
         f"Selection: monitoring {len(selected)} of {len(candidates)} candidates"
     )

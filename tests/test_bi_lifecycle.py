@@ -108,7 +108,7 @@ def test_onboarding_failure_does_not_abort_others(monkeypatch, tmp_path):
         )
 
     # Selection is a no-op here: every candidate is monitored.
-    def select_all(candidates, policy):
+    def select_all(candidates, policy, popular_models):
         return list(candidates), {e: "test" for e in candidates}
 
     _patch_lifecycle_deps(monkeypatch, tmp_path, select=select_all, reinit=fake_reinit)
@@ -126,7 +126,7 @@ def test_onboarding_failure_does_not_abort_others(monkeypatch, tmp_path):
 def test_bad_temperature_is_cached_not_monitored(monkeypatch, tmp_path):
     bad_temp = ep("m/badtemp")
 
-    def select_all(candidates, policy):
+    def select_all(candidates, policy, popular_models):
         return list(candidates), {e: "test" for e in candidates}
 
     async def fake_reinit(client, strategy, endpoint, old_bis, now):
@@ -151,7 +151,7 @@ def test_only_selected_candidates_are_onboarded(monkeypatch, tmp_path):
     candidates = [chosen_a, chosen_b, rejected]
 
     # Selection keeps only the first two of the three candidates.
-    def select_subset(cands, policy):
+    def select_subset(cands, policy, popular_models):
         selected = [chosen_a, chosen_b]
         return selected, {e: "test" for e in selected}
 
