@@ -38,9 +38,10 @@ providers_per_model = 1
 max_monthly_cost = 0.25
 
 [[rule]]
-name = "corroboration"       # extra providers for swap-prone families, where cheap
+name = "corroboration"       # confirm swaps on the newest versions across providers
 kind = "models"
 patterns = ["deepseek/deepseek-v*", "z-ai/glm-*", "moonshotai/kimi-*"]
+latest_n = 2                 # only the 2 newest versions per family (not all history)
 providers_per_model = "all"
 max_monthly_cost = 0.10
 
