@@ -8,7 +8,6 @@ are present, the score is the mean of per-prompt statistics.
 Change detection uses running mean/std normalization + peak detection.
 """
 
-import fire
 import numpy as np
 import orjson
 from datetime import datetime, timezone
@@ -277,7 +276,3 @@ def compute_latest():
         )
     save_events(events_path, all_events)
     logger.info(f"Computed: {n_computed}, skipped (up-to-date): {n_skipped}")
-
-
-if __name__ == "__main__":
-    fire.Fire({"all": compute_all, "latest": compute_latest})
