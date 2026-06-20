@@ -27,7 +27,7 @@ def test_summary_run_rate_and_top():
         ],
     )
     cands = [ep("m/a", "p", 0.00001), ep("m/b", "p", 0.00005)]
-    summary = build_cost_summary(cands, policy)
+    summary = build_cost_summary(cands, policy, [])
     assert summary["budget_per_month"] == 10
     assert abs(summary["run_rate_per_month"] - (0.00001 + 0.00005) * 6000) < 1e-6
     # top endpoints sorted by monthly cost descending
@@ -73,7 +73,7 @@ def test_format_preview_groups_and_totals():
         ],
     )
     cands = [ep("m/a", "p", 0.00001), ep("m/b", "p", 0.00005)]
-    text = format_preview(build_cost_summary(cands, policy))
+    text = format_preview(build_cost_summary(cands, policy, []))
     assert "m/b" in text and "m/a" in text
     assert "/mo" in text
     assert "10.00" in text  # budget shown

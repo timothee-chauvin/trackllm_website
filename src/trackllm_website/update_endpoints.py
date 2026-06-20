@@ -10,6 +10,7 @@ from pydantic import BaseModel
 
 from trackllm_website.api import OpenRouterClient
 from trackllm_website.bi.common import resolve_strategies
+from trackllm_website.bi.popularity import fetch_popular_models_safe
 from trackllm_website.bi.reinit import reinit
 from trackllm_website.bi.selection import (
     SelectionPolicy,
@@ -62,6 +63,7 @@ def save_endpoints_bi(endpoints: list[Endpoint]) -> None:
                 "provider": e.provider,
                 "cost": list(e.cost),
                 "cost_per_request": e.cost_per_request,
+                "created": e.created.isoformat() if e.created else None,
             }
             for e in sorted_endpoints
         ]
@@ -100,13 +102,20 @@ def merge_goods(
 
 
 async def get_model_endpoints(
-    session, model_id, logprob_filter: bool = False
+    session,
+    model_id,
+    created: datetime | None,
+    supports_temperature: bool,
+    logprob_filter: bool = False,
 ) -> list[Endpoint]:
     """Fetch endpoints for a model.
 
     Args:
         session: aiohttp session
         model_id: OpenRouter model ID
+        created: model release date from the /models list, stamped onto each Endpoint
+        supports_temperature: whether the model's /models supported_parameters lists
+            temperature; stamped onto each Endpoint for the vetting temp pre-filter
         logprob_filter: If True, only return endpoints that claim to support logprobs
     """
     url = f"https://openrouter.ai/api/v1/models/{model_id}/endpoints"
@@ -137,6 +146,8 @@ async def get_model_endpoints(
                             ).normalize()
                         ),
                     ),
+                    created=created,
+                    supports_temperature=supports_temperature,
                 )
                 filtered_endpoints.append(endpoint_data)
             return filtered_endpoints
@@ -156,11 +167,27 @@ async def get_endpoints(
             cost is below this cap (in $/Mtok)
     """
     response = requests.get("https://openrouter.ai/api/v1/models")
-    model_ids = [model["id"] for model in response.json()["data"]]
+    models = response.json()["data"]
+    model_ids = [model["id"] for model in models]
+    created_by_id = {
+        model["id"]: datetime.fromtimestamp(model["created"], tz=timezone.utc)
+        for model in models
+        if model.get("created") is not None
+    }
+    supports_temperature_by_id = {
+        model["id"]: "temperature" in (model.get("supported_parameters") or [])
+        for model in models
+    }
     all_endpoints = []
     async with aiohttp.ClientSession() as session:
         tasks = [
-            get_model_endpoints(session, model_id, logprob_filter=logprob_filter)
+            get_model_endpoints(
+                session,
+                model_id,
+                created_by_id.get(model_id),
+                supports_temperature_by_id.get(model_id, True),
+                logprob_filter=logprob_filter,
+            )
             for model_id in model_ids
         ]
         async for result in gather_with_concurrency_streaming(
@@ -271,6 +298,16 @@ async def update_endpoints_lt():
     logger.info(f"Updated {config.endpoints_yaml_path_lt}")
 
 
+def partition_temperature(
+    endpoints: list[Endpoint],
+) -> tuple[list[Endpoint], list[Endpoint]]:
+    """(to_probe, to_skip): skip endpoints that explicitly declare no temperature
+    support (supports_temperature is False); probe unknown (None) and True."""
+    probe = [e for e in endpoints if e.supports_temperature is not False]
+    skip = [e for e in endpoints if e.supports_temperature is False]
+    return probe, skip
+
+
 async def update_endpoints_bi() -> list[Endpoint]:
     """Refresh the BI candidate catalog via cost-based vetting.
 
@@ -300,6 +337,16 @@ async def update_endpoints_bi() -> list[Endpoint]:
     # Re-vet known-good and new endpoints alike (to refresh cost_per_request); skip
     # only those already in a reject bucket.
     to_vet = [e for e in all_endpoints if not cache.is_cached(e)]
+
+    # Pre-filter models whose /models supported_parameters omits temperature: they
+    # provably ignore T=0, so route them straight to bad_temperature without probing.
+    to_vet, temp_skip = partition_temperature(to_vet)
+    for endpoint in temp_skip:
+        cache.add_bad_temperature(endpoint)
+    logger.info(
+        f"Skipping {len(temp_skip)} temperature-unsupported endpoints (temp:NO)"
+    )
+
     logger.info(
         f"Vetting {len(to_vet)} of {len(all_endpoints)} endpoints "
         f"(skipping {len(all_endpoints) - len(to_vet)} cached rejects)"
@@ -358,6 +405,14 @@ class LifecycleActions(BaseModel):
     delist: list[EndpointBIState]
 
 
+def should_delist(state: EndpointBIState, now: datetime, grace_days: int) -> bool:
+    """A monitoring endpoint that's no longer selected delists only after the grace
+    period since it dropped out. Caller sets deselected_since when it leaves the set."""
+    if state.deselected_since is None:
+        return False
+    return now - state.deselected_since >= timedelta(days=grace_days)
+
+
 def select_lifecycle_actions(
     candidates: list[Endpoint],
     states: dict[str, EndpointBIState],
@@ -376,10 +431,14 @@ def select_lifecycle_actions(
         and s.endpoint in candidate_set
         and now - s.retired.last_recheck >= timedelta(days=r.recheck_days)
     ]
+    # Deselected monitoring endpoints are only delisted once past the grace period;
+    # the executor maintains deselected_since on the states beforehand.
     delist = [
         s
         for s in states.values()
-        if s.status == "monitoring" and s.endpoint not in candidate_set
+        if s.status == "monitoring"
+        and s.endpoint not in candidate_set
+        and should_delist(s, now, r.deselection_grace_days)
     ]
     return LifecycleActions(onboard=onboard, recheck=recheck, delist=delist)
 
@@ -391,7 +450,8 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
     subset is monitored.
     """
     policy = load_policy(root / config.bi.selection_path)
-    selected, _breakdown = select_monitoring_targets(candidates, policy)
+    popular_models = fetch_popular_models_safe(config.bi.popularity.top_n)
+    selected, _breakdown = select_monitoring_targets(candidates, policy, popular_models)
     logger.info(
         f"Selection: monitoring {len(selected)} of {len(candidates)} candidates"
     )
@@ -399,6 +459,21 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
     cache = EndpointCache.load(ENDPOINTS_CACHE_BI_PATH)
     states = load_all_states(config.bi.state_dir)
     now = datetime.now(tz=timezone.utc).replace(microsecond=0)
+
+    # Maintain the deselection clock before deciding actions: stamp the moment a
+    # monitored endpoint leaves the selected set, and clear it if it returns.
+    selected_set = set(selected)
+    for state in states.values():
+        if state.status != "monitoring":
+            continue
+        in_set = state.endpoint in selected_set
+        if not in_set and state.deselected_since is None:
+            state.deselected_since = now
+            state.save(config.bi.state_dir)
+        elif in_set and state.deselected_since is not None:
+            state.deselected_since = None
+            state.save(config.bi.state_dir)
+
     actions = select_lifecycle_actions(selected, states, now)
     logger.info(
         f"BI lifecycle: {len(actions.onboard)} to onboard, "
