@@ -16,7 +16,7 @@ class LTChangeEvent(BaseModel):
     endpoint: str
     index: int
     date: datetime
-    sigma: float
+    sigma: float | None  # mirrors ChangePoint.sigma; None when deviation undefined
     first_detected: datetime
 
 
