@@ -29,7 +29,7 @@ interface LTScoresData {
   dates: string[];
   scores: number[];
   sigmas: (number | null)[];
-  changes: { index: number; sigma: number }[];
+  changes: { index: number; sigma: number | null }[];
 }
 
 type TimeRange = "5d" | "1m" | "3m" | "all";
@@ -157,7 +157,8 @@ function formatChangeSummary(data: LTScoresData): string {
   const header = `Detected changes between ${fmt(first)} and ${fmt(last)}:`;
   const items = data.changes.map((cp) => {
     const d = dates[cp.index];
-    return `  • ${fmt(d)} (score = ${data.scores[cp.index].toFixed(3)}, deviation = ${cp.sigma.toFixed(1)}σ)`;
+    const sigma = cp.sigma === null ? "∞" : cp.sigma.toFixed(1);
+    return `  • ${fmt(d)} (score = ${data.scores[cp.index].toFixed(3)}, deviation = ${sigma}σ)`;
   });
   return header + "\n" + items.join("\n");
 }
@@ -233,7 +234,7 @@ function renderAnomalyChart(
       x: dates[cp.index],
       y: 1,
       yref: "paper" as const,
-      text: `${cp.sigma.toFixed(0)}σ`,
+      text: cp.sigma === null ? "∞σ" : `${cp.sigma.toFixed(0)}σ`,
       showarrow: false,
       font: { color: "#888888", size: 10 },
       yanchor: "bottom" as const,

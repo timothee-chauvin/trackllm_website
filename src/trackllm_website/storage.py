@@ -378,7 +378,13 @@ class ResultsStorage:
         """Check if an endpoint is stalled by looking at the `config.abandon_after` latest queries.
 
         An endpoint is stalled if it has at least `config.abandon_after` queries, and the latest `config.abandon_after` queries all resulted in errors."""
-        prompt_paths = list(self.data_dir.glob(f"{self._get_model_slug(endpoint)}/*"))
+        # Only prompt directories; skip stray files like lt_scores.json that the
+        # LT scoring step writes into the endpoint dir.
+        prompt_paths = [
+            p
+            for p in self.data_dir.glob(f"{self._get_model_slug(endpoint)}/*")
+            if p.is_dir()
+        ]
         if not prompt_paths:
             # No responses yet
             return False
