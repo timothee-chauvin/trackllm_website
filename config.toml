@@ -76,9 +76,13 @@ min_bis = 10
 stall_days = 7
 recheck_days = 14
 onboard_concurrency = 20
+deselection_grace_days = 30
 
 [bi.monitor]
 max_concurrent_endpoints = 20
+
+[bi.popularity]
+top_n = 40
 
 [plotting]
 template = "plotly_white"

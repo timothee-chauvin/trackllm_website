@@ -1,5 +1,6 @@
 import logging
 import os
+from datetime import datetime
 from pathlib import Path
 from typing import Literal
 
@@ -25,6 +26,10 @@ class Endpoint(BaseModel):
     max_logprobs: int | None = None
     cost_per_request: float | None = (
         None  # measured $/monitoring-query; set by BI vetting
+    )
+    created: datetime | None = None  # model release date from OpenRouter /models
+    supports_temperature: bool | None = (
+        None  # from /models supported_parameters; transient (not persisted)
     )
 
     def __eq__(self, other: object) -> bool:
@@ -116,6 +121,11 @@ class ReinitConfig(BaseModel):
     stall_days: int
     recheck_days: int
     onboard_concurrency: int
+    deselection_grace_days: int
+
+
+class PopularityConfig(BaseModel):
+    top_n: int
 
 
 class MonitorConfig(BaseModel):
@@ -141,6 +151,7 @@ class BIConfig(BaseModel):
     reinit: ReinitConfig
     monitor: MonitorConfig
     temperature_gate: TemperatureGateConfig
+    popularity: PopularityConfig
 
     @property
     def samples_per_month(self) -> int:

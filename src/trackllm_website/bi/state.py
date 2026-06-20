@@ -38,6 +38,8 @@ class EndpointBIState(BaseModel):
     status: Literal["monitoring", "retired"]
     retired: RetiredInfo | None = None
     epochs: list[Epoch]
+    # set when the endpoint drops out of the selected set; cleared if it returns.
+    deselected_since: datetime | None = None
 
     @property
     def slug(self) -> str:

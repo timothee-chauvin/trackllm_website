@@ -7,6 +7,7 @@ import orjson
 
 from trackllm_website.api import OpenRouterClient
 from trackllm_website.bi.common import resolve_strategies
+from trackllm_website.bi.popularity import fetch_popular_models_safe
 from trackllm_website.bi.selection import (
     SelectionPolicy,
     monthly_cost,
@@ -19,8 +20,10 @@ from trackllm_website.util import gather_with_concurrency
 COSTS_FILENAME = "bi_costs.json"
 
 
-def build_cost_summary(candidates: list[Endpoint], policy: SelectionPolicy) -> dict:
-    selected, breakdown = select_monitoring_targets(candidates, policy)
+def build_cost_summary(
+    candidates: list[Endpoint], policy: SelectionPolicy, popular_models: list[str]
+) -> dict:
+    selected, breakdown = select_monitoring_targets(candidates, policy, popular_models)
     rows = sorted(
         (
             {
@@ -52,7 +55,11 @@ def write_cost_summary() -> None:
     from trackllm_website.bi.selection import load_policy
 
     policy = load_policy(root / config.bi.selection_path)
-    summary = build_cost_summary(config.endpoints_bi, policy)
+    summary = build_cost_summary(
+        config.endpoints_bi,
+        policy,
+        fetch_popular_models_safe(config.bi.popularity.top_n),
+    )
     path = Path(config.data_dir) / COSTS_FILENAME
     path.write_bytes(orjson.dumps(summary, option=orjson.OPT_INDENT_2))
 
@@ -118,7 +125,9 @@ async def preview(policy_path: str | None = None) -> None:
     path = root / (policy_path or config.bi.selection_path)
     policy = load_policy(path)
     candidates = await ensure_costs(list(config.endpoints_bi), save=True)
-    summary = build_cost_summary(candidates, policy)
+    summary = build_cost_summary(
+        candidates, policy, fetch_popular_models_safe(config.bi.popularity.top_n)
+    )
     print(format_preview(summary))
 
 
