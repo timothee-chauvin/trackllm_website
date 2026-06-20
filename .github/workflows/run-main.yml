@@ -36,7 +36,7 @@ jobs:
     - name: Compute LT scores
       env:
         OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-      run: uv run python -m trackllm_website.lt_scores latest
+      run: uv run python -m trackllm_website.lt_scores_cli latest
 
     - name: Commit and push results
       # Commit collected data even if a later step (e.g. LT scoring) failed, so a
