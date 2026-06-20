@@ -1,0 +1,35 @@
+name: Notify on Failure
+
+# Watches the other workflows and emails when any of them concludes in failure.
+# Runs in the default-branch context, so it has access to the notification secrets.
+on:
+  workflow_run:
+    workflows:
+      - "Run Main Script"
+      - "BI Daily Monitor"
+      - "Update Endpoints"
+      - "Deploy to GitHub Pages"
+    types:
+      - completed
+
+jobs:
+  notify:
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Send failure email
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
+          WF_NAME: ${{ github.event.workflow_run.name }}
+          WF_RUN_NUMBER: ${{ github.event.workflow_run.run_number }}
+          WF_EVENT: ${{ github.event.workflow_run.event }}
+          WF_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          WF_RUN_URL: ${{ github.event.workflow_run.html_url }}
+        # System Python on purpose: must work even when the failing run never
+        # reached `uv sync`. notify.py is pure standard library.
+        run: python3 src/trackllm_website/notify.py
