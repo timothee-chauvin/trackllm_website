@@ -39,6 +39,10 @@ jobs:
       run: uv run python -m trackllm_website.lt_scores latest
 
     - name: Commit and push results
+      # Commit collected data even if a later step (e.g. LT scoring) failed, so a
+      # downstream bug can never again silently stop the hourly data commits. The
+      # job still reports failure if an earlier step failed (→ failure email).
+      if: ${{ !cancelled() }}
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"

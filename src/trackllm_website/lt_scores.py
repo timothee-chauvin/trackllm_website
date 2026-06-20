@@ -33,7 +33,7 @@ SCORES_FILENAME = "lt_scores.json"
 
 class ChangePoint(BaseModel):
     index: int
-    sigma: float
+    sigma: float | None  # None when the running std is 0 (deviation undefined)
 
 
 class LTScores(BaseModel):
@@ -131,7 +131,12 @@ def detect_changes(
 
     peaks = find_peaks(exceedances, height=1e-20, distance=PEAK_DISTANCE)[0]
     peaks = [int(p) for p in peaks if scores[p] > STAT_ABSOLUTE_THRESHOLD]
-    return [ChangePoint(index=p, sigma=float(sigmas[p])) for p in peaks], sigmas
+    # A zero-variance window yields an infinite deviation; orjson serializes inf
+    # (and NaN) to JSON `null`, so never let a non-finite value into a ChangePoint.
+    return [
+        ChangePoint(index=p, sigma=float(sigmas[p]) if np.isfinite(sigmas[p]) else None)
+        for p in peaks
+    ], sigmas
 
 
 def compute_endpoint_scores(endpoint_dir: Path) -> LTScores | None:
@@ -175,7 +180,7 @@ def compute_endpoint_scores(endpoint_dir: Path) -> LTScores | None:
         n_per_test=N_PER_TEST,
         dates=ref_dates,
         scores=avg_scores.tolist(),
-        sigmas=[None if np.isnan(v) else v for v in sigmas.tolist()],
+        sigmas=[None if not np.isfinite(v) else v for v in sigmas.tolist()],
         changes=changes,
     )
 
