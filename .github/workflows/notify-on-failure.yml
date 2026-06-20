@@ -11,10 +11,12 @@ on:
       - "Deploy to GitHub Pages"
     types:
       - completed
+  workflow_dispatch:  # Manually fire a test email to verify the send path end-to-end.
 
 jobs:
   notify:
-    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    # Run on a watched-workflow failure, or whenever manually dispatched.
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'failure' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -25,11 +27,12 @@ jobs:
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
-          WF_NAME: ${{ github.event.workflow_run.name }}
-          WF_RUN_NUMBER: ${{ github.event.workflow_run.run_number }}
-          WF_EVENT: ${{ github.event.workflow_run.event }}
-          WF_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
-          WF_RUN_URL: ${{ github.event.workflow_run.html_url }}
+          # workflow_run.* is null on manual dispatch, so fall back to this run's context.
+          WF_NAME: ${{ github.event.workflow_run.name || 'Manual test (notify-on-failure)' }}
+          WF_RUN_NUMBER: ${{ github.event.workflow_run.run_number || github.run_number }}
+          WF_EVENT: ${{ github.event.workflow_run.event || github.event_name }}
+          WF_HEAD_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+          WF_RUN_URL: ${{ github.event.workflow_run.html_url || format('{0}/{1}/actions/runs/{2}', github.server_url, github.repository, github.run_id) }}
         # System Python on purpose: must work even when the failing run never
         # reached `uv sync`. notify.py is pure standard library.
         run: python3 src/trackllm_website/notify.py
