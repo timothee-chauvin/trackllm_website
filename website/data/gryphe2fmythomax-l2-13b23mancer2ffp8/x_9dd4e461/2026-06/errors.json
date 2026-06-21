@@ -1,1 +1,1 @@
-{"seen_errors":[{"http_code":200,"message":"No logprobs returned"}]}
+{"seen_errors":[{"http_code":200,"message":"No logprobs returned"},{"http_code":503,"message":"{\"message\":\"Provider returned error\",\"code\":503,\"metadata\":{\"raw\":\"{\\\"error\\\":{\\\"data\\\":null,\\\"message\\\":\\\"Internal Streaming Error. (No credits charged.)\\\",\\\"type\\\":\\\"INFERENCER_OFFLINE\\\"}}\\n\",\"provider_name\":\"Mancer 2\",\"is_byok\":false}}"}]}
