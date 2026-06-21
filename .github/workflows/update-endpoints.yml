@@ -34,6 +34,11 @@ jobs:
       run: uv run python src/trackllm_website/update_endpoints.py
 
     - name: Commit and push changes
+      # Commit whatever endpoint/state updates landed even if a prior step failed
+      # (e.g. OpenRouter credits exhausted mid-onboarding), so partial BI onboarding
+      # is persisted and the next run resumes instead of redoing it. A deliberate
+      # cancel stays a clean abort (cancelled() => this step is skipped).
+      if: ${{ !cancelled() }}
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
