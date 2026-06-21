@@ -17,11 +17,16 @@ from trackllm_website.bi.download_tokenizers import (
     load_existing_index,
     load_tokenizer_vocab,
 )
+from trackllm_website.bi.selection import SelectionPolicy, exceeds_ceiling
 from trackllm_website.config import Endpoint, config, logger, root
 from trackllm_website.storage import Response
 from trackllm_website.util import atomic_write_bytes, slugify
 
 SAVE_INTERVAL = 5
+
+# Marker placed first in a discover_strategy error list when an endpoint is
+# short-circuited for cost; callers route these to the too_expensive cache.
+TOO_EXPENSIVE = "too_expensive"
 
 
 # --- Query strategy types for reasoning-aware endpoints ---
@@ -108,12 +113,25 @@ def _strategy_to_raw(strategy: QueryStrategy) -> dict | None:
 
 
 async def discover_strategy(
-    client: OpenRouterClient, endpoint: Endpoint
+    client: OpenRouterClient,
+    endpoint: Endpoint,
+    policy: SelectionPolicy | None = None,
 ) -> tuple[QueryStrategy, None] | tuple[None, list[str]]:
     """Probe an endpoint to find a working query strategy.
 
     Returns (strategy, None) on success, or (None, errors) on failure.
     For budget strategies, returns budget = discovered_budget * 2 (headroom).
+
+    If `policy` is given, short-circuit as soon as a probe proves the endpoint will
+    be too expensive: we monitor at 2x the discovered budget for headroom, so if
+    twice a probe's advertised (token-math) price already exceeds the per-request
+    ceiling, every real request will too. Bails with errors=[TOO_EXPENSIVE, ...]
+    instead of escalating (which, for e.g. image models, means more expensive probes).
+
+    This is a token-math pre-filter on `response.cost` (advertised price x usage),
+    not the billed-cost backstop: an endpoint that bills far above its token math
+    (a "liar", e.g. per-image billing with trivial token usage) is still caught
+    later by vet_endpoint's measured get_generation_cost.
     """
     errors: list[str] = []
     TRANSIENT_CODES = {429, 0}
@@ -124,6 +142,17 @@ async def discover_strategy(
         else:
             errors.append(f"{label}: empty response")
 
+    def _too_expensive(r: Response) -> list[str] | None:
+        """The 2x-buffered advertised cost of this probe, vs the selection ceiling."""
+        if policy is None or r.error:
+            return None
+        if exceeds_ceiling(2 * r.cost, endpoint.model, endpoint.provider, policy):
+            return [
+                TOO_EXPENSIVE,
+                f"2x ${r.cost:.4f}/req exceeds ${policy.max_endpoint_cost}/mo ceiling",
+            ]
+        return None
+
     # Try plain
     r = await client.query(
         endpoint,
@@ -131,6 +160,8 @@ async def discover_strategy(
         logprobs=False,
         max_retries=config.bi.probe.max_retries,
     )
+    if (te := _too_expensive(r)) is not None:
+        return None, te
     if not r.error and extract_first_token(r):
         return PlainStrategy(), None
     _record_error(r, "plain")
@@ -145,6 +176,8 @@ async def discover_strategy(
         reasoning={"effort": "none"},
         max_retries=config.bi.probe.max_retries,
     )
+    if (te := _too_expensive(r)) is not None:
+        return None, te
     if not r.error and extract_first_token(r):
         return ReasoningDisabledStrategy(), None
     _record_error(r, "effort=none")
@@ -160,6 +193,8 @@ async def discover_strategy(
             reasoning={"max_tokens": budget},
             max_retries=config.bi.probe.max_retries,
         )
+        if (te := _too_expensive(r)) is not None:
+            return None, te
         if not r.error and extract_first_token(r):
             if not r.reasoning_content:
                 errors.append(f"budget={budget}: hidden reasoning")
@@ -174,12 +209,16 @@ async def discover_strategy(
 async def resolve_strategies(
     client: OpenRouterClient,
     endpoints: list[Endpoint],
+    policy: SelectionPolicy | None = None,
 ) -> tuple[dict[str, QueryStrategy], dict[str, list[str]]]:
     """Resolve strategies for all endpoints, using cache where possible.
 
     Returns (strategies, failed) where:
     - strategies: mapping from endpoint str -> QueryStrategy for working endpoints
     - failed: mapping from endpoint str -> error list for endpoints that failed probing
+
+    When `policy` is given, an endpoint proven too expensive mid-probe is reported in
+    `failed` with TOO_EXPENSIVE as the first error (see discover_strategy).
     """
     cached_raw = load_strategies()
     result: dict[str, QueryStrategy] = {}
@@ -207,7 +246,7 @@ async def resolve_strategies(
         ep: Endpoint,
     ) -> tuple[str, QueryStrategy | None, list[str] | None]:
         key = str(ep)
-        strategy, errors = await discover_strategy(client, ep)
+        strategy, errors = await discover_strategy(client, ep, policy=policy)
         if strategy is None:
             logger.warning(f"Skipping {ep} — probe errors: {errors}")
             return key, None, errors
