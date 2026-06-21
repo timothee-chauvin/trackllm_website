@@ -93,8 +93,9 @@ def test_short_circuits_during_budget_escalation():
 
 
 def test_resolve_strategies_surfaces_too_expensive(monkeypatch):
+    # The probe fails (no strategy), so save_strategies is never reached; only the
+    # cache read needs stubbing to keep the test off disk.
     monkeypatch.setattr("trackllm_website.bi.common.load_strategies", lambda: {})
-    monkeypatch.setattr("trackllm_website.bi.common.save_strategies", lambda raw: None)
     e = ep()
     client = _Scripted(_resp(e, cost=1.0))
     strategies, failed = asyncio.run(resolve_strategies(client, [e], policy=POLICY))

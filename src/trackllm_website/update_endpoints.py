@@ -495,7 +495,9 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
         return
 
     async with OpenRouterClient(timeout=60.0) as probe_client:
-        strategies, _ = await resolve_strategies(probe_client, [e for e, _ in to_init])
+        strategies, _ = await resolve_strategies(
+            probe_client, [e for e, _ in to_init], policy=policy
+        )
 
     async def onboard_one(
         client: OpenRouterClient, endpoint: Endpoint, is_recheck: bool

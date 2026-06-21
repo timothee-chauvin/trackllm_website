@@ -124,9 +124,14 @@ async def discover_strategy(
 
     If `policy` is given, short-circuit as soon as a probe proves the endpoint will
     be too expensive: we monitor at 2x the discovered budget for headroom, so if
-    twice a probe's billed price already exceeds the per-request ceiling, every
-    real request will too. Bails with errors=[TOO_EXPENSIVE, ...] instead of
-    escalating (which, for e.g. image models, means more expensive probes).
+    twice a probe's advertised (token-math) price already exceeds the per-request
+    ceiling, every real request will too. Bails with errors=[TOO_EXPENSIVE, ...]
+    instead of escalating (which, for e.g. image models, means more expensive probes).
+
+    This is a token-math pre-filter on `response.cost` (advertised price x usage),
+    not the billed-cost backstop: an endpoint that bills far above its token math
+    (a "liar", e.g. per-image billing with trivial token usage) is still caught
+    later by vet_endpoint's measured get_generation_cost.
     """
     errors: list[str] = []
     TRANSIENT_CODES = {429, 0}
@@ -138,7 +143,7 @@ async def discover_strategy(
             errors.append(f"{label}: empty response")
 
     def _too_expensive(r: Response) -> list[str] | None:
-        """The 2x-buffered projected cost of this probe, vs the selection ceiling."""
+        """The 2x-buffered advertised cost of this probe, vs the selection ceiling."""
         if policy is None or r.error:
             return None
         if exceeds_ceiling(2 * r.cost, endpoint.model, endpoint.provider, policy):
