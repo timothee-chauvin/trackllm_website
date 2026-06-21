@@ -51,6 +51,20 @@ def _matches_any(endpoint: Endpoint, patterns: list[str]) -> bool:
     return any(fnmatch.fnmatch(t, p) for t in targets for p in patterns)
 
 
+def exceeds_ceiling(
+    cost_per_request: float, model: str, provider: str, policy: SelectionPolicy
+) -> bool:
+    """A non-flagship endpoint above the monthly ceiling is too_expensive to keep probing.
+
+    Flagships (selection's flagship-rule patterns) are exempt — they're monitored
+    regardless of cost.
+    """
+    fake = Endpoint(api="openrouter", model=model, provider=provider, cost=(0, 0))
+    if _matches_any(fake, policy.flagship_patterns()):
+        return False
+    return cost_per_request * config.bi.samples_per_month > policy.max_endpoint_cost
+
+
 def select_monitoring_targets(
     candidates: list[Endpoint], policy: SelectionPolicy, popular_models: list[str]
 ) -> tuple[list[Endpoint], dict[Endpoint, str]]:
