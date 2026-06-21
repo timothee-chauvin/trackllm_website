@@ -1,51 +1,17 @@
-# BI monitoring selection policy. The ONLY place cost is managed.
-# Rules run top to bottom; each adds endpoints (no duplicates) until
-# budget_per_month is reached. Per-endpoint monthly cost = measured
-# cost_per_request x config.bi.samples_per_month (20 BIs x 10 samples x 30 days).
+# BI monitoring selection policy.
+#
+# SELECTION EMPTIED 2026-06-21 to prevent unattended onboarding spend overnight.
+# With no [[rule]] blocks and exclude = ["*"], select_monitoring_targets returns
+# zero endpoints, so update_endpoints_bi_lifecycle onboards/rechecks/delists nothing.
+# (Catalog vetting in update_endpoints_bi still runs, but it is ~1 cheap query per
+# endpoint and is cost-guarded.)
+#
+# Restore the real policy before re-enabling onboarding:
+#   - prior committed policy: git show 774f879754:bi_selection.toml
+#   - in-progress draft (qwen pattern narrowed): /home/ubuntu/bi_selection_wip_backup_2026-06-21.toml
 
-budget_per_month = 10.0
-# Non-flagship endpoints whose monthly cost exceeds this are never probed past
-# vetting (cached too_expensive). Flagships (pins + flagship rule models) are exempt.
+budget_per_month = 0.0
 max_endpoint_cost = 0.50
 
-# Never selected anywhere (globs match "model" or "model#provider").
-exclude = [
-    "*image*", "*-fast", "*:extended", "*customtools*", "*-beta",
-    "switchpoint/router",
-]
-
-[[rule]]
-name = "flagships"           # models people care about, cheapest provider each
-kind = "models"
-patterns = [
-    "anthropic/claude-fable-5", "anthropic/claude-opus-4.8", "anthropic/claude-opus-4.7",
-    "anthropic/claude-sonnet-4.6", "anthropic/claude-sonnet-4.5", "anthropic/claude-haiku-4.5",
-    "openai/gpt-4o", "openai/gpt-4o-mini",
-    "google/gemini-3-flash*", "google/gemini-2.5-flash*",
-    "deepseek/deepseek-v3.2", "deepseek/deepseek-chat*",
-    "qwen/qwen3-235b*", "moonshotai/kimi-k2*", "z-ai/glm-4.7",
-    "meta-llama/llama-4*", "mistralai/mistral-large*", "minimax/minimax-m2",
-]
-providers_per_model = 1
-flagship = true              # exempt from max_endpoint_cost
-
-[[rule]]
-name = "corroboration"       # extra providers for swap-prone models, where cheap
-kind = "models"
-patterns = ["deepseek/deepseek-v3.2", "z-ai/glm-4.7", "qwen/qwen3-235b*", "moonshotai/kimi-k2*"]
-providers_per_model = "all"
-max_monthly_cost = 0.10
-
-[[rule]]
-name = "provider-coverage"   # every provider represented by its cheapest endpoint
-kind = "providers"
-patterns = ["*"]
-endpoints_per_provider = 1
-max_monthly_cost = 0.25
-
-[[rule]]
-name = "long-tail"           # fill remaining budget, cheapest models first
-kind = "models"
-patterns = ["*"]
-providers_per_model = 1
-max_monthly_cost = 0.10
+# Exclude everything: nothing is eligible for selection while emptied.
+exclude = ["*"]
