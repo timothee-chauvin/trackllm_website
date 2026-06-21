@@ -9,12 +9,11 @@ import yaml
 from pydantic import BaseModel
 
 from trackllm_website.api import OpenRouterClient
-from trackllm_website.bi.common import resolve_strategies
+from trackllm_website.bi.common import TOO_EXPENSIVE, resolve_strategies
 from trackllm_website.bi.popularity import fetch_popular_models_safe
 from trackllm_website.bi.reinit import reinit
 from trackllm_website.bi.selection import (
-    SelectionPolicy,
-    _matches_any,
+    exceeds_ceiling,
     load_policy,
     select_monitoring_targets,
 )
@@ -32,18 +31,15 @@ from trackllm_website.util import (
 ENDPOINTS_CACHE_BI_PATH = root / "endpoints_cache_bi.yaml"
 
 
-def exceeds_ceiling(
-    cost_per_request: float, model: str, provider: str, policy: SelectionPolicy
-) -> bool:
-    """A non-flagship endpoint above the monthly ceiling is too_expensive to keep probing.
-
-    Flagships (selection's flagship-rule patterns) are exempt — they're monitored
-    regardless of cost.
-    """
-    fake = Endpoint(api="openrouter", model=model, provider=provider, cost=(0, 0))
-    if _matches_any(fake, policy.flagship_patterns()):
-        return False
-    return cost_per_request * config.bi.samples_per_month > policy.max_endpoint_cost
+def cache_too_expensive_from_probe(
+    failed: dict[str, list[str]], probed: list[Endpoint], cache: EndpointCache
+) -> None:
+    """Route endpoints that discover_strategy short-circuited on cost (errors led by
+    TOO_EXPENSIVE) into the too_expensive cache, so they are not re-probed next run."""
+    by_key = {str(e): e for e in probed}
+    for key, errors in failed.items():
+        if errors and errors[0] == TOO_EXPENSIVE and key in by_key:
+            cache.add_too_expensive(by_key[key])
 
 
 def save_endpoints_bi(endpoints: list[Endpoint]) -> None:
@@ -353,7 +349,10 @@ async def update_endpoints_bi() -> list[Endpoint]:
     )
 
     async with OpenRouterClient(timeout=60.0) as probe_client:
-        strategies, failed = await resolve_strategies(probe_client, to_vet)
+        strategies, failed = await resolve_strategies(
+            probe_client, to_vet, policy=policy
+        )
+    cache_too_expensive_from_probe(failed, to_vet, cache)
     logger.info(
         f"Resolved strategies for {len(strategies)} endpoints "
         f"({len(failed)} failed probing)"
