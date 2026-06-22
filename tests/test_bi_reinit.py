@@ -3,9 +3,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import orjson
+import pytest
 
+from trackllm_website.api import OpenRouterClient, Response
+from trackllm_website.bi import phase_1 as phase_1_mod
 from trackllm_website.bi import reinit as reinit_mod
 from trackllm_website.bi.reinit import parse_phase_1_results
+from trackllm_website.bi.common import PlainStrategy
 from trackllm_website.config import Endpoint
 
 ENDPOINT = Endpoint(api="openrouter", model="m/x", provider="p", cost=(1, 1))
@@ -132,3 +136,120 @@ def test_parse_phase_1_candidates_skips_meta_and_decoy(tmp_path: Path):
     # token-count keys.
     assert parse_phase_1_results(tmp_path, []) == (["bi_prompt"], 2)
     assert parse_phase_1_results(tmp_path, ["bi_prompt"]) == ([], 2)
+
+
+# --- resume test ---
+
+_FIXED_TOKENS = ["tok0", "tok1", "tok2", "tok3", "tok4", "tok5"]
+
+
+class _CountingClient(OpenRouterClient):
+    """Counts queries and returns a fixed border-y token; raises after `fail_after`."""
+
+    def __init__(self, fail_after: int | None = None):
+        self.calls = 0
+        self.fail_after = fail_after
+
+    async def query(self, endpoint, prompt, **kwargs):
+        self.calls += 1
+        if self.fail_after is not None and self.calls > self.fail_after:
+            raise asyncio.CancelledError()
+        token = "a" if self.calls % 2 else "b"
+        return Response(
+            content=token,
+            error=None,
+            date=datetime.now(tz=timezone.utc),
+            endpoint=endpoint,
+            prompt=prompt,
+            cost=0.0,
+        )
+
+    async def close(self):
+        pass
+
+
+def _shrink_phase1(monkeypatch, tmp_path, *, tokens, queries_per_token):
+    """Point data_dir at tmp_path and shrink phase-1 so a run is a handful of queries."""
+    monkeypatch.setattr(reinit_mod.config.bi, "data_dir", tmp_path)
+    p1 = reinit_mod.config.bi.phase_1
+    monkeypatch.setattr(p1, "tokens_per_endpoint", tokens)
+    monkeypatch.setattr(p1, "queries_per_token", queries_per_token)
+    monkeypatch.setattr(p1, "queries_per_candidate", queries_per_token)
+    monkeypatch.setattr(p1, "target_border_inputs", 9999)
+    monkeypatch.setattr(p1, "border_input_candidate_ratio", 1.0)
+    monkeypatch.setattr(p1, "request_delay_seconds", 0.0)
+    # Serial execution (no concurrent token tasks) keeps which queries persist before
+    # the interrupt deterministic, so the resume run's query budget is reproducible.
+    monkeypatch.setattr(p1, "max_concurrent_tokens_per_endpoint", 1)
+
+
+def test_discover_candidates_resumes_partial_progress(monkeypatch, tmp_path):
+    _shrink_phase1(monkeypatch, tmp_path, tokens=4, queries_per_token=2)
+    ep = ENDPOINT
+
+    # Provide a fixed token list so phase_1a has prompts to query.
+    monkeypatch.setattr(
+        phase_1_mod,
+        "load_tokenizers",
+        lambda: ({}, _FIXED_TOKENS),
+    )
+
+    first = _CountingClient(fail_after=3)
+    monkeypatch.setattr(
+        "trackllm_website.bi.common.OpenRouterClient", lambda *a, **k: first
+    )
+
+    async def fake_resolve(client, endpoints, **k):
+        return ({str(e): PlainStrategy() for e in endpoints}, {})
+
+    monkeypatch.setattr(phase_1_mod, "resolve_strategies", fake_resolve)
+
+    with pytest.raises(asyncio.CancelledError):
+        asyncio.run(reinit_mod.discover_candidates(ep, exclude=[]))
+    # The interrupt fires after the 3 successful queries are persisted; the exact
+    # call count past that depends on asyncio flush/scheduling internals, so assert
+    # only the load-bearing property: at least the 3 persisted queries were made.
+    assert first.calls >= 3
+
+    scratch = reinit_mod.onboarding_progress_dir(ep)
+    assert scratch.exists()  # partial results persisted, NOT a tempdir
+
+    second = _CountingClient()
+    monkeypatch.setattr(
+        "trackllm_website.bi.common.OpenRouterClient", lambda *a, **k: second
+    )
+    asyncio.run(reinit_mod.discover_candidates(ep, exclude=[]))
+    # Budget is 4 tokens * 2 = 8 queries total; 3 persisted -> <= 5 remain.
+    assert second.calls <= 5
+    assert second.calls < 8  # proves resume, not restart
+
+
+def test_reinit_cleans_scratch_on_terminal_return(monkeypatch, tmp_path):
+    monkeypatch.setattr(reinit_mod.config.bi, "data_dir", tmp_path)
+    scratch = reinit_mod.onboarding_progress_dir(ENDPOINT)
+    scratch.mkdir(parents=True)
+    (scratch / "marker.txt").write_text("partial")
+
+    # no_bis terminal path: discovery returns nothing.
+    async def fake_discover(endpoint, exclude):
+        return [], 0.0
+
+    monkeypatch.setattr(reinit_mod, "discover_candidates", fake_discover)
+    result = asyncio.run(reinit_mod.reinit(None, None, ENDPOINT, [], NOW))
+    assert result.reason == "no_bis"
+    assert not scratch.exists()  # terminal -> cleaned
+
+
+def test_reinit_preserves_scratch_on_cancel(monkeypatch, tmp_path):
+    monkeypatch.setattr(reinit_mod.config.bi, "data_dir", tmp_path)
+    scratch = reinit_mod.onboarding_progress_dir(ENDPOINT)
+    scratch.mkdir(parents=True)
+    (scratch / "marker.txt").write_text("partial")
+
+    async def cancelling_discover(endpoint, exclude):
+        raise asyncio.CancelledError()
+
+    monkeypatch.setattr(reinit_mod, "discover_candidates", cancelling_discover)
+    with pytest.raises(asyncio.CancelledError):
+        asyncio.run(reinit_mod.reinit(None, None, ENDPOINT, [], NOW))
+    assert scratch.exists()  # cancel -> scratch kept for resume
