@@ -97,7 +97,7 @@ async def discover_candidates(
     return candidates, prevalence
 
 
-async def reinit(
+async def _reinit(
     client,
     strategy: QueryStrategy | None,
     endpoint: Endpoint,
@@ -160,6 +160,24 @@ async def reinit(
     )
     _persist_reference(endpoint, epoch)
     return ReinitResult(epoch=epoch, reason="ok")
+
+
+async def reinit(
+    client,
+    strategy: QueryStrategy | None,
+    endpoint: Endpoint,
+    old_bis: list[str],
+    now: datetime,
+) -> ReinitResult:
+    """Re-init / onboard one endpoint, resuming persisted phase-1 progress.
+
+    Onboarding scratch is removed only on a normal (terminal) return; if the
+    caller's deadline cancels us mid-run, CancelledError propagates past the
+    cleanup so the next run resumes from disk.
+    """
+    result = await _reinit(client, strategy, endpoint, old_bis, now)
+    _cleanup_onboarding_progress(endpoint)
+    return result
 
 
 def _persist_reference(endpoint: Endpoint, epoch: Epoch) -> None:

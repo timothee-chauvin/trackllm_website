@@ -178,7 +178,7 @@ def _shrink_phase1(monkeypatch, tmp_path, *, tokens, queries_per_token):
     monkeypatch.setattr(p1, "target_border_inputs", 9999)
     monkeypatch.setattr(p1, "border_input_candidate_ratio", 1.0)
     monkeypatch.setattr(p1, "request_delay_seconds", 0.0)
-    # Serial execution: makes first.calls == 4 deterministic (no concurrent token tasks).
+    # Serial execution: makes first.calls == 5 deterministic (no concurrent token tasks).
     monkeypatch.setattr(p1, "max_concurrent_tokens_per_endpoint", 1)
 
 
@@ -205,7 +205,7 @@ def test_discover_candidates_resumes_partial_progress(monkeypatch, tmp_path):
 
     with pytest.raises(asyncio.CancelledError):
         asyncio.run(reinit_mod.discover_candidates(ep, exclude=[]))
-    # With max_concurrent_tokens=1 and fail_after=3: tok3(2q) + tok1(2q, 4th raises) +
+    # With max_concurrent_tokens=1 and fail_after=3: tok0(2q) + tok1(2q, 4th raises) +
     # tok2(1q during finally-flush, also raises) = 5. Three queries are persisted.
     assert first.calls == 5
 
@@ -220,3 +220,34 @@ def test_discover_candidates_resumes_partial_progress(monkeypatch, tmp_path):
     # Budget is 4 tokens * 2 = 8 queries total; 3 persisted -> <= 5 remain.
     assert second.calls <= 5
     assert second.calls < 8  # proves resume, not restart
+
+
+def test_reinit_cleans_scratch_on_terminal_return(monkeypatch, tmp_path):
+    monkeypatch.setattr(reinit_mod.config.bi, "data_dir", tmp_path)
+    scratch = reinit_mod.onboarding_progress_dir(ENDPOINT)
+    scratch.mkdir(parents=True)
+    (scratch / "marker.txt").write_text("partial")
+
+    # no_bis terminal path: discovery returns nothing.
+    async def fake_discover(endpoint, exclude):
+        return [], 0.0
+
+    monkeypatch.setattr(reinit_mod, "discover_candidates", fake_discover)
+    result = asyncio.run(reinit_mod.reinit(None, None, ENDPOINT, [], NOW))
+    assert result.reason == "no_bis"
+    assert not scratch.exists()  # terminal -> cleaned
+
+
+def test_reinit_preserves_scratch_on_cancel(monkeypatch, tmp_path):
+    monkeypatch.setattr(reinit_mod.config.bi, "data_dir", tmp_path)
+    scratch = reinit_mod.onboarding_progress_dir(ENDPOINT)
+    scratch.mkdir(parents=True)
+    (scratch / "marker.txt").write_text("partial")
+
+    async def cancelling_discover(endpoint, exclude):
+        raise asyncio.CancelledError()
+
+    monkeypatch.setattr(reinit_mod, "discover_candidates", cancelling_discover)
+    with pytest.raises(asyncio.CancelledError):
+        asyncio.run(reinit_mod.reinit(None, None, ENDPOINT, [], NOW))
+    assert scratch.exists()  # cancel -> scratch kept for resume
