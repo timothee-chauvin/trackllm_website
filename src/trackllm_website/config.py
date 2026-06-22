@@ -79,6 +79,8 @@ class Phase1Config(BaseModel):
     border_input_candidate_ratio: float
     target_border_inputs: int
     queries_per_candidate: int
+    max_retries: int
+    abandon_after_timeouts: int
 
 
 class Phase2Config(BaseModel):
@@ -122,6 +124,7 @@ class ReinitConfig(BaseModel):
     recheck_days: int
     onboard_concurrency: int
     deselection_grace_days: int
+    onboard_timeout_seconds: int
 
 
 class PopularityConfig(BaseModel):

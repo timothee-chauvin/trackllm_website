@@ -105,6 +105,9 @@ async def phase_1a(
             pending_before_new_semaphore=asyncio.Semaphore(max_concurrent_tokens),
             queries_per_token=config.bi.phase_1.queries_per_token,
             query_strategy=strategies[str(ep)],
+            max_retries=config.bi.phase_1.max_retries,
+            backoff_on_timeout=False,
+            abandon_after_timeouts=config.bi.phase_1.abandon_after_timeouts,
         )
         for ep in valid_endpoints
     ]
@@ -150,6 +153,9 @@ async def phase_1b(temperature: float, base_dir: Path | None = None) -> None:
             concurrency_semaphore=asyncio.Semaphore(max_concurrent_requests),
             pending_before_new_semaphore=asyncio.Semaphore(max_concurrent_tokens),
             queries_per_token=config.bi.phase_1.queries_per_token,
+            max_retries=config.bi.phase_1.max_retries,
+            backoff_on_timeout=False,
+            abandon_after_timeouts=config.bi.phase_1.abandon_after_timeouts,
         )
         for ep in endpoints
     ]

@@ -239,3 +239,23 @@ def slugify_eq(endpoint):
     from trackllm_website.util import slugify
 
     return slugify(f"{endpoint.model}#{endpoint.provider}")
+
+
+def test_onboarding_timeout_is_caught_not_propagated(monkeypatch, tmp_path):
+    """A timed-out onboarding must not crash the run or produce a state file."""
+    slow = ep("m/slow")
+
+    async def slow_reinit(client, strategy, endpoint, old_bis, now):
+        await asyncio.sleep(1)  # longer than the patched timeout
+
+    def select_all(candidates, policy, popular_models):
+        return list(candidates), {e: "test" for e in candidates}
+
+    _patch_lifecycle_deps(monkeypatch, tmp_path, select=select_all, reinit=slow_reinit)
+    monkeypatch.setattr(config.bi.reinit, "onboard_timeout_seconds", 0.05)
+
+    # Must return without raising despite the timeout.
+    asyncio.run(update_endpoints_bi_lifecycle([slow]))
+
+    # No state file: the endpoint was not (even partially) onboarded.
+    assert not (config.bi.state_dir / f"{slugify_eq(slow)}.json").exists()

@@ -519,8 +519,9 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
             # old_bis=[]: rechecks intentionally rediscover BIs from scratch,
             # since references from before the monitoring gap are stale.
             old_bis = []
-            result = await reinit(
-                client, strategies[str(endpoint)], endpoint, old_bis, now
+            result = await asyncio.wait_for(
+                reinit(client, strategies[str(endpoint)], endpoint, old_bis, now),
+                timeout=config.bi.reinit.onboard_timeout_seconds,
             )
             if result.reason == "bad_temperature":
                 # T=0 is a no-op for this endpoint: cache it so it's excluded and
@@ -542,6 +543,12 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
                 state.retired = None
                 state.epochs.append(result.epoch)
             state.save(config.bi.state_dir)
+        except asyncio.TimeoutError:
+            hours = config.bi.reinit.onboard_timeout_seconds / 3600
+            logger.warning(
+                f"{endpoint} onboarding exceeded {hours:.0f}h, will resume next run"
+            )
+            return
         except Exception:
             logger.exception(f"BI onboarding failed for {endpoint}")
 

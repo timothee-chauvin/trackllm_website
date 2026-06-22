@@ -190,6 +190,7 @@ class OpenRouterClient:
         output_tokens: int | None = None,
         reasoning: dict | None = None,
         max_retries: int | None = None,
+        backoff_on_timeout: bool = True,
     ) -> Response:
         try:
             return await retry_with_exponential_backoff(
@@ -204,6 +205,7 @@ class OpenRouterClient:
                 if max_retries is not None
                 else config.api.max_retries,
                 on_retry=on_retry,
+                backoff_on_timeout=backoff_on_timeout,
             )
         except Exception as e:
             if isinstance(e, aiohttp.ClientResponseError):
@@ -246,12 +248,14 @@ async def retry_with_exponential_backoff(
     jitter: bool = True,
     retryable_status_codes: tuple[int, ...] = (429, 500, 502, 503, 504),
     on_retry: Callable[[int], None] | None = None,
+    backoff_on_timeout: bool = True,
     **kwargs,
 ) -> Any:
     """Retry an async function with exponential backoff.
 
     Args:
         on_retry: Optional callback called with HTTP status code when retrying.
+        backoff_on_timeout: When False, timeout retries skip the sleep entirely.
     """
 
     def calc_delay(attempt: int) -> float:
@@ -278,11 +282,15 @@ async def retry_with_exponential_backoff(
                 raise
             if on_retry and status:
                 on_retry(status)
-            wait_time = calc_delay(attempt)
+            if isinstance(e, asyncio.TimeoutError) and not backoff_on_timeout:
+                wait_time = 0.0
+            else:
+                wait_time = calc_delay(attempt)
             logger.debug(
                 f"{msg}. Retrying in {wait_time:.2f}s ({attempt + 1}/{max_retries + 1})"
             )
-            await asyncio.sleep(wait_time)
+            if wait_time > 0.0:
+                await asyncio.sleep(wait_time)
             last_exception = e
 
     raise last_exception or RuntimeError("Unexpected end of retry loop")
