@@ -3,7 +3,7 @@
 Also the onboarding path for new endpoints (old_bis=[]).
 """
 
-import tempfile
+import shutil
 from datetime import datetime
 from pathlib import Path
 
@@ -23,6 +23,7 @@ from trackllm_website.bi.phase_2 import (
 from trackllm_website.bi.sampling import sample_prompts
 from trackllm_website.bi.state import Epoch
 from trackllm_website.config import Endpoint, config, logger
+from trackllm_website.util import slugify
 
 
 class ReinitResult(BaseModel):
@@ -66,21 +67,34 @@ def parse_phase_1_results(
     return candidates, len(sampled)
 
 
+def onboarding_progress_dir(endpoint: Endpoint) -> Path:
+    """Persistent per-endpoint scratch dir for resumable phase-1 onboarding.
+
+    Per-endpoint (not shared) because parse_phase_1_results globs *.json and
+    onboarding runs at concurrency 40; a shared dir would mix endpoints' files.
+    """
+    slug = slugify(f"{endpoint.model}#{endpoint.provider}")
+    return config.bi.data_dir / "onboarding_progress" / slug
+
+
+def _cleanup_onboarding_progress(endpoint: Endpoint) -> None:
+    shutil.rmtree(onboarding_progress_dir(endpoint), ignore_errors=True)
+
+
 async def discover_candidates(
     endpoint: Endpoint, exclude: list[str]
 ) -> tuple[list[str], float]:
-    """Run phase 1a discovery for one endpoint.
+    """Run phase 1a discovery for one endpoint, resuming from persisted progress.
 
     Returns (candidates, prevalence) where prevalence = n_border / n_prompts_sampled,
     so the caller can decide whether to run the temperature gate.
     """
-    with tempfile.TemporaryDirectory() as tmp:
-        base_dir = Path(tmp)
-        await phase_1a([endpoint], 0.0, base_dir)
-        results_dir = config.bi.get_phase_1_dir(0.0, base_dir)
-        candidates, n_sampled = parse_phase_1_results(results_dir, exclude)
-        prevalence = len(candidates) / n_sampled if n_sampled else 0.0
-        return candidates, prevalence
+    base_dir = onboarding_progress_dir(endpoint)
+    await phase_1a([endpoint], 0.0, base_dir)
+    results_dir = config.bi.get_phase_1_dir(0.0, base_dir)
+    candidates, n_sampled = parse_phase_1_results(results_dir, exclude)
+    prevalence = len(candidates) / n_sampled if n_sampled else 0.0
+    return candidates, prevalence
 
 
 async def reinit(
