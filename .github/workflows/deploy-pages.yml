@@ -33,8 +33,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # Use the commit from workflow_run if triggered that way
-          ref: ${{ github.event.workflow_run.head_sha || github.ref }}
+          # Deploy the branch tip, NOT workflow_run.head_sha: head_sha is the commit
+          # run-main *started from*, i.e. the parent of the "[bot] add new responses"
+          # commit it pushes at the end of its run. Checking out head_sha publishes
+          # data that is one run-main cycle stale. head_branch is the branch run-main
+          # pushed to ("main"), whose tip includes that just-pushed data.
+          ref: ${{ github.event.workflow_run.head_branch || github.ref }}
 
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
