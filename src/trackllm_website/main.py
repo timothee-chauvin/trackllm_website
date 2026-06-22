@@ -3,7 +3,7 @@ import json
 from datetime import datetime, timezone
 
 from trackllm_website.api import OpenRouterClient
-from trackllm_website.config import Config, config, logger
+from trackllm_website.config import config, logger
 from trackllm_website.storage import Response, ResultsStorage
 from trackllm_website.util import gather_with_concurrency_streaming, trim_to_length
 
@@ -58,7 +58,6 @@ def write_lt_spend(summary: dict, now: datetime) -> None:
 
 async def main():
     """Query all endpoints with configured prompts and store results."""
-    config = Config()
     storage = ResultsStorage(data_dir=config.lt_dir)
     openrouter_client = OpenRouterClient()
 
