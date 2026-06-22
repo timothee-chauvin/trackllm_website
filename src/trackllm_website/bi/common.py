@@ -439,13 +439,18 @@ class EndpointState:
     query_strategy: QueryStrategy = field(default_factory=PlainStrategy)
     extra_output_tokens: int = 0
     content_extractor: Callable[[Response], str] | None = None
+    max_retries: int | None = None
+    backoff_on_timeout: bool = True
     request_timestamps: deque[float] = field(default_factory=lambda: deque(maxlen=100))
     rate_limit_timestamps: deque[float] = field(
         default_factory=lambda: deque(maxlen=100)
     )
+    abandon_after_timeouts: int | None = None
     completed_queries: int = 0
     total_queries: int = 0
     got_404: bool = False
+    timeout_count: int = 0
+    unresponsive: bool = False
     recent_costs: deque[float] = field(default_factory=lambda: deque(maxlen=20))
     total_input_tokens: int = 0
     total_output_tokens: int = 0
@@ -801,13 +806,13 @@ async def query_single(
     token: str,
     temperature: float,
 ) -> bool:
-    """Execute a single query. Returns False if a 404 error is encountered."""
-    if state.got_404:
+    """Execute a single query. Returns False if the endpoint should be abandoned."""
+    if state.got_404 or state.unresponsive:
         return False
 
     await state.rate_limiter.acquire()
 
-    if state.got_404:
+    if state.got_404 or state.unresponsive:
         return False
 
     state.request_timestamps.append(time.monotonic())
@@ -828,6 +833,8 @@ async def query_single(
         temperature=temperature,
         logprobs=False,
         on_retry=on_retry,
+        max_retries=state.max_retries,
+        backoff_on_timeout=state.backoff_on_timeout,
         **query_kwargs,
     )
     state.completed_queries += 1
@@ -837,6 +844,24 @@ async def query_single(
                 state.got_404 = True
                 logger.warning(f"Got 404 for {state.endpoint}, abandoning endpoint")
             return False
+        if response.error.http_code == 0 and response.error.message.startswith(
+            "Timeout"
+        ):
+            state.timeout_count += 1
+            # Abandon a "produced nothing" endpoint: enough timeouts and zero
+            # successes. Gating on successful_queries==0 (rather than requiring
+            # EVERY request to be a timeout) means a stray non-timeout error can't
+            # keep a dead endpoint querying for the whole run.
+            if (
+                state.abandon_after_timeouts is not None
+                and state.timeout_count >= state.abandon_after_timeouts
+                and state.successful_queries == 0
+            ):
+                state.unresponsive = True
+                logger.warning(
+                    f"{state.endpoint} unresponsive ({state.timeout_count} timeouts, 0 successes), abandoning for this run"
+                )
+                return False
         logger.warning(
             f"Error for {state.endpoint}: {token!r}: {response.error.message}"
         )
@@ -891,10 +916,10 @@ async def query_all_for_token(
 
     async with state.pending_before_new_semaphore:
         for i in range(max_rounds):
-            if state.got_404:
+            if state.got_404 or state.unresponsive:
                 return
             for temp in state.temperatures:
-                if state.got_404:
+                if state.got_404 or state.unresponsive:
                     return
                 if temp_pending[temp] <= 0:
                     continue

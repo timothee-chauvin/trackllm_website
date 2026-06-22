@@ -40,6 +40,8 @@ request_delay_seconds = 5.0
 border_input_candidate_ratio = 2
 target_border_inputs = 50
 queries_per_candidate = 100
+max_retries = 3
+abandon_after_timeouts = 20
 
 [bi.prevalence]
 queries_per_token = 3
@@ -75,8 +77,9 @@ top_k_bis = 20
 min_bis = 10
 stall_days = 7
 recheck_days = 14
-onboard_concurrency = 20
+onboard_concurrency = 40
 deselection_grace_days = 30
+onboard_timeout_seconds = 10800
 
 [bi.monitor]
 max_concurrent_endpoints = 20
