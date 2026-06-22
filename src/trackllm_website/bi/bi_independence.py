@@ -237,7 +237,7 @@ def print_markdown_table(
 
 
 def main(
-    data_dir: str = "data_bi/bi_prevalence/T=0",
+    data_dir: str = "website/data/b3it/bi_prevalence/T=0",
     show_lcs: bool = False,
     markdown_table: bool = True,
 ) -> None:

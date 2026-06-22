@@ -19,7 +19,7 @@ inference-net = 5
 xai = 8
 
 [bi]
-data_dir = "data_bi"
+data_dir = "website/data/b3it"
 selection_path = "bi_selection.toml"
 samples_per_day = 200  # BIs (top_k_bis=20) x samples/BI/day (queries_per_token=10), the monitoring cadence
 days_per_month = 30
