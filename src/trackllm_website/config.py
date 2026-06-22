@@ -229,6 +229,10 @@ class Config(BaseSettings):
     openrouter_api_key: str
     hf_token: str | None = None
 
+    @property
+    def lt_dir(self) -> Path:
+        return self.data_dir / "lt"
+
     @classmethod
     def settings_customise_sources(
         cls,
