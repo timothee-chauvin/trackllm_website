@@ -76,3 +76,36 @@ def test_abandon_after_all_timeouts(tmp_path):
     asyncio.run(run())
     assert state.unresponsive is True
     assert client.calls == 3  # 3 timeouts trip the abandon; calls 4-5 hit the top gate
+
+
+def _state_kwargs(tmp_path):
+    return dict(
+        endpoint=Endpoint(api="openrouter", model="m/x", provider="p", cost=(1, 1)),
+        input_tokens=["a"],
+        temperatures=[0.0],
+        base_dir=tmp_path,
+        rate_limiter=AsyncLimiter(1000, 1),
+        concurrency_semaphore=asyncio.Semaphore(1),
+        pending_before_new_semaphore=asyncio.Semaphore(1),
+        queries_per_token=1,
+    )
+
+
+def test_phase1_state_uses_onboarding_safety_knobs(tmp_path):
+    from trackllm_website.bi.phase_1 import Phase1EndpointState
+
+    state = Phase1EndpointState(
+        **_state_kwargs(tmp_path),
+        max_retries=config.bi.phase_1.max_retries,
+        backoff_on_timeout=False,
+        abandon_after_timeouts=config.bi.phase_1.abandon_after_timeouts,
+    )
+    assert state.max_retries == 3
+    assert state.backoff_on_timeout is False
+    assert state.abandon_after_timeouts == 20
+
+
+def test_bare_endpoint_state_keeps_safe_defaults(tmp_path):
+    state = EndpointState(**_state_kwargs(tmp_path))
+    assert state.backoff_on_timeout is True
+    assert state.abandon_after_timeouts is None
