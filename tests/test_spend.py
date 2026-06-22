@@ -25,6 +25,16 @@ def test_track_accumulates_cost_and_counts():
     assert s.n_errors == 1
 
 
+def test_billed_error_still_counts_cost():
+    # A billed-but-errored response (e.g. "No logprobs returned"): tokens were
+    # generated and charged, so its cost must be counted, and it is an error.
+    with track() as s:
+        record_query(0.07, is_error=True)
+    assert abs(s.cost - 0.07) < 1e-9
+    assert s.n_queries == 1
+    assert s.n_errors == 1
+
+
 def test_track_propagates_into_child_tasks():
     async def child():
         record_query(0.02, is_error=False)

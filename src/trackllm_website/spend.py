@@ -31,15 +31,20 @@ _active: contextvars.ContextVar[Spend | None] = contextvars.ContextVar(
 
 
 def record_query(cost: float, is_error: bool) -> None:
-    """Add one query's outcome to the active bucket, if any (else no-op)."""
+    """Add one query's outcome to the active bucket, if any (else no-op).
+
+    `cost` is always added: it is the actually-billed amount, which is 0.0 for
+    true (network/HTTP) errors but non-zero for billed-but-errored responses
+    such as "No logprobs returned" (tokens generated and charged). `n_errors`
+    counts error responses separately.
+    """
     bucket = _active.get()
     if bucket is None:
         return
     bucket.n_queries += 1
+    bucket.cost += cost
     if is_error:
         bucket.n_errors += 1
-    else:
-        bucket.cost += cost
 
 
 @contextmanager
