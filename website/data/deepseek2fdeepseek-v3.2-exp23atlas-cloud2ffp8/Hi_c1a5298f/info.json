@@ -1,0 +1,16 @@
+{
+  "prompt": "Hi",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "deepseek/deepseek-v3.2-exp",
+    "provider": "atlas-cloud/fp8",
+    "cost": [
+      0.27,
+      0.41
+    ],
+    "max_logprobs": null,
+    "cost_per_request": null,
+    "created": null,
+    "supports_temperature": null
+  }
+}

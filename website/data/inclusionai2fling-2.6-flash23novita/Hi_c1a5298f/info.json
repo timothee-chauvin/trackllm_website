@@ -1,0 +1,16 @@
+{
+  "prompt": "Hi",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "inclusionai/ling-2.6-flash",
+    "provider": "novita",
+    "cost": [
+      0.01,
+      0.03
+    ],
+    "max_logprobs": null,
+    "cost_per_request": null,
+    "created": null,
+    "supports_temperature": null
+  }
+}

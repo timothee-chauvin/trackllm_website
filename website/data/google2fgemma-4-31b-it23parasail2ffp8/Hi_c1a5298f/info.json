@@ -1,0 +1,16 @@
+{
+  "prompt": "Hi",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "google/gemma-4-31b-it",
+    "provider": "parasail/fp8",
+    "cost": [
+      0.15,
+      0.4
+    ],
+    "max_logprobs": null,
+    "cost_per_request": null,
+    "created": null,
+    "supports_temperature": null
+  }
+}

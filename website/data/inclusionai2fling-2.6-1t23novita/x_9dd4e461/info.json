@@ -1,0 +1,16 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "inclusionai/ling-2.6-1t",
+    "provider": "novita",
+    "cost": [
+      0.075,
+      0.625
+    ],
+    "max_logprobs": null,
+    "cost_per_request": null,
+    "created": null,
+    "supports_temperature": null
+  }
+}

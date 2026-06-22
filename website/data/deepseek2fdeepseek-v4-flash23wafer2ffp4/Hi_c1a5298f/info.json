@@ -1,0 +1,16 @@
+{
+  "prompt": "Hi",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "deepseek/deepseek-v4-flash",
+    "provider": "wafer/fp4",
+    "cost": [
+      0.09,
+      0.18
+    ],
+    "max_logprobs": null,
+    "cost_per_request": null,
+    "created": null,
+    "supports_temperature": null
+  }
+}

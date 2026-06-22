@@ -1,0 +1,16 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "qwen/qwen3-next-80b-a3b-instruct",
+    "provider": "google-vertex/global",
+    "cost": [
+      0.15,
+      1.2
+    ],
+    "max_logprobs": null,
+    "cost_per_request": null,
+    "created": null,
+    "supports_temperature": null
+  }
+}

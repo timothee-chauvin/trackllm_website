@@ -1,0 +1,16 @@
+{
+  "prompt": "Hi",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "google/gemma-4-26b-a4b-it",
+    "provider": "cloudflare",
+    "cost": [
+      0.1,
+      0.3
+    ],
+    "max_logprobs": null,
+    "cost_per_request": null,
+    "created": null,
+    "supports_temperature": null
+  }
+}

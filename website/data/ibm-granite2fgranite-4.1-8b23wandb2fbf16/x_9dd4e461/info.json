@@ -1,0 +1,16 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "ibm-granite/granite-4.1-8b",
+    "provider": "wandb/bf16",
+    "cost": [
+      0.05,
+      0.1
+    ],
+    "max_logprobs": null,
+    "cost_per_request": null,
+    "created": null,
+    "supports_temperature": null
+  }
+}

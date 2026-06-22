@@ -1,0 +1,16 @@
+{
+  "prompt": "Hi",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "mistralai/mistral-small-3.2-24b-instruct",
+    "provider": "parasail/bf16",
+    "cost": [
+      0.09,
+      0.3
+    ],
+    "max_logprobs": null,
+    "cost_per_request": null,
+    "created": null,
+    "supports_temperature": null
+  }
+}

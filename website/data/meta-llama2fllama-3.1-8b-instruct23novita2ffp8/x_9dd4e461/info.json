@@ -1,0 +1,16 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "meta-llama/llama-3.1-8b-instruct",
+    "provider": "novita/fp8",
+    "cost": [
+      0.02,
+      0.05
+    ],
+    "max_logprobs": null,
+    "cost_per_request": null,
+    "created": null,
+    "supports_temperature": null
+  }
+}

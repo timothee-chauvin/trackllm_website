@@ -1,0 +1,16 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "bytedance/ui-tars-1.5-7b",
+    "provider": "parasail/bf16",
+    "cost": [
+      0.1,
+      0.2
+    ],
+    "max_logprobs": null,
+    "cost_per_request": null,
+    "created": null,
+    "supports_temperature": null
+  }
+}

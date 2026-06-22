@@ -1,0 +1,16 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "qwen/qwen3-30b-a3b-instruct-2507",
+    "provider": "atlas-cloud/fp8",
+    "cost": [
+      0.1,
+      0.3
+    ],
+    "max_logprobs": null,
+    "cost_per_request": null,
+    "created": null,
+    "supports_temperature": null
+  }
+}
