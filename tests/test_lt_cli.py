@@ -2,6 +2,7 @@ import os
 import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 import numpy as np
 
@@ -13,7 +14,7 @@ EP = Endpoint(api="openrouter", model="org/model", provider="prov", cost=(1, 1))
 
 def _seed_endpoint(data_dir, n=50):
     """One endpoint/prompt with enough logprob responses to produce LT scores."""
-    storage = ResultsStorage(data_dir)
+    storage = ResultsStorage(Path(data_dir) / "lt")
     base = datetime(2026, 6, 1, tzinfo=timezone.utc)
     for i in range(n):
         lp = ResponseLogprobs(
@@ -51,4 +52,4 @@ def test_lt_cli_computes_without_main_module_class_mismatch(tmp_path):
     assert result.returncode == 0, result.stderr
     # Reaching save_events (writes lt_changes.json) means the update_endpoint_events
     # call that beartype used to reject went through.
-    assert (tmp_path / "lt_changes.json").exists()
+    assert (tmp_path / "lt" / "lt_changes.json").exists()
