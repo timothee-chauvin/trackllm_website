@@ -20,6 +20,8 @@ import orjson
 from scipy.stats import chi2
 from statsmodels.stats.contingency_tables import StratifiedTable
 
+from trackllm_website.config import config
+
 
 class PairCategory(Enum):
     SAME_MODEL = auto()
@@ -237,10 +239,12 @@ def print_markdown_table(
 
 
 def main(
-    data_dir: str = "website/data/b3it/bi_prevalence/T=0",
+    data_dir: str | None = None,
     show_lcs: bool = False,
     markdown_table: bool = True,
 ) -> None:
+    if data_dir is None:
+        data_dir = str(config.bi.data_dir / "bi_prevalence" / "T=0")
     endpoint_bis = load_endpoint_bis(Path(data_dir))
     print(f"Loaded {len(endpoint_bis)} endpoints from {data_dir}")
 
