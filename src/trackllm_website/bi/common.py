@@ -848,10 +848,14 @@ async def query_single(
             "Timeout"
         ):
             state.timeout_count += 1
+            # Abandon a "produced nothing" endpoint: enough timeouts and zero
+            # successes. Gating on successful_queries==0 (rather than requiring
+            # EVERY request to be a timeout) means a stray non-timeout error can't
+            # keep a dead endpoint querying for the whole run.
             if (
                 state.abandon_after_timeouts is not None
-                and state.completed_queries >= state.abandon_after_timeouts
-                and state.timeout_count == state.completed_queries
+                and state.timeout_count >= state.abandon_after_timeouts
+                and state.successful_queries == 0
             ):
                 state.unresponsive = True
                 logger.warning(
