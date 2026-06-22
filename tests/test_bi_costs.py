@@ -1,8 +1,14 @@
 import asyncio
+from pathlib import Path
 
-from trackllm_website.bi.costs import build_cost_summary, ensure_costs, format_preview
+from trackllm_website.bi.costs import (
+    build_cost_summary,
+    costs_path,
+    ensure_costs,
+    format_preview,
+)
 from trackllm_website.bi.selection import Rule, SelectionPolicy
-from trackllm_website.config import Endpoint
+from trackllm_website.config import Endpoint, config
 
 
 def ep(m, p, cpr=None):
@@ -77,3 +83,8 @@ def test_format_preview_groups_and_totals():
     assert "m/b" in text and "m/a" in text
     assert "/mo" in text
     assert "10.00" in text  # budget shown
+
+
+def test_costs_path_under_b3it():
+    assert costs_path() == config.bi.data_dir / "bi_costs.json"
+    assert costs_path() == Path("website/data/b3it/bi_costs.json")

@@ -20,6 +20,10 @@ from trackllm_website.util import gather_with_concurrency
 COSTS_FILENAME = "bi_costs.json"
 
 
+def costs_path() -> Path:
+    return config.bi.data_dir / COSTS_FILENAME
+
+
 def build_cost_summary(
     candidates: list[Endpoint], policy: SelectionPolicy, popular_models: list[str]
 ) -> dict:
@@ -60,7 +64,7 @@ def write_cost_summary() -> None:
         policy,
         fetch_popular_models_safe(config.bi.popularity.top_n),
     )
-    path = Path(config.data_dir) / COSTS_FILENAME
+    path = costs_path()
     path.write_bytes(orjson.dumps(summary, option=orjson.OPT_INDENT_2))
 
 
