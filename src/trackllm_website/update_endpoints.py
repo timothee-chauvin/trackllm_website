@@ -20,6 +20,7 @@ from trackllm_website.bi.selection import (
 from trackllm_website.bi.state import EndpointBIState, RetiredInfo, load_all_states
 from trackllm_website.bi.vetting import EndpointCache, should_recheck, vet_endpoint
 from trackllm_website.config import Endpoint, config, logger, root
+from trackllm_website.spend import append_entry, track
 from trackllm_website.storage import ResultsStorage
 from trackllm_website.util import (
     atomic_write_bytes,
@@ -319,10 +320,10 @@ async def update_endpoints_bi() -> list[Endpoint]:
     all_endpoints = await get_endpoints(logprob_filter=False, max_cost_mtok=None)
     policy = load_policy(root / config.bi.selection_path)
     cache = EndpointCache.load(ENDPOINTS_CACHE_BI_PATH)
+    now = datetime.now(tz=timezone.utc).replace(microsecond=0)
 
     # Periodically re-vet too_expensive / bad_temperature rejects: prices drop and
     # providers fix temperature, so clear those buckets to re-probe them this run.
-    now = datetime.now(tz=timezone.utc)
     if should_recheck(cache, now, config.bi.reinit.recheck_days):
         n_cleared = len(cache.too_expensive) + len(cache.bad_temperature)
         cache.too_expensive = []
@@ -363,7 +364,15 @@ async def update_endpoints_bi() -> list[Endpoint]:
         strategy = strategies.get(str(endpoint))
         if strategy is None:
             return None  # couldn't resolve a strategy; skip (not cached)
-        res = await vet_endpoint(client, endpoint, strategy)
+        with track() as spend:
+            res = await vet_endpoint(client, endpoint, strategy)
+        append_entry(
+            config.spend_dir,
+            slugify(f"{endpoint.model}#{endpoint.provider}"),
+            "vetting",
+            spend,
+            now,
+        )
         if res.bucket == "candidate":
             endpoint.cost_per_request = res.cost_per_request
             if exceeds_ceiling(
@@ -504,8 +513,10 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
     ) -> None:
         """Onboard or re-check one endpoint; failures are logged and swallowed
         so one bad endpoint never aborts the rest of the batch."""
+        slug = slugify(f"{endpoint.model}#{endpoint.provider}")
+        kind = "recheck" if is_recheck else "onboard"
+        spend = None
         try:
-            slug = slugify(f"{endpoint.model}#{endpoint.provider}")
             state = states.get(slug)
 
             if str(endpoint) not in strategies:
@@ -519,10 +530,12 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
             # old_bis=[]: rechecks intentionally rediscover BIs from scratch,
             # since references from before the monitoring gap are stale.
             old_bis = []
-            result = await asyncio.wait_for(
-                reinit(client, strategies[str(endpoint)], endpoint, old_bis, now),
-                timeout=config.bi.reinit.onboard_timeout_seconds,
-            )
+            with track() as spend:
+                result = await asyncio.wait_for(
+                    reinit(client, strategies[str(endpoint)], endpoint, old_bis, now),
+                    timeout=config.bi.reinit.onboard_timeout_seconds,
+                )
+            append_entry(config.spend_dir, slug, kind, spend, now)
             if result.reason == "bad_temperature":
                 # T=0 is a no-op for this endpoint: cache it so it's excluded and
                 # not re-onboarded every run (rechecked on the cache schedule).
@@ -548,7 +561,8 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
             logger.warning(
                 f"{endpoint} onboarding exceeded {hours:.0f}h, will resume next run"
             )
-            return
+            if spend is not None:
+                append_entry(config.spend_dir, slug, kind, spend, now)
         except Exception:
             logger.exception(f"BI onboarding failed for {endpoint}")
 
