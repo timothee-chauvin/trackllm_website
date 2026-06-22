@@ -9,7 +9,7 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 
 WEBSITE_DIR = Path("website")
-DATA_DIR = WEBSITE_DIR / "data"
+DATA_DIR = WEBSITE_DIR / "data" / "lt"
 ENDPOINTS_DIR = WEBSITE_DIR / "endpoints"
 TEMPLATES_DIR = WEBSITE_DIR / "templates"
 

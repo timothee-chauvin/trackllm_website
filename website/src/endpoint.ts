@@ -58,7 +58,7 @@ async function fetchLogprobsForMonth(
   promptSlug: string,
   month: string
 ): Promise<LogprobQuery[]> {
-  const baseUrl = `../data/${endpointSlug}/${promptSlug}/${month}`;
+  const baseUrl = `../data/lt/${endpointSlug}/${promptSlug}/${month}`;
   try {
     const [queriesRes, logprobsRes] = await Promise.all([
       fetch(`${baseUrl}/queries.json`),
@@ -493,7 +493,7 @@ async function renderCharts(manifest: EndpointManifest): Promise<void> {
   // Anomaly score plot
   changeDates = [];
   try {
-    const res = await fetch(`../data/${manifest.slug}/lt_scores.json`);
+    const res = await fetch(`../data/lt/${manifest.slug}/lt_scores.json`);
     if (res.ok) {
       const ltData: LTScoresData = await res.json();
       if (ltData.scores.length > 0) {
