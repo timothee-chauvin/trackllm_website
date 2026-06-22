@@ -1,0 +1,95 @@
+"""Actual-spend ledger: a context-scoped accumulator and per-endpoint JSONL store.
+
+The accumulator lives in a ContextVar so OpenRouterClient.query can add each
+response's cost without threading a parameter through every call path, and so a
+cancelled (timed-out) coroutine still leaves its partial spend in the caller-owned
+bucket. The ledger records only facts (money spent), one line per logical activity.
+"""
+
+import contextvars
+from collections import defaultdict
+from collections.abc import Iterator
+from contextlib import contextmanager
+from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
+
+import orjson
+from pydantic import BaseModel
+
+
+@dataclass
+class Spend:
+    cost: float = 0.0
+    n_queries: int = 0
+    n_errors: int = 0
+
+
+_active: contextvars.ContextVar[Spend | None] = contextvars.ContextVar(
+    "active_spend", default=None
+)
+
+
+def record_query(cost: float, is_error: bool) -> None:
+    """Add one query's outcome to the active bucket, if any (else no-op)."""
+    bucket = _active.get()
+    if bucket is None:
+        return
+    bucket.n_queries += 1
+    if is_error:
+        bucket.n_errors += 1
+    else:
+        bucket.cost += cost
+
+
+@contextmanager
+def track() -> Iterator[Spend]:
+    """Open a fresh Spend bucket as the active accumulator for the with-body.
+
+    Child asyncio tasks created within inherit it (ContextVar copy-on-task).
+    The yielded Spend stays readable after the block, including after a caught
+    cancellation/timeout inside it.
+    """
+    bucket = Spend()
+    token = _active.set(bucket)
+    try:
+        yield bucket
+    finally:
+        _active.reset(token)
+
+
+class SpendEntry(BaseModel):
+    timestamp: datetime
+    kind: str
+    cost: float
+    n_queries: int
+    n_errors: int
+
+
+def append_entry(
+    spend_dir: Path, slug: str, kind: str, spend: Spend, now: datetime
+) -> None:
+    entry = SpendEntry(
+        timestamp=now,
+        kind=kind,
+        cost=spend.cost,
+        n_queries=spend.n_queries,
+        n_errors=spend.n_errors,
+    )
+    path = spend_dir / slug / f"{now:%Y-%m}.jsonl"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("ab") as f:
+        f.write(orjson.dumps(entry.model_dump(mode="json")) + b"\n")
+
+
+def cumulative_by_kind(spend_dir: Path) -> dict[str, float]:
+    totals: dict[str, float] = defaultdict(float)
+    if not spend_dir.exists():
+        return dict(totals)
+    for f in spend_dir.glob("*/*.jsonl"):
+        for line in f.read_bytes().splitlines():
+            if not line.strip():
+                continue
+            rec = orjson.loads(line)
+            totals[rec["kind"]] += rec["cost"]
+    return dict(totals)
