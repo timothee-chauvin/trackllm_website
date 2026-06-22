@@ -220,7 +220,7 @@ def compute_all():
         update_endpoint_events,
     )
 
-    data_dir = Path(config.data_dir)
+    data_dir = config.lt_dir
     now = datetime.now(tz=timezone.utc)
     events_path = data_dir / EVENTS_FILENAME
     all_events = load_events(events_path)
@@ -252,7 +252,7 @@ def compute_latest():
         update_endpoint_events,
     )
 
-    data_dir = Path(config.data_dir)
+    data_dir = config.lt_dir
     now = datetime.now(tz=timezone.utc)
     events_path = data_dir / EVENTS_FILENAME
     all_events = load_events(events_path)

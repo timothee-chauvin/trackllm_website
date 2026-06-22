@@ -39,7 +39,7 @@ def get_summary(responses: list[Response]) -> dict:
 async def main():
     """Query all endpoints with configured prompts and store results."""
     config = Config()
-    storage = ResultsStorage(data_dir=config.data_dir)
+    storage = ResultsStorage(data_dir=config.lt_dir)
     openrouter_client = OpenRouterClient()
 
     # Create all tasks upfront for concurrent execution

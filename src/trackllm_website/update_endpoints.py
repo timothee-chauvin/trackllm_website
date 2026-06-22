@@ -247,7 +247,7 @@ async def test_endpoints_logprobs(endpoints: Iterable[Endpoint]) -> list[Endpoin
 
 async def update_endpoints_lt():
     """Update the LT endpoints by removing stalled endpoints and adding new ones."""
-    storage = ResultsStorage(config.data_dir)
+    storage = ResultsStorage(config.lt_dir)
     current_endpoints = config.endpoints_lt
     endpoints_to_keep = set([e for e in current_endpoints if not storage.is_stalled(e)])
     logger.info(
