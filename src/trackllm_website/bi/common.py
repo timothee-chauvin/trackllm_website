@@ -439,6 +439,8 @@ class EndpointState:
     query_strategy: QueryStrategy = field(default_factory=PlainStrategy)
     extra_output_tokens: int = 0
     content_extractor: Callable[[Response], str] | None = None
+    max_retries: int | None = None
+    backoff_on_timeout: bool = True
     request_timestamps: deque[float] = field(default_factory=lambda: deque(maxlen=100))
     rate_limit_timestamps: deque[float] = field(
         default_factory=lambda: deque(maxlen=100)
@@ -828,6 +830,8 @@ async def query_single(
         temperature=temperature,
         logprobs=False,
         on_retry=on_retry,
+        max_retries=state.max_retries,
+        backoff_on_timeout=state.backoff_on_timeout,
         **query_kwargs,
     )
     state.completed_queries += 1
