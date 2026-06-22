@@ -515,56 +515,54 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
         so one bad endpoint never aborts the rest of the batch."""
         slug = slugify(f"{endpoint.model}#{endpoint.provider}")
         kind = "recheck" if is_recheck else "onboard"
-        spend = None
-        try:
-            state = states.get(slug)
+        with track() as spend:
+            try:
+                state = states.get(slug)
 
-            if str(endpoint) not in strategies:
-                # Bump last_recheck so a permanently-hidden-reasoning endpoint isn't
-                # re-probed daily. Fresh onboards have no state yet: skip silently.
-                if is_recheck and state is not None:
-                    state.retired.last_recheck = now
-                    state.save(config.bi.state_dir)
-                return
+                if str(endpoint) not in strategies:
+                    # Bump last_recheck so a permanently-hidden-reasoning endpoint isn't
+                    # re-probed daily. Fresh onboards have no state yet: skip silently.
+                    if is_recheck and state is not None:
+                        state.retired.last_recheck = now
+                        state.save(config.bi.state_dir)
+                    return
 
-            # old_bis=[]: rechecks intentionally rediscover BIs from scratch,
-            # since references from before the monitoring gap are stale.
-            old_bis = []
-            with track() as spend:
+                # old_bis=[]: rechecks intentionally rediscover BIs from scratch,
+                # since references from before the monitoring gap are stale.
+                old_bis = []
                 result = await asyncio.wait_for(
                     reinit(client, strategies[str(endpoint)], endpoint, old_bis, now),
                     timeout=config.bi.reinit.onboard_timeout_seconds,
                 )
-            append_entry(config.spend_dir, slug, kind, spend, now)
-            if result.reason == "bad_temperature":
-                # T=0 is a no-op for this endpoint: cache it so it's excluded and
-                # not re-onboarded every run (rechecked on the cache schedule).
-                cache.add_bad_temperature(endpoint)
-                logger.warning(f"{endpoint}: cached bad_temperature (T=0 ignored)")
-                return
-            if state is None:
-                state = EndpointBIState(
-                    endpoint=endpoint, status="monitoring", epochs=[]
+                if result.reason == "bad_temperature":
+                    # T=0 is a no-op for this endpoint: cache it so it's excluded and
+                    # not re-onboarded every run (rechecked on the cache schedule).
+                    cache.add_bad_temperature(endpoint)
+                    logger.warning(f"{endpoint}: cached bad_temperature (T=0 ignored)")
+                    return
+                if state is None:
+                    state = EndpointBIState(
+                        endpoint=endpoint, status="monitoring", epochs=[]
+                    )
+                if result.epoch is None:
+                    state.status = "retired"
+                    state.retired = RetiredInfo(
+                        reason="no_bis", since=now, last_recheck=now
+                    )
+                else:
+                    state.status = "monitoring"
+                    state.retired = None
+                    state.epochs.append(result.epoch)
+                state.save(config.bi.state_dir)
+            except asyncio.TimeoutError:
+                hours = config.bi.reinit.onboard_timeout_seconds / 3600
+                logger.warning(
+                    f"{endpoint} onboarding exceeded {hours:.0f}h, will resume next run"
                 )
-            if result.epoch is None:
-                state.status = "retired"
-                state.retired = RetiredInfo(
-                    reason="no_bis", since=now, last_recheck=now
-                )
-            else:
-                state.status = "monitoring"
-                state.retired = None
-                state.epochs.append(result.epoch)
-            state.save(config.bi.state_dir)
-        except asyncio.TimeoutError:
-            hours = config.bi.reinit.onboard_timeout_seconds / 3600
-            logger.warning(
-                f"{endpoint} onboarding exceeded {hours:.0f}h, will resume next run"
-            )
-            if spend is not None:
+            except Exception:
+                logger.exception(f"BI onboarding failed for {endpoint}")
+            finally:
                 append_entry(config.spend_dir, slug, kind, spend, now)
-        except Exception:
-            logger.exception(f"BI onboarding failed for {endpoint}")
 
     client = OpenRouterClient()
     try:
