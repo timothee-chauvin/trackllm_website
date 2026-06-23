@@ -32,9 +32,16 @@ jobs:
     - name: Run BI monitor
       env:
         OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        GMAIL_USER: ${{ secrets.GMAIL_USER }}
+        GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
       run: uv run python -m trackllm_website.bi.monitor
 
     - name: Commit and push changes
+      # Commit saved monitor state even if a prior step failed — e.g. the in-process
+      # digest email raising on an SMTP error must not discard a day of monitor work
+      # (mirrors update-endpoints.yml). A deliberate cancel stays a clean abort.
+      if: ${{ !cancelled() }}
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"

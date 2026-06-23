@@ -1,6 +1,6 @@
 import pytest
 
-from trackllm_website.notify import build_message, load_creds_from_env
+from trackllm_website.notify import build_message, load_creds_from_env, send_email
 
 CTX = {
     "workflow": "Run Main Script",
@@ -37,3 +37,39 @@ def test_load_creds_returns_all_when_present(monkeypatch):
         "GMAIL_APP_PASSWORD": "secret",
         "NOTIFY_EMAIL": "me@b.c",
     }
+
+
+def test_send_email_multipart(monkeypatch):
+    sent = {}
+
+    class FakeSMTP:
+        def __init__(self, *a, **k):
+            pass
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def login(self, *a):
+            pass
+
+        def send_message(self, msg):
+            sent["msg"] = msg
+
+    monkeypatch.setattr("trackllm_website.notify.smtplib.SMTP_SSL", FakeSMTP)
+    send_email(
+        {
+            "GMAIL_USER": "u@x",
+            "GMAIL_APP_PASSWORD": "p",
+            "NOTIFY_EMAIL": "to@x",
+        },
+        "subj",
+        "the plain text",
+        "<b>hello</b>",
+    )
+    msg = sent["msg"]
+    assert msg["Subject"] == "subj" and msg["To"] == "to@x"
+    body = msg.get_body(("html",))
+    assert body is not None and "hello" in body.get_content()
