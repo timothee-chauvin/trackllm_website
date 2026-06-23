@@ -572,6 +572,71 @@ git commit --no-verify -m "refactor(b3it): derive bi_independence default path f
 
 ---
 
+### Task 7: Attribute strategy-probe spend per endpoint (final-review Issue 2)
+
+`resolve_strategies` runs real billed probe queries in a batch phase BEFORE any
+activity bucket opens, so probe spend was uncounted. But it probes each endpoint
+in its own `_probe_one` task (`common.py:245-256`), so cost IS per-endpoint
+attributable: capture each endpoint's probe `Spend` and fold it into that
+endpoint's vetting/onboard/recheck/monitor ledger line (no new `kind`).
+
+**Files:**
+- Modify: `src/trackllm_website/spend.py` (add `Spend.merge`)
+- Modify: `src/trackllm_website/bi/common.py` (`resolve_strategies` optional out-param)
+- Modify: `src/trackllm_website/update_endpoints.py` (fold probe into vetting + onboard/recheck)
+- Modify: `src/trackllm_website/bi/monitor.py` (fold probe into monitor)
+- Test: `tests/test_spend_probe.py` (create)
+
+**Interfaces:**
+- `Spend.merge(other: "Spend") -> None` — `self.cost += other.cost; self.n_queries += other.n_queries; self.n_errors += other.n_errors`.
+- `resolve_strategies(client, endpoints, policy=None, probe_spend: dict[str, Spend] | None = None)` — unchanged 2-tuple return; when `probe_spend` is provided, `_probe_one` wraps its `discover_strategy` call in `with track() as s:` and stores `probe_spend[key] = s` (key = `str(ep)`). Default `None` → no capture, zero behavior change for the costs-preview / phase_1 callers.
+
+- [ ] **Step 1: Write failing tests** (`tests/test_spend_probe.py`)
+
+Assert that an endpoint requiring a probe has its probe cost folded into the
+activity line. Mirror `tests/test_spend_lifecycle.py`'s stubbing, but stub
+`resolve_strategies` so it ALSO populates the passed `probe_spend` dict (e.g.
+`probe_spend[str(ep)] = Spend(cost=0.02, n_queries=2)`) and stub `vet_endpoint`/
+`reinit` to `record_query` the activity cost. Assert the written `vetting`/
+`onboard` line's cost == probe + activity (read the JSONL, check cost). Also a
+unit test for `Spend.merge`.
+
+- [ ] **Step 2: Run → FAIL** (`OPENROUTER_API_KEY=dummy uv run pytest tests/test_spend_probe.py -q`).
+
+- [ ] **Step 3: Implement**
+
+`spend.py` — add to `class Spend`:
+```python
+    def merge(self, other: "Spend") -> None:
+        self.cost += other.cost
+        self.n_queries += other.n_queries
+        self.n_errors += other.n_errors
+```
+
+`common.py::resolve_strategies` — add `probe_spend: dict[str, "Spend"] | None = None` to the signature; in `_probe_one`, wrap the probe:
+```python
+    async def _probe_one(ep):
+        key = str(ep)
+        if probe_spend is not None:
+            with track() as s:
+                strategy, errors = await discover_strategy(client, ep, policy=policy)
+            probe_spend[key] = s
+        else:
+            strategy, errors = await discover_strategy(client, ep, policy=policy)
+        ...
+```
+(`from trackllm_website.spend import Spend, track` at top of common.py.)
+
+`update_endpoints.py`:
+- `update_endpoints_bi`: create `probe_spend: dict[str, Spend] = {}`, pass it to `resolve_strategies(...)`; in `vet_one`, after the vetting `with track() as spend:` block, `spend.merge(probe_spend.get(str(endpoint), Spend()))` before `append_entry`.
+- `update_endpoints_bi_lifecycle`: same — create a `probe_spend` dict, pass to `resolve_strategies`; in `onboard_one`, inside the `with track() as spend:` (before the `finally` writes), `spend.merge(probe_spend.get(str(endpoint), Spend()))` so the single ledger line includes the probe (including for the strategy-unresolved skip, whose failed probe DID cost money).
+
+`monitor.py::monitor`: create a `probe_spend` dict, pass to `resolve_strategies`; in `run_endpoint`, `monitor_spend.merge(probe_spend.get(str(state.endpoint), Spend()))` before the `monitor` `append_entry`. (Thread `probe_spend` into `run_endpoint`/`run_isolated`.)
+
+- [ ] **Step 4: Run → PASS**, then regression: `OPENROUTER_API_KEY=dummy uv run pytest tests/test_spend_lifecycle.py tests/test_spend_monitor.py tests/test_bi_lifecycle.py tests/test_bi_monitor.py -q`.
+
+- [ ] **Step 5: Commit** (`prek run --files` the changed `.py`, then `git commit --no-verify -m "feat(spend): fold per-endpoint strategy-probe cost into the activity ledger line"`).
+
 ## Self-Review
 
 **Spec coverage (PR 3 of the umbrella spec):**

@@ -80,6 +80,16 @@ def test_append_and_cumulative_round_trip(tmp_path):
     assert abs(cum["monitor"] - 0.75) < 1e-9
 
 
+def test_append_entry_is_nonfatal_and_logs_on_write_error(tmp_path, caplog):
+    # Make the per-slug dir creation fail by planting a FILE where the dir goes.
+    (tmp_path / "slugX").write_text("not a directory")
+    now = datetime(2026, 6, 22, 12, 0, tzinfo=timezone.utc)
+    with caplog.at_level("ERROR"):
+        # Must NOT raise: a ledger write failure can't abort the primary run.
+        append_entry(tmp_path, "slugX", "monitor", Spend(cost=1.0, n_queries=1), now)
+    assert "spend ledger write failed" in caplog.text  # logged loudly, not silent
+
+
 def test_spend_dir_property(monkeypatch):
     monkeypatch.setenv("OPENROUTER_API_KEY", "dummy")
     from trackllm_website.config import Config

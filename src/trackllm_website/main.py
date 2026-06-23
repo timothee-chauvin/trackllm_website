@@ -4,8 +4,13 @@ from datetime import datetime, timezone
 
 from trackllm_website.api import OpenRouterClient
 from trackllm_website.config import config, logger
+from trackllm_website.spend import Spend, append_entry
 from trackllm_website.storage import Response, ResultsStorage
-from trackllm_website.util import gather_with_concurrency_streaming, trim_to_length
+from trackllm_website.util import (
+    gather_with_concurrency_streaming,
+    slugify,
+    trim_to_length,
+)
 
 
 def get_summary(responses: list[Response]) -> dict:
@@ -44,9 +49,6 @@ def write_lt_spend(summary: dict, now: datetime) -> None:
         summary: Dictionary of {key: {success, error, total_cost}} per endpoint
         now: Timestamp for the ledger entry
     """
-    from trackllm_website.spend import Spend, append_entry
-    from trackllm_website.util import slugify
-
     for key, s in summary.items():
         spend = Spend(
             cost=s["total_cost"],

@@ -7,6 +7,7 @@ bucket. The ledger records only facts (money spent), one line per logical activi
 """
 
 import contextvars
+import logging
 from collections import defaultdict
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -24,6 +25,8 @@ class Spend:
     n_queries: int = 0
     n_errors: int = 0
 
+
+logger = logging.getLogger("trackllm-website")
 
 _active: contextvars.ContextVar[Spend | None] = contextvars.ContextVar(
     "active_spend", default=None
@@ -82,9 +85,17 @@ def append_entry(
         n_errors=spend.n_errors,
     )
     path = spend_dir / slug / f"{now:%Y-%m}.jsonl"
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("ab") as f:
-        f.write(orjson.dumps(entry.model_dump(mode="json")) + b"\n")
+    # The ledger is secondary bookkeeping; a write failure must never abort the
+    # primary monitoring/onboarding run (which has already persisted its real
+    # work). Log loudly and continue rather than propagating.
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("ab") as f:
+            f.write(orjson.dumps(entry.model_dump(mode="json")) + b"\n")
+    except Exception:
+        logger.exception(
+            f"spend ledger write failed for {slug} {now:%Y-%m} (kind={kind}); continuing"
+        )
 
 
 def cumulative_by_kind(spend_dir: Path) -> dict[str, float]:
