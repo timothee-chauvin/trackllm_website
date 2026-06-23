@@ -233,6 +233,10 @@ class Config(BaseSettings):
     def lt_dir(self) -> Path:
         return self.data_dir / "lt"
 
+    @property
+    def spend_dir(self) -> Path:
+        return self.data_dir / "spend"
+
     @classmethod
     def settings_customise_sources(
         cls,

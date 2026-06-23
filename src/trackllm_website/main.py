@@ -1,10 +1,16 @@
 import asyncio
 import json
+from datetime import datetime, timezone
 
 from trackllm_website.api import OpenRouterClient
-from trackllm_website.config import Config, logger
+from trackllm_website.config import config, logger
+from trackllm_website.spend import Spend, append_entry
 from trackllm_website.storage import Response, ResultsStorage
-from trackllm_website.util import gather_with_concurrency_streaming, trim_to_length
+from trackllm_website.util import (
+    gather_with_concurrency_streaming,
+    slugify,
+    trim_to_length,
+)
 
 
 def get_summary(responses: list[Response]) -> dict:
@@ -36,9 +42,24 @@ def get_summary(responses: list[Response]) -> dict:
     return summary
 
 
+def write_lt_spend(summary: dict, now: datetime) -> None:
+    """Write per-endpoint LT spend lines to the ledger.
+
+    Args:
+        summary: Dictionary of {key: {success, error, total_cost}} per endpoint
+        now: Timestamp for the ledger entry
+    """
+    for key, s in summary.items():
+        spend = Spend(
+            cost=s["total_cost"],
+            n_queries=s["success"] + s["error"],
+            n_errors=s["error"],
+        )
+        append_entry(config.spend_dir, slugify(key), "lt", spend, now)
+
+
 async def main():
     """Query all endpoints with configured prompts and store results."""
-    config = Config()
     storage = ResultsStorage(data_dir=config.lt_dir)
     openrouter_client = OpenRouterClient()
 
@@ -72,6 +93,8 @@ async def main():
 
     # Print summary
     summary = get_summary(all_responses)
+    now = datetime.now(tz=timezone.utc).replace(microsecond=0)
+    write_lt_spend(summary, now)
     logger.info("\n" + "=" * 60)
     logger.info("SUMMARY")
     logger.info("=" * 60)
