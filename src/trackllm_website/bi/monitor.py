@@ -23,7 +23,7 @@ from trackllm_website.bi.reinit import reinit
 from trackllm_website.bi.sampling import sample_prompts
 from trackllm_website.bi.state import EndpointBIState, RetiredInfo, load_all_states
 from trackllm_website.config import config, logger
-from trackllm_website.spend import append_entry, track
+from trackllm_website.spend import Spend, append_entry, track
 from trackllm_website.util import gather_with_concurrency
 
 
@@ -86,6 +86,7 @@ async def run_endpoint(
     strategy: QueryStrategy,
     state: EndpointBIState,
     now: datetime,
+    probe_spend: dict[str, Spend] | None = None,
 ) -> None:
     epoch = state.current_epoch
     assert epoch is not None
@@ -105,6 +106,8 @@ async def run_endpoint(
         for prompt, prompt_samples in samples.items():
             existing.setdefault(prompt, {})[batch_key] = prompt_samples
         save_results(path, existing)
+    if probe_spend is not None:
+        monitor_spend.merge(probe_spend.get(str(state.endpoint), Spend()))
     append_entry(config.spend_dir, state.slug, "monitor", monitor_spend, now)
 
     results = load_phase2_results(config.bi.phase_2_dir / state.slug)
@@ -148,16 +151,19 @@ async def monitor() -> None:
     logger.info(f"Monitoring {len(monitoring)} endpoints")
     now = datetime.now(tz=timezone.utc).replace(microsecond=0)
 
+    probe_spend: dict[str, Spend] = {}
     async with OpenRouterClient(timeout=60.0) as probe_client:
         strategies, _failed = await resolve_strategies(
-            probe_client, [s.endpoint for s in monitoring]
+            probe_client, [s.endpoint for s in monitoring], probe_spend=probe_spend
         )
 
     client = OpenRouterClient()
 
     async def run_isolated(state: EndpointBIState) -> None:
         try:
-            await run_endpoint(client, strategies[str(state.endpoint)], state, now)
+            await run_endpoint(
+                client, strategies[str(state.endpoint)], state, now, probe_spend
+            )
         except Exception:
             logger.exception(f"Monitor run failed for {state.endpoint}")
 

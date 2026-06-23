@@ -37,7 +37,7 @@ def _patch_deps(monkeypatch, tmp_path, *, select, reinit=None, vet_endpoint=None
         "trackllm_website.update_endpoints.OpenRouterClient", _FakeClient
     )
 
-    async def fake_resolve_strategies(client, endpoints, policy=None):
+    async def fake_resolve_strategies(client, endpoints, policy=None, probe_spend=None):
         return {str(e): None for e in endpoints}, []
 
     monkeypatch.setattr(
@@ -134,7 +134,9 @@ def test_strategy_unresolved_writes_zero_cost_line(monkeypatch, tmp_path):
     endpoint = ep("m/unresolved")
 
     # fake_resolve_strategies returns an empty dict → str(endpoint) not in strategies
-    async def fake_resolve_strategies_empty(client, endpoints, policy=None):
+    async def fake_resolve_strategies_empty(
+        client, endpoints, policy=None, probe_spend=None
+    ):
         return {}, []
 
     monkeypatch.setattr(config.bi, "data_dir", tmp_path)
@@ -198,7 +200,7 @@ def test_vetting_writes_vetting_spend(monkeypatch, tmp_path):
         record_query(0.02, is_error=False)
         return VetResult(bucket="candidate", cost_per_request=0.02)
 
-    async def fake_resolve_strategies(client, endpoints, policy=None):
+    async def fake_resolve_strategies(client, endpoints, policy=None, probe_spend=None):
         return {str(e): PlainStrategy() for e in endpoints}, {}
 
     monkeypatch.setattr(

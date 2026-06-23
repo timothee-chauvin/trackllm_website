@@ -88,7 +88,7 @@ def _patch_lifecycle_deps(monkeypatch, tmp_path, *, select, reinit):
         "trackllm_website.update_endpoints.OpenRouterClient", _FakeClient
     )
 
-    async def fake_resolve_strategies(client, endpoints, policy=None):
+    async def fake_resolve_strategies(client, endpoints, policy=None, probe_spend=None):
         return {str(e): None for e in endpoints}, []
 
     monkeypatch.setattr(

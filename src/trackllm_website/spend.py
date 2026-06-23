@@ -25,6 +25,11 @@ class Spend:
     n_queries: int = 0
     n_errors: int = 0
 
+    def merge(self, other: "Spend") -> None:
+        self.cost += other.cost
+        self.n_queries += other.n_queries
+        self.n_errors += other.n_errors
+
 
 logger = logging.getLogger("trackllm-website")
 

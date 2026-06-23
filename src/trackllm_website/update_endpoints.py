@@ -20,7 +20,7 @@ from trackllm_website.bi.selection import (
 from trackllm_website.bi.state import EndpointBIState, RetiredInfo, load_all_states
 from trackllm_website.bi.vetting import EndpointCache, should_recheck, vet_endpoint
 from trackllm_website.config import Endpoint, config, logger, root
-from trackllm_website.spend import append_entry, track
+from trackllm_website.spend import Spend, append_entry, track
 from trackllm_website.storage import ResultsStorage
 from trackllm_website.util import (
     atomic_write_bytes,
@@ -349,9 +349,10 @@ async def update_endpoints_bi() -> list[Endpoint]:
         f"(skipping {len(all_endpoints) - len(to_vet)} cached rejects)"
     )
 
+    probe_spend: dict[str, Spend] = {}
     async with OpenRouterClient(timeout=60.0) as probe_client:
         strategies, failed = await resolve_strategies(
-            probe_client, to_vet, policy=policy
+            probe_client, to_vet, policy=policy, probe_spend=probe_spend
         )
     cache_too_expensive_from_probe(failed, to_vet, cache)
     logger.info(
@@ -366,6 +367,7 @@ async def update_endpoints_bi() -> list[Endpoint]:
             return None  # couldn't resolve a strategy; skip (not cached)
         with track() as spend:
             res = await vet_endpoint(client, endpoint, strategy)
+        spend.merge(probe_spend.get(str(endpoint), Spend()))
         append_entry(
             config.spend_dir,
             slugify(f"{endpoint.model}#{endpoint.provider}"),
@@ -503,9 +505,13 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
     if not to_init:
         return
 
+    probe_spend: dict[str, Spend] = {}
     async with OpenRouterClient(timeout=60.0) as probe_client:
         strategies, _ = await resolve_strategies(
-            probe_client, [e for e, _ in to_init], policy=policy
+            probe_client,
+            [e for e, _ in to_init],
+            policy=policy,
+            probe_spend=probe_spend,
         )
 
     async def onboard_one(
@@ -562,6 +568,7 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
             except Exception:
                 logger.exception(f"BI onboarding failed for {endpoint}")
             finally:
+                spend.merge(probe_spend.get(str(endpoint), Spend()))
                 append_entry(config.spend_dir, slug, kind, spend, now)
 
     client = OpenRouterClient()
