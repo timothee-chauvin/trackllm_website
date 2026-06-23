@@ -607,7 +607,10 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]) -> Onboardin
 async def main():
     await update_endpoints_lt()
     good = await update_endpoints_bi()
-    await update_endpoints_bi_lifecycle(good)
+    report = await update_endpoints_bi_lifecycle(good)
+    from trackllm_website.bi.digest import send_onboarding_digest
+
+    send_onboarding_digest(report, config.spend_dir)
 
 
 if __name__ == "__main__":

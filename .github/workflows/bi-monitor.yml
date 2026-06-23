@@ -32,6 +32,9 @@ jobs:
     - name: Run BI monitor
       env:
         OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        GMAIL_USER: ${{ secrets.GMAIL_USER }}
+        GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
       run: uv run python -m trackllm_website.bi.monitor
 
     - name: Commit and push changes

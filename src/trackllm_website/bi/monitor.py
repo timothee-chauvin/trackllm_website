@@ -1,5 +1,6 @@
 """Daily BI monitor: sample border inputs, detect changes, trigger re-init."""
 
+import asyncio
 from datetime import datetime, timezone
 from typing import Literal
 
@@ -219,5 +220,12 @@ async def monitor() -> MonitorReport:
     )
 
 
+def main() -> None:
+    report = asyncio.run(monitor())
+    from trackllm_website.bi.digest import send_monitoring_digest
+
+    send_monitoring_digest(report, config.spend_dir)
+
+
 if __name__ == "__main__":
-    fire.Fire(monitor)
+    fire.Fire(main)
