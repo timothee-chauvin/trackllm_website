@@ -87,7 +87,6 @@ def test_send_monitoring_digest_gate_notable(tmp_path, monkeypatch):
 def test_monitor_main_calls_send_monitoring_digest(tmp_path, monkeypatch):
     """monitor.main() must call send_monitoring_digest with the report returned by monitor()."""
     from trackllm_website.bi import monitor as monitor_mod
-    import trackllm_website.bi.digest as digest_mod
     from trackllm_website.config import config
 
     expected_report = MonitorReport(
@@ -102,8 +101,10 @@ def test_monitor_main_calls_send_monitoring_digest(tmp_path, monkeypatch):
         AsyncMock(return_value=expected_report),
     )
     digest_calls = []
+    # monitor.py imports send_monitoring_digest at module top, so patch the name
+    # bound in monitor_mod's namespace (where main() looks it up), not the source.
     monkeypatch.setattr(
-        digest_mod,
+        monitor_mod,
         "send_monitoring_digest",
         lambda report, sd: digest_calls.append((report, sd)),
     )
@@ -120,7 +121,6 @@ def test_update_endpoints_main_calls_send_onboarding_digest(tmp_path, monkeypatc
     """update_endpoints.main() must call send_onboarding_digest with the lifecycle report."""
     import asyncio
 
-    import trackllm_website.bi.digest as digest_mod
     import trackllm_website.update_endpoints as ue
     from trackllm_website.config import config
 
@@ -135,8 +135,9 @@ def test_update_endpoints_main_calls_send_onboarding_digest(tmp_path, monkeypatc
         ue, "update_endpoints_bi_lifecycle", AsyncMock(return_value=expected_report)
     )
     digest_calls = []
+    # update_endpoints imports send_onboarding_digest at module top → patch ue's binding.
     monkeypatch.setattr(
-        digest_mod,
+        ue,
         "send_onboarding_digest",
         lambda report, sd: digest_calls.append((report, sd)),
     )
