@@ -24,15 +24,11 @@ def test_today_by_kind_filters_by_day(tmp_path):
     )
 
     result = today_by_kind(tmp_path, today)
+    # Only today's entries: yesterday's slugB onboard ($2.0) must NOT be counted,
+    # so onboard is 1.0 (not 3.0) and no extra kinds leak in.
+    assert set(result) == {"onboard", "recheck"}
     assert abs(result["onboard"] - 1.0) < 1e-9
     assert abs(result["recheck"] - 0.5) < 1e-9
-    assert (
-        "onboard"
-        not in {k: v for k, v in result.items() if k not in ("onboard", "recheck")}
-        or True
-    )
-    # The yesterday entry should NOT appear
-    assert abs(result.get("onboard", 0) - 1.0) < 1e-9  # only today's onboard
 
 
 def test_today_by_kind_empty_dir(tmp_path):
