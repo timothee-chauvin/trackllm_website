@@ -275,6 +275,12 @@ workflow and sent only when something notable happened. Depends on PR 3.
 
 ### Email content
 
+> **Superseded:** the final email format (cost-prefixed subjects `[trackllm] $X.XX − …`,
+> trackllm.net endpoint links, per-kind spend footers) was iterated with the user on
+> live mockups during PR4 and is authoritatively specified in
+> `docs/superpowers/plans/2026-06-23-pr4-b3it-digest-emails.md`. The sketches below are
+> the original intent, kept for context.
+
 - **Onboarding email** (update-endpoints), subject e.g.
   `[trackllm] B3IT onboarding: 4 onboarded, 1 timed out, 2 no-BIs`: a table of the
   notable endpoints (onboarded / 3h-timeout / not-enough-BIs / recheck-resurrected /

@@ -10,6 +10,11 @@ from pydantic import BaseModel
 
 from trackllm_website.api import OpenRouterClient
 from trackllm_website.bi.common import TOO_EXPENSIVE, resolve_strategies
+from trackllm_website.bi.digest import (
+    OnboardRow,
+    OnboardingReport,
+    send_onboarding_digest,
+)
 from trackllm_website.bi.popularity import fetch_popular_models_safe
 from trackllm_website.bi.reinit import reinit
 from trackllm_website.bi.selection import (
@@ -459,7 +464,7 @@ def select_lifecycle_actions(
     return LifecycleActions(onboard=onboard, recheck=recheck, delist=delist)
 
 
-async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
+async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]) -> OnboardingReport:
     """Onboard new candidates, delist vanished endpoints, re-check retired ones.
 
     Runs the budget policy over the vetted candidates first, so only the selected
@@ -509,8 +514,9 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
     rechecks = [(s.endpoint, True) for s in actions.recheck]
     to_init = onboards + rechecks
     if not to_init:
-        return
+        return OnboardingReport(now.date().isoformat(), [])
 
+    report_rows: list[OnboardRow] = []
     probe_spend: dict[str, Spend] = {}
     async with OpenRouterClient(timeout=60.0) as probe_client:
         strategies, _ = await resolve_strategies(
@@ -527,6 +533,8 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
         so one bad endpoint never aborts the rest of the batch."""
         slug = slugify(f"{endpoint.model}#{endpoint.provider}")
         kind = "recheck" if is_recheck else "onboard"
+        outcome = "error"
+        n_bis: int | None = None
         with track() as spend:
             try:
                 state = states.get(slug)
@@ -537,6 +545,7 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
                     if is_recheck and state is not None:
                         state.retired.last_recheck = now
                         state.save(config.bi.state_dir)
+                    outcome = "no_strategy"
                     return
 
                 # old_bis=[]: rechecks intentionally rediscover BIs from scratch,
@@ -551,6 +560,7 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
                     # not re-onboarded every run (rechecked on the cache schedule).
                     cache.add_bad_temperature(endpoint)
                     logger.warning(f"{endpoint}: cached bad_temperature (T=0 ignored)")
+                    outcome = "bad_temperature"
                     return
                 if state is None:
                     state = EndpointBIState(
@@ -561,21 +571,30 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
                     state.retired = RetiredInfo(
                         reason="no_bis", since=now, last_recheck=now
                     )
+                    outcome = "recheck_still_no_bis" if is_recheck else "no_bis"
                 else:
+                    n_bis = len(result.epoch.border_inputs)
                     state.status = "monitoring"
                     state.retired = None
                     state.epochs.append(result.epoch)
+                    outcome = "recheck_resurrected" if is_recheck else "onboarded"
                 state.save(config.bi.state_dir)
             except asyncio.TimeoutError:
                 hours = config.bi.reinit.onboard_timeout_seconds / 3600
                 logger.warning(
                     f"{endpoint} onboarding exceeded {hours:.0f}h, will resume next run"
                 )
+                outcome = "timeout"
             except Exception:
                 logger.exception(f"BI onboarding failed for {endpoint}")
             finally:
                 spend.merge(probe_spend.get(str(endpoint), Spend()))
                 append_entry(config.spend_dir, slug, kind, spend, now)
+                report_rows.append(
+                    OnboardRow(
+                        endpoint.model, endpoint.provider, outcome, n_bis, spend.cost
+                    )
+                )
 
     client = OpenRouterClient()
     try:
@@ -586,12 +605,14 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
     finally:
         await client.close()
     cache.save(ENDPOINTS_CACHE_BI_PATH)
+    return OnboardingReport(date=now.date().isoformat(), rows=report_rows)
 
 
 async def main():
     await update_endpoints_lt()
     good = await update_endpoints_bi()
-    await update_endpoints_bi_lifecycle(good)
+    report = await update_endpoints_bi_lifecycle(good)
+    send_onboarding_digest(report, config.spend_dir)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 """Daily BI monitor: sample border inputs, detect changes, trigger re-init."""
 
+import asyncio
 from datetime import datetime, timezone
 from typing import Literal
 
@@ -22,6 +23,11 @@ from trackllm_website.bi.phase_2 import (
 from trackllm_website.bi.reinit import reinit
 from trackllm_website.bi.sampling import sample_prompts
 from trackllm_website.bi.state import EndpointBIState, RetiredInfo, load_all_states
+from trackllm_website.bi.digest import (
+    MonitorReport,
+    MonitorRow,
+    send_monitoring_digest,
+)
 from trackllm_website.config import config, logger
 from trackllm_website.spend import Spend, append_entry, track
 from trackllm_website.util import gather_with_concurrency
@@ -87,6 +93,7 @@ async def run_endpoint(
     state: EndpointBIState,
     now: datetime,
     probe_spend: dict[str, Spend] | None = None,
+    event_rows: list[MonitorRow] | None = None,
 ) -> None:
     epoch = state.current_epoch
     assert epoch is not None
@@ -119,6 +126,17 @@ async def run_endpoint(
         state.status = "retired"
         state.retired = RetiredInfo(reason="stalled", since=now, last_recheck=now)
         logger.warning(f"{state.endpoint}: retired (stalled)")
+        if event_rows is not None:
+            event_rows.append(
+                MonitorRow(
+                    state.endpoint.model,
+                    state.endpoint.provider,
+                    "retired_stalled",
+                    None,
+                    None,
+                    0.0,
+                )
+            )
     elif decision.action == "reinit":
         epoch.end = now
         epoch.end_reason = "change_detected"
@@ -132,6 +150,23 @@ async def run_endpoint(
                 client, strategy, state.endpoint, epoch.border_inputs, now
             )
         append_entry(config.spend_dir, state.slug, "reinit", reinit_spend, now)
+        if event_rows is not None:
+            event_rows.append(
+                MonitorRow(
+                    state.endpoint.model,
+                    state.endpoint.provider,
+                    event="reonboarded" if result.epoch else "reonboard_no_bis",
+                    change_date=(
+                        decision.change_date.date().isoformat()
+                        if decision.change_date
+                        else None
+                    ),
+                    n_bis_after=(
+                        len(result.epoch.border_inputs) if result.epoch else None
+                    ),
+                    spent=reinit_spend.cost,
+                )
+            )
         if result.epoch is None:
             # The temperature gate runs only on discovery (old_bis empty); a monitor
             # reinit always has old_bis, so reason is no_bis here. Retire either way.
@@ -145,7 +180,7 @@ async def run_endpoint(
     state.save(config.bi.state_dir)
 
 
-async def monitor() -> None:
+async def monitor() -> MonitorReport:
     states = load_all_states(config.bi.state_dir)
     monitoring = [s for s in states.values() if s.status == "monitoring"]
     logger.info(f"Monitoring {len(monitoring)} endpoints")
@@ -158,11 +193,17 @@ async def monitor() -> None:
         )
 
     client = OpenRouterClient()
+    event_rows: list[MonitorRow] = []
 
     async def run_isolated(state: EndpointBIState) -> None:
         try:
             await run_endpoint(
-                client, strategies[str(state.endpoint)], state, now, probe_spend
+                client,
+                strategies[str(state.endpoint)],
+                state,
+                now,
+                probe_spend,
+                event_rows=event_rows,
             )
         except Exception:
             logger.exception(f"Monitor run failed for {state.endpoint}")
@@ -176,6 +217,17 @@ async def monitor() -> None:
     finally:
         await client.close()
 
+    return MonitorReport(
+        date=now.date().isoformat(),
+        rows=event_rows,
+        n_endpoints=len(monitoring),
+    )
+
+
+def main() -> None:
+    report = asyncio.run(monitor())
+    send_monitoring_digest(report, config.spend_dir)
+
 
 if __name__ == "__main__":
-    fire.Fire(monitor)
+    fire.Fire(main)

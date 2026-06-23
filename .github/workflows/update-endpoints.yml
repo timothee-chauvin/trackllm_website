@@ -31,6 +31,9 @@ jobs:
     - name: Run update_endpoints.py
       env:
         OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        GMAIL_USER: ${{ secrets.GMAIL_USER }}
+        GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
       run: uv run python src/trackllm_website/update_endpoints.py
 
     - name: Commit and push changes

@@ -103,6 +103,20 @@ def append_entry(
         )
 
 
+def today_by_kind(spend_dir: Path, day: str) -> dict[str, float]:
+    totals: dict[str, float] = defaultdict(float)
+    if not spend_dir.exists():
+        return dict(totals)
+    for f in spend_dir.glob("*/*.jsonl"):
+        for line in f.read_bytes().splitlines():
+            if not line.strip():
+                continue
+            rec = orjson.loads(line)
+            if str(rec["timestamp"]).startswith(day):
+                totals[rec["kind"]] += rec["cost"]
+    return dict(totals)
+
+
 def cumulative_by_kind(spend_dir: Path) -> dict[str, float]:
     totals: dict[str, float] = defaultdict(float)
     if not spend_dir.exists():
