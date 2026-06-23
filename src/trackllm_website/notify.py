@@ -37,12 +37,16 @@ def build_message(ctx: dict[str, str]) -> tuple[str, str]:
     return subject, body
 
 
-def send_email(creds: dict[str, str], subject: str, body: str) -> None:
+def send_email(
+    creds: dict[str, str], subject: str, plain: str, html: str | None = None
+) -> None:
     msg = EmailMessage()
     msg["Subject"] = subject
     msg["From"] = creds["GMAIL_USER"]
     msg["To"] = creds["NOTIFY_EMAIL"]
-    msg.set_content(body)
+    msg.set_content(plain)
+    if html is not None:
+        msg.add_alternative(html, subtype="html")
     with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT) as s:
         s.login(creds["GMAIL_USER"], creds["GMAIL_APP_PASSWORD"])
         s.send_message(msg)
