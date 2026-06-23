@@ -10,7 +10,11 @@ from pydantic import BaseModel
 
 from trackllm_website.api import OpenRouterClient
 from trackllm_website.bi.common import TOO_EXPENSIVE, resolve_strategies
-from trackllm_website.bi.digest import OnboardRow, OnboardingReport
+from trackllm_website.bi.digest import (
+    OnboardRow,
+    OnboardingReport,
+    send_onboarding_digest,
+)
 from trackllm_website.bi.popularity import fetch_popular_models_safe
 from trackllm_website.bi.reinit import reinit
 from trackllm_website.bi.selection import (
@@ -608,8 +612,6 @@ async def main():
     await update_endpoints_lt()
     good = await update_endpoints_bi()
     report = await update_endpoints_bi_lifecycle(good)
-    from trackllm_website.bi.digest import send_onboarding_digest
-
     send_onboarding_digest(report, config.spend_dir)
 
 

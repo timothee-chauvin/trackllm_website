@@ -23,7 +23,11 @@ from trackllm_website.bi.phase_2 import (
 from trackllm_website.bi.reinit import reinit
 from trackllm_website.bi.sampling import sample_prompts
 from trackllm_website.bi.state import EndpointBIState, RetiredInfo, load_all_states
-from trackllm_website.bi.digest import MonitorReport, MonitorRow
+from trackllm_website.bi.digest import (
+    MonitorReport,
+    MonitorRow,
+    send_monitoring_digest,
+)
 from trackllm_website.config import config, logger
 from trackllm_website.spend import Spend, append_entry, track
 from trackllm_website.util import gather_with_concurrency
@@ -222,8 +226,6 @@ async def monitor() -> MonitorReport:
 
 def main() -> None:
     report = asyncio.run(monitor())
-    from trackllm_website.bi.digest import send_monitoring_digest
-
     send_monitoring_digest(report, config.spend_dir)
 
 
