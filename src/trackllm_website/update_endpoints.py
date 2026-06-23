@@ -434,10 +434,16 @@ def select_lifecycle_actions(
     candidate_set = set(candidates)
 
     onboard = [e for e in candidates if slugify(f"{e.model}#{e.provider}") not in known]
+    # Never re-onboard endpoints retired for no_bis: they are alive but yield
+    # too few border inputs, so a recheck just re-runs the full (~15k-query)
+    # onboarding and fails again — pure waste. stalled endpoints recheck cheaply
+    # (a dead endpoint fails strategy resolution and is skipped) and delisted
+    # ones are already excluded by the candidate_set test until they return.
     recheck = [
         s
         for s in states.values()
         if s.status == "retired"
+        and s.retired.reason != "no_bis"
         and s.endpoint in candidate_set
         and now - s.retired.last_recheck >= timedelta(days=r.recheck_days)
     ]

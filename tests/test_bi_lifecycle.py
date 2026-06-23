@@ -45,6 +45,19 @@ def test_recheck_due_only_after_interval():
     assert [s.endpoint.model for s in actions.recheck] == ["m/due"]
 
 
+def test_no_bis_endpoints_are_never_rechecked():
+    # no_bis endpoints are alive but yield too few BIs; re-onboarding them is a
+    # ~15k-query waste that re-fails. They must never be rechecked, even past the
+    # interval — unlike a stalled endpoint, which is.
+    states = {
+        "nobis": retired_state("m/nobis", "no_bis", NOW - timedelta(days=60)),
+        "stalled": retired_state("m/stalled", "stalled", NOW - timedelta(days=60)),
+    }
+    candidates = [ep("m/nobis"), ep("m/stalled")]
+    actions = select_lifecycle_actions(candidates, states, NOW)
+    assert [s.endpoint.model for s in actions.recheck] == ["m/stalled"]
+
+
 def test_delisted_only_after_grace_period():
     grace = config.bi.reinit.deselection_grace_days
     states = {
