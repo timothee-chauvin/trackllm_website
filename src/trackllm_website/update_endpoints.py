@@ -20,6 +20,7 @@ from trackllm_website.bi.selection import (
 from trackllm_website.bi.state import EndpointBIState, RetiredInfo, load_all_states
 from trackllm_website.bi.vetting import EndpointCache, should_recheck, vet_endpoint
 from trackllm_website.config import Endpoint, config, logger, root
+from trackllm_website.spend import Spend, append_entry, track
 from trackllm_website.storage import ResultsStorage
 from trackllm_website.util import (
     atomic_write_bytes,
@@ -319,10 +320,10 @@ async def update_endpoints_bi() -> list[Endpoint]:
     all_endpoints = await get_endpoints(logprob_filter=False, max_cost_mtok=None)
     policy = load_policy(root / config.bi.selection_path)
     cache = EndpointCache.load(ENDPOINTS_CACHE_BI_PATH)
+    now = datetime.now(tz=timezone.utc).replace(microsecond=0)
 
     # Periodically re-vet too_expensive / bad_temperature rejects: prices drop and
     # providers fix temperature, so clear those buckets to re-probe them this run.
-    now = datetime.now(tz=timezone.utc)
     if should_recheck(cache, now, config.bi.reinit.recheck_days):
         n_cleared = len(cache.too_expensive) + len(cache.bad_temperature)
         cache.too_expensive = []
@@ -348,9 +349,10 @@ async def update_endpoints_bi() -> list[Endpoint]:
         f"(skipping {len(all_endpoints) - len(to_vet)} cached rejects)"
     )
 
+    probe_spend: dict[str, Spend] = {}
     async with OpenRouterClient(timeout=60.0) as probe_client:
         strategies, failed = await resolve_strategies(
-            probe_client, to_vet, policy=policy
+            probe_client, to_vet, policy=policy, probe_spend=probe_spend
         )
     cache_too_expensive_from_probe(failed, to_vet, cache)
     logger.info(
@@ -363,7 +365,16 @@ async def update_endpoints_bi() -> list[Endpoint]:
         strategy = strategies.get(str(endpoint))
         if strategy is None:
             return None  # couldn't resolve a strategy; skip (not cached)
-        res = await vet_endpoint(client, endpoint, strategy)
+        with track() as spend:
+            res = await vet_endpoint(client, endpoint, strategy)
+        spend.merge(probe_spend.get(str(endpoint), Spend()))
+        append_entry(
+            config.spend_dir,
+            slugify(f"{endpoint.model}#{endpoint.provider}"),
+            "vetting",
+            spend,
+            now,
+        )
         if res.bucket == "candidate":
             endpoint.cost_per_request = res.cost_per_request
             if exceeds_ceiling(
@@ -494,9 +505,13 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
     if not to_init:
         return
 
+    probe_spend: dict[str, Spend] = {}
     async with OpenRouterClient(timeout=60.0) as probe_client:
         strategies, _ = await resolve_strategies(
-            probe_client, [e for e, _ in to_init], policy=policy
+            probe_client,
+            [e for e, _ in to_init],
+            policy=policy,
+            probe_spend=probe_spend,
         )
 
     async def onboard_one(
@@ -504,53 +519,57 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]):
     ) -> None:
         """Onboard or re-check one endpoint; failures are logged and swallowed
         so one bad endpoint never aborts the rest of the batch."""
-        try:
-            slug = slugify(f"{endpoint.model}#{endpoint.provider}")
-            state = states.get(slug)
+        slug = slugify(f"{endpoint.model}#{endpoint.provider}")
+        kind = "recheck" if is_recheck else "onboard"
+        with track() as spend:
+            try:
+                state = states.get(slug)
 
-            if str(endpoint) not in strategies:
-                # Bump last_recheck so a permanently-hidden-reasoning endpoint isn't
-                # re-probed daily. Fresh onboards have no state yet: skip silently.
-                if is_recheck and state is not None:
-                    state.retired.last_recheck = now
-                    state.save(config.bi.state_dir)
-                return
+                if str(endpoint) not in strategies:
+                    # Bump last_recheck so a permanently-hidden-reasoning endpoint isn't
+                    # re-probed daily. Fresh onboards have no state yet: skip silently.
+                    if is_recheck and state is not None:
+                        state.retired.last_recheck = now
+                        state.save(config.bi.state_dir)
+                    return
 
-            # old_bis=[]: rechecks intentionally rediscover BIs from scratch,
-            # since references from before the monitoring gap are stale.
-            old_bis = []
-            result = await asyncio.wait_for(
-                reinit(client, strategies[str(endpoint)], endpoint, old_bis, now),
-                timeout=config.bi.reinit.onboard_timeout_seconds,
-            )
-            if result.reason == "bad_temperature":
-                # T=0 is a no-op for this endpoint: cache it so it's excluded and
-                # not re-onboarded every run (rechecked on the cache schedule).
-                cache.add_bad_temperature(endpoint)
-                logger.warning(f"{endpoint}: cached bad_temperature (T=0 ignored)")
-                return
-            if state is None:
-                state = EndpointBIState(
-                    endpoint=endpoint, status="monitoring", epochs=[]
+                # old_bis=[]: rechecks intentionally rediscover BIs from scratch,
+                # since references from before the monitoring gap are stale.
+                old_bis = []
+                result = await asyncio.wait_for(
+                    reinit(client, strategies[str(endpoint)], endpoint, old_bis, now),
+                    timeout=config.bi.reinit.onboard_timeout_seconds,
                 )
-            if result.epoch is None:
-                state.status = "retired"
-                state.retired = RetiredInfo(
-                    reason="no_bis", since=now, last_recheck=now
+                if result.reason == "bad_temperature":
+                    # T=0 is a no-op for this endpoint: cache it so it's excluded and
+                    # not re-onboarded every run (rechecked on the cache schedule).
+                    cache.add_bad_temperature(endpoint)
+                    logger.warning(f"{endpoint}: cached bad_temperature (T=0 ignored)")
+                    return
+                if state is None:
+                    state = EndpointBIState(
+                        endpoint=endpoint, status="monitoring", epochs=[]
+                    )
+                if result.epoch is None:
+                    state.status = "retired"
+                    state.retired = RetiredInfo(
+                        reason="no_bis", since=now, last_recheck=now
+                    )
+                else:
+                    state.status = "monitoring"
+                    state.retired = None
+                    state.epochs.append(result.epoch)
+                state.save(config.bi.state_dir)
+            except asyncio.TimeoutError:
+                hours = config.bi.reinit.onboard_timeout_seconds / 3600
+                logger.warning(
+                    f"{endpoint} onboarding exceeded {hours:.0f}h, will resume next run"
                 )
-            else:
-                state.status = "monitoring"
-                state.retired = None
-                state.epochs.append(result.epoch)
-            state.save(config.bi.state_dir)
-        except asyncio.TimeoutError:
-            hours = config.bi.reinit.onboard_timeout_seconds / 3600
-            logger.warning(
-                f"{endpoint} onboarding exceeded {hours:.0f}h, will resume next run"
-            )
-            return
-        except Exception:
-            logger.exception(f"BI onboarding failed for {endpoint}")
+            except Exception:
+                logger.exception(f"BI onboarding failed for {endpoint}")
+            finally:
+                spend.merge(probe_spend.get(str(endpoint), Spend()))
+                append_entry(config.spend_dir, slug, kind, spend, now)
 
     client = OpenRouterClient()
     try:

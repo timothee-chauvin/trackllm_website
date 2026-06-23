@@ -9,6 +9,7 @@ import orjson
 from beartype.typing import Callable
 
 from trackllm_website.config import Endpoint, config, logger
+from trackllm_website.spend import record_query
 from trackllm_website.storage import (
     Response,
     ResponseError,
@@ -193,7 +194,7 @@ class OpenRouterClient:
         backoff_on_timeout: bool = True,
     ) -> Response:
         try:
-            return await retry_with_exponential_backoff(
+            response = await retry_with_exponential_backoff(
                 self._make_request,
                 endpoint,
                 prompt,
@@ -222,7 +223,7 @@ class OpenRouterClient:
                 http_code, message = 0, f"Timeout after {config.api.timeout}s"
             else:
                 http_code, message = 0, str(e)
-            return Response(
+            response = Response(
                 date=datetime.now(tz=timezone.utc),
                 endpoint=endpoint,
                 prompt=prompt,
@@ -230,6 +231,8 @@ class OpenRouterClient:
                 cost=0.0,
                 error=ResponseError(http_code=http_code, message=message),
             )
+        record_query(response.cost, response.error is not None)
+        return response
 
 
 def compute_cost(usage: dict, endpoint: Endpoint) -> float:

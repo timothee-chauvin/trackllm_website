@@ -19,6 +19,7 @@ from trackllm_website.bi.download_tokenizers import (
 )
 from trackllm_website.bi.selection import SelectionPolicy, exceeds_ceiling
 from trackllm_website.config import Endpoint, config, logger, root
+from trackllm_website.spend import Spend, track
 from trackllm_website.storage import Response
 from trackllm_website.util import atomic_write_bytes, slugify
 
@@ -210,6 +211,7 @@ async def resolve_strategies(
     client: OpenRouterClient,
     endpoints: list[Endpoint],
     policy: SelectionPolicy | None = None,
+    probe_spend: dict[str, Spend] | None = None,
 ) -> tuple[dict[str, QueryStrategy], dict[str, list[str]]]:
     """Resolve strategies for all endpoints, using cache where possible.
 
@@ -219,6 +221,9 @@ async def resolve_strategies(
 
     When `policy` is given, an endpoint proven too expensive mid-probe is reported in
     `failed` with TOO_EXPENSIVE as the first error (see discover_strategy).
+
+    When `probe_spend` is provided, each probed endpoint's cost is stored in it
+    keyed by str(endpoint). Cached endpoints are not probed and produce no entry.
     """
     cached_raw = load_strategies()
     result: dict[str, QueryStrategy] = {}
@@ -246,7 +251,12 @@ async def resolve_strategies(
         ep: Endpoint,
     ) -> tuple[str, QueryStrategy | None, list[str] | None]:
         key = str(ep)
-        strategy, errors = await discover_strategy(client, ep, policy=policy)
+        if probe_spend is not None:
+            with track() as s:
+                strategy, errors = await discover_strategy(client, ep, policy=policy)
+            probe_spend[key] = s
+        else:
+            strategy, errors = await discover_strategy(client, ep, policy=policy)
         if strategy is None:
             logger.warning(f"Skipping {ep} — probe errors: {errors}")
             return key, None, errors
