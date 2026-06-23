@@ -114,3 +114,36 @@ def test_monitor_main_calls_send_monitoring_digest(tmp_path, monkeypatch):
     assert len(digest_calls) == 1
     assert digest_calls[0][0] is expected_report
     assert digest_calls[0][1] == tmp_path
+
+
+def test_update_endpoints_main_calls_send_onboarding_digest(tmp_path, monkeypatch):
+    """update_endpoints.main() must call send_onboarding_digest with the lifecycle report."""
+    import asyncio
+
+    import trackllm_website.bi.digest as digest_mod
+    import trackllm_website.update_endpoints as ue
+    from trackllm_website.config import config
+
+    expected_report = OnboardingReport(
+        date="2026-06-23",
+        rows=[OnboardRow("m/x", "prov", "onboarded", 12, 0.02)],
+    )
+
+    monkeypatch.setattr(ue, "update_endpoints_lt", AsyncMock(return_value=None))
+    monkeypatch.setattr(ue, "update_endpoints_bi", AsyncMock(return_value=[]))
+    monkeypatch.setattr(
+        ue, "update_endpoints_bi_lifecycle", AsyncMock(return_value=expected_report)
+    )
+    digest_calls = []
+    monkeypatch.setattr(
+        digest_mod,
+        "send_onboarding_digest",
+        lambda report, sd: digest_calls.append((report, sd)),
+    )
+    monkeypatch.setattr(type(config), "spend_dir", property(lambda self: tmp_path))
+
+    asyncio.run(ue.main())
+
+    assert len(digest_calls) == 1
+    assert digest_calls[0][0] is expected_report
+    assert digest_calls[0][1] == tmp_path
