@@ -84,6 +84,11 @@ class _FakeClient:
 def _patch_lifecycle_deps(monkeypatch, tmp_path, *, select, reinit):
     """Wire the non-networked lifecycle dependencies for an in-process run."""
     monkeypatch.setattr(config.bi, "data_dir", tmp_path)
+    # Keep the spend ledger in tmp; onboarding now writes a line per attempt and
+    # must not pollute the repo's real website/data/spend/.
+    monkeypatch.setattr(
+        type(config), "spend_dir", property(lambda self: tmp_path / "spend")
+    )
     monkeypatch.setattr(
         "trackllm_website.update_endpoints.OpenRouterClient", _FakeClient
     )

@@ -77,6 +77,10 @@ def test_run_endpoint_reinit_retires_and_persists(tmp_path, monkeypatch):
         return ReinitResult(epoch=None, reason="no_bis")  # retired "no_bis"
 
     monkeypatch.setattr(monitor_mod.config.bi, "data_dir", tmp_path)
+    # run_endpoint now writes a spend-ledger line; keep it in tmp, not the repo.
+    monkeypatch.setattr(
+        type(monitor_mod.config), "spend_dir", property(lambda self: tmp_path / "spend")
+    )
     state_dir = monitor_mod.config.bi.state_dir
     monkeypatch.setattr(monitor_mod, "sample_prompts", fake_sample_prompts)
     monkeypatch.setattr(monitor_mod, "reinit", fake_reinit)
