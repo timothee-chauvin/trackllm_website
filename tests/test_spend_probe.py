@@ -92,10 +92,6 @@ def test_vetting_folds_probe_cost(monkeypatch, tmp_path):
     monkeypatch.setattr(
         "trackllm_website.update_endpoints.vet_endpoint", fake_vet_endpoint
     )
-    monkeypatch.setattr(
-        "trackllm_website.update_endpoints.get_endpoints",
-        lambda **_: asyncio.coroutine(lambda: [endpoint])(),
-    )
 
     async def fake_get_endpoints(**_):
         return [endpoint]
