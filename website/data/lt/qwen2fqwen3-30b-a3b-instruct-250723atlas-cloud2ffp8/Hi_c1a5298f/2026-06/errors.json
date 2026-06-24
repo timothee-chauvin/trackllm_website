@@ -1,1 +1,1 @@
-{"seen_errors":[{"http_code":0,"message":"Timeout after 15.0s"}]}
+{"seen_errors":[{"http_code":0,"message":"Timeout after 15.0s"},{"http_code":400,"message":"{\"message\":\"Provider returned error\",\"code\":400,\"metadata\":{\"raw\":\"{\\\"code\\\":400,\\\"msg\\\":\\\"bad request\\\",\\\"request_id\\\":\\\"67b6f182-0f9b-45b8-b57c-97fa77f7a4db\\\"}\",\"provider_name\":\"AtlasCloud\",\"is_byok\":false}}"}]}

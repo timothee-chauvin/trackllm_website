@@ -1,1 +1,1 @@
-{"seen_errors":[]}
+{"seen_errors":[{"http_code":400,"message":"{\"message\":\"Provider returned error\",\"code\":400,\"metadata\":{\"raw\":\"{\\\"error\\\":{\\\"code\\\":\\\"invalid_parameter_error\\\",\\\"message\\\":\\\"\\\\u003c400\\\\u003e InternalError.Algo.InvalidParameter: Range of top_logprobs should be [0, 5]\\\",\\\"type\\\":\\\"invalid_parameter_error\\\"},\\\"request_id\\\":\\\"req-fc6ul6-1782316933099059855\\\"}\",\"provider_name\":\"StreamLake\",\"is_byok\":false}}"}]}
