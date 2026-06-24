@@ -1,5 +1,57 @@
 from trackllm_website.generate_site.changes import merge_changes
 
+# --- magnitude_display tests (TDD RED first) ---
+
+
+def _lt_event(sigma):
+    return {
+        "endpoint": "s1",
+        "index": 1,
+        "date": "2026-01-01T00:00:00Z",
+        "sigma": sigma,
+        "first_detected": "2026-06-01T00:00:00Z",
+    }
+
+
+class _LT:
+    model = "m/a"
+    provider = "p"
+
+
+def test_lt_null_sigma_shows_inf():
+    events = merge_changes({"s1": [_lt_event(None)]}, {"s1": _LT()}, {})
+    assert events[0].magnitude_display == "∞σ"
+
+
+def test_lt_huge_sigma_shows_inf():
+    events = merge_changes({"s1": [_lt_event(2.0e38)]}, {"s1": _LT()}, {})
+    assert events[0].magnitude_display == "∞σ"
+
+
+def test_lt_normal_sigma_shows_rounded():
+    events = merge_changes({"s1": [_lt_event(12.0)]}, {"s1": _LT()}, {})
+    assert events[0].magnitude_display == "12σ"
+
+
+def test_b3it_change_detected_magnitude_display_blank():
+    class V:
+        model = "m/b"
+        provider = "q"
+        epochs = [
+            {
+                "start": "2026-01-01T00:00:00Z",
+                "end": "2026-05-01T00:00:00Z",
+                "end_reason": "change_detected",
+                "change_date": "2026-04-15T00:00:00Z",
+            }
+        ]
+
+    events = merge_changes({}, {}, {"s2": V()})
+    assert events[0].magnitude_display == ""
+
+
+# --- existing tests ---
+
 
 def test_merge_sorts_newest_first_across_methods():
     lt_changes = {

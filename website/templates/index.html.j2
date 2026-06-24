@@ -13,7 +13,7 @@
                 <td><a href="endpoints/{{ c.slug }}.html">{{ c.model }}</a></td>
                 <td>{{ c.provider }}</td>
                 <td><span class="badge method {{ c.method|lower }}">{{ c.method }}</span></td>
-                <td>{% if c.magnitude %}{{ '%.0f'|format(c.magnitude) }}σ{% endif %}</td></tr>
+                <td>{{ c.magnitude_display }}</td></tr>
           {% endfor %}
           </tbody></table>
           {% else %}<p class="no-data">No changes detected yet.</p>{% endif %}

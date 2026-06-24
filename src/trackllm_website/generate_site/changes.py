@@ -1,5 +1,16 @@
+import math
 from dataclasses import asdict, dataclass
 from datetime import datetime
+
+# LT sigmas at/above this threshold (or null/non-finite) are effectively infinite
+# and shown as ∞ — they arise from near-zero baseline variance in the detector.
+SIGMA_INF_THRESHOLD = 1e4
+
+
+def _lt_magnitude_display(sigma: float | None) -> str:
+    if sigma is None or not math.isfinite(sigma) or abs(sigma) >= SIGMA_INF_THRESHOLD:
+        return "∞σ"
+    return f"{sigma:.0f}σ"
 
 
 @dataclass
@@ -10,6 +21,7 @@ class ChangeEvent:
     provider: str
     method: str
     magnitude: float | None
+    magnitude_display: str
 
 
 def merge_changes(lt_changes, lt_by_slug, b3it_views) -> list[ChangeEvent]:
@@ -19,8 +31,17 @@ def merge_changes(lt_changes, lt_by_slug, b3it_views) -> list[ChangeEvent]:
         model = ep.model if ep else slug
         provider = ep.provider if ep else ""
         for ev in evs:
+            sigma = ev["sigma"]
             events.append(
-                ChangeEvent(ev["date"], slug, model, provider, "LT", ev["sigma"])
+                ChangeEvent(
+                    ev["date"],
+                    slug,
+                    model,
+                    provider,
+                    "LT",
+                    sigma,
+                    _lt_magnitude_display(sigma),
+                )
             )
     for slug, view in b3it_views.items():
         for epoch in view.epochs:
@@ -35,6 +56,7 @@ def merge_changes(lt_changes, lt_by_slug, b3it_views) -> list[ChangeEvent]:
                         view.provider,
                         "B3IT",
                         None,
+                        "",
                     )
                 )
     events.sort(key=lambda e: datetime.fromisoformat(e.date), reverse=True)
