@@ -22,6 +22,7 @@ async function init(): Promise<void> {
   const res = await fetch("data/spend.json");
   if (!res.ok) return;
   const data: SpendData = await res.json();
+  if (!data.daily?.length) return;
   const dates = data.daily.map((d) => new Date(d.date));
   const traces = GROUP_ORDER.filter((g) => data.daily.some((d) => d.groups[g]))
     .map((g) => ({
