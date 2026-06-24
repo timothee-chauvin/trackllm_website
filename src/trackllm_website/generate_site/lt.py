@@ -1,17 +1,7 @@
-#!/usr/bin/env python3
-"""Generate a static GitHub Pages website from the trackllm data directory."""
-
 import json
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-
-from jinja2 import Environment, FileSystemLoader
-
-WEBSITE_DIR = Path("website")
-DATA_DIR = WEBSITE_DIR / "data" / "lt"
-ENDPOINTS_DIR = WEBSITE_DIR / "endpoints"
-TEMPLATES_DIR = WEBSITE_DIR / "templates"
 
 # Endpoints with last query older than this are considered inactive
 INACTIVE_THRESHOLD_DAYS = 3
@@ -167,80 +157,12 @@ def get_endpoint_info(endpoint_dir: Path) -> EndpointInfo | None:
     )
 
 
-def main():
-    """Generate the static site."""
-    if not DATA_DIR.exists():
-        print(f"Error: Data directory {DATA_DIR} does not exist")
-        return
-
-    WEBSITE_DIR.mkdir(parents=True, exist_ok=True)
-    ENDPOINTS_DIR.mkdir(parents=True, exist_ok=True)
-
-    # Set up Jinja2
-    env = Environment(loader=FileSystemLoader(TEMPLATES_DIR), autoescape=True)
-    index_template = env.get_template("index.html.j2")
-    endpoint_template = env.get_template("endpoint.html.j2")
-
-    # Collect endpoint info
+def discover_lt_endpoints(lt_dir: Path) -> list[EndpointInfo]:
     endpoints: list[EndpointInfo] = []
-
-    for endpoint_dir in sorted(DATA_DIR.iterdir()):
+    for endpoint_dir in sorted(lt_dir.iterdir()):
         if not endpoint_dir.is_dir():
             continue
-
         info = get_endpoint_info(endpoint_dir)
         if info:
             endpoints.append(info)
-            status = "active" if info.is_active else f"inactive ({info.last_query_str})"
-            print(f"  {info.model} @ {info.provider}: {status}")
-
-    # Split into active and inactive
-    active = [e for e in endpoints if e.is_active]
-    inactive = [e for e in endpoints if not e.is_active]
-
-    # Sort alphabetically
-    active.sort(key=lambda e: e.model.lower())
-    inactive.sort(key=lambda e: e.model.lower())
-
-    print(f"\nFound {len(active)} active, {len(inactive)} inactive endpoints")
-
-    # Generate index
-    index_html = index_template.render(
-        active_endpoints=active,
-        inactive_endpoints=inactive,
-        css_path="style.css",
-        body_class="index",
-    )
-    (WEBSITE_DIR / "index.html").write_text(index_html)
-    print("Generated index.html")
-
-    # Clean old endpoint pages
-    for f in ENDPOINTS_DIR.glob("*.html"):
-        f.unlink()
-
-    # Generate endpoint pages
-    for ep in endpoints:
-        manifest = {
-            "model": ep.model,
-            "provider": ep.provider,
-            "slug": ep.slug,
-            "prompts": [
-                {"slug": p.slug, "prompt": p.prompt, "months": p.months}
-                for p in ep.prompts
-            ],
-        }
-
-        endpoint_html = endpoint_template.render(
-            endpoint=ep,
-            manifest_json=json.dumps(manifest),
-            css_path="../style.css",
-            body_class="endpoint",
-        )
-        (ENDPOINTS_DIR / f"{ep.slug}.html").write_text(endpoint_html)
-
-    print(f"Generated {len(endpoints)} endpoint pages in endpoints/")
-    print(f"\nSite generated in {WEBSITE_DIR}/")
-
-
-if __name__ == "__main__":
-    main()
+    return endpoints

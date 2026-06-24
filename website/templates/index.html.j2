@@ -1,52 +1,51 @@
 {% extends "base.html.j2" %}
-
 {% block title %}TrackLLM{% endblock %}
-
 {% block content %}
         <h1>TrackLLM</h1>
-        <p class="subtitle">Tracking LLM API logprob responses</p>
+        <p class="subtitle">Tracking LLM API drift via logprobs (LT) and border inputs (B3IT)</p>
+
+        <section class="changes-section">
+          <h2>Recent changes</h2>
+          {% if changes %}
+          <table><tbody>
+          {% for c in changes %}
+            <tr><td class="date">{{ c.date[:10] }}</td>
+                <td><a href="endpoints/{{ c.slug }}.html">{{ c.model }}</a></td>
+                <td>{{ c.provider }}</td>
+                <td><span class="badge method {{ c.method|lower }}">{{ c.method }}</span></td>
+                <td>{{ c.magnitude_display }}</td></tr>
+          {% endfor %}
+          </tbody></table>
+          {% else %}<p class="no-data">No changes detected yet.</p>{% endif %}
+        </section>
+
+        <section class="spend-strip">
+          {% set total_cumulative = spend.cumulative.values() | sum if spend.cumulative else 0 %}
+          {% set total_30d = spend.last_30d.values() | sum if spend.last_30d else 0 %}
+          <a href="spend.html">API spend</a>:
+          cumulative <strong>${{ "%.2f"|format(total_cumulative) }}</strong>
+          &nbsp;·&nbsp;
+          last 30 days <strong>${{ "%.2f"|format(total_30d) }}</strong>
+          {% if spend.cumulative %}
+          &nbsp;·&nbsp;
+          {% for group, cost in spend.cumulative.items() %}{{ group }} ${{ "%.2f"|format(cost) }}{% if not loop.last %}, {% endif %}{% endfor %}
+          {% endif %}
+        </section>
 
         <section class="endpoints-section">
-            <h2>Currently Tracked <span class="count">({{ active_endpoints | length }})</span></h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Model</th>
-                        <th>Provider</th>
-                    </tr>
-                </thead>
-                <tbody>
-{% for ep in active_endpoints %}
-                    <tr>
-                        <td><a href="endpoints/{{ ep.slug }}.html">{{ ep.model }}</a></td>
-                        <td>{{ ep.provider }}</td>
-                    </tr>
-{% endfor %}
-                </tbody>
-            </table>
+          <h2>Endpoints <span class="count">({{ rows | length }})</span></h2>
+          <table>
+            <thead><tr><th>Model</th><th>Provider</th><th>LT</th><th>B3IT</th></tr></thead>
+            <tbody>
+          {% for row in rows %}
+            <tr class="{{ 'recent' if row.recent_change else '' }}">
+              <td><a href="endpoints/{{ row.slug }}.html">{{ row.model }}</a></td>
+              <td>{{ row.provider }}</td>
+              <td>{{ row.lt_status or '—' }}</td>
+              <td>{% if row.b3it_status == 'retired' %}retired ({{ row.b3it_reason }}){% else %}{{ row.b3it_status or '—' }}{% endif %}</td>
+            </tr>
+          {% endfor %}
+            </tbody>
+          </table>
         </section>
-
-{% if inactive_endpoints %}
-        <section class="endpoints-section inactive">
-            <h2>Previously Tracked <span class="count">({{ inactive_endpoints | length }})</span></h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Model</th>
-                        <th>Provider</th>
-                        <th>Last Query</th>
-                    </tr>
-                </thead>
-                <tbody>
-{% for ep in inactive_endpoints %}
-                    <tr>
-                        <td><a href="endpoints/{{ ep.slug }}.html">{{ ep.model }}</a></td>
-                        <td>{{ ep.provider }}</td>
-                        <td class="date">{{ ep.last_query_str }}</td>
-                    </tr>
-{% endfor %}
-                </tbody>
-            </table>
-        </section>
-{% endif %}
 {% endblock %}

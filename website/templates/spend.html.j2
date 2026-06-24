@@ -1,0 +1,61 @@
+{% extends "base.html.j2" %}
+{% block title %}Spend | TrackLLM{% endblock %}
+{% block content %}
+        <a href="index.html" class="back">← home</a>
+        <h1>API Spend</h1>
+
+        <section class="spend-cumulative">
+          <h2>Cumulative by group</h2>
+          {% if spend.cumulative %}
+          <table>
+            <thead><tr><th>Group</th><th>Cost (USD)</th></tr></thead>
+            <tbody>
+            {% for group, cost in spend.cumulative.items() %}
+              <tr><td>{{ group }}</td><td>${{ "%.4f"|format(cost) }}</td></tr>
+            {% endfor %}
+            </tbody>
+          </table>
+          {% else %}<p class="no-data">No spend data yet.</p>{% endif %}
+        </section>
+
+        <section class="spend-chart">
+          <h2>Daily spend</h2>
+          <div id="spend-chart"></div>
+        </section>
+
+        <section class="spend-by-endpoint">
+          <h2>By endpoint</h2>
+          {% if spend.by_endpoint %}
+          <table>
+            <thead>
+              <tr>
+                <th>Endpoint</th>
+                <th>Onboarding</th>
+                <th>Monitoring</th>
+                <th>LT</th>
+                <th>Vetting</th>
+                <th>Other</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for ep in spend.by_endpoint %}
+              <tr>
+                <td><a href="endpoints/{{ ep.slug }}.html">{{ ep.slug }}</a></td>
+                <td>{% if ep.groups.onboarding %}${{ "%.4f"|format(ep.groups.onboarding) }}{% else %}—{% endif %}</td>
+                <td>{% if ep.groups.monitoring %}${{ "%.4f"|format(ep.groups.monitoring) }}{% else %}—{% endif %}</td>
+                <td>{% if ep.groups.lt %}${{ "%.4f"|format(ep.groups.lt) }}{% else %}—{% endif %}</td>
+                <td>{% if ep.groups.vetting %}${{ "%.4f"|format(ep.groups.vetting) }}{% else %}—{% endif %}</td>
+                <td>{% if ep.groups.other %}${{ "%.4f"|format(ep.groups.other) }}{% else %}—{% endif %}</td>
+                <td>${{ "%.4f"|format(ep.total) }}</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+          {% else %}<p class="no-data">No spend data yet.</p>{% endif %}
+        </section>
+{% endblock %}
+
+{% block scripts %}
+    <script src="js/spend.js"></script>
+{% endblock %}
