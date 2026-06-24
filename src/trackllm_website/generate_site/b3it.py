@@ -5,7 +5,11 @@ from datetime import datetime
 from pathlib import Path
 
 from trackllm_website.bi.analyze import load_phase2_results
-from trackllm_website.bi.detection import adaptive_transitions, epoch_tv_series, is_unstable
+from trackllm_website.bi.detection import (
+    adaptive_transitions,
+    epoch_tv_series,
+    is_unstable,
+)
 from trackllm_website.bi.state import Epoch, EndpointBIState, load_all_states
 
 
@@ -23,7 +27,9 @@ class B3ITView:
     changes: list[dict]
 
 
-def current_epoch_results(state: EndpointBIState, results: dict) -> tuple[Epoch | None, dict]:
+def current_epoch_results(
+    state: EndpointBIState, results: dict
+) -> tuple[Epoch | None, dict]:
     """Mirror monitor.decide (lines 54-79): last open epoch + filtered results."""
     epoch = state.current_epoch
     if epoch is None:
