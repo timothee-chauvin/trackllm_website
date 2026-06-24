@@ -1,12 +1,16 @@
 from datetime import datetime, timezone
 
+import pytest
+
 from trackllm_website.bi.state import EndpointBIState, Epoch, RetiredInfo
 from trackllm_website.config import Endpoint
 from trackllm_website.generate_site.b3it import derive_b3it
 
 
 def _ep():
-    return Endpoint(api="openrouter", model="m/a", provider="p", cost=[0.1, 0.2], max_logprobs=None)
+    return Endpoint(
+        api="openrouter", model="m/a", provider="p", cost=[0.1, 0.2], max_logprobs=None
+    )
 
 
 def test_retired_no_reference_yields_empty_tv_but_full_timeline():
@@ -61,4 +65,4 @@ def test_monitoring_with_reference_yields_tv_series():
     assert view.status == "monitoring"
     assert view.n_bis == 1
     assert view.tv_series["values"]  # non-empty
-    assert view.tv_series["values"][0] > 0  # B vs A => TV 1.0
+    assert view.tv_series["values"][0] == pytest.approx(1.0)
