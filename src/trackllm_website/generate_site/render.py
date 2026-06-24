@@ -11,6 +11,7 @@ from trackllm_website.generate_site import changes as changes_mod
 from .lt import EndpointInfo, discover_lt_endpoints
 
 RECENT_CHANGE_DAYS = 14
+FEED_LIMIT = 25
 
 
 @dataclass
@@ -84,15 +85,6 @@ def render_site(website_dir: Path) -> None:
 
     lt_by_slug = {e.slug: e for e in endpoints}
 
-    active = sorted(
-        [e for e in endpoints if e.is_active], key=lambda e: e.model.lower()
-    )
-    inactive = sorted(
-        [e for e in endpoints if not e.is_active], key=lambda e: e.model.lower()
-    )
-
-    print(f"\nFound {len(active)} active, {len(inactive)} inactive endpoints")
-
     b3it_views = b3it_mod.discover_b3it_views(
         website_dir / "data" / "b3it" / "state",
         website_dir / "data" / "b3it" / "phase_2",
@@ -119,9 +111,12 @@ def render_site(website_dir: Path) -> None:
 
     rows = build_index_rows(endpoints, b3it_views, recent_slugs)
 
+    n_active = sum(1 for r in rows if r.lt_status == "monitoring")
+    print(f"\nFound {n_active} active, {len(rows) - n_active} inactive endpoints")
+
     index_html = index_template.render(
         rows=rows,
-        changes=changes_json,
+        changes=changes_json[:FEED_LIMIT],
         css_path="style.css",
         body_class="index",
     )

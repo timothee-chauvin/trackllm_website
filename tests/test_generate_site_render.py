@@ -48,7 +48,6 @@ def test_render_emits_changes_and_unified_index(tmp_path):
             }
         )
     )
-    from trackllm_website.generate_site.render import render_site
 
     render_site(tmp_path)
     assert (tmp_path / "data" / "changes.json").exists()
@@ -81,7 +80,6 @@ def test_render_emits_b3it_json_and_b3it_only_page(tmp_path):
         ],
     }
     (sd / "b2fx23q.json").write_text(json.dumps(state))
-    from trackllm_website.generate_site.render import render_site
 
     render_site(tmp_path)
     assert (tmp_path / "data" / "b3it" / "b2fx23q" / "b3it.json").exists()
