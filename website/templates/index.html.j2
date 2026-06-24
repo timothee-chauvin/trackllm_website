@@ -1,43 +1,38 @@
 {% extends "base.html.j2" %}
-
 {% block title %}TrackLLM{% endblock %}
-
 {% block content %}
         <h1>TrackLLM</h1>
-        <p class="subtitle">Tracking LLM API logprob responses</p>
+        <p class="subtitle">Tracking LLM API drift via logprobs (LT) and border inputs (B3IT)</p>
+
+        <section class="changes-section">
+          <h2>Recent changes</h2>
+          {% if changes %}
+          <table><tbody>
+          {% for c in changes %}
+            <tr><td class="date">{{ c.date[:10] }}</td>
+                <td><a href="endpoints/{{ c.slug }}.html">{{ c.model }}</a></td>
+                <td>{{ c.provider }}</td>
+                <td><span class="badge method {{ c.method|lower }}">{{ c.method }}</span></td>
+                <td>{% if c.magnitude %}{{ '%.0f'|format(c.magnitude) }}σ{% endif %}</td></tr>
+          {% endfor %}
+          </tbody></table>
+          {% else %}<p class="no-data">No changes detected yet.</p>{% endif %}
+        </section>
 
         <section class="endpoints-section">
-            <h2>Tracked Endpoints <span class="count">({{ rows | length }})</span></h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Model</th>
-                        <th>Provider</th>
-                        <th>LT</th>
-                        <th>B3IT</th>
-                    </tr>
-                </thead>
-                <tbody>
-{% for row in rows %}
-                    <tr>
-                        <td><a href="endpoints/{{ row.slug }}.html">{{ row.model }}</a></td>
-                        <td>{{ row.provider }}</td>
-                        <td>{{ row.lt_status or "" }}</td>
-                        <td>{{ row.b3it_status or "" }}</td>
-                    </tr>
-{% endfor %}
-                </tbody>
-            </table>
+          <h2>Endpoints <span class="count">({{ rows | length }})</span></h2>
+          <table>
+            <thead><tr><th>Model</th><th>Provider</th><th>LT</th><th>B3IT</th></tr></thead>
+            <tbody>
+          {% for row in rows %}
+            <tr class="{{ 'recent' if row.recent_change else '' }}">
+              <td><a href="endpoints/{{ row.slug }}.html">{{ row.model }}</a></td>
+              <td>{{ row.provider }}</td>
+              <td>{{ row.lt_status or '—' }}</td>
+              <td>{% if row.b3it_status == 'retired' %}retired ({{ row.b3it_reason }}){% else %}{{ row.b3it_status or '—' }}{% endif %}</td>
+            </tr>
+          {% endfor %}
+            </tbody>
+          </table>
         </section>
-
-{% if changes %}
-        <section class="changes-section">
-            <h2>Recent Changes</h2>
-            <ul>
-{% for c in changes %}
-                <li>{{ c.date }} — {{ c.model }} ({{ c.method }})</li>
-{% endfor %}
-            </ul>
-        </section>
-{% endif %}
 {% endblock %}
