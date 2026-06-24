@@ -1,4 +1,5 @@
 import json
+import pytest
 import shutil
 from pathlib import Path
 
@@ -123,3 +124,12 @@ def test_render_emits_spend(tmp_path):
     assert (tmp_path / "data" / "spend.json").exists()
     assert (tmp_path / "spend.html").exists()
     assert "spend" in (tmp_path / "index.html").read_text().lower()
+
+    # Assert spend data renders with correct cost value
+    spend_html = (tmp_path / "spend.html").read_text()
+    assert "$0.0500" in spend_html, "Cost should render as $0.0500 (4 decimal places)"
+    assert "m2fa23p" in spend_html, "Endpoint slug should appear in spend table"
+
+    # Assert emitted spend.json has expected cumulative cost
+    spend_data = json.loads((tmp_path / "data" / "spend.json").read_text())
+    assert spend_data["cumulative"]["lt"] == pytest.approx(0.05)
