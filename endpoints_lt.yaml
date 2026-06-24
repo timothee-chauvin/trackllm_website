@@ -336,12 +336,6 @@ endpoints_lt:
   - 0.14
   - 0.8
 - api: openrouter
-  model: google/gemma-4-31b-it
-  provider: ambient
-  cost:
-  - 0.2
-  - 0.8
-- api: openrouter
   model: qwen/qwen3-235b-a22b-2507
   provider: friendli
   cost:
@@ -378,23 +372,17 @@ endpoints_lt:
   - 0.45
   - 0.65
 - api: openrouter
+  model: meta-llama/llama-4-maverick
+  provider: digitalocean
+  cost:
+  - 0.25
+  - 0.87
+- api: openrouter
   model: qwen/qwen3-next-80b-a3b-instruct
   provider: parasail/fp8
   cost:
   - 0.1
   - 1.1
-- api: openrouter
-  model: gryphe/mythomax-l2-13b
-  provider: mancer/fp8
-  cost:
-  - 0.5
-  - 0.75
-- api: openrouter
-  model: undi95/remm-slerp-l2-13b
-  provider: mancer/fp8
-  cost:
-  - 0.5
-  - 0.75
 - api: openrouter
   model: qwen/qwen3-next-80b-a3b-instruct
   provider: google-vertex/global
@@ -438,12 +426,6 @@ endpoints_lt:
   - 0.8
   - 0.8
 - api: openrouter
-  model: mancer/weaver
-  provider: mancer/fp8
-  cost:
-  - 0.75
-  - 1.0
-- api: openrouter
   model: deepseek/deepseek-v3.2
   provider: digitalocean
   cost:
@@ -485,6 +467,12 @@ endpoints_lt:
   cost:
   - 0.21
   - 1.9
+- api: openrouter
+  model: qwen/qwen3-coder-30b-a3b-instruct
+  provider: digitalocean
+  cost:
+  - 0.45
+  - 1.7
 - api: openrouter
   model: deepseek/deepseek-chat-v3.1
   provider: wandb/fp8
@@ -575,12 +563,6 @@ endpoints_lt:
   cost:
   - 3.0
   - 4.5
-- api: openrouter
-  model: anthracite-org/magnum-v4-72b
-  provider: mancer/fp8
-  cost:
-  - 3.0
-  - 5.0
 - api: openrouter
   model: openai/gpt-4o
   provider: azure
