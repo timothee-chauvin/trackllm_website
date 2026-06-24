@@ -3,6 +3,8 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
+from trackllm_website.generate_site import b3it as b3it_mod
+
 from .lt import EndpointInfo, discover_lt_endpoints
 
 
@@ -29,8 +31,14 @@ def render_site(website_dir: Path) -> None:
         status = "active" if ep.is_active else f"inactive ({ep.last_query_str})"
         print(f"  {ep.model} @ {ep.provider}: {status}")
 
-    active = sorted([e for e in endpoints if e.is_active], key=lambda e: e.model.lower())
-    inactive = sorted([e for e in endpoints if not e.is_active], key=lambda e: e.model.lower())
+    lt_by_slug = {e.slug: e for e in endpoints}
+
+    active = sorted(
+        [e for e in endpoints if e.is_active], key=lambda e: e.model.lower()
+    )
+    inactive = sorted(
+        [e for e in endpoints if not e.is_active], key=lambda e: e.model.lower()
+    )
 
     print(f"\nFound {len(active)} active, {len(inactive)} inactive endpoints")
 
@@ -43,27 +51,49 @@ def render_site(website_dir: Path) -> None:
     (website_dir / "index.html").write_text(index_html)
     print("Generated index.html")
 
+    b3it_views = b3it_mod.discover_b3it_views(
+        website_dir / "data" / "b3it" / "state",
+        website_dir / "data" / "b3it" / "phase_2",
+    )
+    for slug, view in b3it_views.items():
+        out_dir = website_dir / "data" / "b3it" / slug
+        out_dir.mkdir(parents=True, exist_ok=True)
+        (out_dir / "b3it.json").write_text(json.dumps(b3it_mod.to_json(view)))
+
     for f in endpoints_dir.glob("*.html"):
         f.unlink()
 
-    for ep in endpoints:
-        manifest = {
-            "model": ep.model,
-            "provider": ep.provider,
-            "slug": ep.slug,
-            "prompts": [
-                {"slug": p.slug, "prompt": p.prompt, "months": p.months}
-                for p in ep.prompts
-            ],
-        }
+    for slug in sorted(set(lt_by_slug) | set(b3it_views)):
+        if slug in lt_by_slug:
+            ep = lt_by_slug[slug]
+            manifest = {
+                "model": ep.model,
+                "provider": ep.provider,
+                "slug": ep.slug,
+                "prompts": [
+                    {"slug": p.slug, "prompt": p.prompt, "months": p.months}
+                    for p in ep.prompts
+                ],
+            }
+            endpoint_obj = ep
+        else:
+            view = b3it_views[slug]
+            manifest = {
+                "model": view.model,
+                "provider": view.provider,
+                "slug": slug,
+                "prompts": [],
+            }
+            endpoint_obj = None
 
         endpoint_html = endpoint_template.render(
-            endpoint=ep,
+            endpoint=endpoint_obj,
             manifest_json=json.dumps(manifest),
             css_path="../style.css",
             body_class="endpoint",
         )
-        (endpoints_dir / f"{ep.slug}.html").write_text(endpoint_html)
+        (endpoints_dir / f"{slug}.html").write_text(endpoint_html)
 
-    print(f"Generated {len(endpoints)} endpoint pages in endpoints/")
+    total = len(set(lt_by_slug) | set(b3it_views))
+    print(f"Generated {total} endpoint pages in endpoints/")
     print(f"\nSite generated in {website_dir}/")

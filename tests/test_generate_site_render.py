@@ -27,3 +27,34 @@ def test_render_site_produces_index_and_endpoint(tmp_path):
     index = (tmp_path / "index.html").read_text()
     assert "m/a" in index
     assert (tmp_path / "endpoints" / "m2fa23p.html").exists()
+
+
+def test_render_emits_b3it_json_and_b3it_only_page(tmp_path):
+    _scaffold(tmp_path)
+    sd = tmp_path / "data" / "b3it" / "state"
+    sd.mkdir(parents=True)
+    state = {
+        "endpoint": {
+            "api": "openrouter",
+            "model": "b/x",
+            "provider": "q",
+            "cost": [0.1, 0.2],
+            "max_logprobs": None,
+        },
+        "status": "monitoring",
+        "retired": None,
+        "epochs": [
+            {
+                "start": "2026-06-01T00:00:00Z",
+                "border_inputs": [],
+                "reference": {},
+                "end": None,
+            }
+        ],
+    }
+    (sd / "b2fx23q.json").write_text(json.dumps(state))
+    from trackllm_website.generate_site.render import render_site
+
+    render_site(tmp_path)
+    assert (tmp_path / "data" / "b3it" / "b2fx23q" / "b3it.json").exists()
+    assert (tmp_path / "endpoints" / "b2fx23q.html").exists()
