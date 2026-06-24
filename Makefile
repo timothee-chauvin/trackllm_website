@@ -7,7 +7,7 @@ install:
 # Build TypeScript and generate HTML
 build: install
 	cd website && bun run build
-	uv run python src/trackllm_website/generate_site.py
+	uv run python -m trackllm_website.generate_site
 
 .PHONY: serve
 # Serve the website locally
