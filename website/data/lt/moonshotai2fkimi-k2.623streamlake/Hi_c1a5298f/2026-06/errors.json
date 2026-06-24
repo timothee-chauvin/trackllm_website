@@ -1,1 +1,1 @@
-{"seen_errors":[]}
+{"seen_errors":[{"http_code":400,"message":"{\"message\":\"Provider returned error\",\"code\":400,\"metadata\":{\"raw\":\"{\\\"error\\\":{\\\"message\\\":\\\"Invalid parameter: parameter out of valid range trace_id: 1245c82ebdc57dda9ef72720e9398c7f\\\",\\\"type\\\":\\\"BadRequest\\\"},\\\"request_id\\\":\\\"req-vjpkwo-1782266305206177654\\\"}\",\"provider_name\":\"StreamLake\",\"is_byok\":false}}"}]}
