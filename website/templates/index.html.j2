@@ -19,6 +19,19 @@
           {% else %}<p class="no-data">No changes detected yet.</p>{% endif %}
         </section>
 
+        <section class="spend-strip">
+          {% set total_cumulative = spend.cumulative.values() | sum if spend.cumulative else 0 %}
+          {% set total_30d = spend.last_30d.values() | sum if spend.last_30d else 0 %}
+          <a href="spend.html">API spend</a>:
+          cumulative <strong>${{ "%.2f"|format(total_cumulative) }}</strong>
+          &nbsp;·&nbsp;
+          last 30 days <strong>${{ "%.2f"|format(total_30d) }}</strong>
+          {% if spend.cumulative %}
+          &nbsp;·&nbsp;
+          {% for group, cost in spend.cumulative.items() %}{{ group }} ${{ "%.2f"|format(cost) }}{% if not loop.last %}, {% endif %}{% endfor %}
+          {% endif %}
+        </section>
+
         <section class="endpoints-section">
           <h2>Endpoints <span class="count">({{ rows | length }})</span></h2>
           <table>

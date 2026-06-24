@@ -97,3 +97,29 @@ def test_render_emits_b3it_json_and_b3it_only_page(tmp_path):
         "b/x" in page_html.split("</h1>")[0].split("<h1>")[-1]
         or "b/x" in page_html.split("</title>")[0].split("<title>")[-1]
     )
+
+
+def test_render_emits_spend(tmp_path):
+    _scaffold(tmp_path)
+    import json
+
+    sp = tmp_path / "data" / "spend" / "m2fa23p"
+    sp.mkdir(parents=True)
+    (sp / "2026-06.jsonl").write_text(
+        json.dumps(
+            {
+                "timestamp": "2026-06-24T00:00:00Z",
+                "kind": "lt",
+                "cost": 0.05,
+                "n_queries": 1,
+                "n_errors": 0,
+            }
+        )
+        + "\n"
+    )
+    from trackllm_website.generate_site.render import render_site
+
+    render_site(tmp_path)
+    assert (tmp_path / "data" / "spend.json").exists()
+    assert (tmp_path / "spend.html").exists()
+    assert "spend" in (tmp_path / "index.html").read_text().lower()

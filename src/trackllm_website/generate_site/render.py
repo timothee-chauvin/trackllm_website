@@ -7,6 +7,7 @@ from jinja2 import Environment, FileSystemLoader
 
 from trackllm_website.generate_site import b3it as b3it_mod
 from trackllm_website.generate_site import changes as changes_mod
+from trackllm_website.generate_site import spend as spend_mod
 
 from .lt import EndpointInfo, discover_lt_endpoints
 
@@ -76,6 +77,7 @@ def render_site(website_dir: Path) -> None:
     env = Environment(loader=FileSystemLoader(templates_dir), autoescape=True)
     index_template = env.get_template("index.html.j2")
     endpoint_template = env.get_template("endpoint.html.j2")
+    spend_template = env.get_template("spend.html.j2")
 
     endpoints: list[EndpointInfo] = []
     for ep in discover_lt_endpoints(data_dir):
@@ -114,14 +116,27 @@ def render_site(website_dir: Path) -> None:
     n_active = sum(1 for r in rows if r.lt_status == "monitoring")
     print(f"\nFound {n_active} active, {len(rows) - n_active} inactive endpoints")
 
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    spend = spend_mod.aggregate_spend(website_dir / "data" / "spend", today)
+    (website_dir / "data" / "spend.json").write_text(json.dumps(spend))
+
     index_html = index_template.render(
         rows=rows,
         changes=changes_json[:FEED_LIMIT],
+        spend=spend,
         css_path="style.css",
         body_class="index",
     )
     (website_dir / "index.html").write_text(index_html)
     print("Generated index.html")
+
+    spend_html = spend_template.render(
+        spend=spend,
+        css_path="style.css",
+        body_class="spend",
+    )
+    (website_dir / "spend.html").write_text(spend_html)
+    print("Generated spend.html")
 
     for f in endpoints_dir.glob("*.html"):
         f.unlink()
