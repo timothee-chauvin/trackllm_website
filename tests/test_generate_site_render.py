@@ -58,3 +58,16 @@ def test_render_emits_b3it_json_and_b3it_only_page(tmp_path):
     render_site(tmp_path)
     assert (tmp_path / "data" / "b3it" / "b2fx23q" / "b3it.json").exists()
     assert (tmp_path / "endpoints" / "b2fx23q.html").exists()
+
+    b3it_data = json.loads(
+        (tmp_path / "data" / "b3it" / "b2fx23q" / "b3it.json").read_text()
+    )
+    assert b3it_data["status"] == "monitoring"
+
+    page_html = (tmp_path / "endpoints" / "b2fx23q.html").read_text()
+    # The model must appear in the visible header (h1/title), not just the manifest JSON script tag.
+    assert "<h1>" in page_html
+    assert (
+        "b/x" in page_html.split("</h1>")[0].split("<h1>")[-1]
+        or "b/x" in page_html.split("</title>")[0].split("<title>")[-1]
+    )

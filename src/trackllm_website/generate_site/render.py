@@ -64,8 +64,11 @@ def render_site(website_dir: Path) -> None:
         f.unlink()
 
     for slug in sorted(set(lt_by_slug) | set(b3it_views)):
+        methods: list[str] = []
         if slug in lt_by_slug:
             ep = lt_by_slug[slug]
+            model = ep.model
+            provider = ep.provider
             manifest = {
                 "model": ep.model,
                 "provider": ep.provider,
@@ -75,19 +78,26 @@ def render_site(website_dir: Path) -> None:
                     for p in ep.prompts
                 ],
             }
-            endpoint_obj = ep
+            methods.append("LT")
         else:
+            ep = None
             view = b3it_views[slug]
+            model = view.model
+            provider = view.provider
             manifest = {
                 "model": view.model,
                 "provider": view.provider,
                 "slug": slug,
                 "prompts": [],
             }
-            endpoint_obj = None
+        if slug in b3it_views:
+            methods.append("B3IT")
 
         endpoint_html = endpoint_template.render(
-            endpoint=endpoint_obj,
+            endpoint=ep,
+            model=model,
+            provider=provider,
+            methods=methods,
             manifest_json=json.dumps(manifest),
             css_path="../style.css",
             body_class="endpoint",

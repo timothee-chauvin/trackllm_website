@@ -1,12 +1,13 @@
 {% extends "base.html.j2" %}
 
-{% block title %}{{ endpoint.model }} @ {{ endpoint.provider }} | TrackLLM{% endblock %}
+{% block title %}{{ model }} @ {{ provider }} | TrackLLM{% endblock %}
 
 {% block content %}
         <a href="../index.html" class="back">← all endpoints</a>
-        <h1>{{ endpoint.model }}</h1>
-        <p class="provider">@ {{ endpoint.provider }}</p>
+        <h1>{{ model }}</h1>
+        <p class="provider">@ {{ provider }}{% for m in methods %} <span class="badge method {{ m|lower }}">{{ m }}</span>{% endfor %}</p>
 
+        <section id="b3it-section"></section>
         <div id="charts-container"></div>
 {% endblock %}
 
@@ -18,4 +19,3 @@
     <script type="application/json" id="manifest">{{ manifest_json | safe }}</script>
     <script src="../js/endpoint.js"></script>
 {% endblock %}
-
