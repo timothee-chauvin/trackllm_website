@@ -40,7 +40,10 @@ def aggregate_spend(spend_dir: Path, today: str) -> dict:
                 if date.fromisoformat(day) > cutoff:
                     last_30d[g] += cost
 
-    by_ep = [{"slug": s, "groups": dict(g), "total": sum(g.values())} for s, g in by_endpoint.items()]
+    by_ep = [
+        {"slug": s, "groups": dict(g), "total": sum(g.values())}
+        for s, g in by_endpoint.items()
+    ]
     by_ep.sort(key=lambda r: r["total"], reverse=True)
     return {
         "cumulative": dict(cumulative),
