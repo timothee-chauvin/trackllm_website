@@ -7,46 +7,37 @@
         <p class="subtitle">Tracking LLM API logprob responses</p>
 
         <section class="endpoints-section">
-            <h2>Currently Tracked <span class="count">({{ active_endpoints | length }})</span></h2>
+            <h2>Tracked Endpoints <span class="count">({{ rows | length }})</span></h2>
             <table>
                 <thead>
                     <tr>
                         <th>Model</th>
                         <th>Provider</th>
+                        <th>LT</th>
+                        <th>B3IT</th>
                     </tr>
                 </thead>
                 <tbody>
-{% for ep in active_endpoints %}
+{% for row in rows %}
                     <tr>
-                        <td><a href="endpoints/{{ ep.slug }}.html">{{ ep.model }}</a></td>
-                        <td>{{ ep.provider }}</td>
+                        <td><a href="endpoints/{{ row.slug }}.html">{{ row.model }}</a></td>
+                        <td>{{ row.provider }}</td>
+                        <td>{{ row.lt_status or "" }}</td>
+                        <td>{{ row.b3it_status or "" }}</td>
                     </tr>
 {% endfor %}
                 </tbody>
             </table>
         </section>
 
-{% if inactive_endpoints %}
-        <section class="endpoints-section inactive">
-            <h2>Previously Tracked <span class="count">({{ inactive_endpoints | length }})</span></h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Model</th>
-                        <th>Provider</th>
-                        <th>Last Query</th>
-                    </tr>
-                </thead>
-                <tbody>
-{% for ep in inactive_endpoints %}
-                    <tr>
-                        <td><a href="endpoints/{{ ep.slug }}.html">{{ ep.model }}</a></td>
-                        <td>{{ ep.provider }}</td>
-                        <td class="date">{{ ep.last_query_str }}</td>
-                    </tr>
+{% if changes %}
+        <section class="changes-section">
+            <h2>Recent Changes</h2>
+            <ul>
+{% for c in changes %}
+                <li>{{ c.date }} — {{ c.model }} ({{ c.method }})</li>
 {% endfor %}
-                </tbody>
-            </table>
+            </ul>
         </section>
 {% endif %}
 {% endblock %}

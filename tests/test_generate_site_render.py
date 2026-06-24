@@ -29,6 +29,34 @@ def test_render_site_produces_index_and_endpoint(tmp_path):
     assert (tmp_path / "endpoints" / "m2fa23p.html").exists()
 
 
+def test_render_emits_changes_and_unified_index(tmp_path):
+    _scaffold(tmp_path)
+    import json
+
+    (tmp_path / "data" / "lt" / "lt_changes.json").write_text(
+        json.dumps(
+            {
+                "m2fa23p": [
+                    {
+                        "endpoint": "m2fa23p",
+                        "index": 3,
+                        "date": "2026-06-20T00:00:00Z",
+                        "sigma": 9.0,
+                        "first_detected": "2026-06-21T00:00:00Z",
+                    }
+                ]
+            }
+        )
+    )
+    from trackllm_website.generate_site.render import render_site
+
+    render_site(tmp_path)
+    assert (tmp_path / "data" / "changes.json").exists()
+    index = (tmp_path / "index.html").read_text()
+    assert "m/a" in index  # endpoint row
+    assert "2026-06-20" in index  # change feed entry
+
+
 def test_render_emits_b3it_json_and_b3it_only_page(tmp_path):
     _scaffold(tmp_path)
     sd = tmp_path / "data" / "b3it" / "state"
