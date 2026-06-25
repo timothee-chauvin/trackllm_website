@@ -35,3 +35,4 @@
 {"timestamp":"2026-06-25T01:20:11Z","kind":"lt","cost":5.0999999999999995e-6,"n_queries":2,"n_errors":0}
 {"timestamp":"2026-06-25T03:25:26Z","kind":"lt","cost":5.0999999999999995e-6,"n_queries":2,"n_errors":0}
 {"timestamp":"2026-06-25T05:42:41Z","kind":"lt","cost":5.0999999999999995e-6,"n_queries":2,"n_errors":0}
+{"timestamp":"2026-06-25T07:32:42Z","kind":"lt","cost":0.0,"n_queries":2,"n_errors":2}
