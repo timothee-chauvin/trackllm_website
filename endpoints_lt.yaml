@@ -222,6 +222,12 @@ endpoints_lt:
   - 0.2288
   - 0.3432
 - api: openrouter
+  model: deepseek/deepseek-v3.2
+  provider: streamlake/fp8
+  cost:
+  - 0.2288
+  - 0.3432
+- api: openrouter
   model: mistralai/ministral-8b-2512
   provider: nextbit/fp8
   cost:
@@ -516,7 +522,19 @@ endpoints_lt:
   - 0.54
   - 2.7
 - api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: streamlake/fp8
+  cost:
+  - 0.54
+  - 2.7
+- api: openrouter
   model: z-ai/glm-5.1
+  provider: gmicloud/fp8
+  cost:
+  - 0.98
+  - 3.08
+- api: openrouter
+  model: z-ai/glm-5.2
   provider: gmicloud/fp8
   cost:
   - 0.98
@@ -530,6 +548,12 @@ endpoints_lt:
 - api: openrouter
   model: moonshotai/kimi-k2.6
   provider: streamlake
+  cost:
+  - 0.855
+  - 3.6
+- api: openrouter
+  model: moonshotai/kimi-k2.6
+  provider: streamlake/fp8
   cost:
   - 0.855
   - 3.6

@@ -224,6 +224,18 @@ too_expensive:
   - 0.5
   - 3.0
 - api: openrouter
+  model: google/gemma-4-31b-it
+  provider: sambanova
+  cost:
+  - 0.38
+  - 1.15
+- api: openrouter
+  model: inception/mercury-2
+  provider: inception
+  cost:
+  - 0.25
+  - 0.75
+- api: openrouter
   model: mancer/weaver
   provider: mancer/fp8
   cost:
@@ -314,6 +326,12 @@ too_expensive:
   - 0.3
   - 1.2
 - api: openrouter
+  model: minimax/minimax-m3
+  provider: siliconflow/fp8
+  cost:
+  - 0.3
+  - 1.2
+- api: openrouter
   model: moonshotai/kimi-k2-thinking
   provider: atlas-cloud/int4
   cost:
@@ -344,6 +362,12 @@ too_expensive:
   - 0.54
   - 2.7
 - api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: streamlake/fp8
+  cost:
+  - 0.54
+  - 2.7
+- api: openrouter
   model: moonshotai/kimi-k2.6
   provider: atlas-cloud/int4
   cost:
@@ -358,6 +382,12 @@ too_expensive:
 - api: openrouter
   model: moonshotai/kimi-k2.6
   provider: streamlake
+  cost:
+  - 0.855
+  - 3.6
+- api: openrouter
+  model: moonshotai/kimi-k2.6
+  provider: streamlake/fp8
   cost:
   - 0.855
   - 3.6
@@ -1376,3 +1406,9 @@ bad_temperature:
   cost:
   - 0.85
   - 1.25
+- api: openrouter
+  model: sakana/fugu-ultra
+  provider: sakana
+  cost:
+  - 5.0
+  - 30.0
