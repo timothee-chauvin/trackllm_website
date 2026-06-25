@@ -5,7 +5,7 @@ endpoints_bi:
   cost:
   - 0.01
   - 0.03
-  cost_per_request: 2.04e-07
+  cost_per_request: 2.2e-07
   created: '2026-04-21T18:24:46+00:00'
 - api: openrouter
   model: meta-llama/llama-3.1-8b-instruct
@@ -397,7 +397,7 @@ endpoints_bi:
   cost:
   - 0.098
   - 0.196
-  cost_per_request: 1.4798e-05
+  cost_per_request: 6.86e-07
   created: '2026-04-24T03:17:46+00:00'
 - api: openrouter
   model: deepseek/deepseek-v4-flash
@@ -509,7 +509,7 @@ endpoints_bi:
   cost:
   - 0.119
   - 0.2
-  cost_per_request: 1.271e-06
+  cost_per_request: 1.39e-06
   created: '2025-03-12T05:12:39+00:00'
 - api: openrouter
   model: openai/gpt-oss-20b
@@ -664,6 +664,14 @@ endpoints_bi:
   cost_per_request: 9.31e-07
   created: '2026-04-24T03:17:46+00:00'
 - api: openrouter
+  model: deepseek/deepseek-v4-flash
+  provider: streamlake/fp8
+  cost:
+  - 0.133
+  - 0.266
+  cost_per_request: 9.31e-07
+  created: '2026-04-24T03:17:46+00:00'
+- api: openrouter
   model: google/gemma-3-27b-it
   provider: nebius/fp8
   cost:
@@ -725,7 +733,7 @@ endpoints_bi:
   cost:
   - 0.1
   - 0.3
-  cost_per_request: 1.04e-06
+  cost_per_request: 1.14e-06
   created: '2025-07-29T16:36:05+00:00'
 - api: openrouter
   model: qwen/qwen3-30b-a3b-instruct-2507
@@ -765,7 +773,7 @@ endpoints_bi:
   cost:
   - 0.134
   - 0.268
-  cost_per_request: 7.5174e-05
+  cost_per_request: 4.489e-05
   created: '2026-04-24T03:17:46+00:00'
 - api: openrouter
   model: google/gemma-4-26b-a4b-it
@@ -813,7 +821,7 @@ endpoints_bi:
   cost:
   - 0.14
   - 0.28
-  cost_per_request: 5.32e-07
+  cost_per_request: 9.8e-07
   created: '2026-04-24T03:17:46+00:00'
 - api: openrouter
   model: deepseek/deepseek-v4-flash
@@ -885,7 +893,7 @@ endpoints_bi:
   cost:
   - 0.09
   - 0.36
-  cost_per_request: 9.72e-06
+  cost_per_request: 9.36e-06
   created: '2025-08-05T17:17:11+00:00'
 - api: openrouter
   model: meta-llama/llama-4-scout
@@ -901,7 +909,7 @@ endpoints_bi:
   cost:
   - 0.05
   - 0.4
-  cost_per_request: 7.885e-05
+  cost_per_request: 7.685e-05
   created: '2025-04-28T21:43:52+00:00'
 - api: openrouter
   model: z-ai/glm-4.7-flash
@@ -933,7 +941,7 @@ endpoints_bi:
   cost:
   - 0.07
   - 0.4
-  cost_per_request: 7.0e-07
+  cost_per_request: 5.8e-07
   created: '2026-01-19T14:45:13+00:00'
 - api: openrouter
   model: google/gemma-4-31b-it
@@ -949,7 +957,7 @@ endpoints_bi:
   cost:
   - 0.12
   - 0.37
-  cost_per_request: 1.93e-06
+  cost_per_request: 1.81e-06
   created: '2026-04-02T16:48:06+00:00'
 - api: openrouter
   model: google/gemma-4-31b-it
@@ -1031,6 +1039,14 @@ endpoints_bi:
   - 0.416
   cost_per_request: 1.352e-06
   created: '2025-10-23T14:55:32+00:00'
+- api: openrouter
+  model: xiaomi/mimo-v2.5
+  provider: venice/fp8
+  cost:
+  - 0.175
+  - 0.35
+  cost_per_request: 2.825e-06
+  created: '2026-04-22T16:11:09+00:00'
 - api: openrouter
   model: google/gemma-3-27b-it
   provider: parasail/fp8
@@ -1160,6 +1176,14 @@ endpoints_bi:
   cost_per_request: 1.487e-06
   created: '2025-12-01T13:10:42+00:00'
 - api: openrouter
+  model: deepseek/deepseek-v3.2
+  provider: streamlake/fp8
+  cost:
+  - 0.2288
+  - 0.3432
+  cost_per_request: 1.487e-06
+  created: '2025-12-01T13:10:42+00:00'
+- api: openrouter
   model: qwen/qwen3-vl-8b-instruct
   provider: alibaba
   cost:
@@ -1229,7 +1253,7 @@ endpoints_bi:
   cost:
   - 0.2
   - 0.4
-  cost_per_request: 2.9e-06
+  cost_per_request: 3.7e-06
   created: '2026-04-28T15:01:44+00:00'
 - api: openrouter
   model: google/gemma-4-31b-it
@@ -1269,7 +1293,7 @@ endpoints_bi:
   cost:
   - 0.26
   - 0.38
-  cost_per_request: 1.68e-06
+  cost_per_request: 3.24e-06
   created: '2025-12-01T13:10:42+00:00'
 - api: openrouter
   model: deepseek/deepseek-v3.2
@@ -1317,7 +1341,7 @@ endpoints_bi:
   cost:
   - 0.269
   - 0.4
-  cost_per_request: 3.359e-06
+  cost_per_request: 1.745e-06
   created: '2025-12-01T13:10:42+00:00'
 - api: openrouter
   model: qwen/qwen3-235b-a22b-2507
@@ -1615,6 +1639,14 @@ endpoints_bi:
   - 0.4
   cost_per_request: 3.2e-06
   created: '2024-11-08T22:04:08+00:00'
+- api: openrouter
+  model: deepseek/deepseek-v3.2
+  provider: venice
+  cost:
+  - 0.33
+  - 0.48
+  cost_per_request: 2.13e-06
+  created: '2025-12-01T13:10:42+00:00'
 - api: openrouter
   model: qwen/qwen3-next-80b-a3b-instruct
   provider: alibaba
@@ -2053,7 +2085,7 @@ endpoints_bi:
   cost:
   - 0.25
   - 1.0
-  cost_per_request: 1.15e-05
+  cost_per_request: 5.5e-06
   created: '2026-06-08T16:45:40+00:00'
 - api: openrouter
   model: qwen/qwen3-235b-a22b-2507
@@ -2189,7 +2221,7 @@ endpoints_bi:
   cost:
   - 0.2
   - 1.1
-  cost_per_request: 1.57e-06
+  cost_per_request: 2.42e-06
   created: '2025-07-25T19:20:58+00:00'
 - api: openrouter
   model: deepseek/deepseek-v4-pro
@@ -2503,14 +2535,6 @@ endpoints_bi:
   - 1.25
   cost_per_request: 4.0e-06
   created: '2026-04-27T03:24:15+00:00'
-- api: openrouter
-  model: google/gemma-4-31b-it
-  provider: sambanova
-  cost:
-  - 0.38
-  - 1.15
-  cost_per_request: 1.445e-05
-  created: '2026-04-02T16:48:06+00:00'
 - api: openrouter
   model: minimax/minimax-m2.5
   provider: venice
@@ -2848,6 +2872,14 @@ endpoints_bi:
   cost_per_request: 1.058e-05
   created: '2025-09-30T12:32:56+00:00'
 - api: openrouter
+  model: z-ai/glm-4.6
+  provider: venice/fp4
+  cost:
+  - 0.43
+  - 1.75
+  cost_per_request: 1.133e-05
+  created: '2025-09-30T12:32:56+00:00'
+- api: openrouter
   model: deepseek/deepseek-chat-v3.1
   provider: wandb/fp8
   cost:
@@ -2866,6 +2898,14 @@ endpoints_bi:
 - api: openrouter
   model: z-ai/glm-4.7
   provider: streamlake
+  cost:
+  - 0.48
+  - 1.76
+  cost_per_request: 4.64e-06
+  created: '2025-12-22T04:33:34+00:00'
+- api: openrouter
+  model: z-ai/glm-4.7
+  provider: streamlake/fp8
   cost:
   - 0.48
   - 1.76
@@ -2981,7 +3021,7 @@ endpoints_bi:
   cost:
   - 0.6
   - 1.8
-  cost_per_request: 5.95e-06
+  cost_per_request: 3.5e-06
   created: '2025-08-11T14:24:48+00:00'
 - api: openrouter
   model: aion-labs/aion-2.0
@@ -3047,6 +3087,14 @@ endpoints_bi:
   - 2.253
   cost_per_request: 1.2801e-05
   created: '2024-12-06T17:28:57+00:00'
+- api: openrouter
+  model: minimax/minimax-m2.7
+  provider: deepinfra/turbo
+  cost:
+  - 0.45
+  - 2.1
+  cost_per_request: 1.965e-05
+  created: '2026-03-18T12:24:57+00:00'
 - api: openrouter
   model: deepseek/deepseek-v4-pro
   provider: streamlake
@@ -3136,13 +3184,13 @@ endpoints_bi:
   cost_per_request: 5.98e-06
   created: '2026-02-11T16:59:42+00:00'
 - api: openrouter
-  model: minimax/minimax-m2.7
-  provider: deepinfra/turbo
+  model: z-ai/glm-5
+  provider: streamlake/fp8
   cost:
-  - 0.5
-  - 2.25
-  cost_per_request: 2.175e-05
-  created: '2026-03-18T12:24:57+00:00'
+  - 0.65
+  - 2.08
+  cost_per_request: 5.98e-06
+  created: '2026-02-11T16:59:42+00:00'
 - api: openrouter
   model: amazon/nova-2-lite-v1
   provider: amazon-bedrock
@@ -3333,7 +3381,7 @@ endpoints_bi:
   cost:
   - 0.6
   - 2.5
-  cost_per_request: 1.27e-05
+  cost_per_request: 7.9e-06
   created: '2025-09-04T21:25:47+00:00'
 - api: openrouter
   model: moonshotai/kimi-k2-thinking
@@ -3455,14 +3503,6 @@ endpoints_bi:
   - 3.0
   cost_per_request: 7.26e-06
   created: '2026-01-27T04:11:16+00:00'
-- api: openrouter
-  model: z-ai/glm-4.6
-  provider: venice/fp4
-  cost:
-  - 0.85
-  - 2.75
-  cost_per_request: 1.885e-05
-  created: '2025-09-30T12:32:56+00:00'
 - api: openrouter
   model: qwen/qwen3-coder-plus
   provider: alibaba
@@ -3629,7 +3669,7 @@ endpoints_bi:
   cost:
   - 0.684
   - 3.42
-  cost_per_request: 6.876e-06
+  cost_per_request: 6.336e-06
   created: '2026-04-20T15:36:42+00:00'
 - api: openrouter
   model: z-ai/glm-4.7
@@ -4013,7 +4053,7 @@ endpoints_bi:
   cost:
   - 1.2
   - 4.0
-  cost_per_request: 9.28e-06
+  cost_per_request: 1.024e-05
   created: '2026-04-01T16:37:38+00:00'
 - api: openrouter
   model: deepseek/deepseek-v4-pro
@@ -4069,15 +4109,15 @@ endpoints_bi:
   cost:
   - 1.2
   - 4.2
-  cost_per_request: 1.98e-05
+  cost_per_request: 8.8e-06
   created: '2026-06-16T17:45:30+00:00'
 - api: openrouter
   model: z-ai/glm-5.2
-  provider: io-net/fp8
+  provider: novita/fp8
   cost:
-  - 1.3
-  - 4.2
-  cost_per_request: 2.11e-05
+  - 1.316
+  - 4.136
+  cost_per_request: 2.1244e-05
   created: '2026-06-16T17:45:30+00:00'
 - api: openrouter
   model: moonshotai/kimi-k2.6
@@ -4089,7 +4129,7 @@ endpoints_bi:
   created: '2026-04-20T15:36:42+00:00'
 - api: openrouter
   model: z-ai/glm-5.2
-  provider: novita/fp8
+  provider: streamlake/fp8
   cost:
   - 1.33
   - 4.18
@@ -4110,6 +4150,14 @@ endpoints_bi:
   - 1.3
   - 4.3
   cost_per_request: 1.34e-05
+  created: '2026-04-07T16:07:05+00:00'
+- api: openrouter
+  model: z-ai/glm-5.1
+  provider: digitalocean
+  cost:
+  - 1.3
+  - 4.3
+  cost_per_request: 1.21e-05
   created: '2026-04-07T16:07:05+00:00'
 - api: openrouter
   model: moonshotai/kimi-k2.6
@@ -4257,14 +4305,6 @@ endpoints_bi:
   created: '2026-06-16T17:45:30+00:00'
 - api: openrouter
   model: z-ai/glm-5.2
-  provider: streamlake/fp8
-  cost:
-  - 1.4
-  - 4.4
-  cost_per_request: 2.26e-05
-  created: '2026-06-16T17:45:30+00:00'
-- api: openrouter
-  model: z-ai/glm-5.2
   provider: together
   cost:
   - 1.4
@@ -4335,6 +4375,14 @@ endpoints_bi:
   - 5.0
   cost_per_request: 1.3e-05
   created: '2025-10-15T17:00:38+00:00'
+- api: openrouter
+  model: z-ai/glm-5.2
+  provider: io-net/fp8
+  cost:
+  - 1.68
+  - 5.28
+  cost_per_request: 2.712e-05
+  created: '2026-06-16T17:45:30+00:00'
 - api: openrouter
   model: openai/gpt-3.5-turbo-16k
   provider: azure
