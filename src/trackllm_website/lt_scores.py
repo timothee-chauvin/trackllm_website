@@ -56,9 +56,11 @@ def load_prompt_logprobs(
         year, month = map(int, month_dir.name.split("-"))
         monthly = MonthlyData.load_existing(path=month_dir, year=year, month=month)
         for date, rl in monthly.logprob_responses:
-            results.append(
-                (date, {tok: float(lp) for tok, lp in zip(rl.tokens, rl.logprobs)})
-            )
+            d = {tok: float(lp) for tok, lp in zip(rl.tokens, rl.logprobs)}
+            # An empty completion (provider returned no logprobs) carries no signal;
+            # keep date/dict pairs aligned by dropping the whole observation.
+            if d:
+                results.append((date, d))
     results.sort(key=lambda x: x[0])
     return results
 
