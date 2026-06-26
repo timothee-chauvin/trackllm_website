@@ -12,6 +12,12 @@ liars:
   cost:
   - 0.28
   - 0.86
+- api: openrouter
+  model: minimax/minimax-m2.7
+  provider: sambanova
+  cost:
+  - 0.6
+  - 2.4
 too_expensive:
 - api: openrouter
   model: aion-labs/aion-1.0
@@ -181,6 +187,12 @@ too_expensive:
   cost:
   - 1.6
   - 3.135
+- api: openrouter
+  model: deepseek/deepseek-v4-pro
+  provider: together
+  cost:
+  - 1.74
+  - 3.48
 - api: openrouter
   model: google/gemini-2.5-flash-image
   provider: google-ai-studio
@@ -782,6 +794,12 @@ too_expensive:
   - 3.0
   - 3.0
 - api: openrouter
+  model: stepfun/step-3.7-flash
+  provider: stepfun/fp8
+  cost:
+  - 0.2
+  - 1.15
+- api: openrouter
   model: thedrummer/cydonia-24b-v4.1
   provider: parasail/bf16
   cost:
@@ -806,8 +824,20 @@ too_expensive:
   - 1.25
   - 2.5
 - api: openrouter
+  model: x-ai/grok-4.20
+  provider: xai/zdr
+  cost:
+  - 1.25
+  - 2.5
+- api: openrouter
   model: x-ai/grok-4.20-multi-agent
   provider: xai
+  cost:
+  - 1.25
+  - 2.5
+- api: openrouter
+  model: x-ai/grok-4.20-multi-agent
+  provider: xai/zdr
   cost:
   - 1.25
   - 2.5
@@ -818,8 +848,20 @@ too_expensive:
   - 1.25
   - 2.5
 - api: openrouter
+  model: x-ai/grok-4.3
+  provider: xai/zdr
+  cost:
+  - 1.25
+  - 2.5
+- api: openrouter
   model: x-ai/grok-build-0.1
   provider: xai
+  cost:
+  - 1.0
+  - 2.0
+- api: openrouter
+  model: x-ai/grok-build-0.1
+  provider: xai/zdr
   cost:
   - 1.0
   - 2.0
@@ -867,10 +909,22 @@ too_expensive:
   - 2.2
 - api: openrouter
   model: z-ai/glm-4.7
+  provider: atlas-cloud/fp8
+  cost:
+  - 0.52
+  - 1.85
+- api: openrouter
+  model: z-ai/glm-4.7
   provider: novita/fp8
   cost:
   - 0.54
   - 1.98
+- api: openrouter
+  model: z-ai/glm-4.7
+  provider: streamlake/fp8
+  cost:
+  - 0.48
+  - 1.76
 - api: openrouter
   model: z-ai/glm-4.7
   provider: z-ai/fp4
@@ -921,6 +975,12 @@ too_expensive:
   - 3.74
 - api: openrouter
   model: z-ai/glm-5.2
+  provider: alibaba
+  cost:
+  - 1.4
+  - 4.4
+- api: openrouter
+  model: z-ai/glm-5.2
   provider: atlas-cloud/fp8
   cost:
   - 1.4
@@ -937,6 +997,12 @@ too_expensive:
   cost:
   - 1.4
   - 4.4
+- api: openrouter
+  model: z-ai/glm-5.2
+  provider: wafer/fast
+  cost:
+  - 3.0
+  - 10.25
 bad_temperature:
 - api: openrouter
   model: anthropic/claude-fable-5
