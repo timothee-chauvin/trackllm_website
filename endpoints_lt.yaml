@@ -36,6 +36,12 @@ endpoints_lt:
   - 0.05
   - 0.1
 - api: openrouter
+  model: openai/gpt-oss-120b
+  provider: mara
+  cost:
+  - 0.03
+  - 0.15
+- api: openrouter
   model: qwen/qwen3-235b-a22b-2507
   provider: wandb/bf16
   cost:
@@ -192,6 +198,12 @@ endpoints_lt:
   - 0.13
   - 0.4
 - api: openrouter
+  model: google/gemma-4-26b-a4b-it
+  provider: wafer/fp8
+  cost:
+  - 0.13
+  - 0.4
+- api: openrouter
   model: meta-llama/llama-3.3-70b-instruct
   provider: akashml/fp8
   cost:
@@ -239,6 +251,12 @@ endpoints_lt:
   cost:
   - 0.17
   - 0.43
+- api: openrouter
+  model: qwen/qwen3-235b-a22b-2507
+  provider: streamlake
+  cost:
+  - 0.126
+  - 0.504
 - api: openrouter
   model: deepseek/deepseek-v3.2
   provider: atlas-cloud/fp8
@@ -318,12 +336,6 @@ endpoints_lt:
   - 0.4
   - 0.4
 - api: openrouter
-  model: openai/gpt-oss-120b
-  provider: mara
-  cost:
-  - 0.15
-  - 0.75
-- api: openrouter
   model: qwen/qwen3-coder-next
   provider: ionstream/fp8
   cost:
@@ -359,12 +371,6 @@ endpoints_lt:
   cost:
   - 0.22
   - 0.8
-- api: openrouter
-  model: qwen/qwen3-235b-a22b-2507
-  provider: streamlake
-  cost:
-  - 0.21
-  - 0.84
 - api: openrouter
   model: qwen/qwen3-235b-a22b-2507
   provider: google-vertex/us-south1
@@ -569,6 +575,12 @@ endpoints_lt:
   cost:
   - 1.21
   - 4.2
+- api: openrouter
+  model: z-ai/glm-5.2
+  provider: alibaba
+  cost:
+  - 1.4
+  - 4.4
 - api: openrouter
   model: openai/gpt-3.5-turbo-16k
   provider: azure
