@@ -23,7 +23,7 @@
       "endpoint": "deepseek2fdeepseek-chat-v3-032423chutes2ffp8",
       "index": 382,
       "date": "2025-08-28T14:00:32Z",
-      "sigma": 3.6194649420771914e38,
+      "sigma": 3.619464942077191e38,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     },
     {
@@ -39,7 +39,7 @@
       "endpoint": "deepseek2fdeepseek-chat-v3-032423crusoe2ffp8",
       "index": 4510,
       "date": "2026-01-11T09:23:55Z",
-      "sigma": 98.7734765596714,
+      "sigma": 98.77347655967138,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -140,7 +140,7 @@
       "endpoint": "deepseek2fdeepseek-chat-v3.123fireworks",
       "index": 231,
       "date": "2025-09-07T06:00:28Z",
-      "sigma": 224.91250802254476,
+      "sigma": 224.91250802254467,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -180,7 +180,7 @@
       "endpoint": "deepseek2fdeepseek-r1-052823chutes",
       "index": 291,
       "date": "2025-08-24T18:00:13Z",
-      "sigma": 1.470809484133443e38,
+      "sigma": 1.4708094841334432e38,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     },
     {
@@ -203,14 +203,14 @@
       "endpoint": "deepseek2fdeepseek-r1-052823crusoe2ffp8",
       "index": 1677,
       "date": "2025-10-01T14:00:26Z",
-      "sigma": 12.733588769630904,
+      "sigma": 12.733588769630906,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     },
     {
       "endpoint": "deepseek2fdeepseek-r1-052823crusoe2ffp8",
       "index": 4500,
       "date": "2026-01-11T09:23:54Z",
-      "sigma": 17.326716984761347,
+      "sigma": 17.326716984761344,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -243,7 +243,7 @@
       "endpoint": "deepseek2fdeepseek-r1-052823lambda2ffp8",
       "index": 411,
       "date": "2025-08-25T23:00:18Z",
-      "sigma": 14.436462201482641,
+      "sigma": 14.436462201482637,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -276,7 +276,7 @@
       "endpoint": "deepseek2fdeepseek-r1-distill-llama-70b23chutes",
       "index": 1094,
       "date": "2025-09-27T12:00:24Z",
-      "sigma": 9.959690397997103e38,
+      "sigma": 9.959690397997104e38,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -287,7 +287,7 @@
       "endpoint": "deepseek2fdeepseek-r1-distill-llama-70b3afree23chutes",
       "index": 1714,
       "date": "2025-09-25T03:00:40Z",
-      "sigma": 4.628737448145878e38,
+      "sigma": 4.628737448145879e38,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -297,7 +297,7 @@
       "endpoint": "deepseek2fdeepseek-r123lambda2ffp8",
       "index": 157,
       "date": "2025-07-04T09:00:08Z",
-      "sigma": 22.49750307248223,
+      "sigma": 22.497503072482218,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -382,7 +382,7 @@
       "endpoint": "meta-llama2fllama-3.3-70b-instruct23fireworks2ffp16",
       "index": 4518,
       "date": "2025-12-18T21:23:13Z",
-      "sigma": 39.0400003545166,
+      "sigma": 39.04000035451659,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -435,7 +435,7 @@
       "endpoint": "minimax2fminimax-m223fireworks",
       "index": 185,
       "date": "2025-12-12T10:24:26Z",
-      "sigma": 190.87788888931354,
+      "sigma": 190.8778888893136,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -454,7 +454,7 @@
       "endpoint": "mistralai2fdevstral-small-25053afree23chutes",
       "index": 153,
       "date": "2025-09-06T14:00:28Z",
-      "sigma": 591.5032486162677,
+      "sigma": 591.5032486162676,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -493,7 +493,7 @@
       "endpoint": "mistralai2fmistral-small-3.1-24b-instruct3afree23chutes",
       "index": 682,
       "date": "2025-08-04T08:01:22Z",
-      "sigma": 4.97885514228528e39,
+      "sigma": 4.978855142285281e39,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     },
     {
@@ -517,7 +517,7 @@
       "endpoint": "mistralai2fmistral-small-3.2-24b-instruct3afree23chutes",
       "index": 652,
       "date": "2025-08-03T13:02:33Z",
-      "sigma": 302.466945915033,
+      "sigma": 302.46694591503297,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     },
     {
@@ -607,7 +607,7 @@
       "endpoint": "nousresearch2fhermes-4-405b23nebius2ffp8",
       "index": 1157,
       "date": "2025-10-15T22:00:18Z",
-      "sigma": 67.99237192506276,
+      "sigma": 67.99237192506278,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -648,7 +648,7 @@
       "endpoint": "openai2fgpt-4o-2024-08-0623azure",
       "index": 2438,
       "date": "2025-10-08T10:00:21Z",
-      "sigma": 24.160465797780084,
+      "sigma": 24.16046579778009,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     },
     {
@@ -764,7 +764,7 @@
       "endpoint": "qwen2fqwen3-32b23chutes",
       "index": 549,
       "date": "2025-09-04T20:00:14Z",
-      "sigma": 1.2221813074930733e39,
+      "sigma": 1.222181307493073e39,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -788,7 +788,7 @@
       "endpoint": "qwen2fqwen3-coder23fireworks",
       "index": 4199,
       "date": "2026-02-05T06:35:00Z",
-      "sigma": 29.225446966752823,
+      "sigma": 29.22544696675283,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -835,7 +835,7 @@
       "endpoint": "thudm2fglm-z1-32b3afree23chutes",
       "index": 350,
       "date": "2025-07-21T10:01:10Z",
-      "sigma": 507.33120718235847,
+      "sigma": 507.33120718235836,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -895,7 +895,7 @@
       "endpoint": "x-ai2fgrok-423xai",
       "index": 1656,
       "date": "2025-09-30T04:00:33Z",
-      "sigma": 1.6774059797944101e38,
+      "sigma": 1.67740597979441e38,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -930,7 +930,7 @@
       "endpoint": "z-ai2fglm-4.523chutes2ffp8",
       "index": 481,
       "date": "2025-09-03T11:00:25Z",
-      "sigma": 2.1062133370881694e39,
+      "sigma": 2.1062133370881697e39,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     },
     {
