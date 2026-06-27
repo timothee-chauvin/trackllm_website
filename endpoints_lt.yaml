@@ -54,12 +54,6 @@ endpoints_lt:
   - 0.1
   - 0.1
 - api: openrouter
-  model: microsoft/phi-4
-  provider: nextbit/int4
-  cost:
-  - 0.065
-  - 0.14
-- api: openrouter
   model: mistralai/mistral-nemo
   provider: novita/fp8
   cost:
@@ -246,18 +240,6 @@ endpoints_lt:
   - 0.3
   - 0.3
 - api: openrouter
-  model: thedrummer/rocinante-12b
-  provider: nextbit/bf16
-  cost:
-  - 0.17
-  - 0.43
-- api: openrouter
-  model: qwen/qwen3-235b-a22b-2507
-  provider: streamlake
-  cost:
-  - 0.126
-  - 0.504
-- api: openrouter
   model: deepseek/deepseek-v3.2
   provider: atlas-cloud/fp8
   cost:
@@ -336,6 +318,12 @@ endpoints_lt:
   - 0.4
   - 0.4
 - api: openrouter
+  model: qwen/qwen3-vl-30b-a3b-instruct
+  provider: novita/bf16
+  cost:
+  - 0.2
+  - 0.7
+- api: openrouter
   model: qwen/qwen3-coder-next
   provider: ionstream/fp8
   cost:
@@ -366,11 +354,11 @@ endpoints_lt:
   - 0.25
   - 0.75
 - api: openrouter
-  model: deepseek/deepseek-chat-v3-0324
-  provider: modelrun/fp4
+  model: qwen/qwen3-235b-a22b-2507
+  provider: streamlake
   cost:
-  - 0.22
-  - 0.8
+  - 0.21
+  - 0.84
 - api: openrouter
   model: qwen/qwen3-235b-a22b-2507
   provider: google-vertex/us-south1
@@ -437,6 +425,12 @@ endpoints_lt:
   cost:
   - 0.8
   - 0.8
+- api: openrouter
+  model: qwen/qwen3-next-80b-a3b-instruct
+  provider: novita/bf16
+  cost:
+  - 0.15
+  - 1.5
 - api: openrouter
   model: deepseek/deepseek-v3.2
   provider: digitalocean
@@ -515,6 +509,12 @@ endpoints_lt:
   cost:
   - 0.9
   - 1.9
+- api: openrouter
+  model: minimax/minimax-m3
+  provider: morph
+  cost:
+  - 0.6
+  - 2.4
 - api: openrouter
   model: openai/gpt-3.5-turbo-0613
   provider: azure
