@@ -302,6 +302,12 @@ too_expensive:
   - 0.3
   - 1.2
 - api: openrouter
+  model: minimax/minimax-m2.5
+  provider: venice
+  cost:
+  - 0.34
+  - 1.19
+- api: openrouter
   model: minimax/minimax-m2.7
   provider: sambanova/minimax-m2.7-dedicated
   cost:
@@ -993,6 +999,12 @@ too_expensive:
   - 4.4
 - api: openrouter
   model: z-ai/glm-5.2
+  provider: ambient/fp8
+  cost:
+  - 1.2
+  - 4.2
+- api: openrouter
+  model: z-ai/glm-5.2
   provider: atlas-cloud/fp8
   cost:
   - 1.4
@@ -1003,6 +1015,12 @@ too_expensive:
   cost:
   - 0.98
   - 3.08
+- api: openrouter
+  model: z-ai/glm-5.2
+  provider: novita/fp8
+  cost:
+  - 1.26
+  - 3.96
 - api: openrouter
   model: z-ai/glm-5.2
   provider: streamlake
