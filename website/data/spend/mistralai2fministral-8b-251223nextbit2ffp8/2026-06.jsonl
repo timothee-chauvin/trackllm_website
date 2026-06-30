@@ -141,3 +141,4 @@
 {"timestamp":"2026-06-30T13:03:18Z","kind":"lt","cost":3e-6,"n_queries":2,"n_errors":0}
 {"timestamp":"2026-06-30T13:59:08Z","kind":"lt","cost":3e-6,"n_queries":2,"n_errors":0}
 {"timestamp":"2026-06-30T15:13:09Z","kind":"lt","cost":3e-6,"n_queries":2,"n_errors":0}
+{"timestamp":"2026-06-30T16:09:56Z","kind":"lt","cost":0.0,"n_queries":2,"n_errors":2}
