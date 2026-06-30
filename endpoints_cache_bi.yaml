@@ -339,6 +339,12 @@ too_expensive:
   - 1.2
 - api: openrouter
   model: minimax/minimax-m3
+  provider: novita/fp8
+  cost:
+  - 0.3
+  - 1.2
+- api: openrouter
+  model: minimax/minimax-m3
   provider: parasail/fp8
   cost:
   - 0.3
@@ -967,6 +973,12 @@ too_expensive:
   cost:
   - 1.0
   - 3.2
+- api: openrouter
+  model: z-ai/glm-5.1
+  provider: atlas-cloud/fp8
+  cost:
+  - 1.26
+  - 3.96
 - api: openrouter
   model: z-ai/glm-5.1
   provider: gmicloud/fp8

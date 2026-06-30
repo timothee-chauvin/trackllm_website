@@ -84,6 +84,12 @@ endpoints_lt:
   - 0.1
   - 0.2
 - api: openrouter
+  model: rekaai/reka-flash-3
+  provider: reka/fp8
+  cost:
+  - 0.1
+  - 0.2
+- api: openrouter
   model: deepseek/deepseek-v4-flash
   provider: digitalocean
   cost:
@@ -395,12 +401,6 @@ endpoints_lt:
   cost:
   - 0.35
   - 1.0
-- api: openrouter
-  model: thedrummer/skyfall-36b-v2
-  provider: parasail/fp8
-  cost:
-  - 0.55
-  - 0.8
 - api: openrouter
   model: sao10k/l3.3-euryale-70b
   provider: nextbit/bf16
