@@ -159,6 +159,12 @@ too_expensive:
   - 1.0284
 - api: openrouter
   model: deepseek/deepseek-v4-flash
+  provider: alibaba
+  cost:
+  - 0.134
+  - 0.268
+- api: openrouter
+  model: deepseek/deepseek-v4-flash
   provider: atlas-cloud/fp8
   cost:
   - 0.14
@@ -181,6 +187,12 @@ too_expensive:
   cost:
   - 1.608
   - 3.216
+- api: openrouter
+  model: deepseek/deepseek-v4-pro
+  provider: gmicloud/fp8
+  cost:
+  - 1.131
+  - 2.262
 - api: openrouter
   model: deepseek/deepseek-v4-pro
   provider: siliconflow/fp8
@@ -1160,6 +1172,48 @@ bad_temperature:
   cost:
   - 10.0
   - 50.0
+- api: openrouter
+  model: anthropic/claude-sonnet-5
+  provider: amazon-bedrock/claude-on-aws
+  cost:
+  - 2.0
+  - 10.0
+- api: openrouter
+  model: anthropic/claude-sonnet-5
+  provider: amazon-bedrock/global
+  cost:
+  - 2.0
+  - 10.0
+- api: openrouter
+  model: anthropic/claude-sonnet-5
+  provider: amazon-bedrock/us-east-1
+  cost:
+  - 2.2
+  - 11.0
+- api: openrouter
+  model: anthropic/claude-sonnet-5
+  provider: anthropic
+  cost:
+  - 2.0
+  - 10.0
+- api: openrouter
+  model: anthropic/claude-sonnet-5
+  provider: azure
+  cost:
+  - 2.0
+  - 10.0
+- api: openrouter
+  model: anthropic/claude-sonnet-5
+  provider: google-vertex/europe
+  cost:
+  - 2.2
+  - 11.0
+- api: openrouter
+  model: anthropic/claude-sonnet-5
+  provider: google-vertex/global
+  cost:
+  - 2.0
+  - 10.0
 - api: openrouter
   model: openai/gpt-4o-mini-search-preview
   provider: openai

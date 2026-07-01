@@ -228,18 +228,6 @@ endpoints_lt:
   - 0.15
   - 0.4
 - api: openrouter
-  model: deepseek/deepseek-v3.2
-  provider: streamlake
-  cost:
-  - 0.2288
-  - 0.3432
-- api: openrouter
-  model: deepseek/deepseek-v3.2
-  provider: streamlake/fp8
-  cost:
-  - 0.2288
-  - 0.3432
-- api: openrouter
   model: mistralai/ministral-8b-2512
   provider: nextbit/fp8
   cost:
@@ -257,12 +245,6 @@ endpoints_lt:
   cost:
   - 0.1625
   - 0.5
-- api: openrouter
-  model: deepseek/deepseek-v3.2-exp
-  provider: atlas-cloud/fp8
-  cost:
-  - 0.27
-  - 0.41
 - api: openrouter
   model: inclusionai/ling-2.6-1t
   provider: novita
@@ -402,6 +384,12 @@ endpoints_lt:
   - 0.35
   - 1.0
 - api: openrouter
+  model: thedrummer/skyfall-36b-v2
+  provider: parasail/fp8
+  cost:
+  - 0.55
+  - 0.8
+- api: openrouter
   model: sao10k/l3.3-euryale-70b
   provider: nextbit/bf16
   cost:
@@ -509,12 +497,6 @@ endpoints_lt:
   cost:
   - 0.9
   - 1.9
-- api: openrouter
-  model: minimax/minimax-m3
-  provider: morph
-  cost:
-  - 0.6
-  - 2.4
 - api: openrouter
   model: openai/gpt-3.5-turbo-0613
   provider: azure
