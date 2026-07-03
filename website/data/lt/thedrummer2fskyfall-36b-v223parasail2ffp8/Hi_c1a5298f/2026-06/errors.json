@@ -1,1 +1,1 @@
-{"seen_errors":[{"http_code":0,"message":"'usage'"}]}
+{"seen_errors":[{"http_code":0,"message":"'usage'"},{"http_code":403,"message":"{\"message\":\"Provider returned error\",\"code\":403,\"metadata\":{\"raw\":\"{\\\"error\\\":{\\\"message\\\":\\\"Deployment parasail-skyfall-36b-v2-fp8 doesn't exist or isn't accessible.\\\",\\\"type\\\":\\\"invalid_request_error\\\",\\\"param\\\":null,\\\"code\\\":null}}\",\"provider_name\":\"Parasail\",\"is_byok\":false}}"}]}

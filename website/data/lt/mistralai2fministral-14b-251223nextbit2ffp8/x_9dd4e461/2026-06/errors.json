@@ -1,1 +1,1 @@
-{"seen_errors":[]}
+{"seen_errors":[{"http_code":429,"message":"{\"message\":\"Provider returned error\",\"code\":429,\"metadata\":{\"raw\":\"mistralai/ministral-14b-2512 is temporarily rate-limited upstream. Please retry shortly, or add your own key to accumulate your rate limits: https://openrouter.ai/settings/integrations\",\"provider_name\":\"NextBit\",\"is_byok\":false,\"retry_after_seconds\":10,\"retry_after_seconds_raw\":10,\"headers\":{\"Retry-After\":\"10\"}}}"}]}

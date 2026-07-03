@@ -1,0 +1,16 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "qwen/qwen3-vl-30b-a3b-instruct",
+    "provider": "novita/bf16",
+    "cost": [
+      0.2,
+      0.7
+    ],
+    "max_logprobs": null,
+    "cost_per_request": null,
+    "created": null,
+    "supports_temperature": null
+  }
+}

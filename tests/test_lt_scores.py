@@ -1,17 +1,21 @@
 import math
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 import numpy as np
 import orjson
 
+from trackllm_website.config import Endpoint
 from trackllm_website.lt_scores import (
     N_PER_TEST,
     SIGMA_INF_THRESHOLD,
     ChangePoint,
     LTScores,
+    compute_endpoint_scores,
     detect_changes,
     normalize_sigma,
 )
+from trackllm_website.storage import Response, ResponseLogprobs, ResultsStorage
 
 START = datetime(2026, 1, 1, tzinfo=timezone.utc)
 
@@ -82,3 +86,38 @@ def test_near_zero_variance_jump_normalizes_huge_finite_sigma_to_none():
     changes, _ = detect_changes(scores)
     detected = next(cp for cp in changes if abs(cp.index - 175) <= 1)
     assert detected.sigma is None
+
+
+def test_empty_logprob_response_is_skipped(tmp_path):
+    """A provider returning an empty completion stores a logprob response with no
+    tokens. Such an observation carries no signal and previously crashed scoring
+    with `ValueError: min() iterable argument is empty` in build_tensor, which
+    took down every hourly run-main. It must be dropped, not crash."""
+    ep = Endpoint(api="openrouter", model="org/model", provider="prov", cost=(1, 1))
+    storage = ResultsStorage(Path(tmp_path) / "lt")
+    base = datetime(2026, 6, 1, tzinfo=timezone.utc)
+    n = 2 * N_PER_TEST + 1
+    for i in range(n):
+        # One real provider returned tokens=[]/logprobs=[] (empty completion).
+        lp = (
+            ResponseLogprobs(tokens=[], logprobs=[])
+            if i == n // 2
+            else ResponseLogprobs(
+                tokens=["a", "b"],
+                logprobs=[np.float32(-0.1 - 0.01 * i), np.float32(-1.0)],
+            )
+        )
+        storage.store_response(
+            Response(
+                date=base + timedelta(hours=i),
+                endpoint=ep,
+                prompt="Hi",
+                logprobs=lp,
+                cost=0,
+            )
+        )
+
+    endpoint_dir = Path(tmp_path) / "lt" / "org2fmodel23prov"
+    result = compute_endpoint_scores(endpoint_dir)
+    assert result is not None
+    assert len(result.dates) == len(result.scores)
