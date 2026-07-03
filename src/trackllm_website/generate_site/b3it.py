@@ -1,7 +1,6 @@
 """Build-time derivation of per-endpoint B3IT display data."""
 
 from dataclasses import dataclass
-from datetime import datetime
 from pathlib import Path
 
 from trackllm_website.bi.analyze import load_phase2_results
@@ -30,19 +29,10 @@ class B3ITView:
 def current_epoch_results(
     state: EndpointBIState, results: dict
 ) -> tuple[Epoch | None, dict]:
-    """Mirror monitor.decide (lines 54-79): last open epoch + filtered results."""
     epoch = state.current_epoch
     if epoch is None:
         return None, {}
-    epoch_results = {
-        p: {
-            ts: s
-            for ts, s in results.get(p, {}).items()
-            if datetime.fromisoformat(ts) >= epoch.start
-        }
-        for p in epoch.border_inputs
-    }
-    return epoch, epoch_results
+    return epoch, epoch.filter_results(results)
 
 
 def _iso(dt) -> str | None:
