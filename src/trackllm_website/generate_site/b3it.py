@@ -92,6 +92,12 @@ def discover_b3it_views(state_dir: Path, phase_2_dir: Path) -> dict[str, B3ITVie
     if not state_dir.exists():
         return views
     for state in load_all_states(state_dir).values():
-        results = load_phase2_results(phase_2_dir / state.slug)
+        # derive_b3it only reads results for the open epoch; skip the (large)
+        # phase_2 load entirely for closed-epoch endpoints.
+        results = (
+            load_phase2_results(phase_2_dir / state.slug)
+            if state.current_epoch is not None
+            else {}
+        )
         views[state.slug] = derive_b3it(state, results)
     return views
