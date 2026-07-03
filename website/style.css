@@ -354,6 +354,16 @@ tr:hover {
   font-size: 0.875rem;
 }
 
+.spend-strip {
+  margin-bottom: 3rem;
+  padding: 0.6rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
 tr.recent {
   border-left: 3px solid var(--accent);
   background: rgba(9, 105, 218, 0.04);
