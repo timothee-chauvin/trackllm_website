@@ -1,7 +1,8 @@
-import json
 from collections import defaultdict
 from datetime import date, timedelta
 from pathlib import Path
+
+from trackllm_website.spend import iter_ledger
 
 GROUPS = {
     "onboard": "onboarding",
@@ -24,21 +25,15 @@ def aggregate_spend(spend_dir: Path, today: str) -> dict:
     by_endpoint: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
     cutoff = date.fromisoformat(today) - timedelta(days=30)
 
-    if spend_dir.exists():
-        for f in sorted(spend_dir.glob("*/*.jsonl")):
-            slug = f.parent.name
-            for line in f.read_text().splitlines():
-                if not line.strip():
-                    continue
-                rec = json.loads(line)
-                g = group_for_kind(rec["kind"])
-                cost = rec["cost"]
-                day = str(rec["timestamp"])[:10]
-                cumulative[g] += cost
-                by_endpoint[slug][g] += cost
-                daily[day][g] += cost
-                if date.fromisoformat(day) > cutoff:
-                    last_30d[g] += cost
+    for slug, rec in iter_ledger(spend_dir):
+        g = group_for_kind(rec["kind"])
+        cost = rec["cost"]
+        day = str(rec["timestamp"])[:10]
+        cumulative[g] += cost
+        by_endpoint[slug][g] += cost
+        daily[day][g] += cost
+        if date.fromisoformat(day) > cutoff:
+            last_30d[g] += cost
 
     by_ep = [
         {"slug": s, "groups": dict(g), "total": sum(g.values())}

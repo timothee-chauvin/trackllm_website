@@ -103,28 +103,28 @@ def append_entry(
         )
 
 
-def today_by_kind(spend_dir: Path, day: str) -> dict[str, float]:
-    totals: dict[str, float] = defaultdict(float)
+def iter_ledger(spend_dir: Path) -> Iterator[tuple[str, dict]]:
+    """Yield (slug, record) for every line of every per-endpoint ledger file."""
     if not spend_dir.exists():
-        return dict(totals)
-    for f in spend_dir.glob("*/*.jsonl"):
+        return
+    for f in sorted(spend_dir.glob("*/*.jsonl")):
+        slug = f.parent.name
         for line in f.read_bytes().splitlines():
             if not line.strip():
                 continue
-            rec = orjson.loads(line)
-            if str(rec["timestamp"]).startswith(day):
-                totals[rec["kind"]] += rec["cost"]
+            yield slug, orjson.loads(line)
+
+
+def today_by_kind(spend_dir: Path, day: str) -> dict[str, float]:
+    totals: dict[str, float] = defaultdict(float)
+    for _, rec in iter_ledger(spend_dir):
+        if str(rec["timestamp"]).startswith(day):
+            totals[rec["kind"]] += rec["cost"]
     return dict(totals)
 
 
 def cumulative_by_kind(spend_dir: Path) -> dict[str, float]:
     totals: dict[str, float] = defaultdict(float)
-    if not spend_dir.exists():
-        return dict(totals)
-    for f in spend_dir.glob("*/*.jsonl"):
-        for line in f.read_bytes().splitlines():
-            if not line.strip():
-                continue
-            rec = orjson.loads(line)
-            totals[rec["kind"]] += rec["cost"]
+    for _, rec in iter_ledger(spend_dir):
+        totals[rec["kind"]] += rec["cost"]
     return dict(totals)
