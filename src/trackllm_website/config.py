@@ -225,9 +225,16 @@ class Config(BaseSettings):
     endpoints_bi: list[Endpoint] = []
     endpoints_bi_prevalence: list[Endpoint] = []
 
-    # read from .env
-    openrouter_api_key: str
+    # read from .env; None so API-less jobs (the Pages site build) can load config
+    openrouter_api_key: str | None = None
     hf_token: str | None = None
+
+    def require_openrouter_api_key(self) -> str:
+        if self.openrouter_api_key is None:
+            raise RuntimeError(
+                "OPENROUTER_API_KEY is not set; it is required to query the OpenRouter API"
+            )
+        return self.openrouter_api_key
 
     @property
     def lt_dir(self) -> Path:

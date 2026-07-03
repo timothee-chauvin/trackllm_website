@@ -25,7 +25,15 @@ POLICY = SelectionPolicy(
     budget_per_month=10.0,
     max_endpoint_cost=0.50,
     exclude=[],
-    rules=[Rule(name="flagships", kind="models", patterns=["flag/*"], flagship=True)],
+    rules=[
+        Rule(
+            name="flagships",
+            kind="models",
+            patterns=["flag/*"],
+            providers_per_model=1,
+            flagship=True,
+        )
+    ],
 )
 
 

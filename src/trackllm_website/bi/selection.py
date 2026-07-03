@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 from trackllm_website.config import Endpoint, config, logger
 
@@ -21,6 +21,16 @@ class Rule(BaseModel):
     max_monthly_cost: float | None = None
     latest_n: int | None = None
     flagship: bool = False
+
+    @model_validator(mode="after")
+    def _require_selection_width(self) -> "Rule":
+        # A None width would silently slice eps[:None] == all providers.
+        if self.kind == "providers":
+            if self.endpoints_per_provider is None:
+                raise ValueError(f"rule {self.name!r}: endpoints_per_provider required")
+        elif self.providers_per_model is None:
+            raise ValueError(f"rule {self.name!r}: providers_per_model required")
+        return self
 
 
 class SelectionPolicy(BaseModel):
