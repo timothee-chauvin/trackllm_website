@@ -17,5 +17,5 @@
 
 {% block scripts %}
     <script type="application/json" id="manifest">{{ manifest_json | safe }}</script>
-    <script src="../js/endpoint.js"></script>
+    <script type="module" src="../js/endpoint.js"></script>
 {% endblock %}
