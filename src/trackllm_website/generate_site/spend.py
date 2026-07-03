@@ -12,10 +12,17 @@ GROUPS = {
     "lt": "lt",
     "vetting": "vetting",
 }
+# Display order, emitted in spend.json as the single source of truth for the
+# spend page's columns and the chart's traces.
+GROUP_ORDER = ["onboarding", "monitoring", "lt", "vetting", "other"]
 
 
 def group_for_kind(kind: str) -> str:
     return GROUPS.get(kind, "other")
+
+
+def _ordered(groups: dict[str, float]) -> dict[str, float]:
+    return {g: groups[g] for g in GROUP_ORDER if g in groups}
 
 
 def aggregate_spend(spend_dir: Path, today: str) -> dict:
@@ -36,13 +43,14 @@ def aggregate_spend(spend_dir: Path, today: str) -> dict:
             last_30d[g] += cost
 
     by_ep = [
-        {"slug": s, "groups": dict(g), "total": sum(g.values())}
+        {"slug": s, "groups": _ordered(g), "total": sum(g.values())}
         for s, g in by_endpoint.items()
     ]
     by_ep.sort(key=lambda r: r["total"], reverse=True)
     return {
-        "cumulative": dict(cumulative),
-        "last_30d": dict(last_30d),
-        "daily": [{"date": d, "groups": dict(g)} for d, g in sorted(daily.items())],
+        "group_order": GROUP_ORDER,
+        "cumulative": _ordered(cumulative),
+        "last_30d": _ordered(last_30d),
+        "daily": [{"date": d, "groups": _ordered(g)} for d, g in sorted(daily.items())],
         "by_endpoint": by_ep,
     }

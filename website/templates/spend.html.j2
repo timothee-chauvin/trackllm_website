@@ -30,11 +30,7 @@
             <thead>
               <tr>
                 <th>Endpoint</th>
-                <th>Onboarding</th>
-                <th>Monitoring</th>
-                <th>LT</th>
-                <th>Vetting</th>
-                <th>Other</th>
+                {% for g in spend.group_order %}<th>{{ g }}</th>{% endfor %}
                 <th>Total</th>
               </tr>
             </thead>
@@ -42,11 +38,9 @@
             {% for ep in spend.by_endpoint %}
               <tr>
                 <td><a href="endpoints/{{ ep.slug }}.html">{{ ep.slug }}</a></td>
-                <td>{% if ep.groups.onboarding %}${{ "%.4f"|format(ep.groups.onboarding) }}{% else %}—{% endif %}</td>
-                <td>{% if ep.groups.monitoring %}${{ "%.4f"|format(ep.groups.monitoring) }}{% else %}—{% endif %}</td>
-                <td>{% if ep.groups.lt %}${{ "%.4f"|format(ep.groups.lt) }}{% else %}—{% endif %}</td>
-                <td>{% if ep.groups.vetting %}${{ "%.4f"|format(ep.groups.vetting) }}{% else %}—{% endif %}</td>
-                <td>{% if ep.groups.other %}${{ "%.4f"|format(ep.groups.other) }}{% else %}—{% endif %}</td>
+                {% for g in spend.group_order %}
+                <td>{% if g in ep.groups %}${{ "%.4f"|format(ep.groups[g]) }}{% else %}—{% endif %}</td>
+                {% endfor %}
                 <td>${{ "%.4f"|format(ep.total) }}</td>
               </tr>
             {% endfor %}

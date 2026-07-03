@@ -61,3 +61,13 @@ def test_aggregate(tmp_path):
     assert totals == sorted(totals, reverse=True), f"Totals not descending: {totals}"
     assert out["by_endpoint"][0]["slug"] == "s1"
     assert out["by_endpoint"][1]["slug"] == "s2"
+
+
+def test_group_order_emitted_and_zero_cost_groups_kept(tmp_path):
+    d = tmp_path / "s0"
+    d.mkdir(parents=True)
+    (d / "2026-06.jsonl").write_text(_line("2026-06-24T00:00:00Z", "lt", 0.0) + "\n")
+    out = aggregate_spend(tmp_path, "2026-06-24")
+    assert out["group_order"] == ["onboarding", "monitoring", "lt", "vetting", "other"]
+    # A zero-cost run is data ("billed $0"), distinct from "no data": the key stays.
+    assert out["by_endpoint"][0]["groups"]["lt"] == 0.0

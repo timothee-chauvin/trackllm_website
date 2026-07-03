@@ -100,25 +100,27 @@ def test_render_emits_b3it_json_and_b3it_only_page(tmp_path):
     )
 
 
+def _spend_line(kind, cost):
+    return json.dumps(
+        {
+            "timestamp": "2026-06-24T00:00:00Z",
+            "kind": kind,
+            "cost": cost,
+            "n_queries": 1,
+            "n_errors": 0,
+        }
+    )
+
+
 def test_render_emits_spend(tmp_path):
     _scaffold(tmp_path)
-    import json
-
     sp = tmp_path / "data" / "spend" / "m2fa23p"
     sp.mkdir(parents=True)
-    (sp / "2026-06.jsonl").write_text(
-        json.dumps(
-            {
-                "timestamp": "2026-06-24T00:00:00Z",
-                "kind": "lt",
-                "cost": 0.05,
-                "n_queries": 1,
-                "n_errors": 0,
-            }
-        )
-        + "\n"
-    )
-    from trackllm_website.generate_site.render import render_site
+    (sp / "2026-06.jsonl").write_text(_spend_line("lt", 0.05) + "\n")
+    # an all-error endpoint: real data ($0 billed), must not render as "no data"
+    zp = tmp_path / "data" / "spend" / "zero2fcost23ep"
+    zp.mkdir(parents=True)
+    (zp / "2026-06.jsonl").write_text(_spend_line("lt", 0.0) + "\n")
 
     render_site(tmp_path)
     assert (tmp_path / "data" / "spend.json").exists()
@@ -129,6 +131,10 @@ def test_render_emits_spend(tmp_path):
     spend_html = (tmp_path / "spend.html").read_text()
     assert "$0.0500" in spend_html, "Cost should render as $0.0500 (4 decimal places)"
     assert "m2fa23p" in spend_html, "Endpoint slug should appear in spend table"
+
+    # Zero-billed group renders as $0.0000 (lt cell + total), not as the no-data dash
+    zero_row = next(r for r in spend_html.split("<tr>") if "zero2fcost23ep" in r)
+    assert zero_row.count("$0.0000") == 2
 
     # Assert emitted spend.json has expected cumulative cost
     spend_data = json.loads((tmp_path / "data" / "spend.json").read_text())
