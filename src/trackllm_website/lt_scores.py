@@ -26,8 +26,16 @@ STAT_RUNNING_STD_WINDOW = 100
 STAT_EXCLUSION_ZONE = 2 * N_PER_TEST
 STAT_ABSOLUTE_THRESHOLD = 1.0
 PEAK_DISTANCE = N_PER_TEST
+# Deviations at/above this arise from a near-zero (but nonzero) baseline std and
+# are effectively infinite: represented as None, displayed as ∞ by all consumers.
+SIGMA_INF_THRESHOLD = 1e4
 
 SCORES_FILENAME = "lt_scores.json"
+
+
+def normalize_sigma(value: float) -> float | None:
+    """None when the deviation is undefined, non-finite, or effectively infinite."""
+    return value if np.isfinite(value) and abs(value) < SIGMA_INF_THRESHOLD else None
 
 
 class ChangePoint(BaseModel):
@@ -135,8 +143,7 @@ def detect_changes(
     # A zero-variance window yields an infinite deviation; orjson serializes inf
     # (and NaN) to JSON `null`, so never let a non-finite value into a ChangePoint.
     return [
-        ChangePoint(index=p, sigma=float(sigmas[p]) if np.isfinite(sigmas[p]) else None)
-        for p in peaks
+        ChangePoint(index=p, sigma=normalize_sigma(float(sigmas[p]))) for p in peaks
     ], sigmas
 
 
@@ -181,7 +188,7 @@ def compute_endpoint_scores(endpoint_dir: Path) -> LTScores | None:
         n_per_test=N_PER_TEST,
         dates=ref_dates,
         scores=avg_scores.tolist(),
-        sigmas=[None if not np.isfinite(v) else v for v in sigmas.tolist()],
+        sigmas=[normalize_sigma(v) for v in sigmas.tolist()],
         changes=changes,
     )
 
