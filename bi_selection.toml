@@ -1,17 +1,25 @@
-# BI monitoring selection policy.
+# BI monitoring selection policy. The ONLY place cost is managed.
+# Rules run top to bottom; each adds endpoints (no duplicates) until
+# budget_per_month is reached. Per-endpoint monthly cost = measured
+# cost_per_request x config.bi.samples_per_month (20 BIs x 10 samples x 30 days).
 #
-# SELECTION EMPTIED 2026-06-21 to prevent unattended onboarding spend overnight.
-# With no [[rule]] blocks and exclude = ["*"], select_monitoring_targets returns
-# zero endpoints, so update_endpoints_bi_lifecycle onboards/rechecks/delists nothing.
-# (Catalog vetting in update_endpoints_bi still runs, but it is ~1 cheap query per
-# endpoint and is cost-guarded.)
-#
-# Restore the real policy before re-enabling onboarding:
+# 2026-07-03: re-enabled with a single popularity rule (top-1 model by OpenRouter
+# token usage, all providers — deepseek/deepseek-v4-flash at the time of writing).
+# The full policy remains parked; restore it from:
 #   - prior committed policy: git show 774f879754:bi_selection.toml
 #   - in-progress draft (qwen pattern narrowed): /home/ubuntu/bi_selection_wip_backup_2026-06-21.toml
 
-budget_per_month = 0.0
+budget_per_month = 1.0
 max_endpoint_cost = 0.50
 
-# Exclude everything: nothing is eligible for selection while emptied.
-exclude = ["*"]
+# Never selected anywhere (globs match "model" or "model#provider").
+exclude = [
+    "*image*", "*-fast", "*:extended", "*customtools*", "*-beta",
+    "switchpoint/router",
+]
+
+[[rule]]
+name = "popular"             # top-N models by token usage; N = config bi.popularity.top_n
+kind = "popular"
+patterns = []                # unused: the popularity feed drives selection
+providers_per_model = "all"
