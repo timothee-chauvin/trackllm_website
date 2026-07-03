@@ -1,14 +1,13 @@
-import math
 from dataclasses import asdict, dataclass
 from datetime import datetime
 
-# LT sigmas at/above this threshold (or null/non-finite) are effectively infinite
-# and shown as ∞ — they arise from near-zero baseline variance in the detector.
-SIGMA_INF_THRESHOLD = 1e4
+from trackllm_website.lt_scores import normalize_sigma
 
 
 def _lt_magnitude_display(sigma: float | None) -> str:
-    if sigma is None or not math.isfinite(sigma) or abs(sigma) >= SIGMA_INF_THRESHOLD:
+    # The detector already stores effectively-infinite sigmas as null; the
+    # re-normalization here only shields against pre-migration legacy entries.
+    if sigma is None or normalize_sigma(sigma) is None:
         return "∞σ"
     return f"{sigma:.0f}σ"
 
