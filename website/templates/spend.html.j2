@@ -1,0 +1,55 @@
+{% extends "base.html.j2" %}
+{% block title %}Spend | TrackLLM{% endblock %}
+{% block content %}
+        <a href="index.html" class="back">← home</a>
+        <h1>API Spend</h1>
+
+        <section class="spend-cumulative">
+          <h2>Cumulative by group</h2>
+          {% if spend.cumulative %}
+          <table>
+            <thead><tr><th>Group</th><th>Cost (USD)</th></tr></thead>
+            <tbody>
+            {% for group, cost in spend.cumulative.items() %}
+              <tr><td>{{ group }}</td><td>${{ "%.4f"|format(cost) }}</td></tr>
+            {% endfor %}
+            </tbody>
+          </table>
+          {% else %}<p class="no-data">No spend data yet.</p>{% endif %}
+        </section>
+
+        <section class="spend-chart">
+          <h2>Daily spend</h2>
+          <div id="spend-chart"></div>
+        </section>
+
+        <section class="spend-by-endpoint">
+          <h2>By endpoint</h2>
+          {% if spend.by_endpoint %}
+          <table>
+            <thead>
+              <tr>
+                <th>Endpoint</th>
+                {% for g in spend.group_order %}<th>{{ g }}</th>{% endfor %}
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for ep in spend.by_endpoint %}
+              <tr>
+                <td><a href="endpoints/{{ ep.slug }}.html">{{ ep.slug }}</a></td>
+                {% for g in spend.group_order %}
+                <td>{% if g in ep.groups %}${{ "%.4f"|format(ep.groups[g]) }}{% else %}—{% endif %}</td>
+                {% endfor %}
+                <td>${{ "%.4f"|format(ep.total) }}</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+          {% else %}<p class="no-data">No spend data yet.</p>{% endif %}
+        </section>
+{% endblock %}
+
+{% block scripts %}
+    <script type="module" src="js/spend.js"></script>
+{% endblock %}

@@ -2,8 +2,8 @@
   "name": "trackllm-website",
   "private": true,
   "scripts": {
-    "build": "bun build src/endpoint.ts --outdir=js --minify",
-    "watch": "bun build src/endpoint.ts --outdir=js --watch"
+    "build": "bun build src/endpoint.ts src/spend.ts --outdir=js --minify --splitting",
+    "watch": "bun build src/endpoint.ts src/spend.ts --outdir=js --watch --splitting"
   },
   "dependencies": {
     "plotly.js-dist-min": "^3.3.1"

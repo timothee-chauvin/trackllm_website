@@ -13,6 +13,16 @@ interface EndpointManifest {
   prompts: PromptManifest[];
 }
 
+interface B3ITData {
+  status: string;
+  retired_reason: string | null;
+  n_bis: number;
+  unstable: boolean;
+  epochs: { start: string; end: string | null; end_reason: string | null; change_date: string | null }[];
+  tv_series: { dates: string[]; values: number[] };
+  changes: { date: string; kind: string }[];
+}
+
 interface LogprobQuery {
   date: Date;
   tokens: string[];
@@ -553,6 +563,64 @@ async function renderCharts(manifest: EndpointManifest): Promise<void> {
   }
 }
 
+async function renderB3IT(slug: string): Promise<void> {
+  const section = document.getElementById("b3it-section");
+  if (!section) return;
+  let data: B3ITData;
+  try {
+    const res = await fetch(`../data/b3it/${slug}/b3it.json`);
+    if (!res.ok) return;
+    data = await res.json();
+  } catch {
+    return;
+  }
+
+  const statusLabel = data.status === "monitoring" ? "monitoring"
+    : `retired (${data.retired_reason ?? "?"})`;
+  const badges = [
+    `<span class="badge">B3IT: ${statusLabel}</span>`,
+    `<span class="badge">${data.n_bis} border inputs</span>`,
+    data.unstable ? `<span class="badge warn">⚠ unstable</span>` : "",
+  ].join(" ");
+
+  const header = document.createElement("div");
+  header.className = "b3it-header";
+  header.innerHTML = `<h2>Border-input drift</h2>${badges}`;
+  section.innerHTML = "";
+  section.appendChild(header);
+
+  if (data.tv_series.values.length === 0) {
+    const note = document.createElement("div");
+    note.className = "no-data";
+    note.textContent = "No TV data for the current epoch.";
+    section.appendChild(note);
+    return;
+  }
+
+  const dates = data.tv_series.dates.map((d) => new Date(d));
+  const changeDts = data.changes.map((c) => new Date(c.date));
+  const plotDiv = document.createElement("div");
+  plotDiv.className = "chart";
+  section.appendChild(plotDiv);
+  Plotly.newPlot(
+    plotDiv,
+    [{
+      x: dates, y: data.tv_series.values, type: "scatter", mode: "lines",
+      name: "Mean TV vs reference", line: { width: 1.5, color: "#8250df" },
+      hovertemplate: "%{x}<br>TV: %{y:.4f}<extra></extra>",
+    }],
+    {
+      title: { text: "Border-input TV distance over time", font: { color: "#1f2328", size: 14 } },
+      xaxis: { title: { text: "Date" }, gridcolor: "#d0d7de" },
+      yaxis: { title: { text: "Mean TV distance" }, gridcolor: "#d0d7de", rangemode: "tozero" },
+      paper_bgcolor: "#f6f8fa", plot_bgcolor: "#ffffff", font: { color: "#1f2328" },
+      height: 360, margin: { t: 40, r: 20, b: 50, l: 60 },
+      shapes: makeChangeShapes(changeDts),
+    },
+    { responsive: true, displayModeBar: false }
+  );
+}
+
 function init(): void {
   const manifestEl = document.getElementById("manifest");
   if (!manifestEl) {
@@ -561,6 +629,7 @@ function init(): void {
   }
 
   const manifest: EndpointManifest = JSON.parse(manifestEl.textContent || "{}");
+  renderB3IT(manifest.slug);
   renderCharts(manifest);
 }
 

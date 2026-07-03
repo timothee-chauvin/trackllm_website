@@ -56,14 +56,7 @@ def decide(state: EndpointBIState, results: dict, now: datetime) -> Decision:
     if epoch is None:
         return Decision(action="none")
 
-    epoch_results = {
-        p: {
-            ts: s
-            for ts, s in results.get(p, {}).items()
-            if datetime.fromisoformat(ts) >= epoch.start
-        }
-        for p in epoch.border_inputs
-    }
+    epoch_results = epoch.filter_results(results)
 
     # Stall: the most recent stall_days queried days all had zero successes.
     # Checked before detection because a dead endpoint may still carry a pending

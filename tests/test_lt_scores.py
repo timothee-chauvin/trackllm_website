@@ -8,10 +8,12 @@ import orjson
 from trackllm_website.config import Endpoint
 from trackllm_website.lt_scores import (
     N_PER_TEST,
+    SIGMA_INF_THRESHOLD,
     ChangePoint,
     LTScores,
     compute_endpoint_scores,
     detect_changes,
+    normalize_sigma,
 )
 from trackllm_website.storage import Response, ResponseLogprobs, ResultsStorage
 
@@ -63,6 +65,27 @@ def test_lt_scores_survive_json_roundtrip_with_nonfinite_sigma():
 
 def test_change_point_accepts_none_sigma():
     assert ChangePoint(index=10, sigma=None).sigma is None
+
+
+def test_normalize_sigma():
+    assert normalize_sigma(12.3) == 12.3
+    assert normalize_sigma(0.0) == 0.0
+    assert normalize_sigma(2.0e38) is None
+    assert normalize_sigma(-2.0e38) is None
+    assert normalize_sigma(SIGMA_INF_THRESHOLD) is None
+    assert normalize_sigma(float("inf")) is None
+    assert normalize_sigma(float("nan")) is None
+
+
+def test_near_zero_variance_jump_normalizes_huge_finite_sigma_to_none():
+    """A tiny-but-nonzero baseline std yields a finite astronomically-large
+    deviation (~5e38 here, matching real data); it must be represented as None
+    so every consumer displays ∞ instead of a 39-digit number."""
+    scores = _zero_variance_jump()
+    scores += np.random.default_rng(0).normal(0, 1e-38, len(scores))
+    changes, _ = detect_changes(scores)
+    detected = next(cp for cp in changes if abs(cp.index - 175) <= 1)
+    assert detected.sigma is None
 
 
 def test_empty_logprob_response_is_skipped(tmp_path):

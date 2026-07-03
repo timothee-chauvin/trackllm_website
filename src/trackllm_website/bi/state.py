@@ -26,6 +26,21 @@ class Epoch(BaseModel):
     change_date: datetime | None = None
     params: dict | None = None  # detection params in force when the epoch closed
 
+    def filter_results(self, results: dict) -> dict:
+        """Restrict phase 2 results to this epoch: its border inputs, from its start.
+
+        The single definition of "results belonging to an epoch", shared by the
+        live detector (monitor.decide) and the site build (generate_site.b3it).
+        """
+        return {
+            p: {
+                ts: s
+                for ts, s in results.get(p, {}).items()
+                if datetime.fromisoformat(ts) >= self.start
+            }
+            for p in self.border_inputs
+        }
+
 
 class RetiredInfo(BaseModel):
     reason: Literal["stalled", "no_bis", "delisted"]
