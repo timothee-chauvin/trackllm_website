@@ -199,6 +199,12 @@ endpoints_lt:
   - 0.4
 - api: openrouter
   model: google/gemma-4-26b-a4b-it
+  provider: venice/bf16
+  cost:
+  - 0.13
+  - 0.4
+- api: openrouter
+  model: google/gemma-4-26b-a4b-it
   provider: wafer/fp8
   cost:
   - 0.13
@@ -239,12 +245,6 @@ endpoints_lt:
   cost:
   - 0.26
   - 0.38
-- api: openrouter
-  model: google/gemma-4-26b-a4b-it
-  provider: venice/bf16
-  cost:
-  - 0.1625
-  - 0.5
 - api: openrouter
   model: inclusionai/ling-2.6-1t
   provider: novita
@@ -561,8 +561,8 @@ endpoints_lt:
   model: z-ai/glm-5.2
   provider: alibaba
   cost:
-  - 1.4
-  - 4.4
+  - 1.3188
+  - 4.1448
 - api: openrouter
   model: openai/gpt-3.5-turbo-16k
   provider: azure

@@ -165,6 +165,12 @@ too_expensive:
   - 0.268
 - api: openrouter
   model: deepseek/deepseek-v4-flash
+  provider: atlas-cloud/fp4
+  cost:
+  - 0.14
+  - 0.28
+- api: openrouter
+  model: deepseek/deepseek-v4-flash
   provider: atlas-cloud/fp8
   cost:
   - 0.14
@@ -439,6 +445,12 @@ too_expensive:
   cost:
   - 0.9
   - 1.9
+- api: openrouter
+  model: nvidia/nemotron-3-ultra-550b-a55b
+  provider: nebius/fp4
+  cost:
+  - 1.0
+  - 3.0
 - api: openrouter
   model: openai/gpt-4
   provider: azure
@@ -895,6 +907,12 @@ too_expensive:
   cost:
   - 1.0
   - 2.0
+- api: openrouter
+  model: xiaomi/mimo-v2.5-pro
+  provider: atlas-cloud/fp8
+  cost:
+  - 0.435
+  - 0.87
 - api: openrouter
   model: xiaomi/mimo-v2.5-pro
   provider: deepinfra/fp8
