@@ -22,7 +22,7 @@ class OpenRouterClient:
         self.connector = aiohttp.TCPConnector(limit=600)
         self.session = aiohttp.ClientSession(
             connector=self.connector,
-            headers={"Authorization": f"Bearer {config.openrouter_api_key}"},
+            headers={"Authorization": f"Bearer {config.require_openrouter_api_key()}"},
             timeout=aiohttp.ClientTimeout(total=timeout or config.api.timeout),
         )
 
@@ -49,7 +49,7 @@ class OpenRouterClient:
                     async with session.get(
                         url="https://openrouter.ai/api/v1/generation",
                         headers={
-                            "Authorization": f"Bearer {config.openrouter_api_key}"
+                            "Authorization": f"Bearer {config.require_openrouter_api_key()}"
                         },
                         params={"id": generation_id},
                         timeout=aiohttp.ClientTimeout(total=10),

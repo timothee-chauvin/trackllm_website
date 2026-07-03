@@ -53,7 +53,7 @@ def map_to_model_ids(
 
 def fetch_popular_models(top_n: int) -> list[str]:
     """Return the top_n most-used model ids (popularity order). Network call."""
-    headers = {"Authorization": f"Bearer {config.openrouter_api_key}"}
+    headers = {"Authorization": f"Bearer {config.require_openrouter_api_key()}"}
     rows = requests.get(RANKINGS_URL, headers=headers, timeout=30).json()["data"]
     models = requests.get(MODELS_URL, headers=headers, timeout=30).json()["data"]
     # canonical_slug first, then id->id as fallback for slugs that match an id directly.
