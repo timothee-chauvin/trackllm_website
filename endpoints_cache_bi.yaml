@@ -195,6 +195,12 @@ too_expensive:
   - 3.216
 - api: openrouter
   model: deepseek/deepseek-v4-pro
+  provider: atlas-cloud/fp4
+  cost:
+  - 1.68
+  - 3.38
+- api: openrouter
+  model: deepseek/deepseek-v4-pro
   provider: gmicloud/fp8
   cost:
   - 1.131

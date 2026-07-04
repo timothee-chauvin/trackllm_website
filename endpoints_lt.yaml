@@ -66,12 +66,6 @@ endpoints_lt:
   - 0.04815
   - 0.19305
 - api: openrouter
-  model: deepseek/deepseek-v4-flash
-  provider: wafer/fp4
-  cost:
-  - 0.09
-  - 0.18
-- api: openrouter
   model: mistralai/ministral-3b-2512
   provider: nextbit/fp8
   cost:
@@ -517,12 +511,6 @@ endpoints_lt:
   - 2.7
 - api: openrouter
   model: z-ai/glm-5.1
-  provider: gmicloud/fp8
-  cost:
-  - 0.98
-  - 3.08
-- api: openrouter
-  model: z-ai/glm-5.2
   provider: gmicloud/fp8
   cost:
   - 0.98
