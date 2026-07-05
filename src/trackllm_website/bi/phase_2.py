@@ -25,6 +25,8 @@ Prompt = NewType("Prompt", str)
 Timestamp = NewType("Timestamp", str)
 ResponseToken = NewType("ResponseToken", str)
 
+Results = dict[Prompt, dict[Timestamp, list[tuple[Timestamp, ResponseToken]]]]
+
 
 def get_output_path(endpoint: Endpoint, year_month: str) -> Path:
     """Get the output JSON path for an endpoint."""
@@ -35,19 +37,25 @@ def get_output_path(endpoint: Endpoint, year_month: str) -> Path:
     return endpoint_dir / f"{year_month}.json"
 
 
-def load_existing_results(
-    path: Path,
-) -> dict[Prompt, dict[Timestamp, list[list[str]]]]:
-    """Load existing results from JSON file."""
+def load_existing_results(path: Path) -> Results:
+    """Load existing results from JSON file, restoring sample tuples.
+
+    JSON round-trips tuples into lists; without the conversion, re-saving
+    loaded results violates the `Results` type hint.
+    """
     if not path.exists():
         return {}
     with open(path, "rb") as f:
-        return orjson.loads(f.read())
+        raw = orjson.loads(f.read())
+    return {
+        prompt: {ts: [tuple(s) for s in samples] for ts, samples in batches.items()}
+        for prompt, batches in raw.items()
+    }
 
 
 def save_results(
     path: Path,
-    results: dict[Prompt, dict[Timestamp, list[tuple[Timestamp, ResponseToken]]]],
+    results: Results,
 ) -> None:
     """Save results to JSON file."""
     atomic_write_bytes(path, orjson.dumps(results))
@@ -77,9 +85,7 @@ class EndpointState:
     start_timestamp: Timestamp
     query_strategy: QueryStrategy = field(default_factory=PlainStrategy)
 
-    results: dict[Prompt, dict[Timestamp, list[tuple[Timestamp, ResponseToken]]]] = (
-        field(default_factory=dict)
-    )
+    results: Results = field(default_factory=dict)
     _current_batch: dict[Prompt, list[tuple[Timestamp, ResponseToken]]] = field(
         default_factory=dict
     )
