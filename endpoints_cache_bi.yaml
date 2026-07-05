@@ -177,6 +177,12 @@ too_expensive:
   - 0.28
 - api: openrouter
   model: deepseek/deepseek-v4-flash
+  provider: gmicloud/fp8
+  cost:
+  - 0.098
+  - 0.196
+- api: openrouter
+  model: deepseek/deepseek-v4-flash
   provider: novita/fp8
   cost:
   - 0.14
@@ -187,6 +193,12 @@ too_expensive:
   cost:
   - 0.13
   - 0.28
+- api: openrouter
+  model: deepseek/deepseek-v4-flash
+  provider: streamlake/fp8
+  cost:
+  - 0.1288
+  - 0.2576
 - api: openrouter
   model: deepseek/deepseek-v4-pro
   provider: alibaba
@@ -343,6 +355,12 @@ too_expensive:
   cost:
   - 0.42
   - 1.68
+- api: openrouter
+  model: minimax/minimax-m3
+  provider: deepinfra/bf16
+  cost:
+  - 0.3
+  - 1.2
 - api: openrouter
   model: minimax/minimax-m3
   provider: minimax/fp8
@@ -517,6 +535,12 @@ too_expensive:
   cost:
   - 2.5
   - 2.0
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: amazon-bedrock
+  cost:
+  - 0.15
+  - 0.6
 - api: openrouter
   model: openai/gpt-oss-120b
   provider: parasail/fp4

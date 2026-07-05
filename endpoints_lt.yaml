@@ -42,12 +42,6 @@ endpoints_lt:
   - 0.03
   - 0.15
 - api: openrouter
-  model: qwen/qwen3-235b-a22b-2507
-  provider: wandb/bf16
-  cost:
-  - 0.1
-  - 0.1
-- api: openrouter
   model: rekaai/reka-edge
   provider: reka/bf16
   cost:
@@ -143,12 +137,6 @@ endpoints_lt:
   cost:
   - 0.14
   - 0.28
-- api: openrouter
-  model: microsoft/phi-4-mini-instruct
-  provider: wandb/bf16
-  cost:
-  - 0.08
-  - 0.35
 - api: openrouter
   model: meta-llama/llama-3.1-8b-instruct
   provider: wandb/bf16
@@ -419,12 +407,6 @@ endpoints_lt:
   cost:
   - 0.425
   - 1.36
-- api: openrouter
-  model: meta-llama/llama-3.3-70b-instruct
-  provider: sambanova/bf16
-  cost:
-  - 0.6
-  - 1.2
 - api: openrouter
   model: qwen/qwen2.5-vl-72b-instruct
   provider: parasail/fp8
