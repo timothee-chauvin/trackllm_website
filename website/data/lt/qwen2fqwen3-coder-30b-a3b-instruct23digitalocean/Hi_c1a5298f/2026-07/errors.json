@@ -1,1 +1,1 @@
-{"seen_errors":[{"http_code":0,"message":"Timeout after 15.0s"}]}
+{"seen_errors":[{"http_code":0,"message":"Timeout after 15.0s"},{"http_code":403,"message":"{\"message\":\"Provider returned error\",\"code\":403,\"metadata\":{\"raw\":\"{\\\"id\\\": \\\"Forbidden\\\", \\\"message\\\": \\\"You are not allowed to perform this operation\\\" }\",\"provider_name\":\"DigitalOcean\",\"is_byok\":false}}"}]}
