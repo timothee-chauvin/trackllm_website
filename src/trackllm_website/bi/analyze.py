@@ -10,16 +10,14 @@ import orjson
 import plotly.graph_objects as go
 
 from trackllm_website.bi.phase_2 import (
-    Prompt,
     ResponseToken,
+    Results,
     Timestamp,
     load_border_inputs,
     load_existing_results,
 )
 from trackllm_website.config import config, logger
 from trackllm_website.util import endpoint_from_slug, slugify
-
-Results = dict[Prompt, dict[Timestamp, list[list[str]]]]
 
 # Paul Tol's muted color scheme
 TOL_MUTED = [
