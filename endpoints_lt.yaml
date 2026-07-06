@@ -103,12 +103,6 @@ endpoints_lt:
   - 0.3
 - api: openrouter
   model: qwen/qwen3-30b-a3b-instruct-2507
-  provider: atlas-cloud/fp8
-  cost:
-  - 0.1
-  - 0.3
-- api: openrouter
-  model: qwen/qwen3-30b-a3b-instruct-2507
   provider: wandb/bf16
   cost:
   - 0.1
@@ -221,12 +215,6 @@ endpoints_lt:
   cost:
   - 0.3
   - 0.3
-- api: openrouter
-  model: deepseek/deepseek-v3.2
-  provider: atlas-cloud/fp8
-  cost:
-  - 0.26
-  - 0.38
 - api: openrouter
   model: inclusionai/ling-2.6-1t
   provider: novita
@@ -527,12 +515,6 @@ endpoints_lt:
   cost:
   - 1.21
   - 4.2
-- api: openrouter
-  model: z-ai/glm-5.2
-  provider: alibaba
-  cost:
-  - 1.3188
-  - 4.1448
 - api: openrouter
   model: openai/gpt-3.5-turbo-16k
   provider: azure
