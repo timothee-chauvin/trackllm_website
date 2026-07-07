@@ -239,4 +239,73 @@ def test_monitor_returns_report_with_n_endpoints(monkeypatch, tmp_path):
     assert isinstance(report, MonitorReport)
     assert report.n_endpoints == 1
     assert report.rows == []
+    assert report.failures == []
     assert report.date == datetime.now(tz=timezone.utc).date().isoformat()
+
+
+def test_monitor_records_unexpected_endpoint_failures(monkeypatch, tmp_path):
+    """An exception escaping run_endpoint is isolated but recorded in the report.
+
+    API errors are handled inside run_endpoint (skipped probes, per-query
+    warnings); anything that propagates out — e.g. a failure to save — is a
+    bug and must not be silently swallowed.
+    """
+    from trackllm_website.bi.monitor import monitor
+
+    state, _ = _state_from_fixture("openai2fgpt-4o-mini23azure")
+
+    monkeypatch.setattr(type(config), "spend_dir", property(lambda self: tmp_path))
+    monkeypatch.setattr(monitor_mod.config.bi, "data_dir", tmp_path)
+    monkeypatch.setattr(monitor_mod, "load_all_states", lambda d: {"ep": state})
+
+    async def fake_resolve_strategies(client, endpoints, probe_spend=None):
+        return {str(state.endpoint): PlainStrategy()}, []
+
+    async def fake_run_endpoint(*args, **kwargs):
+        raise RuntimeError("disk full")
+
+    monkeypatch.setattr(monitor_mod, "resolve_strategies", fake_resolve_strategies)
+    monkeypatch.setattr(monitor_mod, "run_endpoint", fake_run_endpoint)
+    monkeypatch.setattr(
+        monitor_mod,
+        "gather_with_concurrency",
+        lambda n, *coros: asyncio.gather(*coros),
+    )
+
+    report = asyncio.run(monitor())
+
+    assert report.failures == ["openrouter#m/x#p"]
+
+
+def test_main_fails_after_digest_when_endpoints_failed(monkeypatch):
+    """main() still sends the digest, then exits non-zero on recorded failures."""
+    import pytest
+
+    report = MonitorReport(
+        date="2026-07-07", rows=[], n_endpoints=2, failures=["openrouter#m/x#p"]
+    )
+    sent = []
+
+    async def fake_monitor():
+        return report
+
+    monkeypatch.setattr(monitor_mod, "monitor", fake_monitor)
+    monkeypatch.setattr(
+        monitor_mod, "send_monitoring_digest", lambda r, d: sent.append(r)
+    )
+
+    with pytest.raises(RuntimeError, match="openrouter#m/x#p"):
+        monitor_mod.main()
+    assert sent == [report]
+
+
+def test_main_succeeds_without_failures(monkeypatch):
+    report = MonitorReport(date="2026-07-07", rows=[], n_endpoints=2)
+
+    async def fake_monitor():
+        return report
+
+    monkeypatch.setattr(monitor_mod, "monitor", fake_monitor)
+    monkeypatch.setattr(monitor_mod, "send_monitoring_digest", lambda r, d: None)
+
+    monitor_mod.main()  # must not raise
