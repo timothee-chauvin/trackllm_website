@@ -63,6 +63,18 @@ too_expensive:
   - 25.0
 - api: openrouter
   model: anthropic/claude-opus-4.5
+  provider: anthropic
+  cost:
+  - 5.0
+  - 25.0
+- api: openrouter
+  model: anthropic/claude-opus-4.5
+  provider: anthropic/2
+  cost:
+  - 5.0
+  - 25.0
+- api: openrouter
+  model: anthropic/claude-opus-4.5
   provider: google-vertex/global
   cost:
   - 5.0
@@ -70,6 +82,18 @@ too_expensive:
 - api: openrouter
   model: anthropic/claude-opus-4.6
   provider: amazon-bedrock/us-east-1
+  cost:
+  - 5.0
+  - 25.0
+- api: openrouter
+  model: anthropic/claude-opus-4.6
+  provider: anthropic
+  cost:
+  - 5.0
+  - 25.0
+- api: openrouter
+  model: anthropic/claude-opus-4.6
+  provider: anthropic/2
   cost:
   - 5.0
   - 25.0
@@ -92,11 +116,29 @@ too_expensive:
   - 5.0
   - 25.0
 - api: openrouter
+  model: anthropic/claude-opus-4.8
+  provider: azure/us-east-2
+  cost:
+  - 5.0
+  - 25.0
+- api: openrouter
   model: bytedance-seed/seed-1.6
   provider: seed/fp8
   cost:
   - 0.25
   - 2.0
+- api: openrouter
+  model: deepseek/deepseek-r1
+  provider: novita/fp8
+  cost:
+  - 0.7
+  - 2.5
+- api: openrouter
+  model: deepseek/deepseek-r1-0528
+  provider: siliconflow/fp8
+  cost:
+  - 0.5
+  - 2.18
 - api: openrouter
   model: deepseek/deepseek-v3.1-terminus
   provider: streamlake
@@ -158,6 +200,12 @@ too_expensive:
   - 0.5
   - 3.0
 - api: openrouter
+  model: google/gemma-4-31b-it
+  provider: sambanova
+  cost:
+  - 0.22
+  - 0.59
+- api: openrouter
   model: inception/mercury-2
   provider: inception
   cost:
@@ -199,6 +247,12 @@ too_expensive:
   cost:
   - 0.3
   - 1.2
+- api: openrouter
+  model: minimax/minimax-m2.5
+  provider: venice
+  cost:
+  - 0.27
+  - 0.95
 - api: openrouter
   model: minimax/minimax-m2.7
   provider: sambanova/minimax-m2.7-dedicated
@@ -265,6 +319,12 @@ too_expensive:
   cost:
   - 0.95
   - 4.0
+- api: openrouter
+  model: moonshotai/kimi-k2.6
+  provider: novita
+  cost:
+  - 0.8
+  - 3.4
 - api: openrouter
   model: moonshotai/kimi-k2.6
   provider: siliconflow/fp8
@@ -422,6 +482,12 @@ too_expensive:
   - 0.13
   - 0.52
 - api: openrouter
+  model: qwen/qwen3-30b-a3b-instruct-2507
+  provider: phala
+  cost:
+  - 0.15
+  - 0.55
+- api: openrouter
   model: qwen/qwen3-30b-a3b-thinking-2507
   provider: alibaba
   cost:
@@ -439,6 +505,12 @@ too_expensive:
   cost:
   - 0.14
   - 0.57
+- api: openrouter
+  model: qwen/qwen3-8b
+  provider: alibaba
+  cost:
+  - 0.117
+  - 0.455
 - api: openrouter
   model: qwen/qwen3-next-80b-a3b-thinking
   provider: alibaba
@@ -704,6 +776,12 @@ too_expensive:
   - 0.435
   - 0.87
 - api: openrouter
+  model: z-ai/glm-4.5-air
+  provider: siliconflow/fp8
+  cost:
+  - 0.14
+  - 0.86
+- api: openrouter
   model: z-ai/glm-4.6
   provider: novita/bf16
   cost:
@@ -739,6 +817,30 @@ too_expensive:
   cost:
   - 0.6
   - 2.2
+- api: openrouter
+  model: z-ai/glm-5
+  provider: atlas-cloud/fp8
+  cost:
+  - 0.95
+  - 3.15
+- api: openrouter
+  model: z-ai/glm-5
+  provider: novita/fp8
+  cost:
+  - 1.0
+  - 3.2
+- api: openrouter
+  model: z-ai/glm-5
+  provider: phala
+  cost:
+  - 1.2
+  - 3.5
+- api: openrouter
+  model: z-ai/glm-5
+  provider: z-ai/fp8
+  cost:
+  - 1.0
+  - 3.2
 - api: openrouter
   model: z-ai/glm-5.1
   provider: gmicloud/fp8
@@ -784,6 +886,12 @@ bad_temperature:
   - 50.0
 - api: openrouter
   model: anthropic/claude-fable-5
+  provider: google-vertex/europe
+  cost:
+  - 11.0
+  - 55.0
+- api: openrouter
+  model: anthropic/claude-fable-5
   provider: google-vertex/global
   cost:
   - 10.0
@@ -809,6 +917,12 @@ bad_temperature:
 - api: openrouter
   model: anthropic/claude-opus-4.7
   provider: anthropic/2
+  cost:
+  - 5.0
+  - 25.0
+- api: openrouter
+  model: anthropic/claude-opus-4.7
+  provider: azure/us-east-2
   cost:
   - 5.0
   - 25.0
@@ -899,6 +1013,12 @@ bad_temperature:
 - api: openrouter
   model: anthropic/claude-sonnet-5
   provider: azure
+  cost:
+  - 2.0
+  - 10.0
+- api: openrouter
+  model: anthropic/claude-sonnet-5
+  provider: azure/us-east-2
   cost:
   - 2.0
   - 10.0
