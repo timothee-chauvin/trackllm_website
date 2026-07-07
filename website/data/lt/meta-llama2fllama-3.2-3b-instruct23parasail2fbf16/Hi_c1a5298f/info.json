@@ -1,0 +1,16 @@
+{
+  "prompt": "Hi",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "meta-llama/llama-3.2-3b-instruct",
+    "provider": "parasail/bf16",
+    "cost": [
+      0.05,
+      0.33
+    ],
+    "max_logprobs": null,
+    "cost_per_request": null,
+    "created": null,
+    "supports_temperature": null
+  }
+}
