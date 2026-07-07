@@ -84,6 +84,12 @@ endpoints_lt:
   - 0.112
   - 0.224
 - api: openrouter
+  model: meta-llama/llama-3.2-3b-instruct
+  provider: parasail/bf16
+  cost:
+  - 0.05
+  - 0.33
+- api: openrouter
   model: google/gemma-4-26b-a4b-it
   provider: dekallm/bf16
   cost:
@@ -121,12 +127,6 @@ endpoints_lt:
   - 0.28
 - api: openrouter
   model: deepseek/deepseek-v4-flash
-  provider: cloudflare
-  cost:
-  - 0.14
-  - 0.28
-- api: openrouter
-  model: deepseek/deepseek-v4-flash
   provider: wandb/fp8
   cost:
   - 0.14
@@ -155,12 +155,6 @@ endpoints_lt:
   cost:
   - 0.08
   - 0.45
-- api: openrouter
-  model: google/gemma-4-26b-a4b-it
-  provider: nextbit/bf16
-  cost:
-  - 0.13
-  - 0.4
 - api: openrouter
   model: google/gemma-4-26b-a4b-it
   provider: novita/bf16
@@ -196,6 +190,12 @@ endpoints_lt:
   provider: novita/bf16
   cost:
   - 0.135
+  - 0.4
+- api: openrouter
+  model: google/gemma-4-26b-a4b-it
+  provider: nextbit/bf16
+  cost:
+  - 0.14
   - 0.4
 - api: openrouter
   model: google/gemma-4-31b-it
@@ -390,6 +390,12 @@ endpoints_lt:
   - 0.15
   - 1.5
 - api: openrouter
+  model: qwen/qwen3-235b-a22b-2507
+  provider: gmicloud/fp8
+  cost:
+  - 0.35
+  - 1.4
+- api: openrouter
   model: deepseek/deepseek-v3.2
   provider: digitalocean
   cost:
@@ -446,6 +452,12 @@ endpoints_lt:
 - api: openrouter
   model: deepseek/deepseek-chat-v3.1
   provider: google-vertex/us-west2
+  cost:
+  - 0.6
+  - 1.7
+- api: openrouter
+  model: deepseek/deepseek-chat-v3.1
+  provider: mara
   cost:
   - 0.6
   - 1.7
