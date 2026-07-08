@@ -84,6 +84,12 @@ endpoints_lt:
   - 0.112
   - 0.224
 - api: openrouter
+  model: qwen/qwen3.5-9b
+  provider: parasail/bf16
+  cost:
+  - 0.1
+  - 0.25
+- api: openrouter
   model: meta-llama/llama-3.2-3b-instruct
   provider: parasail/bf16
   cost:
@@ -157,6 +163,12 @@ endpoints_lt:
   - 0.45
 - api: openrouter
   model: google/gemma-4-26b-a4b-it
+  provider: nextbit/bf16
+  cost:
+  - 0.13
+  - 0.4
+- api: openrouter
+  model: google/gemma-4-26b-a4b-it
   provider: novita/bf16
   cost:
   - 0.13
@@ -190,12 +202,6 @@ endpoints_lt:
   provider: novita/bf16
   cost:
   - 0.135
-  - 0.4
-- api: openrouter
-  model: google/gemma-4-26b-a4b-it
-  provider: nextbit/bf16
-  cost:
-  - 0.14
   - 0.4
 - api: openrouter
   model: google/gemma-4-31b-it
@@ -263,6 +269,12 @@ endpoints_lt:
   cost:
   - 0.15
   - 0.6
+- api: openrouter
+  model: thedrummer/rocinante-12b
+  provider: parasail/bf16
+  cost:
+  - 0.25
+  - 0.5
 - api: openrouter
   model: thedrummer/cydonia-24b-v4.1
   provider: parasail/bf16
