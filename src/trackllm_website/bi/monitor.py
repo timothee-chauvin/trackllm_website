@@ -187,6 +187,7 @@ async def monitor() -> MonitorReport:
 
     client = OpenRouterClient()
     event_rows: list[MonitorRow] = []
+    failures: list[str] = []
 
     async def run_isolated(state: EndpointBIState) -> None:
         try:
@@ -200,6 +201,7 @@ async def monitor() -> MonitorReport:
             )
         except Exception:
             logger.exception(f"Monitor run failed for {state.endpoint}")
+            failures.append(str(state.endpoint))
 
     try:
         runnable = [s for s in monitoring if str(s.endpoint) in strategies]
@@ -214,12 +216,20 @@ async def monitor() -> MonitorReport:
         date=now.date().isoformat(),
         rows=event_rows,
         n_endpoints=len(monitoring),
+        failures=failures,
     )
 
 
 def main() -> None:
     report = asyncio.run(monitor())
     send_monitoring_digest(report, config.spend_dir)
+    # Fail the run (after saving and sending the digest) so a green check
+    # really means every endpoint's batch was saved.
+    if report.failures:
+        raise RuntimeError(
+            f"monitor run failed unexpectedly for {len(report.failures)} "
+            f"endpoint(s): {', '.join(report.failures)}"
+        )
 
 
 if __name__ == "__main__":

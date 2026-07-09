@@ -605,8 +605,11 @@ async function renderB3IT(slug: string): Promise<void> {
   Plotly.newPlot(
     plotDiv,
     [{
-      x: dates, y: data.tv_series.values, type: "scatter", mode: "lines",
+      x: dates, y: data.tv_series.values, type: "scatter",
+      // markers make short series visible (a single "lines" point draws nothing)
+      mode: dates.length < 20 ? "lines+markers" : "lines",
       name: "Mean TV vs reference", line: { width: 1.5, color: "#8250df" },
+      marker: { size: 5 },
       hovertemplate: "%{x}<br>TV: %{y:.4f}<extra></extra>",
     }],
     {
