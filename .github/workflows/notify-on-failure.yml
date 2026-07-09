@@ -1,6 +1,8 @@
 name: Notify on Failure
 
 # Watches the other workflows and emails when any of them concludes in failure.
+# Infra flakes (job failed but no step ever failed, e.g. runner never acquired)
+# are auto-retried once instead of emailed; any failure on attempt >= 2 emails.
 # Runs in the default-branch context, so it has access to the notification secrets.
 on:
   workflow_run:
@@ -13,6 +15,10 @@ on:
       - completed
   workflow_dispatch:  # Manually fire a test email to verify the send path end-to-end.
 
+permissions:
+  contents: read
+  actions: write  # rerun failed jobs; also covers the read of the jobs API
+
 jobs:
   notify:
     # Run on a watched-workflow failure, or whenever manually dispatched.
@@ -22,7 +28,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Skipped on manual dispatch: verdict stays empty, so the email step runs.
+      - name: Classify failure (infra flake vs code)
+        if: ${{ github.event_name == 'workflow_run' }}
+        id: triage
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }}/attempts/${{ github.event.workflow_run.run_attempt }}/jobs?per_page=100" \
+            | python3 src/trackllm_website/notify_triage.py >> "$GITHUB_OUTPUT"
+
+      - name: Retry infra flake (once)
+        if: ${{ steps.triage.outputs.verdict == 'infra' && github.event.workflow_run.run_attempt == 1 }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run rerun ${{ github.event.workflow_run.id }} --failed
+
       - name: Send failure email
+        if: ${{ !(steps.triage.outputs.verdict == 'infra' && github.event.workflow_run.run_attempt == 1) }}
         env:
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
@@ -30,6 +53,7 @@ jobs:
           # workflow_run.* is null on manual dispatch, so fall back to this run's context.
           WF_NAME: ${{ github.event.workflow_run.name || 'Manual test (notify-on-failure)' }}
           WF_RUN_NUMBER: ${{ github.event.workflow_run.run_number || github.run_number }}
+          WF_RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt || github.run_attempt }}
           WF_EVENT: ${{ github.event.workflow_run.event || github.event_name }}
           WF_HEAD_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
           WF_RUN_URL: ${{ github.event.workflow_run.html_url || format('{0}/{1}/actions/runs/{2}', github.server_url, github.repository, github.run_id) }}
