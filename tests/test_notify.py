@@ -5,6 +5,7 @@ from trackllm_website.notify import build_message, load_creds_from_env, send_ema
 CTX = {
     "workflow": "Run Main Script",
     "run_number": "42",
+    "run_attempt": "2",
     "event": "schedule",
     "head_sha": "abc1234def",
     "run_url": "https://github.com/x/y/actions/runs/123",
@@ -18,6 +19,7 @@ def test_build_message_includes_run_details():
     assert "https://github.com/x/y/actions/runs/123" in body
     assert "42" in body
     assert "abc1234def" in body
+    assert "Attempt:  2" in body
 
 
 def test_load_creds_fails_loud_on_missing(monkeypatch):
