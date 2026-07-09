@@ -29,6 +29,7 @@ def build_message(ctx: dict[str, str]) -> tuple[str, str]:
         [
             f"Workflow: {ctx['workflow']}",
             f"Run:      #{ctx['run_number']}",
+            f"Attempt:  {ctx['run_attempt']}",
             f"Event:    {ctx['event']}",
             f"Commit:   {ctx['head_sha']}",
             f"Details:  {ctx['run_url']}",
@@ -56,6 +57,7 @@ def main() -> None:
     ctx = {
         "workflow": os.environ.get("WF_NAME", "(unknown)"),
         "run_number": os.environ.get("WF_RUN_NUMBER", "?"),
+        "run_attempt": os.environ.get("WF_RUN_ATTEMPT", "?"),
         "event": os.environ.get("WF_EVENT", "?"),
         "head_sha": os.environ.get("WF_HEAD_SHA", "?"),
         "run_url": os.environ.get("WF_RUN_URL", "?"),
