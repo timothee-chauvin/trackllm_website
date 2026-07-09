@@ -1,1 +1,1 @@
-{"seen_errors":[]}
+{"seen_errors":[{"http_code":403,"message":"{\"message\":\"Provider returned error\",\"code\":403,\"metadata\":{\"raw\":\"{\\\"error\\\":{\\\"message\\\":\\\"{\\\\\\\"detail\\\\\\\": \\\\\\\"User is locked. Reason: Exhausted balance. Top up your balance at fal.ai/dashboard/billing.\\\\\\\"}\\\",\\\"type\\\":\\\"invalid_request_error\\\",\\\"code\\\":\\\"invalid_request\\\",\\\"param\\\":null}}\",\"provider_name\":\"Reka\",\"is_byok\":false}}"}]}
