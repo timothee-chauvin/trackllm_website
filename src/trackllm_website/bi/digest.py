@@ -1,6 +1,6 @@
 """Render and send the two daily B3IT digest emails (onboarding, monitoring)."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from trackllm_website import notify
 from trackllm_website.config import logger
@@ -58,6 +58,9 @@ class MonitorReport:
     date: str
     rows: list[MonitorRow]
     n_endpoints: int
+    # endpoints where an exception escaped run_endpoint (never expected:
+    # API errors are handled inside; this means e.g. a failure to save)
+    failures: list[str] = field(default_factory=list)
 
     def notable(self) -> bool:
         return bool(self.rows)
