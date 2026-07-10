@@ -85,7 +85,7 @@ onboard_timeout_seconds = 10800
 max_concurrent_endpoints = 20
 
 [bi.popularity]
-top_n = 1
+top_n = 5
 
 [plotting]
 template = "plotly_white"

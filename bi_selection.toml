@@ -8,8 +8,10 @@
 # The full policy remains parked; restore it from:
 #   - prior committed policy: git show 774f879754:bi_selection.toml
 #   - in-progress draft (qwen pattern narrowed): /home/ubuntu/bi_selection_wip_backup_2026-06-21.toml
+# 2026-07-10: widened to top-5 (config bi.popularity.top_n = 5); budget raised to
+# $3/mo to cover full provider fan-out (simulated uncapped run-rate ~$1.5/mo).
 
-budget_per_month = 1.0
+budget_per_month = 3.0
 max_endpoint_cost = 0.50
 
 # Never selected anywhere (globs match "model" or "model#provider").
