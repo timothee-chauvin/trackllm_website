@@ -146,6 +146,12 @@ too_expensive:
   - 0.075
   - 0.3
 - api: openrouter
+  model: cognitivecomputations/dolphin-mistral-24b-venice-edition
+  provider: venice/fp16
+  cost:
+  - 0.2
+  - 0.9
+- api: openrouter
   model: deepseek/deepseek-r1
   provider: novita/fp8
   cost:
@@ -199,6 +205,12 @@ too_expensive:
   cost:
   - 1.68
   - 3.38
+- api: openrouter
+  model: deepseek/deepseek-v4-pro
+  provider: baidu/fp8
+  cost:
+  - 0.7605
+  - 1.521
 - api: openrouter
   model: deepseek/deepseek-v4-pro
   provider: siliconflow/fp8
@@ -325,6 +337,12 @@ too_expensive:
   cost:
   - 0.3
   - 1.2
+- api: openrouter
+  model: moonshotai/kimi-k2-thinking
+  provider: novita/bf16
+  cost:
+  - 0.6
+  - 2.5
 - api: openrouter
   model: moonshotai/kimi-k2.5
   provider: atlas-cloud/int4
@@ -765,10 +783,22 @@ too_expensive:
   - 2.5
 - api: openrouter
   model: x-ai/grok-4.20
+  provider: xai/priority
+  cost:
+  - 2.5
+  - 5.0
+- api: openrouter
+  model: x-ai/grok-4.20
   provider: xai/zdr
   cost:
   - 1.25
   - 2.5
+- api: openrouter
+  model: x-ai/grok-4.20
+  provider: xai/zdr/priority
+  cost:
+  - 2.5
+  - 5.0
 - api: openrouter
   model: x-ai/grok-4.20-multi-agent
   provider: xai
@@ -777,10 +807,22 @@ too_expensive:
   - 2.5
 - api: openrouter
   model: x-ai/grok-4.20-multi-agent
+  provider: xai/priority
+  cost:
+  - 2.5
+  - 5.0
+- api: openrouter
+  model: x-ai/grok-4.20-multi-agent
   provider: xai/zdr
   cost:
   - 1.25
   - 2.5
+- api: openrouter
+  model: x-ai/grok-4.20-multi-agent
+  provider: xai/zdr/priority
+  cost:
+  - 2.5
+  - 5.0
 - api: openrouter
   model: x-ai/grok-4.3
   provider: xai
@@ -789,10 +831,46 @@ too_expensive:
   - 2.5
 - api: openrouter
   model: x-ai/grok-4.3
+  provider: xai/priority
+  cost:
+  - 2.5
+  - 5.0
+- api: openrouter
+  model: x-ai/grok-4.3
   provider: xai/zdr
   cost:
   - 1.25
   - 2.5
+- api: openrouter
+  model: x-ai/grok-4.3
+  provider: xai/zdr/priority
+  cost:
+  - 2.5
+  - 5.0
+- api: openrouter
+  model: x-ai/grok-4.5
+  provider: xai
+  cost:
+  - 2.0
+  - 6.0
+- api: openrouter
+  model: x-ai/grok-4.5
+  provider: xai/priority
+  cost:
+  - 4.0
+  - 12.0
+- api: openrouter
+  model: x-ai/grok-4.5
+  provider: xai/zdr
+  cost:
+  - 2.0
+  - 6.0
+- api: openrouter
+  model: x-ai/grok-4.5
+  provider: xai/zdr/priority
+  cost:
+  - 4.0
+  - 12.0
 - api: openrouter
   model: x-ai/grok-build-0.1
   provider: xai
@@ -801,10 +879,22 @@ too_expensive:
   - 2.0
 - api: openrouter
   model: x-ai/grok-build-0.1
+  provider: xai/priority
+  cost:
+  - 2.0
+  - 4.0
+- api: openrouter
+  model: x-ai/grok-build-0.1
   provider: xai/zdr
   cost:
   - 1.0
   - 2.0
+- api: openrouter
+  model: x-ai/grok-build-0.1
+  provider: xai/zdr/priority
+  cost:
+  - 2.0
+  - 4.0
 - api: openrouter
   model: xiaomi/mimo-v2.5-pro
   provider: atlas-cloud/fp8
@@ -1167,6 +1257,12 @@ bad_temperature:
   - 0.25
   - 2.0
 - api: openrouter
+  model: openai/gpt-5-mini
+  provider: openai/flex
+  cost:
+  - 0.125
+  - 1.0
+- api: openrouter
   model: openai/gpt-5-nano
   provider: azure
   cost:
@@ -1184,6 +1280,12 @@ bad_temperature:
   cost:
   - 0.05
   - 0.4
+- api: openrouter
+  model: openai/gpt-5-nano
+  provider: openai/flex
+  cost:
+  - 0.025
+  - 0.2
 - api: openrouter
   model: openai/gpt-5-pro
   provider: openai
@@ -1209,6 +1311,18 @@ bad_temperature:
   - 1.25
   - 10.0
 - api: openrouter
+  model: openai/gpt-5.1
+  provider: openai/default/flex
+  cost:
+  - 0.625
+  - 5.0
+- api: openrouter
+  model: openai/gpt-5.1
+  provider: openai/default/priority
+  cost:
+  - 2.5
+  - 20.0
+- api: openrouter
   model: openai/gpt-5.1-chat
   provider: azure
   cost:
@@ -1233,6 +1347,12 @@ bad_temperature:
   - 1.25
   - 10.0
 - api: openrouter
+  model: openai/gpt-5.1-codex
+  provider: openai/priority
+  cost:
+  - 2.5
+  - 20.0
+- api: openrouter
   model: openai/gpt-5.1-codex-max
   provider: azure
   cost:
@@ -1244,6 +1364,12 @@ bad_temperature:
   cost:
   - 1.25
   - 10.0
+- api: openrouter
+  model: openai/gpt-5.1-codex-max
+  provider: openai/priority
+  cost:
+  - 2.5
+  - 20.0
 - api: openrouter
   model: openai/gpt-5.1-codex-mini
   provider: azure
@@ -1269,6 +1395,18 @@ bad_temperature:
   - 1.75
   - 14.0
 - api: openrouter
+  model: openai/gpt-5.2
+  provider: openai/flex
+  cost:
+  - 0.875
+  - 7.0
+- api: openrouter
+  model: openai/gpt-5.2
+  provider: openai/priority
+  cost:
+  - 3.5
+  - 28.0
+- api: openrouter
   model: openai/gpt-5.2-chat
   provider: azure
   cost:
@@ -1292,6 +1430,12 @@ bad_temperature:
   cost:
   - 1.75
   - 14.0
+- api: openrouter
+  model: openai/gpt-5.2-codex
+  provider: openai/priority
+  cost:
+  - 3.5
+  - 28.0
 - api: openrouter
   model: openai/gpt-5.2-pro
   provider: openai
@@ -1323,6 +1467,12 @@ bad_temperature:
   - 1.75
   - 14.0
 - api: openrouter
+  model: openai/gpt-5.3-codex
+  provider: openai/priority
+  cost:
+  - 3.5
+  - 28.0
+- api: openrouter
   model: openai/gpt-5.4
   provider: azure
   cost:
@@ -1340,6 +1490,18 @@ bad_temperature:
   cost:
   - 2.5
   - 15.0
+- api: openrouter
+  model: openai/gpt-5.4
+  provider: openai/flex
+  cost:
+  - 1.25
+  - 7.5
+- api: openrouter
+  model: openai/gpt-5.4
+  provider: openai/priority
+  cost:
+  - 5.0
+  - 30.0
 - api: openrouter
   model: openai/gpt-5.4-image-2
   provider: openai
@@ -1359,6 +1521,18 @@ bad_temperature:
   - 0.75
   - 4.5
 - api: openrouter
+  model: openai/gpt-5.4-mini
+  provider: openai/flex
+  cost:
+  - 0.375
+  - 2.25
+- api: openrouter
+  model: openai/gpt-5.4-mini
+  provider: openai/priority
+  cost:
+  - 1.5
+  - 9.0
+- api: openrouter
   model: openai/gpt-5.4-nano
   provider: azure
   cost:
@@ -1371,6 +1545,12 @@ bad_temperature:
   - 0.2
   - 1.25
 - api: openrouter
+  model: openai/gpt-5.4-nano
+  provider: openai/flex
+  cost:
+  - 0.1
+  - 0.625
+- api: openrouter
   model: openai/gpt-5.4-pro
   provider: azure
   cost:
@@ -1382,6 +1562,12 @@ bad_temperature:
   cost:
   - 30.0
   - 180.0
+- api: openrouter
+  model: openai/gpt-5.4-pro
+  provider: openai/flex
+  cost:
+  - 15.0
+  - 90.0
 - api: openrouter
   model: openai/gpt-5.5
   provider: azure
@@ -1401,11 +1587,209 @@ bad_temperature:
   - 5.0
   - 30.0
 - api: openrouter
+  model: openai/gpt-5.5
+  provider: openai/flex
+  cost:
+  - 2.5
+  - 15.0
+- api: openrouter
+  model: openai/gpt-5.5
+  provider: openai/priority
+  cost:
+  - 12.5
+  - 75.0
+- api: openrouter
   model: openai/gpt-5.5-pro
   provider: openai
   cost:
   - 30.0
   - 180.0
+- api: openrouter
+  model: openai/gpt-5.5-pro
+  provider: openai/flex
+  cost:
+  - 15.0
+  - 90.0
+- api: openrouter
+  model: openai/gpt-5.6-luna
+  provider: azure
+  cost:
+  - 1.0
+  - 6.0
+- api: openrouter
+  model: openai/gpt-5.6-luna
+  provider: azure/eu
+  cost:
+  - 1.1
+  - 6.6
+- api: openrouter
+  model: openai/gpt-5.6-luna
+  provider: openai
+  cost:
+  - 1.0
+  - 6.0
+- api: openrouter
+  model: openai/gpt-5.6-luna
+  provider: openai/flex
+  cost:
+  - 0.5
+  - 3.0
+- api: openrouter
+  model: openai/gpt-5.6-luna
+  provider: openai/priority
+  cost:
+  - 2.0
+  - 12.0
+- api: openrouter
+  model: openai/gpt-5.6-luna-pro
+  provider: azure
+  cost:
+  - 1.0
+  - 6.0
+- api: openrouter
+  model: openai/gpt-5.6-luna-pro
+  provider: azure/eu
+  cost:
+  - 1.1
+  - 6.6
+- api: openrouter
+  model: openai/gpt-5.6-luna-pro
+  provider: openai
+  cost:
+  - 1.0
+  - 6.0
+- api: openrouter
+  model: openai/gpt-5.6-luna-pro
+  provider: openai/flex
+  cost:
+  - 0.5
+  - 3.0
+- api: openrouter
+  model: openai/gpt-5.6-luna-pro
+  provider: openai/priority
+  cost:
+  - 2.0
+  - 12.0
+- api: openrouter
+  model: openai/gpt-5.6-sol
+  provider: azure
+  cost:
+  - 5.0
+  - 30.0
+- api: openrouter
+  model: openai/gpt-5.6-sol
+  provider: azure/eu
+  cost:
+  - 5.5
+  - 33.0
+- api: openrouter
+  model: openai/gpt-5.6-sol
+  provider: openai
+  cost:
+  - 5.0
+  - 30.0
+- api: openrouter
+  model: openai/gpt-5.6-sol
+  provider: openai/flex
+  cost:
+  - 2.5
+  - 15.0
+- api: openrouter
+  model: openai/gpt-5.6-sol
+  provider: openai/priority
+  cost:
+  - 10.0
+  - 60.0
+- api: openrouter
+  model: openai/gpt-5.6-sol-pro
+  provider: azure
+  cost:
+  - 5.0
+  - 30.0
+- api: openrouter
+  model: openai/gpt-5.6-sol-pro
+  provider: azure/eu
+  cost:
+  - 5.5
+  - 33.0
+- api: openrouter
+  model: openai/gpt-5.6-sol-pro
+  provider: openai
+  cost:
+  - 5.0
+  - 30.0
+- api: openrouter
+  model: openai/gpt-5.6-sol-pro
+  provider: openai/flex
+  cost:
+  - 2.5
+  - 15.0
+- api: openrouter
+  model: openai/gpt-5.6-sol-pro
+  provider: openai/priority
+  cost:
+  - 10.0
+  - 60.0
+- api: openrouter
+  model: openai/gpt-5.6-terra
+  provider: azure
+  cost:
+  - 2.5
+  - 15.0
+- api: openrouter
+  model: openai/gpt-5.6-terra
+  provider: azure/eu
+  cost:
+  - 2.75
+  - 16.5
+- api: openrouter
+  model: openai/gpt-5.6-terra
+  provider: openai
+  cost:
+  - 2.5
+  - 15.0
+- api: openrouter
+  model: openai/gpt-5.6-terra
+  provider: openai/flex
+  cost:
+  - 1.25
+  - 7.5
+- api: openrouter
+  model: openai/gpt-5.6-terra
+  provider: openai/priority
+  cost:
+  - 5.0
+  - 30.0
+- api: openrouter
+  model: openai/gpt-5.6-terra-pro
+  provider: azure
+  cost:
+  - 2.5
+  - 15.0
+- api: openrouter
+  model: openai/gpt-5.6-terra-pro
+  provider: azure/eu
+  cost:
+  - 2.75
+  - 16.5
+- api: openrouter
+  model: openai/gpt-5.6-terra-pro
+  provider: openai
+  cost:
+  - 2.5
+  - 15.0
+- api: openrouter
+  model: openai/gpt-5.6-terra-pro
+  provider: openai/flex
+  cost:
+  - 1.25
+  - 7.5
+- api: openrouter
+  model: openai/gpt-5.6-terra-pro
+  provider: openai/priority
+  cost:
+  - 5.0
+  - 30.0
 - api: openrouter
   model: openai/gpt-chat-latest
   provider: openai
