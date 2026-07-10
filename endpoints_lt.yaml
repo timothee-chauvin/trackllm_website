@@ -36,12 +36,6 @@ endpoints_lt:
   - 0.05
   - 0.1
 - api: openrouter
-  model: openai/gpt-oss-120b
-  provider: mara
-  cost:
-  - 0.03
-  - 0.15
-- api: openrouter
   model: rekaai/reka-edge
   provider: reka/bf16
   cost:
@@ -293,6 +287,12 @@ endpoints_lt:
   cost:
   - 0.2
   - 0.7
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: mara
+  cost:
+  - 0.15
+  - 0.75
 - api: openrouter
   model: qwen/qwen3-coder-next
   provider: ionstream/fp8
