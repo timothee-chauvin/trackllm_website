@@ -236,6 +236,12 @@ too_expensive:
   - 2.0
   - 12.0
 - api: openrouter
+  model: google/gemini-3-pro-image-preview
+  provider: google-vertex/global/flex
+  cost:
+  - 1.0
+  - 6.0
+- api: openrouter
   model: google/gemini-3.1-flash-image-preview
   provider: google-vertex/global
   cost:
@@ -313,6 +319,12 @@ too_expensive:
   cost:
   - 0.3
   - 1.2
+- api: openrouter
+  model: minimax/minimax-m3
+  provider: gmicloud/fp8
+  cost:
+  - 0.6
+  - 2.4
 - api: openrouter
   model: minimax/minimax-m3
   provider: minimax/fp8
