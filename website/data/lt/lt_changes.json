@@ -39,7 +39,7 @@
       "endpoint": "deepseek2fdeepseek-chat-v3-032423crusoe2ffp8",
       "index": 4510,
       "date": "2026-01-11T09:23:55Z",
-      "sigma": 98.77347655967138,
+      "sigma": 98.77347655967142,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -56,7 +56,7 @@
       "endpoint": "deepseek2fdeepseek-chat-v3-032423fireworks",
       "index": 3135,
       "date": "2025-11-07T00:00:16Z",
-      "sigma": 23.368650855060373,
+      "sigma": 23.36865085506037,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     },
     {
@@ -203,7 +203,7 @@
       "endpoint": "deepseek2fdeepseek-r1-052823crusoe2ffp8",
       "index": 1677,
       "date": "2025-10-01T14:00:26Z",
-      "sigma": 12.733588769630904,
+      "sigma": 12.733588769630906,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     },
     {
@@ -219,14 +219,14 @@
       "endpoint": "deepseek2fdeepseek-r1-052823fireworks",
       "index": 3111,
       "date": "2025-11-05T09:00:18Z",
-      "sigma": 25.68700666344715,
+      "sigma": 25.687006663447153,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     },
     {
       "endpoint": "deepseek2fdeepseek-r1-052823fireworks",
       "index": 3136,
       "date": "2025-11-06T10:00:21Z",
-      "sigma": 24.36955635292657,
+      "sigma": 24.369556352926566,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     },
     {
@@ -243,7 +243,7 @@
       "endpoint": "deepseek2fdeepseek-r1-052823lambda2ffp8",
       "index": 411,
       "date": "2025-08-25T23:00:18Z",
-      "sigma": 14.436462201482641,
+      "sigma": 14.436462201482637,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -297,7 +297,7 @@
       "endpoint": "deepseek2fdeepseek-r123lambda2ffp8",
       "index": 157,
       "date": "2025-07-04T09:00:08Z",
-      "sigma": 22.497503072482225,
+      "sigma": 22.49750307248223,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -396,7 +396,7 @@
       "endpoint": "meta-llama2fllama-4-maverick23lambda2ffp8",
       "index": 311,
       "date": "2025-07-10T21:00:25Z",
-      "sigma": 13.16432379500179,
+      "sigma": 13.164323795001792,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -411,7 +411,7 @@
       "endpoint": "microsoft2fmai-ds-r123chutes2ffp8",
       "index": 845,
       "date": "2025-09-17T12:00:15Z",
-      "sigma": 73.26001555427733,
+      "sigma": 73.26001555427732,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -454,7 +454,7 @@
       "endpoint": "mistralai2fdevstral-small-25053afree23chutes",
       "index": 153,
       "date": "2025-09-06T14:00:28Z",
-      "sigma": 591.5032486162676,
+      "sigma": 591.5032486162677,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -500,7 +500,7 @@
       "endpoint": "mistralai2fmistral-small-3.1-24b-instruct3afree23chutes",
       "index": 1951,
       "date": "2025-10-10T02:00:25Z",
-      "sigma": 2625.2070507009457,
+      "sigma": 2625.207050700946,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     },
     {
@@ -517,7 +517,7 @@
       "endpoint": "mistralai2fmistral-small-3.2-24b-instruct3afree23chutes",
       "index": 652,
       "date": "2025-08-03T13:02:33Z",
-      "sigma": 302.466945915033,
+      "sigma": 302.46694591503297,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     },
     {
@@ -571,7 +571,7 @@
       "endpoint": "nousresearch2fhermes-3-llama-3.1-405b23lambda2ffp8",
       "index": 462,
       "date": "2025-07-17T01:00:07Z",
-      "sigma": 156.7117933398002,
+      "sigma": 156.71179333980024,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -607,7 +607,7 @@
       "endpoint": "nousresearch2fhermes-4-405b23nebius2ffp8",
       "index": 1157,
       "date": "2025-10-15T22:00:18Z",
-      "sigma": 67.99237192506277,
+      "sigma": 67.99237192506276,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -788,7 +788,7 @@
       "endpoint": "qwen2fqwen3-coder23fireworks",
       "index": 4199,
       "date": "2026-02-05T06:35:00Z",
-      "sigma": 29.22544696675283,
+      "sigma": 29.225446966752838,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -810,7 +810,7 @@
       "endpoint": "qwen2fqwq-32b23nebius2ffp8",
       "index": 3644,
       "date": "2025-09-11T14:00:26Z",
-      "sigma": 76.72541018026038,
+      "sigma": 76.72541018026035,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -835,7 +835,7 @@
       "endpoint": "thudm2fglm-z1-32b3afree23chutes",
       "index": 350,
       "date": "2025-07-21T10:01:10Z",
-      "sigma": 507.33120718235847,
+      "sigma": 507.3312071823583,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -1040,5 +1040,8 @@
   "moonshotai2fkimi-k2.523streamlake2ffp8": [],
   "google2fgemma-4-26b-a4b-it23wafer2ffp8": [],
   "z-ai2fglm-5.223alibaba": [],
-  "rekaai2freka-flash-323reka2ffp8": []
+  "rekaai2freka-flash-323reka2ffp8": [],
+  "deepseek2fdeepseek-chat-v3.123mara": [],
+  "meta-llama2fllama-3.2-3b-instruct23parasail2fbf16": [],
+  "qwen2fqwen3-235b-a22b-250723gmicloud2ffp8": []
 }
