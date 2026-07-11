@@ -39,7 +39,7 @@
       "endpoint": "deepseek2fdeepseek-chat-v3-032423crusoe2ffp8",
       "index": 4510,
       "date": "2026-01-11T09:23:55Z",
-      "sigma": 98.77347655967141,
+      "sigma": 98.77347655967138,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -56,7 +56,7 @@
       "endpoint": "deepseek2fdeepseek-chat-v3-032423fireworks",
       "index": 3135,
       "date": "2025-11-07T00:00:16Z",
-      "sigma": 23.36865085506037,
+      "sigma": 23.368650855060373,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     },
     {
@@ -203,7 +203,7 @@
       "endpoint": "deepseek2fdeepseek-r1-052823crusoe2ffp8",
       "index": 1677,
       "date": "2025-10-01T14:00:26Z",
-      "sigma": 12.733588769630908,
+      "sigma": 12.733588769630904,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     },
     {
@@ -297,7 +297,7 @@
       "endpoint": "deepseek2fdeepseek-r123lambda2ffp8",
       "index": 157,
       "date": "2025-07-04T09:00:08Z",
-      "sigma": 22.49750307248223,
+      "sigma": 22.497503072482225,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -330,7 +330,7 @@
       "endpoint": "deepseek2fdeepseek-v3.223deepseek",
       "index": 1925,
       "date": "2026-02-26T22:26:01Z",
-      "sigma": 17.33264842592344,
+      "sigma": 17.332648425923434,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -382,7 +382,7 @@
       "endpoint": "meta-llama2fllama-3.3-70b-instruct23fireworks2ffp16",
       "index": 4518,
       "date": "2025-12-18T21:23:13Z",
-      "sigma": 39.04000035451661,
+      "sigma": 39.0400003545166,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -435,7 +435,7 @@
       "endpoint": "minimax2fminimax-m223fireworks",
       "index": 185,
       "date": "2025-12-12T10:24:26Z",
-      "sigma": 190.8778888893136,
+      "sigma": 190.87788888931354,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -454,7 +454,7 @@
       "endpoint": "mistralai2fdevstral-small-25053afree23chutes",
       "index": 153,
       "date": "2025-09-06T14:00:28Z",
-      "sigma": 591.5032486162677,
+      "sigma": 591.5032486162676,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -474,7 +474,7 @@
       "endpoint": "mistralai2fmistral-small-24b-instruct-25013afree23chutes",
       "index": 660,
       "date": "2025-08-03T12:00:24Z",
-      "sigma": 215.18840283808032,
+      "sigma": 215.18840283808035,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -517,7 +517,7 @@
       "endpoint": "mistralai2fmistral-small-3.2-24b-instruct3afree23chutes",
       "index": 652,
       "date": "2025-08-03T13:02:33Z",
-      "sigma": 302.46694591503297,
+      "sigma": 302.466945915033,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     },
     {
@@ -648,7 +648,7 @@
       "endpoint": "openai2fgpt-4o-2024-08-0623azure",
       "index": 2438,
       "date": "2025-10-08T10:00:21Z",
-      "sigma": 24.160465797780088,
+      "sigma": 24.16046579778009,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     },
     {
@@ -810,7 +810,7 @@
       "endpoint": "qwen2fqwq-32b23nebius2ffp8",
       "index": 3644,
       "date": "2025-09-11T14:00:26Z",
-      "sigma": 76.72541018026035,
+      "sigma": 76.72541018026038,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
