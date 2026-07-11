@@ -127,6 +127,12 @@ endpoints_lt:
   - 0.28
 - api: openrouter
   model: deepseek/deepseek-v4-flash
+  provider: nextbit/fp8
+  cost:
+  - 0.14
+  - 0.28
+- api: openrouter
+  model: deepseek/deepseek-v4-flash
   provider: wandb/fp8
   cost:
   - 0.14

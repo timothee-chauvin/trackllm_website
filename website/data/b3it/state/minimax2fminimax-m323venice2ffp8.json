@@ -1,0 +1,23 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "minimax/minimax-m3",
+    "provider": "venice/fp8",
+    "cost": [
+      0.3,
+      1.2
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 8.94e-6,
+    "created": "2026-05-31T16:36:14Z",
+    "supports_temperature": true
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "no_bis",
+    "since": "2026-07-11T04:12:35Z",
+    "last_recheck": "2026-07-11T04:12:35Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}
