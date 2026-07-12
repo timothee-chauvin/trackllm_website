@@ -43,21 +43,29 @@ def merge_changes(lt_changes, lt_by_slug, b3it_views) -> list[ChangeEvent]:
                 )
             )
     for slug, view in b3it_views.items():
+        seen: set[datetime] = set()
+
+        def _emit(date: str) -> None:
+            key = datetime.fromisoformat(date)
+            if key in seen:
+                return
+            seen.add(key)
+            events.append(
+                ChangeEvent(date, slug, view.model, view.provider, "B3IT", None, "")
+            )
+
+        # Authoritative epoch closures (live detector).
         for epoch in view.epochs:
             if epoch.get("end_reason") == "change_detected" and epoch.get(
                 "change_date"
             ):
-                events.append(
-                    ChangeEvent(
-                        epoch["change_date"],
-                        slug,
-                        view.model,
-                        view.provider,
-                        "B3IT",
-                        None,
-                        "",
-                    )
-                )
+                _emit(epoch["change_date"])
+        # Onsets derived from the TV series of every epoch, including closed and
+        # migrated legacy epochs whose changes never triggered a closure. This is
+        # the entire pre-detector history; dedup guards against a live-detected
+        # change being counted twice.
+        for change in getattr(view, "changes", None) or []:
+            _emit(change["date"])
     events.sort(key=lambda e: datetime.fromisoformat(e.date), reverse=True)
     return events
 

@@ -50,6 +50,48 @@ def test_b3it_change_detected_magnitude_display_blank():
     assert events[0].magnitude_display == ""
 
 
+def test_b3it_derived_onsets_surface_in_feed():
+    """Onsets inside a closed 'gap' epoch (no closure) still reach the feed."""
+
+    class V:
+        model = "m/c"
+        provider = "r"
+        epochs = [
+            {
+                "start": "2026-01-01T00:00:00Z",
+                "end": "2026-05-01T00:00:00Z",
+                "end_reason": "gap",
+                "change_date": None,
+            }
+        ]
+        changes = [{"date": "2026-02-04T21:16:18+00:00", "kind": "onset"}]
+
+    events = merge_changes({}, {}, {"s3": V()})
+    assert len(events) == 1
+    assert events[0].method == "B3IT"
+    assert events[0].date.startswith("2026-02-04")
+
+
+def test_b3it_change_detected_not_double_counted_with_derived_onset():
+    """A live-detected closure and its derived onset are the same event."""
+
+    class V:
+        model = "m/d"
+        provider = "s"
+        epochs = [
+            {
+                "start": "2026-01-01T00:00:00Z",
+                "end": "2026-05-01T00:00:00Z",
+                "end_reason": "change_detected",
+                "change_date": "2026-04-15T00:00:00Z",
+            }
+        ]
+        changes = [{"date": "2026-04-15T00:00:00Z", "kind": "onset"}]
+
+    events = merge_changes({}, {}, {"s4": V()})
+    assert len(events) == 1
+
+
 # --- existing tests ---
 
 
