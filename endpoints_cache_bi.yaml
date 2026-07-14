@@ -134,6 +134,30 @@ too_expensive:
   - 5.0
   - 25.0
 - api: openrouter
+  model: anthropic/claude-sonnet-4.5
+  provider: amazon-bedrock/eu-west-1
+  cost:
+  - 3.3
+  - 16.5
+- api: openrouter
+  model: anthropic/claude-sonnet-4.5
+  provider: google-vertex/us-east5
+  cost:
+  - 3.3
+  - 16.5
+- api: openrouter
+  model: anthropic/claude-sonnet-4.6
+  provider: amazon-bedrock/eu-west-1
+  cost:
+  - 3.3
+  - 16.5
+- api: openrouter
+  model: anthropic/claude-sonnet-4.6
+  provider: google-vertex/europe
+  cost:
+  - 3.3
+  - 16.5
+- api: openrouter
   model: bytedance-seed/seed-1.6
   provider: seed/fp8
   cost:
@@ -259,6 +283,18 @@ too_expensive:
   cost:
   - 0.25
   - 0.75
+- api: openrouter
+  model: kwaipilot/kat-coder-air-v2.5
+  provider: streamlake
+  cost:
+  - 0.15
+  - 0.6
+- api: openrouter
+  model: kwaipilot/kat-coder-pro-v2.5
+  provider: streamlake
+  cost:
+  - 0.74
+  - 2.96
 - api: openrouter
   model: mancer/weaver
   provider: mancer/fp8
@@ -925,6 +961,12 @@ too_expensive:
   cost:
   - 0.6
   - 3.0
+- api: openrouter
+  model: xiaomi/mimo-v2.5-pro
+  provider: gmicloud/bf16
+  cost:
+  - 0.8
+  - 2.4
 - api: openrouter
   model: xiaomi/mimo-v2.5-pro
   provider: novita
