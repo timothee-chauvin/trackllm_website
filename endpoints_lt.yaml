@@ -253,12 +253,6 @@ endpoints_lt:
   - 0.6
 - api: openrouter
   model: openai/gpt-4o-mini
-  provider: azure/swedencentral
-  cost:
-  - 0.15
-  - 0.6
-- api: openrouter
-  model: openai/gpt-4o-mini
   provider: openai
   cost:
   - 0.15
@@ -287,6 +281,12 @@ endpoints_lt:
   cost:
   - 0.4
   - 0.4
+- api: openrouter
+  model: openai/gpt-4o-mini
+  provider: azure/swedencentral
+  cost:
+  - 0.165
+  - 0.66
 - api: openrouter
   model: qwen/qwen3-vl-30b-a3b-instruct
   provider: novita/bf16
