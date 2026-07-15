@@ -944,6 +944,18 @@ too_expensive:
   - 2.0
   - 4.0
 - api: openrouter
+  model: xiaomi/mimo-v2.5
+  provider: gmicloud/fp8
+  cost:
+  - 0.32
+  - 1.6
+- api: openrouter
+  model: xiaomi/mimo-v2.5
+  provider: novita/fp8
+  cost:
+  - 0.168
+  - 0.336
+- api: openrouter
   model: xiaomi/mimo-v2.5-pro
   provider: atlas-cloud/fp8
   cost:
@@ -979,6 +991,12 @@ too_expensive:
   cost:
   - 0.435
   - 0.87
+- api: openrouter
+  model: z-ai/glm-4.5
+  provider: z-ai/fp8
+  cost:
+  - 0.6
+  - 2.2
 - api: openrouter
   model: z-ai/glm-4.5-air
   provider: siliconflow/fp8
