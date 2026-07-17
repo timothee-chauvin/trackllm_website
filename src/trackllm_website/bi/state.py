@@ -43,7 +43,7 @@ class Epoch(BaseModel):
 
 
 class RetiredInfo(BaseModel):
-    reason: Literal["stalled", "no_bis", "delisted"]
+    reason: Literal["stalled", "no_bis", "delisted", "unreachable"]
     since: datetime
     last_recheck: datetime
 
