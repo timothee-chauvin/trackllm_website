@@ -102,6 +102,12 @@ endpoints_lt:
   - 0.09
   - 0.3
 - api: openrouter
+  model: qwen/qwen3-30b-a3b-instruct-2507
+  provider: dekallm
+  cost:
+  - 0.09
+  - 0.3
+- api: openrouter
   model: google/gemma-4-26b-a4b-it
   provider: cloudflare
   cost:
@@ -139,6 +145,18 @@ endpoints_lt:
   - 0.22
 - api: openrouter
   model: google/gemma-4-31b-it
+  provider: open-inference/bf16
+  cost:
+  - 0.1
+  - 0.35
+- api: openrouter
+  model: google/gemma-4-26b-a4b-it
+  provider: nextbit/bf16
+  cost:
+  - 0.12
+  - 0.35
+- api: openrouter
+  model: google/gemma-4-31b-it
   provider: wandb/bf16
   cost:
   - 0.12
@@ -161,12 +179,6 @@ endpoints_lt:
   cost:
   - 0.08
   - 0.45
-- api: openrouter
-  model: google/gemma-4-26b-a4b-it
-  provider: nextbit/bf16
-  cost:
-  - 0.13
-  - 0.4
 - api: openrouter
   model: google/gemma-4-26b-a4b-it
   provider: novita/bf16

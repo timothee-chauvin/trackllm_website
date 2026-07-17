@@ -194,6 +194,12 @@ too_expensive:
   - 0.3426
   - 1.0284
 - api: openrouter
+  model: deepseek/deepseek-v3.2
+  provider: gmicloud/fp8
+  cost:
+  - 0.29
+  - 0.43
+- api: openrouter
   model: deepseek/deepseek-v4-flash
   provider: atlas-cloud/fp4
   cost:
@@ -301,6 +307,12 @@ too_expensive:
   cost:
   - 0.75
   - 1.0
+- api: openrouter
+  model: meta/muse-spark-1.1
+  provider: meta
+  cost:
+  - 1.25
+  - 4.25
 - api: openrouter
   model: minimax/minimax-01
   provider: minimax
@@ -1268,6 +1280,12 @@ bad_temperature:
   cost:
   - 2.0
   - 10.0
+- api: openrouter
+  model: moonshotai/kimi-k3
+  provider: moonshotai/int4
+  cost:
+  - 3.0
+  - 15.0
 - api: openrouter
   model: openai/gpt-4o-mini-search-preview
   provider: openai
