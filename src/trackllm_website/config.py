@@ -28,6 +28,7 @@ class Endpoint(BaseModel):
         None  # measured $/monitoring-query; set by BI vetting
     )
     created: datetime | None = None  # model release date from OpenRouter /models
+    last_seen: datetime | None = None  # last run this endpoint vetted good (BI only)
     supports_temperature: bool | None = (
         None  # from /models supported_parameters; transient (not persisted)
     )
@@ -146,6 +147,7 @@ class BIConfig(BaseModel):
     selection_path: str
     samples_per_day: int
     days_per_month: int
+    carry_forward_days: int
     probe: ProbeConfig
     phase_1: Phase1Config
     phase_2: Phase2Config
