@@ -70,6 +70,7 @@ def save_endpoints_bi(endpoints: list[Endpoint]) -> None:
                 "cost": list(e.cost),
                 "cost_per_request": e.cost_per_request,
                 "created": e.created.isoformat() if e.created else None,
+                "last_seen": e.last_seen.isoformat() if e.last_seen else None,
             }
             for e in sorted_endpoints
         ]
@@ -87,6 +88,7 @@ def merge_goods(
     prior_goods: list[Endpoint],
     freshly_good: list[Endpoint],
     cache: EndpointCache,
+    now: datetime,
 ) -> list[Endpoint]:
     """Merge this run's good endpoints with prior goods that flaked transiently.
 
@@ -95,15 +97,29 @@ def merge_goods(
     it forward with its PRIOR cost_per_request so a flaky API day doesn't shrink
     the monitored set. Endpoints explicitly moved to liar / too_expensive are
     excluded (they live in the cache now). Fresh measurements win on overlap.
+
+    Carrying is bounded by last_seen (stamped on every fresh good): an endpoint
+    that hasn't vetted good for carry_forward_days has left the catalog for real,
+    not flaked, and would otherwise stay a zombie candidate forever. Legacy
+    entries without last_seen get stamped now rather than dropped in bulk.
     """
+    for e in freshly_good:
+        e.last_seen = now
+    expiry = now - timedelta(days=config.bi.carry_forward_days)
     fresh_set = set(freshly_good)
-    carried = [
-        e
-        for e in prior_goods
-        if e not in fresh_set
-        and not cache.is_cached(e)
-        and e.cost_per_request is not None
-    ]
+    carried, expired = [], []
+    for e in prior_goods:
+        if e in fresh_set or cache.is_cached(e) or e.cost_per_request is None:
+            continue
+        if e.last_seen is None:
+            e.last_seen = now
+        (carried if e.last_seen >= expiry else expired).append(e)
+    if expired:
+        logger.info(
+            f"Expired {len(expired)} carried candidates absent for over "
+            f"{config.bi.carry_forward_days} days: "
+            f"{', '.join(str(e) for e in expired)}"
+        )
     return freshly_good + carried
 
 
@@ -406,7 +422,7 @@ async def update_endpoints_bi() -> list[Endpoint]:
         await client.close()
 
     freshly_good = [e for e in results if e is not None]
-    good = merge_goods(prior_goods, freshly_good, cache)
+    good = merge_goods(prior_goods, freshly_good, cache, now)
     logger.info(
         f"Vetting results: {len(freshly_good)} freshly good, "
         f"{len(good) - len(freshly_good)} carried (transient flakes), "
