@@ -120,6 +120,21 @@ class OpenRouterClient:
                     message=response["error"]["message"],
                 )
 
+        # Some providers return 200 OK with no usage at all (e.g. io.net): nothing
+        # to bill or count, so surface a clear error instead of a bare KeyError.
+        if "usage" not in response:
+            return Response(
+                date=datetime.now(tz=timezone.utc),
+                endpoint=endpoint,
+                prompt=prompt,
+                logprobs=None,
+                cost=0.0,
+                error=ResponseError(
+                    http_code=resp.status,
+                    message=f"No usage in response; keys: {sorted(response)}",
+                ),
+            )
+
         usage = response["usage"]
         input_tokens = usage["prompt_tokens"]
         output_tokens = usage["completion_tokens"]
