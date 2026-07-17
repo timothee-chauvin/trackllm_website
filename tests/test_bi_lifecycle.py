@@ -1,6 +1,7 @@
 import asyncio
 from datetime import datetime, timedelta, timezone
 
+from trackllm_website.bi.common import probe_errors_unreachable
 from trackllm_website.bi.reinit import ReinitResult
 from trackllm_website.bi.state import EndpointBIState, Epoch, RetiredInfo
 from trackllm_website.config import Endpoint, config
@@ -58,6 +59,32 @@ def test_no_bis_endpoints_are_never_rechecked():
     assert [s.endpoint.model for s in actions.recheck] == ["m/stalled"]
 
 
+def test_probe_errors_unreachable_when_every_probe_404s():
+    errors = [
+        "plain: 404 No allowed providers are available for the selected model",
+        "effort=none: 404 No allowed providers are available for the selected model",
+        "budget=1: 404 No allowed providers are available for the selected model",
+    ]
+    assert probe_errors_unreachable(errors)
+
+
+def test_probe_errors_not_unreachable_on_transient_or_mixed_failures():
+    assert not probe_errors_unreachable([])
+    assert not probe_errors_unreachable(["plain: 429 rate-limited upstream"])
+    assert not probe_errors_unreachable(
+        ["plain: 404 gone", "effort=none: empty response"]
+    )
+    assert not probe_errors_unreachable(["cached: hidden reasoning"])
+
+
+def test_unreachable_endpoints_are_rechecked_after_interval():
+    states = {
+        "gone": retired_state("m/gone", "unreachable", NOW - timedelta(days=20)),
+    }
+    actions = select_lifecycle_actions([ep("m/gone")], states, NOW)
+    assert [s.endpoint.model for s in actions.recheck] == ["m/gone"]
+
+
 def test_delisted_only_after_grace_period():
     grace = config.bi.reinit.deselection_grace_days
     states = {
@@ -107,7 +134,7 @@ def _patch_lifecycle_deps(monkeypatch, tmp_path, *, select, reinit):
     )
 
     async def fake_resolve_strategies(client, endpoints, policy=None, probe_spend=None):
-        return {str(e): None for e in endpoints}, []
+        return {str(e): None for e in endpoints}, {}
 
     monkeypatch.setattr(
         "trackllm_website.update_endpoints.resolve_strategies",
@@ -257,6 +284,63 @@ def slugify_eq(endpoint):
     from trackllm_website.util import slugify
 
     return slugify(f"{endpoint.model}#{endpoint.provider}")
+
+
+def _resolve_all_failed(errors_for):
+    """A resolve_strategies fake where every endpoint fails probing."""
+
+    async def fake(client, endpoints, policy=None, probe_spend=None):
+        return {}, {str(e): errors_for(e) for e in endpoints}
+
+    return fake
+
+
+def test_fresh_onboard_with_all_404_probes_is_retired_unreachable(
+    monkeypatch, tmp_path
+):
+    gone = ep("m/gone")
+
+    def select_all(candidates, policy, popular_models):
+        return list(candidates), {e: "test" for e in candidates}
+
+    async def fake_reinit(client, strategy, endpoint, old_bis, now):
+        raise AssertionError("an unreachable endpoint must not be onboarded")
+
+    _patch_lifecycle_deps(monkeypatch, tmp_path, select=select_all, reinit=fake_reinit)
+    monkeypatch.setattr(
+        "trackllm_website.update_endpoints.resolve_strategies",
+        _resolve_all_failed(lambda e: ["plain: 404 No allowed providers"]),
+    )
+
+    asyncio.run(update_endpoints_bi_lifecycle([gone]))
+
+    state = EndpointBIState.load(config.bi.state_dir / f"{slugify_eq(gone)}.json")
+    assert state.status == "retired"
+    assert state.retired.reason == "unreachable"
+    assert state.retired.last_recheck == state.retired.since
+
+
+def test_fresh_onboard_with_transient_probe_failure_leaves_no_state(
+    monkeypatch, tmp_path
+):
+    flaky = ep("m/flaky")
+
+    def select_all(candidates, policy, popular_models):
+        return list(candidates), {e: "test" for e in candidates}
+
+    async def fake_reinit(client, strategy, endpoint, old_bis, now):
+        raise AssertionError("a failed probe must not reach onboarding")
+
+    _patch_lifecycle_deps(monkeypatch, tmp_path, select=select_all, reinit=fake_reinit)
+    monkeypatch.setattr(
+        "trackllm_website.update_endpoints.resolve_strategies",
+        _resolve_all_failed(lambda e: ["plain: 429 rate-limited upstream"]),
+    )
+
+    asyncio.run(update_endpoints_bi_lifecycle([flaky]))
+
+    # Transient failure: stays unknown so tomorrow's run retries it.
+    assert not (config.bi.state_dir / f"{slugify_eq(flaky)}.json").exists()
 
 
 def test_onboarding_timeout_is_caught_not_propagated(monkeypatch, tmp_path):

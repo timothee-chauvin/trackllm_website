@@ -9,7 +9,11 @@ import yaml
 from pydantic import BaseModel
 
 from trackllm_website.api import OpenRouterClient
-from trackllm_website.bi.common import TOO_EXPENSIVE, resolve_strategies
+from trackllm_website.bi.common import (
+    TOO_EXPENSIVE,
+    probe_errors_unreachable,
+    resolve_strategies,
+)
 from trackllm_website.bi.digest import (
     OnboardRow,
     OnboardingReport,
@@ -519,7 +523,7 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]) -> Onboardin
     report_rows: list[OnboardRow] = []
     probe_spend: dict[str, Spend] = {}
     async with OpenRouterClient(timeout=60.0) as probe_client:
-        strategies, _ = await resolve_strategies(
+        strategies, failed = await resolve_strategies(
             probe_client,
             [e for e, _ in to_init],
             policy=policy,
@@ -541,11 +545,27 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]) -> Onboardin
 
                 if str(endpoint) not in strategies:
                     # Bump last_recheck so a permanently-hidden-reasoning endpoint isn't
-                    # re-probed daily. Fresh onboards have no state yet: skip silently.
+                    # re-probed daily. Fresh onboards have no state yet: skip silently,
+                    # except when every probe 404'd — the provider no longer serves the
+                    # model, so retire it and let the recheck schedule take over from
+                    # daily re-probing.
                     if is_recheck and state is not None:
                         state.retired.last_recheck = now
                         state.save(config.bi.state_dir)
                     outcome = "no_strategy"
+                    if state is None and probe_errors_unreachable(
+                        failed.get(str(endpoint), [])
+                    ):
+                        state = EndpointBIState(
+                            endpoint=endpoint,
+                            status="retired",
+                            retired=RetiredInfo(
+                                reason="unreachable", since=now, last_recheck=now
+                            ),
+                            epochs=[],
+                        )
+                        state.save(config.bi.state_dir)
+                        outcome = "unreachable"
                     return
 
                 # old_bis=[]: rechecks intentionally rediscover BIs from scratch,
