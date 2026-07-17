@@ -1,0 +1,3 @@
+# Spend ledgers are append-only: union-merge concurrent appends from parallel
+# workflow runs instead of conflicting on rebase.
+website/data/spend/**/*.jsonl merge=union
