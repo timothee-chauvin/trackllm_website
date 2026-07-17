@@ -108,20 +108,29 @@ def test_flagship_above_ceiling_is_kept():
     assert exceeds_ceiling(0.0001, "m/flag", "p", pol) is False
 
 
+MERGE_NOW = datetime(2026, 7, 17, tzinfo=timezone.utc)
+
+
+def mk_good(model, cpr, last_seen=None):
+    e = Endpoint(api="openrouter", model=model, provider="p", cost=(1, 1))
+    e.cost_per_request = cpr
+    e.last_seen = last_seen
+    return e
+
+
 def test_merge_goods_carries_forward_transient_flakes():
     # A re-measured this run (fresh cpr), B cached as a liar, C flaked transiently
     # (not freshly good, not cached) => carried forward with its prior cpr.
-    def mk(model, cpr):
-        e = Endpoint(api="openrouter", model=model, provider="p", cost=(1, 1))
-        e.cost_per_request = cpr
-        return e
-
-    prior = [mk("m/a", 0.1), mk("m/b", 0.2), mk("m/c", 0.3)]
-    freshly_good = [mk("m/a", 0.15)]
+    prior = [
+        mk_good("m/a", 0.1, MERGE_NOW),
+        mk_good("m/b", 0.2, MERGE_NOW),
+        mk_good("m/c", 0.3, MERGE_NOW),
+    ]
+    freshly_good = [mk_good("m/a", 0.15)]
     cache = EndpointCache(liars=[], too_expensive=[], bad_temperature=[])
-    cache.add_liar(mk("m/b", 0.2))
+    cache.add_liar(mk_good("m/b", 0.2))
 
-    result = merge_goods(prior, freshly_good, cache)
+    result = merge_goods(prior, freshly_good, cache, MERGE_NOW)
     by_model = {e.model: e for e in result}
 
     assert set(by_model) == {"m/a", "m/c"}  # B (cached liar) excluded
@@ -132,16 +141,46 @@ def test_merge_goods_carries_forward_transient_flakes():
 def test_merge_goods_drops_carried_without_cost():
     # D flaked transiently (not freshly good, not cached) but has no prior
     # cost_per_request => can't be priced/selected, so it's dropped.
-    def mk(model, cpr):
-        e = Endpoint(api="openrouter", model=model, provider="p", cost=(1, 1))
-        e.cost_per_request = cpr
-        return e
-
-    prior = [mk("m/a", 0.1), mk("m/d", None)]
+    prior = [mk_good("m/a", 0.1, MERGE_NOW), mk_good("m/d", None, MERGE_NOW)]
     cache = EndpointCache(liars=[], too_expensive=[], bad_temperature=[])
 
-    result = merge_goods(prior, freshly_good=[], cache=cache)
+    result = merge_goods(prior, freshly_good=[], cache=cache, now=MERGE_NOW)
     assert {e.model for e in result} == {"m/a"}
+
+
+def test_merge_goods_stamps_last_seen_on_freshly_good():
+    fresh = mk_good("m/a", 0.1)
+    cache = EndpointCache(liars=[], too_expensive=[], bad_temperature=[])
+
+    result = merge_goods([], [fresh], cache, MERGE_NOW)
+    assert result[0].last_seen == MERGE_NOW
+
+
+def test_merge_goods_expires_carries_absent_too_long():
+    # An endpoint that vanished from the catalog stops being carried once its
+    # last good vetting is older than carry_forward_days; a recent flake stays.
+    from trackllm_website.config import config
+
+    days = config.bi.carry_forward_days
+    prior = [
+        mk_good("m/recent", 0.1, MERGE_NOW - timedelta(days=1)),
+        mk_good("m/dead", 0.2, MERGE_NOW - timedelta(days=days + 1)),
+    ]
+    cache = EndpointCache(liars=[], too_expensive=[], bad_temperature=[])
+
+    result = merge_goods(prior, [], cache, MERGE_NOW)
+    assert {e.model for e in result} == {"m/recent"}
+
+
+def test_merge_goods_grandfathers_legacy_carries_without_last_seen():
+    # Pre-last_seen registry entries: keep them and start their absence clock now,
+    # rather than dropping 100 carried endpoints on the first run after deploy.
+    legacy = mk_good("m/legacy", 0.1)
+    cache = EndpointCache(liars=[], too_expensive=[], bad_temperature=[])
+
+    result = merge_goods([legacy], [], cache, MERGE_NOW)
+    assert [e.model for e in result] == ["m/legacy"]
+    assert result[0].last_seen == MERGE_NOW
 
 
 def test_cache_round_trip(tmp_path):
