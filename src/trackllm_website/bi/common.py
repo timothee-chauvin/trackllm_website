@@ -1,6 +1,7 @@
 """Common utilities for BI (border input) experiments."""
 
 import asyncio
+import re
 import time
 from collections import deque
 from dataclasses import dataclass, field
@@ -28,6 +29,15 @@ SAVE_INTERVAL = 5
 # Marker placed first in a discover_strategy error list when an endpoint is
 # short-circuited for cost; callers route these to the too_expensive cache.
 TOO_EXPENSIVE = "too_expensive"
+
+# Matches discover_strategy's "{label}: {http_code} {message}" error format.
+_PROBE_404 = re.compile(r"^[^:]+: 404 ")
+
+
+def probe_errors_unreachable(errors: list[str]) -> bool:
+    """True when every probe 404'd: the provider no longer serves the model on
+    OpenRouter (delisted providers keep 404ing), unlike transient 429/5xx/timeouts."""
+    return bool(errors) and all(_PROBE_404.match(e) for e in errors)
 
 
 # --- Query strategy types for reasoning-aware endpoints ---
