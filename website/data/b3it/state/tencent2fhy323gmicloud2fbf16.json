@@ -10,6 +10,7 @@
     "max_logprobs": null,
     "cost_per_request": 2.82e-6,
     "created": "2026-07-06T13:20:48Z",
+    "last_seen": null,
     "supports_temperature": true
   },
   "status": "monitoring",
