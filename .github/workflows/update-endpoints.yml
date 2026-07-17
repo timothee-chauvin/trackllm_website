@@ -47,4 +47,4 @@ jobs:
         git config --local user.name "github-actions[bot]"
         git add .
         git diff --staged --quiet || git commit -m "[bot] Daily update of target endpoints"
-        git push
+        bash .github/scripts/push-with-rebase.sh
