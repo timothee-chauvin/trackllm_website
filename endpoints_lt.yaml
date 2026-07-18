@@ -172,7 +172,7 @@ endpoints_lt:
   provider: nextbit/fp8
   cost:
   - 0.18
-  - 0.35
+  - 0.34
 - api: openrouter
   model: google/gemma-3-27b-it
   provider: parasail/fp8
@@ -528,6 +528,12 @@ endpoints_lt:
   - 0.54
   - 2.7
 - api: openrouter
+  model: deepseek/deepseek-v4-pro
+  provider: ionstream/fp4
+  cost:
+  - 1.131
+  - 2.262
+- api: openrouter
   model: z-ai/glm-5.1
   provider: gmicloud/fp8
   cost:
@@ -557,6 +563,12 @@ endpoints_lt:
   cost:
   - 1.74
   - 3.48
+- api: openrouter
+  model: z-ai/glm-5.1
+  provider: phala
+  cost:
+  - 1.21
+  - 4.2
 - api: openrouter
   model: openai/gpt-3.5-turbo-16k
   provider: azure
