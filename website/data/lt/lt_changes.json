@@ -96,7 +96,7 @@
       "endpoint": "deepseek2fdeepseek-chat-v3-032423lambda2ffp8",
       "index": 500,
       "date": "2025-07-17T01:00:09Z",
-      "sigma": 21.765006179466315,
+      "sigma": 21.76500617946632,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -226,14 +226,14 @@
       "endpoint": "deepseek2fdeepseek-r1-052823fireworks",
       "index": 3136,
       "date": "2025-11-06T10:00:21Z",
-      "sigma": 24.369556352926566,
+      "sigma": 24.36955635292657,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     },
     {
       "endpoint": "deepseek2fdeepseek-r1-052823fireworks",
       "index": 3358,
       "date": "2025-11-15T16:00:13Z",
-      "sigma": 22.62775285412694,
+      "sigma": 22.627752854126935,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -243,7 +243,7 @@
       "endpoint": "deepseek2fdeepseek-r1-052823lambda2ffp8",
       "index": 411,
       "date": "2025-08-25T23:00:18Z",
-      "sigma": 14.436462201482641,
+      "sigma": 14.436462201482637,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -297,7 +297,7 @@
       "endpoint": "deepseek2fdeepseek-r123lambda2ffp8",
       "index": 157,
       "date": "2025-07-04T09:00:08Z",
-      "sigma": 22.49750307248223,
+      "sigma": 22.497503072482225,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -357,7 +357,7 @@
       "endpoint": "mancer2fweaver23mancer2ffp8",
       "index": 2370,
       "date": "2026-03-17T01:55:14Z",
-      "sigma": 134.65523862733733,
+      "sigma": 134.6552386273373,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -411,7 +411,7 @@
       "endpoint": "microsoft2fmai-ds-r123chutes2ffp8",
       "index": 845,
       "date": "2025-09-17T12:00:15Z",
-      "sigma": 73.26001555427735,
+      "sigma": 73.26001555427736,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -444,7 +444,7 @@
       "endpoint": "mistralai2fdevstral-small-250523chutes",
       "index": 594,
       "date": "2025-09-06T14:00:16Z",
-      "sigma": 562.3170318335107,
+      "sigma": 562.3170318335106,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -454,7 +454,7 @@
       "endpoint": "mistralai2fdevstral-small-25053afree23chutes",
       "index": 153,
       "date": "2025-09-06T14:00:28Z",
-      "sigma": 591.5032486162677,
+      "sigma": 591.5032486162678,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -474,7 +474,7 @@
       "endpoint": "mistralai2fmistral-small-24b-instruct-25013afree23chutes",
       "index": 660,
       "date": "2025-08-03T12:00:24Z",
-      "sigma": 215.18840283808032,
+      "sigma": 215.18840283808035,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -517,7 +517,7 @@
       "endpoint": "mistralai2fmistral-small-3.2-24b-instruct3afree23chutes",
       "index": 652,
       "date": "2025-08-03T13:02:33Z",
-      "sigma": 302.46694591503297,
+      "sigma": 302.46694591503285,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     },
     {
@@ -533,7 +533,7 @@
       "endpoint": "mistralai2fmixtral-8x22b-instruct23fireworks",
       "index": 1594,
       "date": "2025-09-03T02:00:18Z",
-      "sigma": 105.35475704101901,
+      "sigma": 105.35475704101898,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -694,7 +694,7 @@
       "endpoint": "qwen2fqwen-2.5-coder-32b-instruct3afree23chutes",
       "index": 363,
       "date": "2025-07-22T02:02:16Z",
-      "sigma": 316.7143735692483,
+      "sigma": 316.71437356924844,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -752,7 +752,7 @@
       "endpoint": "qwen2fqwen3-30b-a3b23nebius2ffp8",
       "index": 1909,
       "date": "2025-09-17T06:00:28Z",
-      "sigma": 15.767061771194193,
+      "sigma": 15.767061771194196,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
@@ -788,7 +788,7 @@
       "endpoint": "qwen2fqwen3-coder23fireworks",
       "index": 4199,
       "date": "2026-02-05T06:35:00Z",
-      "sigma": 29.225446966752823,
+      "sigma": 29.22544696675283,
       "first_detected": "2026-06-11T17:41:46.966404Z"
     }
   ],
