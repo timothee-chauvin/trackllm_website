@@ -200,6 +200,12 @@ too_expensive:
   - 0.29
   - 0.43
 - api: openrouter
+  model: deepseek/deepseek-v3.2
+  provider: siliconflow/fp8
+  cost:
+  - 0.259
+  - 0.42
+- api: openrouter
   model: deepseek/deepseek-v4-flash
   provider: atlas-cloud/fp4
   cost:
@@ -254,6 +260,36 @@ too_expensive:
   - 0.3
   - 2.5
 - api: openrouter
+  model: google/gemini-2.5-pro
+  provider: google-ai-studio/priority
+  cost:
+  - 2.25
+  - 18.0
+- api: openrouter
+  model: google/gemini-2.5-pro-preview
+  provider: google-ai-studio
+  cost:
+  - 1.25
+  - 10.0
+- api: openrouter
+  model: google/gemini-2.5-pro-preview
+  provider: google-ai-studio/priority
+  cost:
+  - 2.25
+  - 18.0
+- api: openrouter
+  model: google/gemini-2.5-pro-preview-05-06
+  provider: google-ai-studio
+  cost:
+  - 1.25
+  - 10.0
+- api: openrouter
+  model: google/gemini-2.5-pro-preview-05-06
+  provider: google-ai-studio/priority
+  cost:
+  - 2.25
+  - 18.0
+- api: openrouter
   model: google/gemini-3-pro-image
   provider: google-vertex/global
   cost:
@@ -273,10 +309,46 @@ too_expensive:
   - 6.0
 - api: openrouter
   model: google/gemini-3.1-flash-image-preview
+  provider: google-ai-studio
+  cost:
+  - 0.5
+  - 3.0
+- api: openrouter
+  model: google/gemini-3.1-flash-image-preview
   provider: google-vertex/global
   cost:
   - 0.5
   - 3.0
+- api: openrouter
+  model: google/gemini-3.1-flash-image-preview
+  provider: google-vertex/global/flex
+  cost:
+  - 0.25
+  - 1.5
+- api: openrouter
+  model: google/gemini-3.1-flash-lite-image
+  provider: google-ai-studio
+  cost:
+  - 0.25
+  - 1.5
+- api: openrouter
+  model: google/gemini-3.1-flash-lite-image
+  provider: google-vertex/global
+  cost:
+  - 0.25
+  - 1.5
+- api: openrouter
+  model: google/gemini-3.1-pro-preview
+  provider: google-ai-studio/priority
+  cost:
+  - 3.6
+  - 21.6
+- api: openrouter
+  model: google/gemini-3.1-pro-preview
+  provider: google-vertex/global/priority
+  cost:
+  - 3.6
+  - 21.6
 - api: openrouter
   model: google/gemma-4-31b-it
   provider: sambanova
@@ -451,6 +523,12 @@ too_expensive:
   cost:
   - 0.855
   - 3.6
+- api: openrouter
+  model: moonshotai/kimi-k2.7-code
+  provider: atlas-cloud/int4
+  cost:
+  - 0.95
+  - 4.0
 - api: openrouter
   model: morph/morph-v3-fast
   provider: morph

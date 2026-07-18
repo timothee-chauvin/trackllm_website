@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "deepseek/deepseek-v4-flash",
+    "provider": "dekallm",
+    "cost": [
+      0.089,
+      0.18
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 6.25e-7,
+    "created": "2026-04-24T03:17:46Z",
+    "last_seen": "2026-07-18T03:49:51Z",
+    "supports_temperature": null
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "unreachable",
+    "since": "2026-07-18T04:02:35Z",
+    "last_recheck": "2026-07-18T04:02:35Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}

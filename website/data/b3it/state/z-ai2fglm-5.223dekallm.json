@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "z-ai/glm-5.2",
+    "provider": "dekallm",
+    "cost": [
+      0.94,
+      3.0
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 0.00001522,
+    "created": "2026-06-16T17:45:30Z",
+    "last_seen": "2026-07-18T03:49:51Z",
+    "supports_temperature": null
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "unreachable",
+    "since": "2026-07-18T04:02:35Z",
+    "last_recheck": "2026-07-18T04:02:35Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}
