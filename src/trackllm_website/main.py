@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 
 from trackllm_website.api import OpenRouterClient
 from trackllm_website.config import config, logger
+from trackllm_website.logprob_discovery import query_endpoint
 from trackllm_website.spend import Spend, append_entry
 from trackllm_website.storage import Response, ResultsStorage
 from trackllm_website.util import (
@@ -63,33 +64,33 @@ async def main():
     storage = ResultsStorage(data_dir=config.lt_dir)
     openrouter_client = OpenRouterClient()
 
-    # Create all tasks upfront for concurrent execution
+    # One task per endpoint: each serializes its first query to discover the
+    # endpoint's top_logprobs cap before the remaining prompts run concurrently.
     tasks = [
-        openrouter_client.query(endpoint=endpoint, prompt=prompt)
+        query_endpoint(openrouter_client.query, endpoint, config.prompts)
         for endpoint in config.endpoints_lt
-        for prompt in config.prompts
     ]
+    total = len(config.endpoints_lt) * len(config.prompts)
 
-    logger.info(
-        f"{len(tasks)} requests to send with max_workers={config.api.max_workers}"
-    )
+    logger.info(f"{total} requests to send with max_workers={config.api.max_workers}")
 
     all_responses = []
     i = 0
-    async for response in gather_with_concurrency_streaming(
+    async for responses in gather_with_concurrency_streaming(
         config.api.max_workers, *tasks
     ):
-        all_responses.append(response)
-        storage.store_response(response)
+        for response in responses:
+            all_responses.append(response)
+            storage.store_response(response)
 
-        success_or_error = (
-            "SUCCESS" if not response.error else f"ERROR: {response.error}"
-        )
-        logger.info(
-            f"{i + 1}/{len(tasks)}: {response.endpoint.model} ({response.endpoint.provider}) "
-            f"({repr(trim_to_length(response.prompt, 50))}) {success_or_error}"
-        )
-        i += 1
+            success_or_error = (
+                "SUCCESS" if not response.error else f"ERROR: {response.error}"
+            )
+            logger.info(
+                f"{i + 1}/{total}: {response.endpoint.model} ({response.endpoint.provider}) "
+                f"({repr(trim_to_length(response.prompt, 50))}) {success_or_error}"
+            )
+            i += 1
 
     # Print summary
     summary = get_summary(all_responses)
