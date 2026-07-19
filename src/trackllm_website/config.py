@@ -77,9 +77,7 @@ class Phase1Config(BaseModel):
     max_concurrent_requests_per_endpoint: int
     max_concurrent_tokens_per_endpoint: int
     request_delay_seconds: float
-    border_input_candidate_ratio: float
     target_border_inputs: int
-    queries_per_candidate: int
     max_retries: int
     abandon_after_timeouts: int
 
