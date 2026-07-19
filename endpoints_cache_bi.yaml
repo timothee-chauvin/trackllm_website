@@ -261,6 +261,12 @@ too_expensive:
   - 2.5
 - api: openrouter
   model: google/gemini-2.5-pro
+  provider: google-ai-studio
+  cost:
+  - 1.25
+  - 10.0
+- api: openrouter
+  model: google/gemini-2.5-pro
   provider: google-ai-studio/priority
   cost:
   - 2.25
@@ -274,6 +280,12 @@ too_expensive:
 - api: openrouter
   model: google/gemini-2.5-pro-preview
   provider: google-ai-studio/priority
+  cost:
+  - 2.25
+  - 18.0
+- api: openrouter
+  model: google/gemini-2.5-pro-preview
+  provider: google-vertex/global/priority
   cost:
   - 2.25
   - 18.0
@@ -1171,6 +1183,12 @@ too_expensive:
   cost:
   - 1.21
   - 4.2
+- api: openrouter
+  model: z-ai/glm-5.2
+  provider: baseten/fp8
+  cost:
+  - 1.4
+  - 4.4
 - api: openrouter
   model: z-ai/glm-5.2
   provider: gmicloud/fp8
