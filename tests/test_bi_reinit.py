@@ -174,7 +174,6 @@ def _shrink_phase1(monkeypatch, tmp_path, *, tokens, queries_per_token):
     p1 = reinit_mod.config.bi.phase_1
     monkeypatch.setattr(p1, "tokens_per_endpoint", tokens)
     monkeypatch.setattr(p1, "queries_per_token", queries_per_token)
-    monkeypatch.setattr(p1, "queries_per_candidate", queries_per_token)
     monkeypatch.setattr(p1, "target_border_inputs", 9999)
     monkeypatch.setattr(p1, "border_input_candidate_ratio", 1.0)
     monkeypatch.setattr(p1, "request_delay_seconds", 0.0)

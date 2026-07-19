@@ -40,20 +40,6 @@ class Phase1EndpointState(EndpointState):
                 logger.info(f"Reached target border inputs for {self.endpoint}")
             self.reached_target = True
 
-    def get_unfinished_border_inputs(self) -> list[tuple[str, int]]:
-        """Get list of (prompt, pending_count) for border inputs that still need queries."""
-        border_inputs = self.get_border_tokens()
-        results = []
-        for token in border_inputs:
-            first_temp = self._temp_results[self.temperatures[0]]
-            pending = (
-                config.bi.phase_1.queries_per_candidate
-                - first_temp._prompt_query_counts.get(token, 0)
-            )
-            if pending > 0:
-                results.append((token, pending))
-        return results
-
 
 def stop_early_phase1(state: EndpointState) -> bool:
     """Check if we should stop early for phase 1 (reached target border inputs)."""
