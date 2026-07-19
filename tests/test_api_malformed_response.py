@@ -61,3 +61,19 @@ def test_missing_usage_yields_clear_error_not_keyerror():
     assert r.error.http_code == 200
     assert "usage" in r.error.message and r.error.message != "'usage'"
     assert r.cost == 0.0
+
+
+def test_missing_usage_error_includes_body_excerpt():
+    # Some providers wrap the real error in a 200 body (e.g. mara's
+    # {"error": ...}); the message must surface it, not just the key names.
+    payload = {"error": {"message": "User is locked. Reason: Exhausted balance"}}
+    r = _query(payload)
+    assert r.error is not None
+    assert "User is locked" in r.error.message
+
+
+def test_missing_usage_error_body_excerpt_is_trimmed():
+    payload = {"error": {"message": "x" * 5000}}
+    r = _query(payload)
+    assert r.error is not None
+    assert len(r.error.message) < 1000
