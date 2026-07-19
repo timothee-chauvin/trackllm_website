@@ -15,6 +15,7 @@ from trackllm_website.storage import (
     ResponseError,
     ResponseLogprobs,
 )
+from trackllm_website.util import trim_to_length
 
 
 class OpenRouterClient:
@@ -131,7 +132,8 @@ class OpenRouterClient:
                 cost=0.0,
                 error=ResponseError(
                     http_code=resp.status,
-                    message=f"No usage in response; keys: {sorted(response)}",
+                    message="No usage in response; body: "
+                    f"{trim_to_length(orjson.dumps(response).decode(), 500)}",
                 ),
             )
 
