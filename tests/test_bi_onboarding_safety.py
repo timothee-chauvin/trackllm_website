@@ -198,3 +198,21 @@ def test_bare_endpoint_state_keeps_safe_defaults(tmp_path):
     state = EndpointState(**_state_kwargs(tmp_path))
     assert state.backoff_on_timeout is True
     assert state.abandon_after_timeouts is None
+
+
+def test_phase1_stops_at_target_border_inputs(tmp_path, monkeypatch):
+    """Discovery stops at target_border_inputs: reinit truncates candidates there,
+    so discovering more is pure waste."""
+    from trackllm_website.bi.phase_1 import Phase1EndpointState, stop_early_phase1
+
+    monkeypatch.setattr(config.bi.phase_1, "target_border_inputs", 3)
+    state = Phase1EndpointState(
+        **_state_kwargs(tmp_path),
+        max_retries=1,
+        backoff_on_timeout=False,
+        abandon_after_timeouts=None,
+    )
+    for count, expected in [(2, False), (3, True)]:
+        monkeypatch.setattr(state, "get_border_tokens_count", lambda c=count: c)
+        state.reached_target = False
+        assert stop_early_phase1(state) is expected

@@ -31,28 +31,10 @@ class Phase1EndpointState(EndpointState):
         self.update_reached_target()
 
     def update_reached_target(self) -> None:
-        if (
-            self.get_border_tokens_count()
-            >= config.bi.phase_1.border_input_candidate_ratio
-            * config.bi.phase_1.target_border_inputs
-        ):
+        if self.get_border_tokens_count() >= config.bi.phase_1.target_border_inputs:
             if self.reached_target is False:
                 logger.info(f"Reached target border inputs for {self.endpoint}")
             self.reached_target = True
-
-    def get_unfinished_border_inputs(self) -> list[tuple[str, int]]:
-        """Get list of (prompt, pending_count) for border inputs that still need queries."""
-        border_inputs = self.get_border_tokens()
-        results = []
-        for token in border_inputs:
-            first_temp = self._temp_results[self.temperatures[0]]
-            pending = (
-                config.bi.phase_1.queries_per_candidate
-                - first_temp._prompt_query_counts.get(token, 0)
-            )
-            if pending > 0:
-                results.append((token, pending))
-        return results
 
 
 def stop_early_phase1(state: EndpointState) -> bool:
