@@ -38,9 +38,7 @@ max_concurrent_requests_per_endpoint = 10
 max_concurrent_tokens_per_endpoint = 100
 tokens_per_endpoint = 5000
 request_delay_seconds = 5.0
-border_input_candidate_ratio = 2
 target_border_inputs = 50
-queries_per_candidate = 100
 max_retries = 3
 abandon_after_timeouts = 20
 
