@@ -426,12 +426,6 @@ endpoints_lt:
   - 0.15
   - 1.5
 - api: openrouter
-  model: qwen/qwen3-235b-a22b-2507
-  provider: gmicloud/fp8
-  cost:
-  - 0.35
-  - 1.4
-- api: openrouter
   model: deepseek/deepseek-v3.2
   provider: digitalocean
   cost:
