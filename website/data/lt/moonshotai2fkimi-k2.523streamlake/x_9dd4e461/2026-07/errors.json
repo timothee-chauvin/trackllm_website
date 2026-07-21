@@ -1,1 +1,1 @@
-{"seen_errors":[]}
+{"seen_errors":[{"http_code":525,"message":"{\"message\":\"Provider returned error\",\"code\":525,\"metadata\":{\"raw\":\"error code: 525\\n\",\"provider_name\":\"StreamLake\",\"is_byok\":false}}"}]}
