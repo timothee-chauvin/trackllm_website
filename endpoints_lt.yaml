@@ -216,6 +216,12 @@ endpoints_lt:
   - 0.14
   - 0.4
 - api: openrouter
+  model: openai/gpt-oss-120b
+  provider: mancer/fp8
+  cost:
+  - 0.045
+  - 0.5
+- api: openrouter
   model: google/gemma-4-31b-it
   provider: parasail/fp8
   cost:
@@ -227,12 +233,6 @@ endpoints_lt:
   cost:
   - 0.3
   - 0.3
-- api: openrouter
-  model: openai/gpt-oss-120b
-  provider: mancer/fp8
-  cost:
-  - 0.055
-  - 0.55
 - api: openrouter
   model: inclusionai/ling-2.6-1t
   provider: novita
