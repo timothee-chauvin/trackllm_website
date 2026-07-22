@@ -20,6 +20,12 @@ liars:
   - 2.4
 too_expensive:
 - api: openrouter
+  model: aion-labs/aion-3.0
+  provider: aion-labs
+  cost:
+  - 3.0
+  - 6.0
+- api: openrouter
   model: amazon/nova-premier-v1
   provider: amazon-bedrock
   cost:
@@ -272,6 +278,12 @@ too_expensive:
   - 2.25
   - 18.0
 - api: openrouter
+  model: google/gemini-2.5-pro-preview-05-06
+  provider: google-vertex/global/priority
+  cost:
+  - 2.25
+  - 18.0
+- api: openrouter
   model: google/gemini-3-pro-image
   provider: google-vertex/global
   cost:
@@ -279,6 +291,12 @@ too_expensive:
   - 12.0
 - api: openrouter
   model: google/gemini-3.1-flash-image
+  provider: google-ai-studio
+  cost:
+  - 0.5
+  - 3.0
+- api: openrouter
+  model: google/gemini-3.1-flash-image-preview
   provider: google-ai-studio
   cost:
   - 0.5
@@ -376,6 +394,12 @@ too_expensive:
 - api: openrouter
   model: minimax/minimax-m3
   provider: deepinfra/bf16
+  cost:
+  - 0.3
+  - 1.2
+- api: openrouter
+  model: minimax/minimax-m3
+  provider: deepinfra/fp8
   cost:
   - 0.3
   - 1.2
@@ -536,6 +560,12 @@ too_expensive:
   - 2.5
   - 2.0
 - api: openrouter
+  model: openai/gpt-oss-120b
+  provider: siliconflow/fp8
+  cost:
+  - 0.05
+  - 0.45
+- api: openrouter
   model: openai/gpt-oss-20b
   provider: siliconflow/fp8
   cost:
@@ -607,6 +637,12 @@ too_expensive:
   cost:
   - 0.13
   - 0.52
+- api: openrouter
+  model: qwen/qwen3-30b-a3b-instruct-2507
+  provider: phala
+  cost:
+  - 0.15
+  - 0.55
 - api: openrouter
   model: qwen/qwen3-30b-a3b-thinking-2507
   provider: alibaba
@@ -739,6 +775,12 @@ too_expensive:
   cost:
   - 0.75
   - 4.5
+- api: openrouter
+  model: qwen/qwen3.5-flash-02-23
+  provider: alibaba
+  cost:
+  - 0.065
+  - 0.26
 - api: openrouter
   model: qwen/qwen3.5-plus-02-15
   provider: alibaba
@@ -998,6 +1040,12 @@ too_expensive:
   - 0.48
   - 1.76
 - api: openrouter
+  model: z-ai/glm-4.7
+  provider: z-ai/fp4
+  cost:
+  - 0.6
+  - 2.2
+- api: openrouter
   model: z-ai/glm-5
   provider: z-ai/fp8
   cost:
@@ -1017,6 +1065,12 @@ too_expensive:
   - 4.4
 - api: openrouter
   model: z-ai/glm-5.2
+  provider: alibaba/fast
+  cost:
+  - 2.31
+  - 7.26
+- api: openrouter
+  model: z-ai/glm-5.2
   provider: io-net/fp8
   cost:
   - 2.834498
@@ -1027,6 +1081,12 @@ too_expensive:
   cost:
   - 3.0
   - 10.25
+- api: openrouter
+  model: z-ai/glm-5.2
+  provider: wafer/fp4
+  cost:
+  - 1.2
+  - 4.1
 bad_temperature:
 - api: openrouter
   model: anthropic/claude-fable-5
@@ -1826,3 +1886,9 @@ bad_temperature:
   cost:
   - 5.0
   - 30.0
+- api: openrouter
+  model: xiaomi/mimo-v2.5
+  provider: gmicloud/fp8
+  cost:
+  - 0.112
+  - 0.224
