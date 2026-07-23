@@ -1,1 +1,1 @@
-{"seen_errors":[{"http_code":200,"message":"No logprobs returned"}]}
+{"seen_errors":[{"http_code":200,"message":"No logprobs returned"},{"http_code":400,"message":"{\"message\":\"Provider returned error\",\"code\":400,\"metadata\":{\"raw\":\"{\\\"message\\\":\\\"\\\\u003c400\\\\u003e InternalError.Algo.InvalidParameter: Range of top_logprobs should be [0, 5] trace_id: f11d6be7e4316ddc6917918301724d45\\\",\\\"type\\\":\\\"invalid_request_error\\\"}\\n\",\"provider_name\":\"Novita\",\"is_byok\":false}}"}]}
