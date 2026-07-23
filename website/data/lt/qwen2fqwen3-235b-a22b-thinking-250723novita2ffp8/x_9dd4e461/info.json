@@ -1,0 +1,17 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "qwen/qwen3-235b-a22b-thinking-2507",
+    "provider": "novita/fp8",
+    "cost": [
+      0.3,
+      3.0
+    ],
+    "max_logprobs": 5,
+    "cost_per_request": null,
+    "created": null,
+    "last_seen": null,
+    "supports_temperature": null
+  }
+}
