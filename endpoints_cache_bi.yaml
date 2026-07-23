@@ -236,6 +236,12 @@ too_expensive:
   - 0.3426
   - 1.0284
 - api: openrouter
+  model: deepseek/deepseek-v3.2
+  provider: siliconflow/fp8
+  cost:
+  - 0.259
+  - 0.42
+- api: openrouter
   model: deepseek/deepseek-v4-flash
   provider: siliconflow/fp8
   cost:
@@ -271,6 +277,12 @@ too_expensive:
   cost:
   - 2.25
   - 18.0
+- api: openrouter
+  model: google/gemini-2.5-pro-preview-05-06
+  provider: google-ai-studio
+  cost:
+  - 1.25
+  - 10.0
 - api: openrouter
   model: google/gemini-2.5-pro-preview-05-06
   provider: google-ai-studio/priority
@@ -385,6 +397,12 @@ too_expensive:
   cost:
   - 0.3
   - 1.2
+- api: openrouter
+  model: minimax/minimax-m2.5
+  provider: venice
+  cost:
+  - 0.27
+  - 0.95
 - api: openrouter
   model: minimax/minimax-m3
   provider: atlas-cloud/fp8
@@ -1047,6 +1065,12 @@ too_expensive:
   - 2.2
 - api: openrouter
   model: z-ai/glm-5
+  provider: novita/fp8
+  cost:
+  - 1.0
+  - 3.2
+- api: openrouter
+  model: z-ai/glm-5
   provider: z-ai/fp8
   cost:
   - 1.0
@@ -1062,6 +1086,12 @@ too_expensive:
   provider: novita/fp8
   cost:
   - 1.38
+  - 4.4
+- api: openrouter
+  model: z-ai/glm-5.1
+  provider: z-ai/fp8
+  cost:
+  - 1.4
   - 4.4
 - api: openrouter
   model: z-ai/glm-5.2
