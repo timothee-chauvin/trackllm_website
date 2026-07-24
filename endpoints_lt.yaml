@@ -31,6 +31,12 @@ endpoints_lt:
   - 0.1
 - api: openrouter
   model: ibm-granite/granite-4.1-8b
+  provider: coreweave/bf16
+  cost:
+  - 0.05
+  - 0.1
+- api: openrouter
+  model: ibm-granite/granite-4.1-8b
   provider: wandb/bf16
   cost:
   - 0.05
@@ -115,6 +121,12 @@ endpoints_lt:
   - 0.3
 - api: openrouter
   model: qwen/qwen3-30b-a3b-instruct-2507
+  provider: coreweave/bf16
+  cost:
+  - 0.1
+  - 0.3
+- api: openrouter
+  model: qwen/qwen3-30b-a3b-instruct-2507
   provider: wandb/bf16
   cost:
   - 0.1
@@ -133,10 +145,22 @@ endpoints_lt:
   - 0.28
 - api: openrouter
   model: deepseek/deepseek-v4-flash
+  provider: coreweave/fp8
+  cost:
+  - 0.14
+  - 0.28
+- api: openrouter
+  model: deepseek/deepseek-v4-flash
   provider: wandb/fp8
   cost:
   - 0.14
   - 0.28
+- api: openrouter
+  model: meta-llama/llama-3.1-8b-instruct
+  provider: coreweave/bf16
+  cost:
+  - 0.22
+  - 0.22
 - api: openrouter
   model: meta-llama/llama-3.1-8b-instruct
   provider: wandb/bf16
@@ -152,6 +176,12 @@ endpoints_lt:
 - api: openrouter
   model: google/gemma-4-26b-a4b-it
   provider: nextbit/bf16
+  cost:
+  - 0.12
+  - 0.35
+- api: openrouter
+  model: google/gemma-4-31b-it
+  provider: coreweave/bf16
   cost:
   - 0.12
   - 0.35
@@ -231,7 +261,7 @@ endpoints_lt:
   model: openai/gpt-oss-120b
   provider: mancer/fp8
   cost:
-  - 0.05
+  - 0.055
   - 0.5
 - api: openrouter
   model: mistralai/ministral-8b-2512
@@ -409,6 +439,12 @@ endpoints_lt:
   - 0.75
 - api: openrouter
   model: meta-llama/llama-3.3-70b-instruct
+  provider: coreweave/fp16
+  cost:
+  - 0.71
+  - 0.71
+- api: openrouter
+  model: meta-llama/llama-3.3-70b-instruct
   provider: wandb/fp16
   cost:
   - 0.71
@@ -419,6 +455,12 @@ endpoints_lt:
   cost:
   - 0.3
   - 1.2
+- api: openrouter
+  model: meta-llama/llama-3.1-70b-instruct
+  provider: coreweave/bf16
+  cost:
+  - 0.8
+  - 0.8
 - api: openrouter
   model: meta-llama/llama-3.1-70b-instruct
   provider: wandb/bf16
@@ -475,6 +517,12 @@ endpoints_lt:
   - 1.7
 - api: openrouter
   model: deepseek/deepseek-chat-v3.1
+  provider: coreweave/fp8
+  cost:
+  - 0.55
+  - 1.65
+- api: openrouter
+  model: deepseek/deepseek-chat-v3.1
   provider: wandb/fp8
   cost:
   - 0.55
@@ -499,6 +547,12 @@ endpoints_lt:
   - 1.7
 - api: openrouter
   model: qwen/qwen3-coder
+  provider: coreweave/bf16
+  cost:
+  - 1.0
+  - 1.5
+- api: openrouter
+  model: qwen/qwen3-coder
   provider: wandb/bf16
   cost:
   - 1.0
@@ -512,6 +566,18 @@ endpoints_lt:
 - api: openrouter
   model: openai/gpt-3.5-turbo-0613
   provider: azure
+  cost:
+  - 1.0
+  - 2.0
+- api: openrouter
+  model: x-ai/grok-build-0.1
+  provider: xai
+  cost:
+  - 1.0
+  - 2.0
+- api: openrouter
+  model: x-ai/grok-build-0.1
+  provider: xai/zdr
   cost:
   - 1.0
   - 2.0
@@ -540,6 +606,30 @@ endpoints_lt:
   - 1.131
   - 2.262
 - api: openrouter
+  model: x-ai/grok-4.20
+  provider: xai
+  cost:
+  - 1.25
+  - 2.5
+- api: openrouter
+  model: x-ai/grok-4.20
+  provider: xai/zdr
+  cost:
+  - 1.25
+  - 2.5
+- api: openrouter
+  model: x-ai/grok-4.3
+  provider: xai
+  cost:
+  - 1.25
+  - 2.5
+- api: openrouter
+  model: x-ai/grok-4.3
+  provider: xai/zdr
+  cost:
+  - 1.25
+  - 2.5
+- api: openrouter
   model: z-ai/glm-5.1
   provider: gmicloud/fp8
   cost:
@@ -565,6 +655,12 @@ endpoints_lt:
   - 3.6
 - api: openrouter
   model: deepseek/deepseek-v4-pro
+  provider: coreweave/fp8
+  cost:
+  - 1.74
+  - 3.48
+- api: openrouter
+  model: deepseek/deepseek-v4-pro
   provider: wandb/fp8
   cost:
   - 1.74
@@ -575,6 +671,18 @@ endpoints_lt:
   cost:
   - 1.2
   - 4.1
+- api: openrouter
+  model: x-ai/grok-build-0.1
+  provider: xai/priority
+  cost:
+  - 2.0
+  - 4.0
+- api: openrouter
+  model: x-ai/grok-build-0.1
+  provider: xai/zdr/priority
+  cost:
+  - 2.0
+  - 4.0
 - api: openrouter
   model: openai/gpt-3.5-turbo-16k
   provider: azure
@@ -593,6 +701,42 @@ endpoints_lt:
   cost:
   - 3.0
   - 4.5
+- api: openrouter
+  model: x-ai/grok-4.20
+  provider: xai/priority
+  cost:
+  - 2.5
+  - 5.0
+- api: openrouter
+  model: x-ai/grok-4.20
+  provider: xai/zdr/priority
+  cost:
+  - 2.5
+  - 5.0
+- api: openrouter
+  model: x-ai/grok-4.3
+  provider: xai/priority
+  cost:
+  - 2.5
+  - 5.0
+- api: openrouter
+  model: x-ai/grok-4.3
+  provider: xai/zdr/priority
+  cost:
+  - 2.5
+  - 5.0
+- api: openrouter
+  model: x-ai/grok-4.5
+  provider: xai
+  cost:
+  - 2.0
+  - 6.0
+- api: openrouter
+  model: x-ai/grok-4.5
+  provider: xai/zdr
+  cost:
+  - 2.0
+  - 6.0
 - api: openrouter
   model: openai/gpt-4o
   provider: azure
@@ -623,6 +767,18 @@ endpoints_lt:
   cost:
   - 2.5
   - 10.0
+- api: openrouter
+  model: x-ai/grok-4.5
+  provider: xai/priority
+  cost:
+  - 4.0
+  - 12.0
+- api: openrouter
+  model: x-ai/grok-4.5
+  provider: xai/zdr/priority
+  cost:
+  - 4.0
+  - 12.0
 - api: openrouter
   model: openai/gpt-4o-2024-05-13
   provider: azure
