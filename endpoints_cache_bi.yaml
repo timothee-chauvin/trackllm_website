@@ -242,6 +242,12 @@ too_expensive:
   - 0.259
   - 0.42
 - api: openrouter
+  model: deepseek/deepseek-v3.2-exp
+  provider: siliconflow/fp8
+  cost:
+  - 0.27
+  - 0.41
+- api: openrouter
   model: deepseek/deepseek-v4-flash
   provider: siliconflow/fp8
   cost:
@@ -268,6 +274,12 @@ too_expensive:
 - api: openrouter
   model: google/gemini-2.5-pro
   provider: google-ai-studio/priority
+  cost:
+  - 2.25
+  - 18.0
+- api: openrouter
+  model: google/gemini-2.5-pro
+  provider: google-vertex/global/priority
   cost:
   - 2.25
   - 18.0
@@ -1250,6 +1262,12 @@ bad_temperature:
   cost:
   - 2.0
   - 10.0
+- api: openrouter
+  model: minimax/minimax-m2.1
+  provider: minimax/fp8
+  cost:
+  - 0.3
+  - 1.2
 - api: openrouter
   model: moonshotai/kimi-k3
   provider: moonshotai/int4

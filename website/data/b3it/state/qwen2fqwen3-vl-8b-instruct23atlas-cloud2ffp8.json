@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "qwen/qwen3-vl-8b-instruct",
+    "provider": "atlas-cloud/fp8",
+    "cost": [
+      0.08,
+      0.5
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 1.22e-6,
+    "created": "2025-10-14T17:35:08Z",
+    "last_seen": "2026-07-18T03:49:51Z",
+    "supports_temperature": null
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "unreachable",
+    "since": "2026-07-24T04:13:08Z",
+    "last_recheck": "2026-07-24T04:13:08Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}

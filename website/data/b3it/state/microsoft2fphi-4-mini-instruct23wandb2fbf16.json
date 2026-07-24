@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "microsoft/phi-4-mini-instruct",
+    "provider": "wandb/bf16",
+    "cost": [
+      0.08,
+      0.35
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 6.7e-7,
+    "created": "2025-10-17T18:34:09Z",
+    "last_seen": "2026-07-18T03:49:51Z",
+    "supports_temperature": null
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "unreachable",
+    "since": "2026-07-24T04:13:08Z",
+    "last_recheck": "2026-07-24T04:13:08Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}

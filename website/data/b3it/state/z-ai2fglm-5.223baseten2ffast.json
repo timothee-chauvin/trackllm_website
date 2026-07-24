@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "z-ai/glm-5.2",
+    "provider": "baseten/fast",
+    "cost": [
+      2.1,
+      6.6
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 0.000036,
+    "created": "2026-06-16T17:45:30Z",
+    "last_seen": "2026-07-24T04:02:21Z",
+    "supports_temperature": true
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "no_bis",
+    "since": "2026-07-24T04:13:08Z",
+    "last_recheck": "2026-07-24T04:13:08Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}

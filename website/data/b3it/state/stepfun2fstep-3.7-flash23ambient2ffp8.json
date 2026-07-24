@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "stepfun/step-3.7-flash",
+    "provider": "ambient/fp8",
+    "cost": [
+      0.19,
+      1.14
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 3.61e-6,
+    "created": "2026-05-28T16:17:49Z",
+    "last_seen": "2026-07-18T03:49:51Z",
+    "supports_temperature": null
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "unreachable",
+    "since": "2026-07-24T04:13:08Z",
+    "last_recheck": "2026-07-24T04:13:08Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}

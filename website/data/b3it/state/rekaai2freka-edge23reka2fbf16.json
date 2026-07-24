@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "rekaai/reka-edge",
+    "provider": "reka/bf16",
+    "cost": [
+      0.1,
+      0.1
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 7e-7,
+    "created": "2026-03-20T17:16:05Z",
+    "last_seen": "2026-07-24T04:02:21Z",
+    "supports_temperature": true
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "no_bis",
+    "since": "2026-07-24T04:13:08Z",
+    "last_recheck": "2026-07-24T04:13:08Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}

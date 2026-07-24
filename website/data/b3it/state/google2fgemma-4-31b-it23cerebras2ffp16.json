@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "google/gemma-4-31b-it",
+    "provider": "cerebras/fp16",
+    "cost": [
+      0.99,
+      1.49
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 0.00001535,
+    "created": "2026-04-02T16:48:06Z",
+    "last_seen": "2026-07-24T04:02:21Z",
+    "supports_temperature": true
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "no_bis",
+    "since": "2026-07-24T04:13:08Z",
+    "last_recheck": "2026-07-24T04:13:08Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}

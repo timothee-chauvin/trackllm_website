@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "arcee-ai/trinity-mini",
+    "provider": "clarifai/bf16",
+    "cost": [
+      0.045,
+      0.15
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 6.45e-7,
+    "created": "2025-12-01T15:08:40Z",
+    "last_seen": "2026-07-18T03:49:51Z",
+    "supports_temperature": null
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "unreachable",
+    "since": "2026-07-24T04:13:08Z",
+    "last_recheck": "2026-07-24T04:13:08Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}

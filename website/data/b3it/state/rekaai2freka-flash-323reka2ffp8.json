@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "rekaai/reka-flash-3",
+    "provider": "reka/fp8",
+    "cost": [
+      0.1,
+      0.2
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 2.6e-6,
+    "created": "2025-03-12T20:53:33Z",
+    "last_seen": "2026-07-23T04:03:04Z",
+    "supports_temperature": null
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "no_bis",
+    "since": "2026-07-24T04:13:08Z",
+    "last_recheck": "2026-07-24T04:13:08Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}

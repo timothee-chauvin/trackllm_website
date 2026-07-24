@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "google/gemini-2.5-flash-lite",
+    "provider": "google-vertex/eu",
+    "cost": [
+      0.1,
+      0.4
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 5e-7,
+    "created": "2025-07-22T16:04:36Z",
+    "last_seen": "2026-07-24T04:02:21Z",
+    "supports_temperature": true
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "no_bis",
+    "since": "2026-07-24T04:13:08Z",
+    "last_recheck": "2026-07-24T04:13:08Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}

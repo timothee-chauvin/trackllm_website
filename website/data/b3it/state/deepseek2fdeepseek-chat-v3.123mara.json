@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "deepseek/deepseek-chat-v3.1",
+    "provider": "mara",
+    "cost": [
+      0.6,
+      1.7
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 4.7e-6,
+    "created": "2025-08-21T12:33:48Z",
+    "last_seen": "2026-07-23T04:03:04Z",
+    "supports_temperature": null
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "no_bis",
+    "since": "2026-07-24T04:13:08Z",
+    "last_recheck": "2026-07-24T04:13:08Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}

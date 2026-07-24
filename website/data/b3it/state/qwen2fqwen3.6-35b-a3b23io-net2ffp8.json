@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "qwen/qwen3.6-35b-a3b",
+    "provider": "io-net/fp8",
+    "cost": [
+      0.2187,
+      1.215
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 3.62e-6,
+    "created": "2026-04-27T03:24:15Z",
+    "last_seen": "2026-07-24T04:02:21Z",
+    "supports_temperature": true
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "no_bis",
+    "since": "2026-07-24T04:13:08Z",
+    "last_recheck": "2026-07-24T04:13:08Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}

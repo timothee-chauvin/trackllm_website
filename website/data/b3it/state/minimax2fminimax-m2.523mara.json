@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "minimax/minimax-m2.5",
+    "provider": "mara",
+    "cost": [
+      0.24,
+      0.96
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 0.00001032,
+    "created": "2026-02-12T15:01:42Z",
+    "last_seen": "2026-07-24T04:02:21Z",
+    "supports_temperature": true
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "no_bis",
+    "since": "2026-07-24T04:13:08Z",
+    "last_recheck": "2026-07-24T04:13:08Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}

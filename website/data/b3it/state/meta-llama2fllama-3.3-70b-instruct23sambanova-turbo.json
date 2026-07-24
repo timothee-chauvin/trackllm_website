@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "meta-llama/llama-3.3-70b-instruct",
+    "provider": "sambanova-turbo",
+    "cost": [
+      0.45,
+      0.9
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 5.85e-6,
+    "created": "2024-12-06T17:28:57Z",
+    "last_seen": "2026-07-24T04:02:21Z",
+    "supports_temperature": true
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "no_bis",
+    "since": "2026-07-24T04:13:08Z",
+    "last_recheck": "2026-07-24T04:13:08Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}

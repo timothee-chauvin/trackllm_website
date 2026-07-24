@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "perceptron/perceptron-mk1",
+    "provider": "perceptron",
+    "cost": [
+      0.15,
+      1.5
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 0.00001635,
+    "created": "2026-05-12T14:43:49Z",
+    "last_seen": "2026-07-24T04:02:21Z",
+    "supports_temperature": true
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "no_bis",
+    "since": "2026-07-24T04:13:08Z",
+    "last_recheck": "2026-07-24T04:13:08Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}

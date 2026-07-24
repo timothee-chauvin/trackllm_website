@@ -7,13 +7,17 @@
       0.65,
       1.5
     ],
-    "max_logprobs": null
+    "max_logprobs": null,
+    "cost_per_request": null,
+    "created": null,
+    "last_seen": null,
+    "supports_temperature": null
   },
   "status": "retired",
   "retired": {
-    "reason": "stalled",
-    "since": "2026-04-07T21:21:09Z",
-    "last_recheck": "2026-06-11T16:22:57.723198Z"
+    "reason": "no_bis",
+    "since": "2026-07-24T04:13:08Z",
+    "last_recheck": "2026-07-24T04:13:08Z"
   },
   "epochs": [
     {
@@ -24230,5 +24234,6 @@
       "change_date": null,
       "params": null
     }
-  ]
+  ],
+  "deselected_since": null
 }

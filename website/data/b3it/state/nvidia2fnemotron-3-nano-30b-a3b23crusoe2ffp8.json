@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "nvidia/nemotron-3-nano-30b-a3b",
+    "provider": "crusoe/fp8",
+    "cost": [
+      0.05,
+      0.2
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 1.05e-6,
+    "created": "2025-12-14T16:54:35Z",
+    "last_seen": "2026-07-24T04:02:21Z",
+    "supports_temperature": true
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "no_bis",
+    "since": "2026-07-24T04:13:08Z",
+    "last_recheck": "2026-07-24T04:13:08Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}

@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "aion-labs/aion-1.0-mini",
+    "provider": "aion-labs/bf16",
+    "cost": [
+      0.7,
+      1.4
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 3.5e-6,
+    "created": "2025-02-04T19:25:07Z",
+    "last_seen": "2026-07-18T03:49:51Z",
+    "supports_temperature": null
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "unreachable",
+    "since": "2026-07-24T04:13:08Z",
+    "last_recheck": "2026-07-24T04:13:08Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}

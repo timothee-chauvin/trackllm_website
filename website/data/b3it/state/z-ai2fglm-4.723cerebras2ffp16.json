@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "z-ai/glm-4.7",
+    "provider": "cerebras/fp16",
+    "cost": [
+      2.25,
+      2.75
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 0.00001625,
+    "created": "2025-12-22T04:33:34Z",
+    "last_seen": "2026-07-24T04:02:21Z",
+    "supports_temperature": true
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "no_bis",
+    "since": "2026-07-24T04:13:08Z",
+    "last_recheck": "2026-07-24T04:13:08Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}
