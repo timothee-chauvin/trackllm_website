@@ -1,1 +1,1 @@
-{"seen_errors":[]}
+{"seen_errors":[{"http_code":404,"message":"{\"message\":\"No allowed providers are available for the selected model.\",\"code\":404,\"metadata\":{\"available_providers\":[\"deepinfra\",\"nebius\",\"akashml\",\"novita\",\"parasail\",\"cloudflare\",\"sambanova-turbo\",\"groq\",\"wandb-legacy\",\"coreweave\",\"google-vertex\",\"together\"],\"requested_providers\":[\"wandb/fp16\"]}}"}]}
