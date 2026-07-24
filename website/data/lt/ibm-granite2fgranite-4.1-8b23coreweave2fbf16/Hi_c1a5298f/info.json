@@ -1,0 +1,17 @@
+{
+  "prompt": "Hi",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "ibm-granite/granite-4.1-8b",
+    "provider": "coreweave/bf16",
+    "cost": [
+      0.05,
+      0.1
+    ],
+    "max_logprobs": null,
+    "cost_per_request": null,
+    "created": null,
+    "last_seen": null,
+    "supports_temperature": null
+  }
+}

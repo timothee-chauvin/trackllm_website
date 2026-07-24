@@ -1,0 +1,17 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "meta-llama/llama-3.1-70b-instruct",
+    "provider": "coreweave/bf16",
+    "cost": [
+      0.8,
+      0.8
+    ],
+    "max_logprobs": null,
+    "cost_per_request": null,
+    "created": null,
+    "last_seen": null,
+    "supports_temperature": null
+  }
+}

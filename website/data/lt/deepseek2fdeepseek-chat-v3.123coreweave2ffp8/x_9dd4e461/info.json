@@ -1,0 +1,17 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "deepseek/deepseek-chat-v3.1",
+    "provider": "coreweave/fp8",
+    "cost": [
+      0.55,
+      1.65
+    ],
+    "max_logprobs": null,
+    "cost_per_request": null,
+    "created": null,
+    "last_seen": null,
+    "supports_temperature": null
+  }
+}
