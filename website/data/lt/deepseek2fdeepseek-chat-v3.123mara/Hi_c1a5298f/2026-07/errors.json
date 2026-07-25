@@ -1,1 +1,1 @@
-{"seen_errors":[{"http_code":0,"message":"'usage'"},{"http_code":200,"message":"No usage in response; keys: ['error']"}]}
+{"seen_errors":[{"http_code":0,"message":"'usage'"},{"http_code":200,"message":"No usage in response; keys: ['error']"},{"http_code":200,"message":"No usage in response; body: {\"error\":{\"message\":\"error code: 504\\n\",\"code\":504}}"}]}
