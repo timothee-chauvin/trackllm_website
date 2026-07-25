@@ -135,6 +135,12 @@ too_expensive:
   - 25.0
 - api: openrouter
   model: anthropic/claude-opus-4.8
+  provider: amazon-bedrock
+  cost:
+  - 5.0
+  - 25.0
+- api: openrouter
+  model: anthropic/claude-opus-4.8
   provider: amazon-bedrock/eu-west-1
   cost:
   - 5.5
@@ -171,6 +177,42 @@ too_expensive:
   - 27.5
 - api: openrouter
   model: anthropic/claude-opus-4.8
+  provider: google-vertex/global
+  cost:
+  - 5.0
+  - 25.0
+- api: openrouter
+  model: anthropic/claude-opus-5
+  provider: amazon-bedrock
+  cost:
+  - 5.0
+  - 25.0
+- api: openrouter
+  model: anthropic/claude-opus-5
+  provider: amazon-bedrock/claude-on-aws
+  cost:
+  - 5.0
+  - 25.0
+- api: openrouter
+  model: anthropic/claude-opus-5
+  provider: anthropic
+  cost:
+  - 5.0
+  - 25.0
+- api: openrouter
+  model: anthropic/claude-opus-5
+  provider: azure/us-east-2
+  cost:
+  - 5.0
+  - 25.0
+- api: openrouter
+  model: anthropic/claude-opus-5
+  provider: google-vertex/europe
+  cost:
+  - 5.5
+  - 27.5
+- api: openrouter
+  model: anthropic/claude-opus-5
   provider: google-vertex/global
   cost:
   - 5.0
@@ -237,6 +279,12 @@ too_expensive:
   - 1.0284
 - api: openrouter
   model: deepseek/deepseek-v3.2
+  provider: gmicloud/fp8
+  cost:
+  - 0.29
+  - 0.43
+- api: openrouter
+  model: deepseek/deepseek-v3.2
   provider: siliconflow/fp8
   cost:
   - 0.259
@@ -267,10 +315,22 @@ too_expensive:
   - 3.135
 - api: openrouter
   model: google/gemini-2.5-flash-image
+  provider: google-ai-studio/flex
+  cost:
+  - 0.15
+  - 1.25
+- api: openrouter
+  model: google/gemini-2.5-flash-image
   provider: google-vertex/global
   cost:
   - 0.3
   - 2.5
+- api: openrouter
+  model: google/gemini-2.5-pro
+  provider: google-ai-studio
+  cost:
+  - 1.25
+  - 10.0
 - api: openrouter
   model: google/gemini-2.5-pro
   provider: google-ai-studio/priority
@@ -283,6 +343,12 @@ too_expensive:
   cost:
   - 2.25
   - 18.0
+- api: openrouter
+  model: google/gemini-2.5-pro-preview
+  provider: google-ai-studio
+  cost:
+  - 1.25
+  - 10.0
 - api: openrouter
   model: google/gemini-2.5-pro-preview
   provider: google-ai-studio/priority
@@ -1216,6 +1282,12 @@ bad_temperature:
   - 150.0
 - api: openrouter
   model: anthropic/claude-opus-4.8-fast
+  provider: anthropic
+  cost:
+  - 10.0
+  - 50.0
+- api: openrouter
+  model: anthropic/claude-opus-5-fast
   provider: anthropic
   cost:
   - 10.0
