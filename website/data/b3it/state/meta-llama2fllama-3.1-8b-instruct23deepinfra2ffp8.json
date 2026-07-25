@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "meta-llama/llama-3.1-8b-instruct",
+    "provider": "deepinfra/fp8",
+    "cost": [
+      0.02,
+      0.04
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 2.6e-7,
+    "created": "2024-07-23T00:00:00Z",
+    "last_seen": "2026-07-25T03:58:26Z",
+    "supports_temperature": true
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "no_bis",
+    "since": "2026-07-25T04:07:21Z",
+    "last_recheck": "2026-07-25T04:07:21Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}

@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "qwen/qwen3-30b-a3b-instruct-2507",
+    "provider": "dekallm",
+    "cost": [
+      0.09,
+      0.3
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 1.11e-6,
+    "created": "2025-07-29T16:36:05Z",
+    "last_seen": "2026-07-24T04:02:21Z",
+    "supports_temperature": null
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "unreachable",
+    "since": "2026-07-25T04:07:21Z",
+    "last_recheck": "2026-07-25T04:07:21Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}

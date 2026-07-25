@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "moonshotai/kimi-k2.5",
+    "provider": "chutes/int4",
+    "cost": [
+      0.44,
+      2.0
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 4.2e-6,
+    "created": "2026-01-27T04:11:16Z",
+    "last_seen": "2026-07-25T03:58:26Z",
+    "supports_temperature": true
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "no_bis",
+    "since": "2026-07-25T04:07:21Z",
+    "last_recheck": "2026-07-25T04:07:21Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}

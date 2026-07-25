@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "openai/gpt-oss-120b",
+    "provider": "sambanova",
+    "cost": [
+      0.14,
+      0.95
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 0.00001047,
+    "created": "2025-08-05T17:17:11Z",
+    "last_seen": "2026-07-25T03:58:26Z",
+    "supports_temperature": true
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "no_bis",
+    "since": "2026-07-25T04:07:21Z",
+    "last_recheck": "2026-07-25T04:07:21Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}
