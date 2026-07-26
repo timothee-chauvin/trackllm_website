@@ -207,6 +207,12 @@ too_expensive:
   - 25.0
 - api: openrouter
   model: anthropic/claude-opus-5
+  provider: claude-on-aws
+  cost:
+  - 5.0
+  - 25.0
+- api: openrouter
+  model: anthropic/claude-opus-5
   provider: google-vertex/europe
   cost:
   - 5.5
@@ -427,6 +433,12 @@ too_expensive:
   cost:
   - 0.25
   - 0.75
+- api: openrouter
+  model: kwaipilot/kat-coder-air-v2.5
+  provider: streamlake
+  cost:
+  - 0.15
+  - 0.6
 - api: openrouter
   model: kwaipilot/kat-coder-pro-v2.5
   provider: streamlake
@@ -1196,6 +1208,12 @@ too_expensive:
   - 1.2
   - 4.1
 bad_temperature:
+- api: openrouter
+  model: anthropic/claude-fable-5
+  provider: amazon-bedrock
+  cost:
+  - 10.0
+  - 50.0
 - api: openrouter
   model: anthropic/claude-fable-5
   provider: amazon-bedrock/claude-on-aws
