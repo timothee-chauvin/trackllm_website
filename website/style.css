@@ -253,4 +253,28 @@ td .methods { display: flex; gap: 0.3rem; }
 .method-note .card p { font-size: 0.83rem; color: var(--text-muted); margin: 0; }
 @media (max-width: 620px) { .method-note { grid-template-columns: 1fr; } }
 
+/* model page */
+.head h1 .org { color: var(--text-dim); font-weight: 500; }
+.head .lede { color: var(--text-muted); font-size: 0.95rem; max-width: 80ch; margin: 0; }
+.head .lede b { color: var(--text); } .head .lede .hl { color: var(--changed); font-weight: 600; }
+.summary { display: flex; gap: 2rem; margin-top: 1.2rem; flex-wrap: wrap; }
+.summary .s .v { font-family: var(--mono); font-size: 1.4rem; font-weight: 650; }
+.summary .s .k { font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-dim); }
+
+.legend { display: flex; gap: 1.3rem; margin: 0.6rem 0 0; font-size: 0.78rem; color: var(--text-muted); flex-wrap: wrap; }
+.legend .k { display: inline-flex; align-items: center; gap: 0.4rem; } .legend .k i { width: 9px; height: 9px; border-radius: 50%; }
+
+.cmp { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
+.cmp .row { display: grid; grid-template-columns: 176px 1fr 96px; align-items: center; gap: 0.7rem; padding: 0.4rem 1rem; border-top: 1px solid var(--border-soft); }
+.cmp .row:first-child { border-top: none; } .cmp .row:hover { background: var(--surface-2); }
+.cmp .pv a { font-family: var(--mono); font-size: 0.84rem; font-weight: 550; }
+.cmp .pv a:hover { color: var(--accent); } .cmp .pv .mm { display: flex; gap: 0.25rem; margin-top: 0.2rem; }
+.cmp .spark svg { width: 100%; height: 40px; display: block; }
+.cmp .meta { text-align: right; font-family: var(--mono); font-size: 0.74rem; }
+.cmp .meta .peak { color: var(--text-muted); } .cmp .meta .chg .some { color: var(--changed); font-weight: 650; } .cmp .meta .chg .zero { color: var(--text-dim); }
+.cmp .axis { display: grid; grid-template-columns: 176px 1fr 96px; gap: 0.7rem; padding: 0.3rem 1rem 0.5rem; border-top: 1px solid var(--border); }
+.cmp .axis .ticks { grid-column: 2; position: relative; height: 14px; font-family: var(--mono); font-size: 0.64rem; color: var(--text-dim); }
+.cmp .axis .ticks span { position: absolute; transform: translateX(-50%); }
+@media (max-width: 680px) { .cmp .row, .cmp .axis { grid-template-columns: 108px 1fr 54px; } }
+
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }

@@ -30,6 +30,7 @@ def render_site(website_dir: Path) -> None:
     index_template = env.get_template("index.html.j2")
     endpoint_template = env.get_template("endpoint.html.j2")
     spend_template = env.get_template("spend.html.j2")
+    model_template = env.get_template("model.html.j2")
 
     endpoints: list[EndpointInfo] = []
     for ep in discover_lt_endpoints(data_dir):
@@ -74,6 +75,23 @@ def render_site(website_dir: Path) -> None:
     model_views = model_mod.build_model_views(website_dir, endpoints, b3it_views)
     for mslug, view in model_views.items():
         (models_dir / f"{mslug}.json").write_text(json.dumps(view))
+
+    model_pages_dir = website_dir / "models"
+    model_pages_dir.mkdir(parents=True, exist_ok=True)
+    for f in model_pages_dir.glob("*.html"):
+        f.unlink()
+
+    for mslug, view in model_views.items():
+        model_html = model_template.render(
+            model_slug=mslug,
+            model=view["model"],
+            org=view["org"],
+            css_path="../style.css",
+            body_class="model",
+            nav_prefix="../",
+        )
+        (model_pages_dir / f"{mslug}.html").write_text(model_html)
+    print(f"Generated {len(model_views)} model pages in models/")
 
     # slug -> (model_slug, n_providers) so endpoint pages can link to their model
     # page with a provider count consistent with that model's own page (Task 7).
