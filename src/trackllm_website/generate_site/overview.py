@@ -23,7 +23,8 @@ FEED_TRACE_LEN = 40
 FEED_WINDOW_BEFORE = 60
 FEED_WINDOW_AFTER = 20
 FEED_MIN_WINDOW = 6
-FEED_PEAK_WINDOW = 20
+FEED_LT_PEAK_WINDOW = 20
+FEED_B3IT_PEAK_WINDOW = 8
 FEED_DEFAULT_CHANGE_FRAC = 0.5
 LT_ALERT_THRESHOLD = 0.8
 B3IT_ALERT_THRESHOLD = 0.6
@@ -47,6 +48,42 @@ def downsample_trace(vals: list[float | int], n: int) -> list[float]:
         chunk = vals[lo:hi] or [vals[min(lo, len(vals) - 1)]]
         out.append(round(sum(chunk) / len(chunk), 3))
     return out
+
+
+def _b3it_status_trace(
+    view: B3ITView, now: datetime
+) -> tuple[str, list[float], int | None]:
+    """Directory row (status/trace/stableDays) for a B3IT-only endpoint.
+
+    Mirrors endpoint.ts::computeStatus (date-gap based), plus the view's own
+    retired status -- a B3IT endpoint the pipeline has explicitly retired
+    (e.g. delisted, no border inputs) must show as retired even if its last
+    tv_series point happens to fall inside RETIRED_GAP_DAYS.
+    """
+    tv_dates = [datetime.fromisoformat(s) for s in view.tv_series["dates"]]
+    tv_values = view.tv_series["values"]
+    change_dates = sorted(datetime.fromisoformat(c["date"]) for c in view.changes)
+
+    last_tv_date = tv_dates[-1] if tv_dates else None
+    gap_retired = (
+        last_tv_date is not None and (now - last_tv_date).days > RETIRED_GAP_DAYS
+    )
+    if view.status == "retired" or gap_retired:
+        status = "retired"
+    else:
+        last_change_date = change_dates[-1] if change_dates else None
+        recent = (
+            last_change_date is not None
+            and (now - last_change_date).days <= RECENT_CHANGE_DAYS
+        )
+        status = "changed" if recent else "stable"
+
+    stable_since = (
+        change_dates[-1] if change_dates else (tv_dates[0] if tv_dates else None)
+    )
+    stable_days = (now - stable_since).days if stable_since is not None else None
+    trace = downsample_trace(tv_values, TRACE_LEN)
+    return status, trace, stable_days
 
 
 @dataclass
@@ -99,7 +136,7 @@ def _build_lt_feed_item(
     cfrac = FEED_DEFAULT_CHANGE_FRAC
     if drift:
         k = _nearest_index(drift, cd)
-        peak_hi = min(len(drift), k + FEED_PEAK_WINDOW)
+        peak_hi = min(len(drift), k + FEED_LT_PEAK_WINDOW)
         drift_at = round(max(v for _, v in drift[k:peak_hi]), 2)
         ftrace, cfrac = _feed_window(drift, k)
     sev = (
@@ -139,7 +176,7 @@ def _build_b3it_feed_item(view: B3ITView, change: dict, now: datetime) -> dict:
     cfrac = FEED_DEFAULT_CHANGE_FRAC
     if pairs:
         k = _nearest_index(pairs, cd)
-        peak_hi = min(len(pairs), k + FEED_PEAK_WINDOW)
+        peak_hi = min(len(pairs), k + FEED_B3IT_PEAK_WINDOW)
         peak = round(max(v for _, v in pairs[k:peak_hi]), 3)
         ftrace, cfrac = _feed_window(pairs, k)
     sev = (
@@ -263,6 +300,8 @@ def build_overview(
                 else (now - info.dates[0]).days
             )
             trace = downsample_trace([v for _, v in info.drift], TRACE_LEN)
+        elif view is not None and now is not None:
+            status, trace, stable_days = _b3it_status_trace(view, now)
 
         n_changes = n_lt_changes + (len(view.changes) if view else 0)
         endpoint_recs.append(

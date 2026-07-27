@@ -1,3 +1,8 @@
+// `export {}` makes this a module so its top-level names (DATA, fmtInt, init, ...)
+// don't collide with the same names in other bundler-entrypoint scripts (endpoint.ts)
+// when type-checked together as one tsc program.
+export {};
+
 interface Stats {
   endpoints: number;
   providers: number;
@@ -73,8 +78,6 @@ interface OverviewData {
   const fmtInt = (n: number): string => n.toLocaleString("en-US");
   const fmtM = (n: number): string =>
     n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e3 ? (n / 1e3).toFixed(0) + "k" : "" + n;
-  const fmtMag = (v: number | null): string =>
-    v == null ? "—" : v >= 100 ? v.toFixed(0) : v.toFixed(2);
 
   function sparkPath(
     vals: number[],

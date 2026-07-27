@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}TrackLLM{% endblock %}</title>
+    <script>
+    (function () {
+        var stored = localStorage.getItem('theme');
+        if (stored === 'light' || stored === 'dark') document.documentElement.dataset.theme = stored;
+    })();
+    </script>
     <link rel="stylesheet" href="{{ css_path }}">
 </head>
 <body class="{{ body_class }}">
@@ -43,8 +49,6 @@
         function effectiveTheme() {
             return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         }
-        var stored = localStorage.getItem('theme');
-        if (stored === 'light' || stored === 'dark') root.dataset.theme = stored;
         if (btn) {
             btn.textContent = label(effectiveTheme());
             btn.addEventListener('click', function () {

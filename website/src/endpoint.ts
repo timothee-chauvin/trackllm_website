@@ -1,3 +1,8 @@
+// `export {}` makes this a module so its top-level names (MONTHS, td, init, ...)
+// don't collide with the same names in other bundler-entrypoint scripts (overview.ts, model.ts)
+// when type-checked together as one tsc program.
+export {};
+
 interface ManifestData {
   model: string;
   provider: string;

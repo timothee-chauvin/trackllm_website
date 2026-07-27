@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from trackllm_website.bi.phase_2 import save_results
-from trackllm_website.bi.state import EndpointBIState, Epoch
+from trackllm_website.bi.state import EndpointBIState, Epoch, RetiredInfo
 from trackllm_website.config import Endpoint
 from trackllm_website.generate_site.b3it import discover_b3it_views
 from trackllm_website.generate_site.lt import discover_lt_endpoints
@@ -95,7 +95,9 @@ def _daily_batch(day: int, token: str):
     return ts, [(ts, token)] * 10
 
 
-def _write_b3it_with_transition(root: Path, slug: str, model: str, provider: str):
+def _write_b3it_with_transition(
+    root: Path, slug: str, model: str, provider: str, *, status, retired=None
+):
     """A b3it endpoint whose reference actually produces a TV transition."""
     ep = Endpoint(api="openrouter", model=model, provider=provider, cost=(0.1, 0.2))
     ref = {"p1": [("2026-01-01T00:00:00Z", "A")] * 10}
@@ -107,8 +109,8 @@ def _write_b3it_with_transition(root: Path, slug: str, model: str, provider: str
     }
     state = EndpointBIState(
         endpoint=ep,
-        status="monitoring",
-        retired=None,
+        status=status,
+        retired=retired,
         epochs=[
             Epoch(
                 start=datetime(2026, 1, 1, tzinfo=timezone.utc),
@@ -234,7 +236,7 @@ def test_feed_includes_b3it_item_from_view_transition(tmp_path):
     _write_lt_endpoint(
         root, "m2fa23p", "m/a", "p", dates=dates, changes=[], drift=[0.1] * 5
     )
-    _write_b3it_with_transition(root, "m2fb23q", "m/b", "q")
+    _write_b3it_with_transition(root, "m2fb23q", "m/b", "q", status="monitoring")
     (root / "data" / "changes.json").write_text(json.dumps([]))
     (root / "data" / "spend.json").write_text(json.dumps({"cumulative": {}}))
 
@@ -247,6 +249,35 @@ def test_feed_includes_b3it_item_from_view_transition(tmp_path):
     assert item["sevKey"] in {"alert", "changed", "stable"}
     assert item["model"] == "b"
     assert item["provider"] == "q"
+
+
+def test_b3it_only_retired_endpoint_gets_retired_status(tmp_path):
+    root = tmp_path / "website"
+    dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 6)]
+    _write_lt_endpoint(
+        root, "m2fa23p", "m/a", "p", dates=dates, changes=[], drift=[0.1] * 5
+    )
+    _write_b3it_with_transition(
+        root,
+        "m2fb23q",
+        "m/b",
+        "q",
+        status="retired",
+        retired=RetiredInfo(
+            reason="delisted",
+            since=datetime(2026, 1, 25, tzinfo=timezone.utc),
+            last_recheck=datetime(2026, 1, 25, tzinfo=timezone.utc),
+        ),
+    )
+    (root / "data" / "changes.json").write_text(json.dumps([]))
+    (root / "data" / "spend.json").write_text(json.dumps({"cumulative": {}}))
+
+    ov = _build_overview(root)
+    ep = next(e for e in ov["endpoints"] if e["slug"] == "m2fb23q")
+    assert ep["methods"] == ["b3it"]
+    assert ep["status"] == "retired"
+    assert len(ep["trace"]) > 0
+    assert ov["stats"]["active"] == 1  # only the still-monitoring LT endpoint
 
 
 def test_providers_include_zero_change_providers(fake_site):
