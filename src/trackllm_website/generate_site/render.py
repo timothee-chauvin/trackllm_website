@@ -80,7 +80,7 @@ def render_site(website_dir: Path) -> None:
     slug_to_model_slug: dict[str, str] = {}
     slug_to_n_providers: dict[str, int] = {}
     for mslug, view in model_views.items():
-        n_providers = len(view["endpoints"])
+        n_providers = view["n_providers"]
         for e in view["endpoints"]:
             slug_to_model_slug[e["slug"]] = mslug
             slug_to_n_providers[e["slug"]] = n_providers

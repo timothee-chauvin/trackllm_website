@@ -38,11 +38,18 @@ interface B3ITChange {
 interface FocusLT {
   drift: [string, number][];
   changes: LTChange[];
+  // raw LT observation range from lt_scores.json's own `dates`, independent of the
+  // drift trace (which may be empty/absent pre-backfill) -- see buildLT.
+  firstDate: string;
+  lastDate: string;
 }
 
 interface FocusB3IT {
   tv: [string, number][];
   changes: B3ITChange[];
+  // raw tv_series observation range, independent of the (possibly downsampled) `tv` trace.
+  firstDate: string;
+  lastDate: string;
 }
 
 type Status = "stable" | "changed" | "retired";
@@ -117,7 +124,12 @@ function buildLT(scores: LTScoresData | null): FocusLT | null {
     const level = peakFrom(day, pairs, LT_PEAK_WINDOW);
     return { date: day, sigma: sigmaDisplay(c.sigma), drift: level === null ? null : round(level, 3) };
   });
-  return { drift: downsamplePairs(pairs, TRACE_LEN), changes };
+  return {
+    drift: downsamplePairs(pairs, TRACE_LEN),
+    changes,
+    firstDate: scores.dates[0].slice(0, 10),
+    lastDate: last(scores.dates)!.slice(0, 10),
+  };
 }
 
 function buildB3IT(data: B3ITData | null): FocusB3IT | null {
@@ -131,7 +143,12 @@ function buildB3IT(data: B3ITData | null): FocusB3IT | null {
     const peak = peakFrom(day, pairs, B3IT_PEAK_WINDOW);
     return { date: day, peakTV: peak === null ? null : round(peak, 3) };
   });
-  return { tv: downsamplePairs(pairs, TRACE_LEN), changes };
+  return {
+    tv: downsamplePairs(pairs, TRACE_LEN),
+    changes,
+    firstDate: data.tv_series.dates.length ? data.tv_series.dates[0].slice(0, 10) : "",
+    lastDate: data.tv_series.dates.length ? last(data.tv_series.dates)!.slice(0, 10) : "",
+  };
 }
 
 function computeStatus(lastObserved: string | null, lastChange: string | null): Status {
@@ -148,10 +165,8 @@ function renderStatusCard(lt: FocusLT | null, b3it: FocusB3IT | null): void {
   const el = document.getElementById("statuscard");
   if (!el) return;
 
-  const lastDates = [last(lt?.drift ?? [])?.[0], last(b3it?.tv ?? [])?.[0]].filter(
-    (d): d is string => !!d
-  );
-  const firstDates = [lt?.drift[0]?.[0], b3it?.tv[0]?.[0]].filter((d): d is string => !!d);
+  const lastDates = [lt?.lastDate, b3it?.lastDate].filter((d): d is string => !!d);
+  const firstDates = [lt?.firstDate, b3it?.firstDate].filter((d): d is string => !!d);
   const lastObserved = lastDates.length ? last(lastDates.sort())! : null;
   const first = firstDates.length ? firstDates.sort()[0] : null;
 

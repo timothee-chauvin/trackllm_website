@@ -4,6 +4,7 @@ import shutil
 from pathlib import Path
 
 from trackllm_website.generate_site.render import render_site
+from trackllm_website.util import slugify
 
 
 def _scaffold(website: Path):
@@ -144,3 +145,28 @@ def test_render_emits_spend(tmp_path):
     # Assert emitted spend.json has expected cumulative cost
     spend_data = json.loads((tmp_path / "data" / "spend.json").read_text())
     assert spend_data["cumulative"]["lt"] == pytest.approx(0.05)
+
+
+def test_render_endpoint_page_context_for_multi_provider_model(tmp_path):
+    _scaffold(tmp_path)
+    # second endpoint for the same model ("m/a") but a different provider, so
+    # the model is served by 2 providers.
+    ep2 = tmp_path / "data" / "lt" / "m2fa23p2" / "default"
+    ep2.mkdir(parents=True)
+    ep2_info = {"prompt": "hi", "endpoint": {"model": "m/a", "provider": "p2"}}
+    (ep2 / "info.json").write_text(json.dumps(ep2_info))
+    md2 = ep2 / "2026-06"
+    md2.mkdir()
+    (md2 / "queries.json").write_text(json.dumps([["24 10:00:00", 0]]))
+
+    render_site(tmp_path)
+
+    model_slug = slugify("m/a")
+    page = (tmp_path / "endpoints" / "m2fa23p.html").read_text()
+
+    # nav_prefix="../" applied to a nav/crumb link
+    assert 'href="../index.html"' in page
+    # compare banner links to the model page with the model's own slug
+    assert f'href="../models/{model_slug}.html"' in page
+    # n_providers count text, sourced from view["n_providers"]
+    assert "served by 2 providers" in page
