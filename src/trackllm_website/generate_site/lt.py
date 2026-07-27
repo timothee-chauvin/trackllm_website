@@ -3,6 +3,8 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+from trackllm_website.lt_scores import SCORES_FILENAME
+
 # Endpoints with last query older than this are considered inactive
 INACTIVE_THRESHOLD_DAYS = 3
 
@@ -166,3 +168,16 @@ def discover_lt_endpoints(lt_dir: Path) -> list[EndpointInfo]:
         if info:
             endpoints.append(info)
     return endpoints
+
+
+def load_lt_scores(lt_dir: Path, slug: str) -> dict | None:
+    """Load an endpoint's already-generated lt_scores.json, if present and non-empty.
+
+    Shared by overview.py and model.py so both read the one on-disk contract
+    (n_per_test/dates/scores/changes/drift/drift_dates) the same way.
+    """
+    path = lt_dir / slug / SCORES_FILENAME
+    if not path.exists():
+        return None
+    d = json.loads(path.read_text())
+    return d if d.get("dates") else None

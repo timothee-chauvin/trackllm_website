@@ -4,22 +4,64 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}TrackLLM{% endblock %}</title>
+    <script>
+    (function () {
+        var stored = localStorage.getItem('theme');
+        if (stored === 'light' || stored === 'dark') document.documentElement.dataset.theme = stored;
+    })();
+    </script>
     <link rel="stylesheet" href="{{ css_path }}">
 </head>
 <body class="{{ body_class }}">
+    {% set nav_prefix = nav_prefix | default('') %}
+    <nav class="nav">
+        <a class="brand" href="{{ nav_prefix }}index.html">
+            <span class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="#0B0F14" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l2-7 4 14 2-7h8"/></svg></span>
+            <span class="name">Track<b>LLM</b></span>
+        </a>
+        <div class="nav-links">
+            <a href="{{ nav_prefix }}index.html">Overview</a>
+            <a href="{{ nav_prefix }}spend.html">Spend</a>
+            <a href="https://tchauvin.com/change-detection-llm-apis" target="_blank" rel="noopener">Methodology</a>
+            <a href="https://github.com/timothee-chauvin/trackllm_website" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://arxiv.org/abs/2512.03816" target="_blank" rel="noopener">Paper</a>
+        </div>
+        <div class="nav-right">
+            <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle color theme"></button>
+        </div>
+    </nav>
     <div class="container">
         {% block content %}{% endblock %}
 
-        <footer>
+        <footer class="site">
             {% block footer %}
-            Data collected via OpenRouter API
+            <span>Data collected via the OpenRouter API · sampled at T=0 on a fixed cadence.</span>
+            <span><a href="https://tchauvin.com/change-detection-llm-apis">Methodology</a> · <a href="https://github.com/timothee-chauvin/trackllm_website">GitHub</a> · <a href="https://arxiv.org/abs/2512.03816">Paper</a></span>
             {% endblock %}
         </footer>
     </div>
     {% block scripts %}{% endblock %}
+    <script>
+    (function () {
+        var root = document.documentElement;
+        var btn = document.getElementById('themeToggle');
+        function label(theme) { return theme === 'dark' ? '☀' : '☾'; }
+        function effectiveTheme() {
+            return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        }
+        if (btn) {
+            btn.textContent = label(effectiveTheme());
+            btn.addEventListener('click', function () {
+                var next = effectiveTheme() === 'dark' ? 'light' : 'dark';
+                root.dataset.theme = next;
+                localStorage.setItem('theme', next);
+                btn.textContent = label(next);
+            });
+        }
+    })();
+    </script>
     <!-- Privacy-friendly analytics with https://www.goatcounter.com -->
     <script data-goatcounter="https://trackllm.goatcounter.com/count" async src="//gc.zgo.at/count.v5.js"
       crossorigin="anonymous" integrity="sha384-atnOLvQb9t+jTSipvd75X2yginT4PjVbqDdlJAmxMm+wYElFmeR6EmLP5bYeoRVQ"></script>
 </body>
 </html>
-
