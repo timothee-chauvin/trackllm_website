@@ -71,10 +71,19 @@ def render_site(website_dir: Path) -> None:
     )
     models_dir = website_dir / "data" / "models"
     models_dir.mkdir(parents=True, exist_ok=True)
-    for mslug, view in model_mod.build_model_views(
-        website_dir, endpoints, b3it_views
-    ).items():
+    model_views = model_mod.build_model_views(website_dir, endpoints, b3it_views)
+    for mslug, view in model_views.items():
         (models_dir / f"{mslug}.json").write_text(json.dumps(view))
+
+    # slug -> (model_slug, n_providers) so endpoint pages can link to their model
+    # page with a provider count consistent with that model's own page (Task 7).
+    slug_to_model_slug: dict[str, str] = {}
+    slug_to_n_providers: dict[str, int] = {}
+    for mslug, view in model_views.items():
+        n_providers = len(view["endpoints"])
+        for e in view["endpoints"]:
+            slug_to_model_slug[e["slug"]] = mslug
+            slug_to_n_providers[e["slug"]] = n_providers
 
     index_html = index_template.render(
         css_path="style.css",
@@ -127,11 +136,16 @@ def render_site(website_dir: Path) -> None:
         endpoint_html = endpoint_template.render(
             endpoint=ep,
             model=model,
+            org=model.split("/")[0],
+            model_name=model.split("/")[-1],
             provider=provider,
             methods=methods,
             manifest_json=json.dumps(manifest),
             css_path="../style.css",
             body_class="endpoint",
+            nav_prefix="../",
+            model_slug=slug_to_model_slug.get(slug, ""),
+            n_providers=slug_to_n_providers.get(slug, 1),
         )
         (endpoints_dir / f"{slug}.html").write_text(endpoint_html)
 

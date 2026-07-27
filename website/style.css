@@ -213,4 +213,44 @@ td .methods { display: flex; gap: 0.3rem; }
 
 .note { max-width: var(--maxw); margin: 1.4rem auto 0; padding: 0 clamp(1rem, 4vw, 2rem); color: var(--text-dim); font-size: 0.78rem; font-style: italic; }
 
+/* endpoint page */
+.head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap; padding-bottom: 1.4rem; border-bottom: 1px solid var(--border-soft); }
+.head h1 { font-size: clamp(1.4rem, 3vw, 1.9rem); font-weight: 660; letter-spacing: -0.02em; margin: 0.2rem 0 0.3rem; }
+.head .prov { font-family: var(--mono); color: var(--text-muted); font-size: 0.95rem; }
+.head .badges { display: flex; gap: 0.4rem; margin-top: 0.7rem; }
+
+.statuscard { display: grid; grid-template-columns: repeat(3, auto); gap: 1.6rem; padding: 0.9rem 1.3rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+.statuscard .k { font-size: 0.68rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.25rem; }
+.statuscard .v { font-family: var(--mono); font-size: 0.95rem; font-weight: 600; }
+.statuscard .v small { font-weight: 500; color: var(--text-dim); }
+@media (max-width: 620px) { .statuscard { grid-template-columns: repeat(2, auto); } }
+
+.compare { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1.4rem;
+  padding: 0.85rem 1.2rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); flex-wrap: wrap; }
+.compare .t { font-size: 0.9rem; } .compare .t b { color: var(--accent); }
+.compare .t span { color: var(--text-muted); }
+.compare a.go { font-family: var(--mono); font-size: 0.82rem; color: var(--accent); white-space: nowrap; }
+.compare a.go:hover { text-decoration: underline; }
+
+.sec-desc { color: var(--text-muted); font-size: 0.86rem; margin: -0.6rem 0 1.1rem; max-width: 82ch; }
+.sec-desc b { color: var(--text); font-weight: 600; }
+.sec-desc .lt { color: var(--accent); font-weight: 600; } .sec-desc .b3 { color: var(--b3it); font-weight: 600; }
+
+.chartwrap { padding: 0.8rem 1rem 0.4rem; } .chart svg { width: 100%; height: auto; display: block; }
+
+.changes-tbl { width: 100%; border-collapse: collapse; }
+.changes-tbl th { text-align: left; font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-dim); font-weight: 600; padding: 0.6rem 1.1rem; border-bottom: 1px solid var(--border); }
+.changes-tbl th.r, .changes-tbl td.r { text-align: right; }
+.changes-tbl td { padding: 0.6rem 1.1rem; border-bottom: 1px solid var(--border-soft); font-size: 0.88rem; }
+.changes-tbl tr:last-child td { border-bottom: none; }
+.changes-tbl .date { font-family: var(--mono); color: var(--text-muted); }
+.changes-tbl .mag { font-family: var(--mono); font-weight: 600; }
+.changes-tbl .desc { color: var(--text-muted); font-size: 0.82rem; }
+
+.method-note { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.method-note .card { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: 1rem 1.2rem; }
+.method-note .card h3 { font-size: 0.92rem; margin: 0 0 0.4rem; display: flex; align-items: center; gap: 0.5rem; }
+.method-note .card p { font-size: 0.83rem; color: var(--text-muted); margin: 0; }
+@media (max-width: 620px) { .method-note { grid-template-columns: 1fr; } }
+
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }

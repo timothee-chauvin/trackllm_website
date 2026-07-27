@@ -1,37 +1,7 @@
-import Plotly from "plotly.js-dist-min";
-
-interface PromptManifest {
-  slug: string;
-  prompt: string;
-  months: string[];
-}
-
-interface EndpointManifest {
+interface ManifestData {
   model: string;
   provider: string;
   slug: string;
-  prompts: PromptManifest[];
-}
-
-interface B3ITData {
-  status: string;
-  retired_reason: string | null;
-  n_bis: number;
-  unstable: boolean;
-  epochs: { start: string; end: string | null; end_reason: string | null; change_date: string | null }[];
-  tv_series: { dates: string[]; values: number[] };
-  changes: { date: string; kind: string }[];
-}
-
-interface LogprobQuery {
-  date: Date;
-  tokens: string[];
-  logprobs: number[];
-}
-
-interface LogprobsData {
-  seen_tokens: string[];
-  seen_logprobs: { tokens: number[]; logprobs: number[] }[];
 }
 
 interface LTScoresData {
@@ -40,600 +10,325 @@ interface LTScoresData {
   scores: number[];
   sigmas: (number | null)[];
   changes: { index: number; sigma: number | null }[];
+  // absent entirely on endpoints whose lt_scores.json predates the Task 1 drift backfill
+  drift_dates?: string[];
+  drift?: number[];
 }
 
-type TimeRange = "5d" | "1m" | "3m" | "all";
+interface B3ITData {
+  status: string;
+  retired_reason: string | null;
+  n_bis: number;
+  unstable: boolean;
+  tv_series: { dates: string[]; values: number[] };
+  changes: { date: string; kind: string }[];
+}
 
-const TIME_RANGES: { value: TimeRange; label: string }[] = [
-  { value: "5d", label: "5 Days" },
-  { value: "1m", label: "1 Month" },
-  { value: "3m", label: "3 Months" },
-  { value: "all", label: "All" },
-];
+interface LTChange {
+  date: string;
+  sigma: string;
+  drift: number | null; // null when the drift lane has no data yet to look up a level in
+}
 
-let currentRange: TimeRange = "3m";
-let showTokens: boolean = false;
-let changeDates: Date[] = [];
-const cachedData = new Map<string, LogprobQuery[]>();
-const chartElements: {
-  plotDiv: HTMLElement;
-  promptName: string;
-  slug: string;
-}[] = [];
-const radioGroups: HTMLElement[] = [];
-const tokenToggleInputs: HTMLInputElement[] = [];
+interface B3ITChange {
+  date: string;
+  peakTV: number | null;
+}
 
-async function fetchLogprobsForMonth(
-  endpointSlug: string,
-  promptSlug: string,
-  month: string
-): Promise<LogprobQuery[]> {
-  const baseUrl = `../data/lt/${endpointSlug}/${promptSlug}/${month}`;
+interface FocusLT {
+  drift: [string, number][];
+  changes: LTChange[];
+}
+
+interface FocusB3IT {
+  tv: [string, number][];
+  changes: B3ITChange[];
+}
+
+type Status = "stable" | "changed" | "retired";
+
+// downsampling/windowing constants mirror generate_site/model.py so the endpoint
+// page and the model page read the same drift level for the same changepoint.
+const TRACE_LEN = 110;
+const LT_PEAK_WINDOW = 20;
+const B3IT_PEAK_WINDOW = 8;
+const RETIRED_GAP_DAYS = 14;
+const RECENT_CHANGE_DAYS = 60;
+const SIGMA_INF_THRESHOLD = 1e4;
+
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const td = (s: string): number => Date.parse(s.slice(0, 10) + "T00:00:00Z");
+const fmtMon = (s: string): string => {
+  const d = new Date(td(s));
+  return `${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+};
+const round = (v: number, n: number): number => {
+  const f = 10 ** n;
+  return Math.round(v * f) / f;
+};
+const last = <T,>(arr: T[]): T | undefined => arr[arr.length - 1];
+
+function downsamplePairs(pairs: [string, number][], n: number): [string, number][] {
+  if (pairs.length <= n) return pairs;
+  return Array.from({ length: n }, (_, i) => pairs[Math.floor((i * pairs.length) / n)]);
+}
+
+// first point on/after `day`, max over the next `window` points -- same rule as
+// generate_site/model.py's _peak_from, so drift levels agree across pages.
+function peakFrom(day: string, pairs: [string, number][], window: number): number | null {
+  const onOrAfter = pairs.filter(([d]) => d >= day).slice(0, window);
+  if (onOrAfter.length) return Math.max(...onOrAfter.map(([, v]) => v));
+  const sameDay = pairs.filter(([d]) => d === day);
+  return sameDay.length ? sameDay[sameDay.length - 1][1] : null;
+}
+
+function sigmaDisplay(sigma: number | null): string {
+  if (sigma === null || !Number.isFinite(sigma) || Math.abs(sigma) >= SIGMA_INF_THRESHOLD) {
+    return "∞σ";
+  }
+  return `${Math.round(sigma)}σ`;
+}
+
+const fmtDrift = (v: number | null): string => (v === null ? "—" : `${v} nats`);
+const fmtTV = (v: number | null): string => (v === null ? "TV —" : `TV ${v}`);
+
+async function fetchJSON<T>(url: string): Promise<T | null> {
   try {
-    const [queriesRes, logprobsRes] = await Promise.all([
-      fetch(`${baseUrl}/queries.json`),
-      fetch(`${baseUrl}/logprobs.json`),
-    ]);
-    if (!queriesRes.ok || !logprobsRes.ok) return [];
-
-    const queries: [string, number | string][] = await queriesRes.json();
-    const logprobsData: LogprobsData = await logprobsRes.json();
-
-    const [year, monthNum] = month.split("-").map(Number);
-    const entries: LogprobQuery[] = [];
-
-    for (const [dateStr, idx] of queries) {
-      if (typeof idx === "string") continue;
-
-      const [day, time] = dateStr.split(" ");
-      const [hour, minute, second] = time.split(":").map(Number);
-      const date = new Date(
-        year,
-        monthNum - 1,
-        parseInt(day),
-        hour,
-        minute,
-        second
-      );
-
-      const logprobVec = logprobsData.seen_logprobs[idx];
-      if (!logprobVec || logprobVec.logprobs.length === 0) continue;
-
-      const tokens = logprobVec.tokens.map((i) => logprobsData.seen_tokens[i]);
-      entries.push({ date, tokens, logprobs: logprobVec.logprobs });
-    }
-
-    return entries;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    return (await res.json()) as T;
   } catch {
-    return [];
+    return null;
   }
 }
 
-async function fetchAllLogprobsForPrompt(
-  manifest: EndpointManifest,
-  prompt: PromptManifest
-): Promise<LogprobQuery[]> {
-  const allEntries = (
-    await Promise.all(
-      prompt.months.map((month) =>
-        fetchLogprobsForMonth(manifest.slug, prompt.slug, month)
+// Read drift straight from lt_scores.json's own drift/drift_dates -- this is
+// already computed by the pipeline (Task 1); never recompute it from raw logprobs here.
+// `changes` (sigma-based changepoints) come from a different part of the LT pipeline than
+// the drift trace, so a still-empty drift/drift_dates backfill (see brief) must not hide them --
+// only the per-change drift *level* lookup is unavailable until the backfill lands.
+function buildLT(scores: LTScoresData | null): FocusLT | null {
+  if (!scores || !scores.dates.length) return null;
+  const driftDates = scores.drift_dates ?? [];
+  const drift = scores.drift ?? [];
+  const pairs: [string, number][] = driftDates.map((d, i) => [d.slice(0, 10), round(drift[i], 3)]);
+  const changes: LTChange[] = scores.changes.map((c) => {
+    const day = scores.dates[c.index].slice(0, 10);
+    const level = peakFrom(day, pairs, LT_PEAK_WINDOW);
+    return { date: day, sigma: sigmaDisplay(c.sigma), drift: level === null ? null : round(level, 3) };
+  });
+  return { drift: downsamplePairs(pairs, TRACE_LEN), changes };
+}
+
+function buildB3IT(data: B3ITData | null): FocusB3IT | null {
+  if (!data) return null;
+  const pairs: [string, number][] = data.tv_series.dates.map((d, i) => [
+    d.slice(0, 10),
+    round(data.tv_series.values[i], 3),
+  ]);
+  const changes: B3ITChange[] = data.changes.map((c) => {
+    const day = c.date.slice(0, 10);
+    const peak = peakFrom(day, pairs, B3IT_PEAK_WINDOW);
+    return { date: day, peakTV: peak === null ? null : round(peak, 3) };
+  });
+  return { tv: downsamplePairs(pairs, TRACE_LEN), changes };
+}
+
+function computeStatus(lastObserved: string | null, lastChange: string | null): Status {
+  if (!lastObserved) return "stable";
+  const gapDays = (Date.now() - td(lastObserved)) / 86400_000;
+  if (gapDays > RETIRED_GAP_DAYS) return "retired";
+  if (lastChange && (Date.now() - td(lastChange)) / 86400_000 <= RECENT_CHANGE_DAYS) {
+    return "changed";
+  }
+  return "stable";
+}
+
+function renderStatusCard(lt: FocusLT | null, b3it: FocusB3IT | null): void {
+  const el = document.getElementById("statuscard");
+  if (!el) return;
+
+  const lastDates = [last(lt?.drift ?? [])?.[0], last(b3it?.tv ?? [])?.[0]].filter(
+    (d): d is string => !!d
+  );
+  const firstDates = [lt?.drift[0]?.[0], b3it?.tv[0]?.[0]].filter((d): d is string => !!d);
+  const lastObserved = lastDates.length ? last(lastDates.sort())! : null;
+  const first = firstDates.length ? firstDates.sort()[0] : null;
+
+  const changeDates = [...(lt?.changes ?? []), ...(b3it?.changes ?? [])].map((c) => c.date);
+  const lastChange = changeDates.length ? last(changeDates.sort())! : null;
+
+  const status = computeStatus(lastObserved, lastChange);
+  const LABEL: Record<Status, string> = { stable: "Stable", changed: "Changed", retired: "Retired" };
+  const nLT = lt?.changes.length ?? 0;
+  const nB3 = b3it?.changes.length ?? 0;
+  const monitored = first && lastObserved ? `${fmtMon(first)} – ${fmtMon(lastObserved)}` : "—";
+
+  el.innerHTML = `
+    <div><div class="k">Status</div><div class="v"><span class="pill ${status}"><span class="led"></span>${LABEL[status]}</span></div></div>
+    <div><div class="k">Monitored</div><div class="v">${monitored}</div></div>
+    <div><div class="k">Changes</div><div class="v">${nLT + nB3} <small>(${nLT} LT · ${nB3} B3IT)</small></div></div>`;
+}
+
+// ---- stacked-lane drift chart: LT drift (nats) and B3IT total variation (0-1)
+// share one time axis so a real change reads as an aligned step in both lanes.
+const VW = 1000, PL = 50, PR = 20;
+const LANE_H = 108, GAP = 34, TOP1 = 34;
+const TOP2 = TOP1 + LANE_H + GAP;
+const VH = TOP2 + LANE_H + 40;
+const PW = VW - PL - PR;
+
+function renderChart(lt: FocusLT | null, b3it: FocusB3IT | null): void {
+  const chartEl = document.getElementById("mainchart");
+  const footEl = document.getElementById("footnote");
+  if (!chartEl) return;
+
+  const anchors = [
+    lt?.drift[0]?.[0], last(lt?.drift ?? [])?.[0],
+    b3it?.tv[0]?.[0], last(b3it?.tv ?? [])?.[0],
+  ].filter((d): d is string => !!d);
+  if (!anchors.length) {
+    chartEl.innerHTML = `<div style="padding:2rem 1rem;color:var(--text-dim);font-size:0.85rem">No monitoring data available yet for this endpoint.</div>`;
+    if (footEl) footEl.innerHTML = "";
+    return;
+  }
+  const d0 = td(anchors.sort()[0]);
+  const d1 = td(last(anchors.sort())!);
+  const span = Math.max(1, d1 - d0);
+  const fx = (s: string): number => PL + ((td(s) - d0) / span) * PW;
+
+  function monthTicks(): Date[] {
+    const out: Date[] = [];
+    const d = new Date(d0);
+    d.setUTCDate(1);
+    while (d.getTime() <= d1) {
+      if (d.getTime() >= d0 - 15 * 86400_000) out.push(new Date(d));
+      d.setUTCMonth(d.getUTCMonth() + 1);
+    }
+    return out;
+  }
+
+  function lane(
+    series: [string, number][],
+    topY: number,
+    maxV: number,
+    color: string,
+    fill: string,
+    label: string,
+    axisFmt: (v: number) => string
+  ): string {
+    const yv = (v: number): number => topY + LANE_H * (1 - v / maxV);
+    const pts = series
+      .map(([d, v], i) => `${i ? "L" : "M"}${fx(d).toFixed(1)} ${yv(v).toFixed(1)}`)
+      .join(" ");
+    const area =
+      `M${fx(series[0][0]).toFixed(1)} ${(topY + LANE_H).toFixed(1)} ` +
+      series.map(([d, v]) => `L${fx(d).toFixed(1)} ${yv(v).toFixed(1)}`).join(" ") +
+      ` L${fx(last(series)![0]).toFixed(1)} ${(topY + LANE_H).toFixed(1)} Z`;
+    const grid = monthTicks()
+      .map((d) => {
+        const x = fx(d.toISOString().slice(0, 10));
+        return `<line x1="${x.toFixed(1)}" y1="${topY}" x2="${x.toFixed(1)}" y2="${topY + LANE_H}" stroke="var(--border-soft)" stroke-width="1"/>`;
+      })
+      .join("");
+    const ticks = [0, maxV / 2, maxV]
+      .map(
+        (v) =>
+          `<line x1="${PL}" y1="${yv(v).toFixed(1)}" x2="${VW - PR}" y2="${yv(v).toFixed(1)}" stroke="var(--border-soft)" stroke-width="0.7" opacity="0.6"/><text x="${PL - 8}" y="${(yv(v) + 3).toFixed(1)}" fill="${color}" font-size="10" font-family="var(--mono)" text-anchor="end">${axisFmt(v)}</text>`
       )
-    )
-  ).flat();
-  allEntries.sort((a, b) => a.date.getTime() - b.date.getTime());
-  return allEntries;
-}
-
-function filterByTimeRange(
-  entries: LogprobQuery[],
-  range: TimeRange
-): LogprobQuery[] {
-  if (range === "all") return entries;
-  const now = new Date();
-  let cutoff: Date;
-  switch (range) {
-    case "5d":
-      cutoff = new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000);
-      break;
-    case "1m":
-      cutoff = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-      break;
-    case "3m":
-      cutoff = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
-      break;
-  }
-  return entries.filter((e) => e.date >= cutoff);
-}
-
-function reprToken(token: string): string {
-  const escaped = JSON.stringify(token).slice(1, -1);
-  if (escaped.length > 15) return `'${escaped.slice(0, 12)}…'`;
-  return `'${escaped}'`;
-}
-
-const SCORE_COLOR = "#0969da";
-const SIGMA_COLOR = "#cf222e";
-
-function formatChangeSummary(data: LTScoresData): string {
-  const dates = data.dates.map((d) => new Date(d));
-  const first = dates[0];
-  const last = dates[dates.length - 1];
-  const fmt = (d: Date) => d.toISOString().slice(0, 10);
-
-  if (data.changes.length === 0) {
-    return `No detected changes between ${fmt(first)} and ${fmt(last)}.`;
+      .join("");
+    return `${grid}${ticks}<path d="${area}" fill="${fill}" stroke="none"/><path d="${pts}" fill="none" stroke="${color}" stroke-width="1.7" vector-effect="non-scaling-stroke"/>
+      <text x="${PL}" y="${topY - 8}" fill="${color}" font-size="11.5" font-family="var(--mono)" font-weight="600">${label}</text>`;
   }
 
-  const header = `Detected changes between ${fmt(first)} and ${fmt(last)}:`;
-  const items = data.changes.map((cp) => {
-    const d = dates[cp.index];
-    const sigma = cp.sigma === null ? "∞" : cp.sigma.toFixed(1);
-    return `  • ${fmt(d)} (score = ${data.scores[cp.index].toFixed(3)}, deviation = ${sigma}σ)`;
-  });
-  return header + "\n" + items.join("\n");
-}
-
-function renderAnomalyChart(
-  container: HTMLElement,
-  data: LTScoresData
-): void {
-  const dates = data.dates.map((d) => new Date(d));
-
-  // Left y-axis: test statistic
-  const traces: Plotly.Data[] = [
-    {
-      x: dates,
-      y: data.scores,
-      type: "scatter",
-      mode: "lines",
-      name: "Test statistic",
-      yaxis: "y",
-      line: { width: 1.5, color: SCORE_COLOR },
-      hovertemplate: "%{x}<br>Score: %{y:.4f}<extra></extra>",
-    },
-    {
-      x: [dates[0], dates[dates.length - 1]],
-      y: [1.0, 1.0],
-      type: "scatter",
-      mode: "lines",
-      name: "Score threshold (1.0)",
-      yaxis: "y",
-      line: { width: 1, color: SCORE_COLOR, dash: "dot" },
-      hoverinfo: "skip",
-    } as Plotly.Data,
-  ];
-
-  // Right y-axis: deviation in sigmas
-  const sigmaDates: Date[] = [];
-  const sigmaVals: number[] = [];
-  for (let i = 0; i < data.sigmas.length; i++) {
-    if (data.sigmas[i] !== null) {
-      sigmaDates.push(dates[i]);
-      sigmaVals.push(data.sigmas[i] as number);
-    }
-  }
-  if (sigmaDates.length > 0) {
-    traces.push(
-      {
-        x: sigmaDates,
-        y: sigmaVals,
-        type: "scatter",
-        mode: "lines",
-        name: "Deviation (σ)",
-        yaxis: "y2",
-        line: { width: 1.5, color: SIGMA_COLOR },
-        hovertemplate: "%{x}<br>Deviation: %{y:.1f}σ<extra></extra>",
-      },
-      {
-        x: [sigmaDates[0], sigmaDates[sigmaDates.length - 1]],
-        y: [12, 12],
-        type: "scatter",
-        mode: "lines",
-        name: "σ threshold (12)",
-        yaxis: "y2",
-        line: { width: 1, color: SIGMA_COLOR, dash: "dot" },
-        hoverinfo: "skip",
-      } as Plotly.Data
-    );
+  function placeholder(topY: number, text: string): string {
+    return `<text x="${PL}" y="${topY + LANE_H / 2}" fill="var(--text-dim)" font-size="11" font-family="var(--mono)">${text}</text>`;
   }
 
-  const shapes = makeChangeShapes(data.changes.map((cp) => dates[cp.index]));
+  const ltMax = lt && lt.drift.length ? Math.max(1, ...lt.drift.map(([, v]) => v)) * 1.08 : 1;
+  const ltSvg =
+    lt && lt.drift.length
+      ? lane(lt.drift, TOP1, ltMax, "var(--accent)", "var(--accent-fill)", "LT · drift from baseline (nats)", (v) => v.toFixed(1))
+      : placeholder(TOP1, lt ? "LT · drift trace not available for this endpoint yet" : "LT · not monitored for this endpoint");
+  const b3Svg =
+    b3it && b3it.tv.length
+      ? lane(b3it.tv, TOP2, 1, "var(--b3it)", "var(--b3it-fill)", "B3IT · total variation from baseline (0–1)", (v) => v.toFixed(1))
+      : placeholder(TOP2, b3it ? "B3IT · no reference data in this window" : "B3IT · not monitored for this endpoint");
 
-  const annotations: Partial<Plotly.Annotations>[] = data.changes.map(
-    (cp) => ({
-      x: dates[cp.index],
-      y: 1,
-      yref: "paper" as const,
-      text: cp.sigma === null ? "∞σ" : `${cp.sigma.toFixed(0)}σ`,
-      showarrow: false,
-      font: { color: "#888888", size: 10 },
-      yanchor: "bottom" as const,
+  const cps: { x: number; col: string; lab: string; lane: "lt" | "b3" }[] = [];
+  (lt?.changes ?? []).forEach((c) => cps.push({ x: fx(c.date), col: "var(--accent)", lab: c.sigma, lane: "lt" }));
+  (b3it?.changes ?? []).forEach((c) => cps.push({ x: fx(c.date), col: "var(--b3it)", lab: fmtTV(c.peakTV), lane: "b3" }));
+  const cpSvg = cps
+    .map((c) => {
+      const labY = c.lane === "lt" ? TOP1 - 8 : TOP2 - 8;
+      return `<line x1="${c.x.toFixed(1)}" y1="${TOP1 - 4}" x2="${c.x.toFixed(1)}" y2="${TOP2 + LANE_H}" stroke="${c.col}" stroke-width="1" stroke-dasharray="3 3" opacity="0.55"/>
+        <circle cx="${c.x.toFixed(1)}" cy="${(labY + 4).toFixed(1)}" r="2.6" fill="${c.col}"/>
+        <text x="${c.x.toFixed(1)}" y="${labY}" fill="${c.col}" font-size="10.5" font-family="var(--mono)" font-weight="600" text-anchor="middle">${c.lab}</text>`;
     })
+    .join("");
+
+  const xlabels = monthTicks()
+    .map((d) => {
+      const x = fx(d.toISOString().slice(0, 10));
+      return `<text x="${x.toFixed(1)}" y="${VH - 14}" fill="var(--text-dim)" font-size="10.5" font-family="var(--mono)" text-anchor="middle">${MONTHS[d.getUTCMonth()]} ${String(d.getUTCFullYear()).slice(2)}</text>`;
+    })
+    .join("");
+
+  chartEl.innerHTML = `<svg viewBox="0 0 ${VW} ${VH}" preserveAspectRatio="xMidYMid meet">
+    ${ltSvg}${b3Svg}${cpSvg}${xlabels}
+    <line x1="${PL}" y1="${TOP2 + LANE_H}" x2="${VW - PR}" y2="${TOP2 + LANE_H}" stroke="var(--border)" stroke-width="1"/></svg>`;
+
+  if (footEl) {
+    let note =
+      "<b>Reading it:</b> both lanes share the time axis. A change reads as a step up that persists; dashed lines mark detected changepoints, with the detector's confidence (LT: σ) or peak reached (B3IT: TV) labelled above.";
+    if (lt?.drift.length && b3it?.tv.length && b3it.tv[0][0] > lt.drift[0][0]) {
+      note += ` B3IT only has reference data from ${b3it.tv[0][0]} onward, so its lane starts there.`;
+    }
+    footEl.innerHTML = note;
+  }
+}
+
+function renderChangesTable(lt: FocusLT | null, b3it: FocusB3IT | null): void {
+  const el = document.getElementById("changerows");
+  if (!el) return;
+  const rows: { date: string; method: "lt" | "b3it"; mag: string; conf: string }[] = [];
+  (lt?.changes ?? []).forEach((c) =>
+    rows.push({ date: c.date, method: "lt", mag: fmtDrift(c.drift), conf: c.sigma })
   );
-
-  const layout: Partial<Plotly.Layout> = {
-    title: {
-      text: `Anomaly Score (${data.scores.length} points, window=${data.n_per_test})`,
-      font: { color: "#1f2328", size: 14 },
-    },
-    xaxis: {
-      title: { text: "Date", font: { color: "#57606a" } },
-      gridcolor: "#d0d7de",
-      tickfont: { color: "#57606a" },
-    },
-    yaxis: {
-      title: { text: "Test Statistic", font: { color: SCORE_COLOR } },
-      gridcolor: "#d0d7de",
-      tickfont: { color: SCORE_COLOR },
-      rangemode: "tozero",
-    },
-    yaxis2: {
-      title: { text: "Deviation (σ)", font: { color: SIGMA_COLOR } },
-      tickfont: { color: SIGMA_COLOR },
-      overlaying: "y",
-      side: "right",
-      rangemode: "tozero",
-      showgrid: false,
-    },
-    paper_bgcolor: "#f6f8fa",
-    plot_bgcolor: "#ffffff",
-    font: { color: "#1f2328" },
-    legend: {
-      font: { color: "#1f2328", size: 10 },
-      bgcolor: "transparent",
-      orientation: "h",
-      y: -0.2,
-    },
-    height: 400,
-    margin: { t: 40, r: 60, b: 80, l: 60 },
-    shapes,
-    annotations,
-  };
-
-  container.innerHTML = "";
-  Plotly.newPlot(container, traces, layout, {
-    responsive: true,
-    displayModeBar: false,
-  });
-}
-
-function makeChangeShapes(
-  changeDts: Date[],
-): Partial<Plotly.Shape>[] {
-  return changeDts.map((d) => ({
-    type: "line" as const,
-    x0: d,
-    x1: d,
-    y0: 0,
-    y1: 1,
-    yref: "paper" as const,
-    line: { color: "#888888", width: 1.5, dash: "dot" as const },
-  }));
-}
-
-function renderPromptChart(
-  container: HTMLElement,
-  promptName: string,
-  entries: LogprobQuery[]
-): void {
-  if (entries.length === 0) {
-    container.innerHTML = '<div class="no-data">No logprob data available</div>';
-    return;
-  }
-
-  const sorted = [...entries].sort(
-    (a, b) => a.date.getTime() - b.date.getTime()
+  (b3it?.changes ?? []).forEach((c) =>
+    rows.push({ date: c.date, method: "b3it", mag: fmtTV(c.peakTV), conf: "—" })
   );
-
-  const maxLogprobs = Math.max(...sorted.map((e) => e.logprobs.length));
-
-  const tokenAtPosition: string[] = [];
-  for (let i = 0; i < maxLogprobs; i++) {
-    const tokenCounts = new Map<string, number>();
-    for (const entry of sorted) {
-      if (i < entry.tokens.length) {
-        const token = entry.tokens[i];
-        tokenCounts.set(token, (tokenCounts.get(token) || 0) + 1);
-      }
-    }
-    let mostCommon = `pos ${i + 1}`;
-    let maxCount = 0;
-    for (const [token, count] of tokenCounts) {
-      if (count > maxCount) {
-        maxCount = count;
-        mostCommon = token;
-      }
-    }
-    tokenAtPosition.push(mostCommon);
-  }
-
-  const traces = [];
-  for (let i = 0; i < maxLogprobs; i++) {
-    const x: Date[] = [];
-    const y: number[] = [];
-    const hoverTokens: string[] = [];
-
-    for (const entry of sorted) {
-      if (i < entry.logprobs.length) {
-        x.push(entry.date);
-        y.push(entry.logprobs[i]);
-        hoverTokens.push(reprToken(entry.tokens[i] || "?"));
-      }
-    }
-
-    if (x.length > 0) {
-      const label = reprToken(tokenAtPosition[i]);
-      traces.push({
-        x,
-        y,
-        type: "scatter",
-        mode: "lines",
-        name: label,
-        line: { width: 1 },
-        text: hoverTokens,
-        hovertemplate: `<b>%{text}</b><br>%{x}<br>Logprob: %{y:.4f}<extra></extra>`,
-      });
-    }
-  }
-
-  const layout = {
-    title: {
-      text: `Logprobs for "${promptName}" (${sorted.length} Queries)`,
-      font: { color: "#1f2328", size: 14 },
-    },
-    xaxis: {
-      title: { text: "Date", font: { color: "#57606a" } },
-      gridcolor: "#d0d7de",
-      tickfont: { color: "#57606a" },
-    },
-    yaxis: {
-      title: { text: "Log Probability", font: { color: "#57606a" } },
-      gridcolor: "#d0d7de",
-      tickfont: { color: "#57606a" },
-    },
-    paper_bgcolor: "#f6f8fa",
-    plot_bgcolor: "#ffffff",
-    font: { color: "#1f2328" },
-    legend: {
-      font: { color: "#1f2328", size: 10 },
-      bgcolor: "transparent",
-      orientation: "h" as const,
-      y: -0.2,
-    },
-    height: 560,
-    margin: { t: 40, r: 20, b: 80, l: 60 },
-    showlegend: showTokens && maxLogprobs <= 25,
-    shapes: makeChangeShapes(changeDates.filter(
-      (d) => d >= sorted[0].date && d <= sorted[sorted.length - 1].date
-    )),
-  };
-
-  const config = {
-    responsive: true,
-    displayModeBar: false,
-  };
-
-  container.innerHTML = "";
-  Plotly.newPlot(container, traces, layout, config);
+  rows.sort((a, b) => td(b.date) - td(a.date));
+  el.innerHTML = rows
+    .map(
+      (r) => `<tr>
+    <td class="date">${r.date}</td>
+    <td><span class="badge ${r.method}">${r.method}</span></td>
+    <td class="r mag" style="color:${r.method === "lt" ? "var(--accent)" : "var(--b3it)"}">${r.mag}</td>
+    <td class="r num" style="color:var(--text-muted)">${r.conf}</td></tr>`
+    )
+    .join("");
 }
 
-function createRangeSelector(): HTMLElement {
-  const container = document.createElement("div");
-  container.className = "range-selector";
-
-  for (const { value, label } of TIME_RANGES) {
-    const optLabel = document.createElement("label");
-    optLabel.className =
-      "range-option" + (value === currentRange ? " active" : "");
-
-    const input = document.createElement("input");
-    input.type = "radio";
-    input.name = `range-${radioGroups.length}`;
-    input.value = value;
-    input.checked = value === currentRange;
-    input.addEventListener("change", () => {
-      currentRange = value;
-      syncAllRadios();
-      rerenderAllCharts();
-    });
-
-    optLabel.appendChild(input);
-    optLabel.appendChild(document.createTextNode(label));
-    container.appendChild(optLabel);
-  }
-
-  const tokenLabel = document.createElement("label");
-  tokenLabel.className = "range-option token-toggle" + (showTokens ? " active" : "");
-
-  const tokenInput = document.createElement("input");
-  tokenInput.type = "checkbox";
-  tokenInput.checked = showTokens;
-  tokenInput.style.display = "none";
-  tokenInput.addEventListener("change", () => {
-    showTokens = tokenInput.checked;
-    syncAllTokenToggles();
-    rerenderAllCharts();
-  });
-
-  tokenLabel.appendChild(tokenInput);
-  tokenLabel.appendChild(document.createTextNode("show tokens"));
-  container.appendChild(tokenLabel);
-  tokenToggleInputs.push(tokenInput);
-
-  radioGroups.push(container);
-  return container;
-}
-
-function syncAllRadios(): void {
-  for (const group of radioGroups) {
-    const labels = group.querySelectorAll<HTMLLabelElement>(".range-option");
-    for (const label of labels) {
-      const input = label.querySelector<HTMLInputElement>("input[type=radio]");
-      if (input) {
-        input.checked = input.value === currentRange;
-        label.classList.toggle("active", input.value === currentRange);
-      }
-    }
-  }
-}
-
-function syncAllTokenToggles(): void {
-  for (const input of tokenToggleInputs) {
-    input.checked = showTokens;
-    const label = input.closest<HTMLLabelElement>("label");
-    if (label) label.classList.toggle("active", showTokens);
-  }
-}
-
-function rerenderAllCharts(): void {
-  for (const { plotDiv, promptName, slug } of chartElements) {
-    const entries = cachedData.get(slug);
-    if (entries) {
-      renderPromptChart(plotDiv, promptName, filterByTimeRange(entries, currentRange));
-    }
-  }
-}
-
-async function renderCharts(manifest: EndpointManifest): Promise<void> {
-  const chartsContainer = document.getElementById("charts-container");
-  if (!chartsContainer) return;
-
-  chartsContainer.innerHTML = "";
-
-  // Anomaly score plot
-  changeDates = [];
-  try {
-    const res = await fetch(`../data/lt/${manifest.slug}/lt_scores.json`);
-    if (res.ok) {
-      const ltData: LTScoresData = await res.json();
-      if (ltData.scores.length > 0) {
-        const dates = ltData.dates.map((d) => new Date(d));
-        changeDates = ltData.changes.map((cp) => dates[cp.index]);
-
-        const summaryEl = document.createElement("pre");
-        summaryEl.className = "change-summary";
-        summaryEl.textContent = formatChangeSummary(ltData);
-        chartsContainer.appendChild(summaryEl);
-
-        const anomalyDiv = document.createElement("div");
-        anomalyDiv.className = "chart";
-        const plotDiv = document.createElement("div");
-        anomalyDiv.appendChild(plotDiv);
-        chartsContainer.appendChild(anomalyDiv);
-        renderAnomalyChart(plotDiv, ltData);
-      }
-    }
-  } catch {
-    // No lt_scores available
-  }
-
-  // Detailed per-prompt charts inside a dropdown
-  const details = document.createElement("details");
-  details.className = "detailed-plots";
-  const summary = document.createElement("summary");
-  summary.textContent = "Detailed plots";
-  details.appendChild(summary);
-  chartsContainer.appendChild(details);
-
-  for (const prompt of manifest.prompts) {
-    const chartDiv = document.createElement("div");
-    chartDiv.className = "chart";
-
-    chartDiv.appendChild(createRangeSelector());
-
-    const plotDiv = document.createElement("div");
-    plotDiv.innerHTML = '<div class="loading">Loading chart...</div>';
-    chartDiv.appendChild(plotDiv);
-
-    details.appendChild(chartDiv);
-    chartElements.push({
-      plotDiv,
-      promptName: prompt.prompt,
-      slug: prompt.slug,
-    });
-
-    fetchAllLogprobsForPrompt(manifest, prompt).then((entries) => {
-      cachedData.set(prompt.slug, entries);
-      renderPromptChart(
-        plotDiv,
-        prompt.prompt,
-        filterByTimeRange(entries, currentRange)
-      );
-    });
-  }
-}
-
-async function renderB3IT(slug: string): Promise<void> {
-  const section = document.getElementById("b3it-section");
-  if (!section) return;
-  let data: B3ITData;
-  try {
-    const res = await fetch(`../data/b3it/${slug}/b3it.json`);
-    if (!res.ok) return;
-    data = await res.json();
-  } catch {
-    return;
-  }
-
-  const statusLabel = data.status === "monitoring" ? "monitoring"
-    : `retired (${data.retired_reason ?? "?"})`;
-  const badges = [
-    `<span class="badge">B3IT: ${statusLabel}</span>`,
-    `<span class="badge">${data.n_bis} border inputs</span>`,
-    data.unstable ? `<span class="badge warn">⚠ unstable</span>` : "",
-  ].join(" ");
-
-  const header = document.createElement("div");
-  header.className = "b3it-header";
-  header.innerHTML = `<h2>Border-input drift</h2>${badges}`;
-  section.innerHTML = "";
-  section.appendChild(header);
-
-  if (data.tv_series.values.length === 0) {
-    const note = document.createElement("div");
-    note.className = "no-data";
-    note.textContent = "No TV data for the current epoch.";
-    section.appendChild(note);
-    return;
-  }
-
-  const dates = data.tv_series.dates.map((d) => new Date(d));
-  const changeDts = data.changes.map((c) => new Date(c.date));
-  const plotDiv = document.createElement("div");
-  plotDiv.className = "chart";
-  section.appendChild(plotDiv);
-  Plotly.newPlot(
-    plotDiv,
-    [{
-      x: dates, y: data.tv_series.values, type: "scatter",
-      // markers make short series visible (a single "lines" point draws nothing)
-      mode: dates.length < 20 ? "lines+markers" : "lines",
-      name: "Mean TV vs reference", line: { width: 1.5, color: "#8250df" },
-      marker: { size: 5 },
-      hovertemplate: "%{x}<br>TV: %{y:.4f}<extra></extra>",
-    }],
-    {
-      title: { text: "Border-input TV distance over time", font: { color: "#1f2328", size: 14 } },
-      xaxis: { title: { text: "Date" }, gridcolor: "#d0d7de" },
-      yaxis: { title: { text: "Mean TV distance" }, gridcolor: "#d0d7de", rangemode: "tozero" },
-      paper_bgcolor: "#f6f8fa", plot_bgcolor: "#ffffff", font: { color: "#1f2328" },
-      height: 360, margin: { t: 40, r: 20, b: 50, l: 60 },
-      shapes: makeChangeShapes(changeDts),
-    },
-    { responsive: true, displayModeBar: false }
-  );
-}
-
-function init(): void {
+async function init(): Promise<void> {
   const manifestEl = document.getElementById("manifest");
   if (!manifestEl) {
     console.error("Manifest element not found");
     return;
   }
+  const manifest: ManifestData = JSON.parse(manifestEl.textContent || "{}");
 
-  const manifest: EndpointManifest = JSON.parse(manifestEl.textContent || "{}");
-  renderB3IT(manifest.slug);
-  renderCharts(manifest);
+  const [scores, b3itData] = await Promise.all([
+    fetchJSON<LTScoresData>(`../data/lt/${manifest.slug}/lt_scores.json`),
+    fetchJSON<B3ITData>(`../data/b3it/${manifest.slug}/b3it.json`),
+  ]);
+
+  const lt = buildLT(scores);
+  const b3it = buildB3IT(b3itData);
+
+  renderStatusCard(lt, b3it);
+  renderChart(lt, b3it);
+  renderChangesTable(lt, b3it);
 }
 
 init();
