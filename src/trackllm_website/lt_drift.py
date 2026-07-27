@@ -28,9 +28,12 @@ def compute_drift_series(
 ) -> list[tuple[datetime, float]]:
     """Compute daily drift series from reference period baseline."""
     obs = sorted(
-        (dt, {t: max(LOGPROB_FLOOR, v) for t, v in d.items()})
-        for dt, d in observations
-        if d
+        (
+            (dt, {t: max(LOGPROB_FLOOR, v) for t, v in d.items()})
+            for dt, d in observations
+            if d
+        ),
+        key=lambda x: x[0],
     )
     if len({dt.date() for dt, _ in obs}) < 3:
         return []
