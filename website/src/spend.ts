@@ -9,14 +9,19 @@ interface SpendData {
 }
 
 // Group names and order come from spend.json (single source: generate_site/spend.py);
-// only the presentation colors live here.
+// only the presentation colors live here. Colors reuse the design system's token
+// palette (dark-theme hex, which stays legible against both light and dark page
+// backgrounds) rather than a single flat color, since a stacked chart needs one
+// hue per group to remain readable.
 const GROUP_COLOR: Record<string, string> = {
-  onboarding: "#8250df",
-  monitoring: "#0969da",
-  lt: "#1a7f37",
-  vetting: "#9a6700",
+  onboarding: "#B98BE8", // --b3it
+  monitoring: "#37C2E0", // --accent
+  lt: "#3FB77E", // --stable
+  vetting: "#E0A94A", // --changed
 };
-const DEFAULT_GROUP_COLOR = "#57606a";
+const DEFAULT_GROUP_COLOR = "#8A97A8";
+const MUTED_TEXT = "#8A97A8";
+const MUTED_GRID = "rgba(140,150,165,0.25)";
 
 async function init(): Promise<void> {
   const el = document.getElementById("spend-chart");
@@ -40,12 +45,13 @@ async function init(): Promise<void> {
     traces,
     {
       barmode: "stack",
-      title: { text: "Daily spend by category", font: { color: "#1f2328", size: 14 } },
-      xaxis: { title: { text: "Date" }, gridcolor: "#d0d7de" },
-      yaxis: { title: { text: "USD" }, gridcolor: "#d0d7de", rangemode: "tozero" },
-      paper_bgcolor: "#f6f8fa",
-      plot_bgcolor: "#ffffff",
-      font: { color: "#1f2328" },
+      title: { text: "Daily spend by category", font: { color: MUTED_TEXT, size: 14 } },
+      xaxis: { title: { text: "Date" }, gridcolor: MUTED_GRID, color: MUTED_TEXT },
+      yaxis: { title: { text: "USD" }, gridcolor: MUTED_GRID, color: MUTED_TEXT, rangemode: "tozero" },
+      paper_bgcolor: "rgba(0,0,0,0)",
+      plot_bgcolor: "rgba(0,0,0,0)",
+      font: { color: MUTED_TEXT },
+      legend: { bgcolor: "rgba(0,0,0,0)", font: { color: MUTED_TEXT } },
       height: 400,
       margin: { t: 40, r: 20, b: 50, l: 60 },
     },
