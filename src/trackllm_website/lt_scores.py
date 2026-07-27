@@ -15,9 +15,10 @@ from numpy.lib.stride_tricks import sliding_window_view
 from pathlib import Path
 from scipy.signal import find_peaks
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from trackllm_website.config import config, logger
+from trackllm_website.lt_drift import compute_drift_series
 from trackllm_website.storage import MonthlyData
 
 N_PER_TEST = 24
@@ -49,6 +50,8 @@ class LTScores(BaseModel):
     scores: list[float]
     sigmas: list[float | None]
     changes: list[ChangePoint]
+    drift_dates: list[datetime] = Field(default_factory=list)
+    drift: list[float] = Field(default_factory=list)
 
 
 def load_prompt_logprobs(
@@ -155,6 +158,7 @@ def compute_endpoint_scores(endpoint_dir: Path) -> LTScores | None:
 
     per_prompt_stats: list[np.ndarray] = []
     per_prompt_dates: list[list[datetime]] = []
+    per_prompt_data: list[list[tuple[datetime, dict[str, float]]]] = []
 
     for prompt_dir in prompt_dirs:
         data = load_prompt_logprobs(prompt_dir)
@@ -166,6 +170,7 @@ def compute_endpoint_scores(endpoint_dir: Path) -> LTScores | None:
         stats = compute_statistics(tensor, N_PER_TEST)
         per_prompt_stats.append(stats)
         per_prompt_dates.append(dates[N_PER_TEST : N_PER_TEST + len(stats)])
+        per_prompt_data.append(data)
 
     if not per_prompt_stats:
         return None
@@ -183,6 +188,7 @@ def compute_endpoint_scores(endpoint_dir: Path) -> LTScores | None:
 
     avg_scores = np.nanmean(grid, axis=0)
     changes, sigmas = detect_changes(avg_scores)
+    drift_series = compute_drift_series(per_prompt_data[longest])
 
     return LTScores(
         n_per_test=N_PER_TEST,
@@ -190,6 +196,8 @@ def compute_endpoint_scores(endpoint_dir: Path) -> LTScores | None:
         scores=avg_scores.tolist(),
         sigmas=[normalize_sigma(v) for v in sigmas.tolist()],
         changes=changes,
+        drift_dates=[dt for dt, _ in drift_series],
+        drift=[v for _, v in drift_series],
     )
 
 

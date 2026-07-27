@@ -1,64 +1,16 @@
 import json
-from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
 from trackllm_website.generate_site import b3it as b3it_mod
 from trackllm_website.generate_site import changes as changes_mod
+from trackllm_website.generate_site import model as model_mod
+from trackllm_website.generate_site import overview as overview_mod
 from trackllm_website.generate_site import spend as spend_mod
 
 from .lt import EndpointInfo, discover_lt_endpoints
-
-RECENT_CHANGE_DAYS = 14
-FEED_LIMIT = 25
-
-
-@dataclass
-class IndexRow:
-    slug: str
-    model: str
-    provider: str
-    lt_status: str | None
-    b3it_status: str | None
-    b3it_reason: str | None
-    recent_change: bool
-
-
-def build_index_rows(
-    lt_endpoints: list[EndpointInfo],
-    b3it_views: dict,
-    recent_slugs: set[str],
-) -> list[IndexRow]:
-    lt_by_slug = {e.slug: e for e in lt_endpoints}
-    all_slugs = sorted(
-        set(lt_by_slug) | set(b3it_views),
-        key=lambda s: (lt_by_slug.get(s) or b3it_views[s]).model.lower(),
-    )
-    rows = []
-    for slug in all_slugs:
-        ep = lt_by_slug.get(slug)
-        view = b3it_views.get(slug)
-        if ep:
-            model, provider = ep.model, ep.provider
-        else:
-            model, provider = view.model, view.provider
-        lt_status = ("monitoring" if ep.is_active else "retired") if ep else None
-        b3it_status = view.status if view else None
-        b3it_reason = view.retired_reason if view else None
-        rows.append(
-            IndexRow(
-                slug,
-                model,
-                provider,
-                lt_status,
-                b3it_status,
-                b3it_reason,
-                slug in recent_slugs,
-            )
-        )
-    return rows
 
 
 def render_site(website_dir: Path) -> None:
@@ -78,6 +30,7 @@ def render_site(website_dir: Path) -> None:
     index_template = env.get_template("index.html.j2")
     endpoint_template = env.get_template("endpoint.html.j2")
     spend_template = env.get_template("spend.html.j2")
+    model_template = env.get_template("model.html.j2")
 
     endpoints: list[EndpointInfo] = []
     for ep in discover_lt_endpoints(data_dir):
@@ -106,24 +59,51 @@ def render_site(website_dir: Path) -> None:
     (website_dir / "data").mkdir(parents=True, exist_ok=True)
     (website_dir / "data" / "changes.json").write_text(json.dumps(changes_json))
 
-    cutoff = datetime.now(timezone.utc) - timedelta(days=RECENT_CHANGE_DAYS)
-    recent_slugs: set[str] = {
-        e.slug for e in events if datetime.fromisoformat(e.date) > cutoff
-    }
-
-    rows = build_index_rows(endpoints, b3it_views, recent_slugs)
-
-    n_active = sum(1 for r in rows if r.lt_status == "monitoring")
-    print(f"\nFound {n_active} active, {len(rows) - n_active} inactive endpoints")
+    n_active = sum(1 for ep in endpoints if ep.is_active)
+    n_total = len(set(lt_by_slug) | set(b3it_views))
+    print(f"\nFound {n_active} active, {n_total - n_active} inactive endpoints")
 
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     spend = spend_mod.aggregate_spend(website_dir / "data" / "spend", today)
     (website_dir / "data" / "spend.json").write_text(json.dumps(spend))
 
+    (website_dir / "data" / "overview.json").write_text(
+        json.dumps(overview_mod.build_overview(website_dir, endpoints, b3it_views))
+    )
+    models_dir = website_dir / "data" / "models"
+    models_dir.mkdir(parents=True, exist_ok=True)
+    model_views = model_mod.build_model_views(website_dir, endpoints, b3it_views)
+    for mslug, view in model_views.items():
+        (models_dir / f"{mslug}.json").write_text(json.dumps(view))
+
+    model_pages_dir = website_dir / "models"
+    model_pages_dir.mkdir(parents=True, exist_ok=True)
+    for f in model_pages_dir.glob("*.html"):
+        f.unlink()
+
+    for mslug, view in model_views.items():
+        model_html = model_template.render(
+            model_slug=mslug,
+            model=view["model"],
+            org=view["org"],
+            css_path="../style.css",
+            body_class="model",
+            nav_prefix="../",
+        )
+        (model_pages_dir / f"{mslug}.html").write_text(model_html)
+    print(f"Generated {len(model_views)} model pages in models/")
+
+    # slug -> (model_slug, n_providers) so endpoint pages can link to their model
+    # page with a provider count consistent with that model's own page (Task 7).
+    slug_to_model_slug: dict[str, str] = {}
+    slug_to_n_providers: dict[str, int] = {}
+    for mslug, view in model_views.items():
+        n_providers = view["n_providers"]
+        for e in view["endpoints"]:
+            slug_to_model_slug[e["slug"]] = mslug
+            slug_to_n_providers[e["slug"]] = n_providers
+
     index_html = index_template.render(
-        rows=rows,
-        changes=changes_json[:FEED_LIMIT],
-        spend=spend,
         css_path="style.css",
         body_class="index",
     )
@@ -174,11 +154,16 @@ def render_site(website_dir: Path) -> None:
         endpoint_html = endpoint_template.render(
             endpoint=ep,
             model=model,
+            org=model.split("/")[0],
+            model_name=model.split("/")[-1],
             provider=provider,
             methods=methods,
             manifest_json=json.dumps(manifest),
             css_path="../style.css",
             body_class="endpoint",
+            nav_prefix="../",
+            model_slug=slug_to_model_slug.get(slug, ""),
+            n_providers=slug_to_n_providers.get(slug, 1),
         )
         (endpoints_dir / f"{slug}.html").write_text(endpoint_html)
 

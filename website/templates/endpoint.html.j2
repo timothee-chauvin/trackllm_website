@@ -3,16 +3,54 @@
 {% block title %}{{ model }} @ {{ provider }} | TrackLLM{% endblock %}
 
 {% block content %}
-        <a href="../index.html" class="back">← all endpoints</a>
-        <h1>{{ model }}</h1>
-        <p class="provider">@ {{ provider }}{% for m in methods %} <span class="badge method {{ m|lower }}">{{ m }}</span>{% endfor %}</p>
+<div class="wrap">
+  <div class="crumb">
+    <a href="{{ nav_prefix }}index.html">Home</a><span class="sep">/</span>
+    <a href="{{ nav_prefix }}index.html">{{ org }}</a><span class="sep">/</span>
+    {% if model_slug %}<a href="{{ nav_prefix }}models/{{ model_slug }}.html">{{ model_name }}</a>{% else %}<span>{{ model_name }}</span>{% endif %}<span class="sep">/</span>
+    <span style="color:var(--text-muted)">@ {{ provider }}</span>
+  </div>
+  <div class="head">
+    <div>
+      <h1>{{ model_name }}</h1>
+      <div class="prov">@ {{ provider }} <span style="color:var(--text-dim)">· {{ org }}</span></div>
+      <div class="badges">{% for m in methods %}<span class="badge {{ m|lower }}">{{ m|lower }}</span>{% endfor %}</div>
+    </div>
+    <div class="statuscard" id="statuscard"></div>
+  </div>
+  <div class="compare">
+    <div class="t"><b>{{ model_name }}</b> <span>is served by {{ n_providers }} provider{{ "s" if n_providers != 1 else "" }} — compare {{ "its" if n_providers == 1 else "their" }} drift side by side.</span></div>
+    {% if model_slug %}<a class="go" href="{{ nav_prefix }}models/{{ model_slug }}.html">View model page →</a>{% endif %}
+  </div>
+</div>
 
-        <section id="b3it-section"></section>
-        <div id="charts-container"></div>
-{% endblock %}
+<main class="wrap">
+  <section class="block">
+    <div class="sec-head"><h2>Drift from baseline</h2></div>
+    <p class="sec-desc">Both signals measure how far this endpoint's behaviour has moved from its <b>reference period</b> (its first two weeks). <span class="lt">LT</span> tracks the average change in the returned tokens' log-probabilities (nats); <span class="b3">B3IT</span> tracks the total-variation distance of the border-input votes (0–1). Both read <b>0 when the endpoint matches its baseline</b> and rise — staying elevated — after a real change. Dashed lines mark detected changepoints; <b>σ</b> is the detector's statistical confidence, separate from how far the signal actually moved.</p>
+    <div class="panel">
+      <div class="chartwrap chart" id="mainchart"></div>
+      <div class="footnote" id="footnote"></div>
+    </div>
+  </section>
 
-{% block footer %}
-            <a href="../index.html">← back to all endpoints</a>
+  <section class="block">
+    <div class="sec-head"><h2>Detected changes</h2></div>
+    <div class="panel">
+      <table class="changes-tbl">
+        <thead><tr><th>Date</th><th>Method</th><th class="r">Drift reached</th><th class="r">Confidence</th></tr></thead>
+        <tbody id="changerows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="method-note">
+      <div class="card"><h3><span class="badge lt">LT</span> Logprob tracking</h3><p>Primary signal where the provider returns logprobs. The drift is the mean absolute change in the returned tokens' log-probabilities versus the reference period (in nats — natural-log probability units). The detector also reports a statistical confidence σ, which can be high even when the drift is small.</p></div>
+      <div class="card"><h3><span class="badge b3it">B3IT</span> Border inputs</h3><p>Black-box fallback for endpoints that hide logprobs. Tracks how far the top-token votes on a ranked set of near-tie prompts have moved from the reference distribution (total variation, 0–1). Corroborates LT where both run on the same endpoint.</p></div>
+    </div>
+  </section>
+</main>
 {% endblock %}
 
 {% block scripts %}

@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 import orjson
 
+import trackllm_website.lt_scores as lt_scores
 from trackllm_website.config import Endpoint
 from trackllm_website.lt_scores import (
     N_PER_TEST,
@@ -121,3 +122,23 @@ def test_empty_logprob_response_is_skipped(tmp_path):
     result = compute_endpoint_scores(endpoint_dir)
     assert result is not None
     assert len(result.dates) == len(result.scores)
+
+
+def test_compute_endpoint_scores_populates_drift(tmp_path, monkeypatch):
+    ep = tmp_path / "endpoint"
+    prompt = ep / "prompt1"
+    prompt.mkdir(parents=True)
+    (prompt / "info.json").write_text("{}")
+    base = datetime(2026, 1, 1, 12, tzinfo=timezone.utc)
+    data = [
+        (
+            base + timedelta(days=day, hours=k),
+            {"A": -0.02, "B": -4.0} if day < 15 else {"A": -4.0, "B": -0.02},
+        )
+        for day in range(30)
+        for k in range(4)
+    ]
+    monkeypatch.setattr(lt_scores, "load_prompt_logprobs", lambda _dir: data)
+    s = compute_endpoint_scores(ep)
+    assert s is not None and len(s.drift) == len(s.drift_dates) > 0
+    assert s.drift[0] < 0.3 and max(s.drift) > 1.0

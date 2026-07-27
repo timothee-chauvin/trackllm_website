@@ -4,6 +4,7 @@ import shutil
 from pathlib import Path
 
 from trackllm_website.generate_site.render import render_site
+from trackllm_website.util import slugify
 
 
 def _scaffold(website: Path):
@@ -26,8 +27,11 @@ def test_render_site_produces_index_and_endpoint(tmp_path):
     _scaffold(tmp_path)
     render_site(tmp_path)
     index = (tmp_path / "index.html").read_text()
-    assert "m/a" in index
+    # index.html is now a static shell; the directory is populated client-side from overview.json
+    assert 'id="dirBody"' in index
     assert (tmp_path / "endpoints" / "m2fa23p.html").exists()
+    overview = json.loads((tmp_path / "data" / "overview.json").read_text())
+    assert "a" in {e["model"] for e in overview["endpoints"]}
 
 
 def test_render_emits_changes_and_unified_index(tmp_path):
@@ -51,10 +55,12 @@ def test_render_emits_changes_and_unified_index(tmp_path):
     )
 
     render_site(tmp_path)
-    assert (tmp_path / "data" / "changes.json").exists()
-    index = (tmp_path / "index.html").read_text()
-    assert "m/a" in index  # endpoint row
-    assert "2026-06-20" in index  # change feed entry
+    # index.html is a static shell now; the directory + feed are populated client-side
+    # from overview.json / changes.json rather than server-rendered into index.html.
+    changes = json.loads((tmp_path / "data" / "changes.json").read_text())
+    assert any("2026-06-20" in c["date"] for c in changes)  # change feed entry
+    overview = json.loads((tmp_path / "data" / "overview.json").read_text())
+    assert "a" in {e["model"] for e in overview["endpoints"]}  # endpoint row
 
 
 def test_render_emits_b3it_json_and_b3it_only_page(tmp_path):
@@ -139,3 +145,28 @@ def test_render_emits_spend(tmp_path):
     # Assert emitted spend.json has expected cumulative cost
     spend_data = json.loads((tmp_path / "data" / "spend.json").read_text())
     assert spend_data["cumulative"]["lt"] == pytest.approx(0.05)
+
+
+def test_render_endpoint_page_context_for_multi_provider_model(tmp_path):
+    _scaffold(tmp_path)
+    # second endpoint for the same model ("m/a") but a different provider, so
+    # the model is served by 2 providers.
+    ep2 = tmp_path / "data" / "lt" / "m2fa23p2" / "default"
+    ep2.mkdir(parents=True)
+    ep2_info = {"prompt": "hi", "endpoint": {"model": "m/a", "provider": "p2"}}
+    (ep2 / "info.json").write_text(json.dumps(ep2_info))
+    md2 = ep2 / "2026-06"
+    md2.mkdir()
+    (md2 / "queries.json").write_text(json.dumps([["24 10:00:00", 0]]))
+
+    render_site(tmp_path)
+
+    model_slug = slugify("m/a")
+    page = (tmp_path / "endpoints" / "m2fa23p.html").read_text()
+
+    # nav_prefix="../" applied to a nav/crumb link
+    assert 'href="../index.html"' in page
+    # compare banner links to the model page with the model's own slug
+    assert f'href="../models/{model_slug}.html"' in page
+    # n_providers count text, sourced from view["n_providers"]
+    assert "served by 2 providers" in page
