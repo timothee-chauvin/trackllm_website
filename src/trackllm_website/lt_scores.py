@@ -158,7 +158,7 @@ def compute_endpoint_scores(endpoint_dir: Path) -> LTScores | None:
 
     per_prompt_stats: list[np.ndarray] = []
     per_prompt_dates: list[list[datetime]] = []
-    per_prompt_data: list[list[tuple[datetime, dict]]] = []
+    per_prompt_data: list[list[tuple[datetime, dict[str, float]]]] = []
 
     for prompt_dir in prompt_dirs:
         data = load_prompt_logprobs(prompt_dir)
