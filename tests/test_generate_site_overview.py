@@ -7,7 +7,18 @@ import pytest
 from trackllm_website.bi.phase_2 import save_results
 from trackllm_website.bi.state import EndpointBIState, Epoch
 from trackllm_website.config import Endpoint
+from trackllm_website.generate_site.b3it import discover_b3it_views
+from trackllm_website.generate_site.lt import discover_lt_endpoints
 from trackllm_website.generate_site.overview import build_overview, downsample_trace
+
+
+def _build_overview(root: Path) -> dict:
+    lt_dir = root / "data" / "lt"
+    lt_endpoints = list(discover_lt_endpoints(lt_dir)) if lt_dir.exists() else []
+    b3it_views = discover_b3it_views(
+        root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
+    )
+    return build_overview(root, lt_endpoints, b3it_views)
 
 
 def test_downsample_trace_caps_length():
@@ -52,7 +63,9 @@ def _write_lt_endpoint(
     )
 
 
-def _write_b3it_state(root: Path, slug: str, model: str, provider: str, *, status="monitoring"):
+def _write_b3it_state(
+    root: Path, slug: str, model: str, provider: str, *, status="monitoring"
+):
     state = {
         "endpoint": {
             "api": "openrouter",
@@ -64,7 +77,12 @@ def _write_b3it_state(root: Path, slug: str, model: str, provider: str, *, statu
         "status": status,
         "retired": None,
         "epochs": [
-            {"start": "2026-01-01T00:00:00Z", "border_inputs": [], "reference": {}, "end": None}
+            {
+                "start": "2026-01-01T00:00:00Z",
+                "border_inputs": [],
+                "reference": {},
+                "end": None,
+            }
         ],
     }
     sd = root / "data" / "b3it" / "state"
@@ -111,7 +129,9 @@ def fake_site(tmp_path):
     dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 31)]
     drift = [0.1] * 24 + [1.5] * 6
     changes = [{"index": 24, "sigma": 40.0}]
-    _write_lt_endpoint(root, "m2fa23p", "m/a", "p", dates=dates, changes=changes, drift=drift)
+    _write_lt_endpoint(
+        root, "m2fa23p", "m/a", "p", dates=dates, changes=changes, drift=drift
+    )
     _write_b3it_state(root, "m2fa23p", "m/a", "p")
 
     (root / "data" / "changes.json").write_text(
@@ -134,15 +154,26 @@ def fake_site(tmp_path):
 
 
 def test_build_overview_shape(fake_site):
-    ov = build_overview(fake_site)
+    ov = _build_overview(fake_site)
     assert set(ov) == {"stats", "feed", "providers", "endpoints"}
     ep = ov["endpoints"][0]
-    assert set(ep) >= {"slug", "model", "provider", "methods", "status", "nChanges", "trace"}
-    assert ov["stats"]["changes_total"] == ov["stats"]["changes_lt"] + ov["stats"]["changes_b3it"]
+    assert set(ep) >= {
+        "slug",
+        "model",
+        "provider",
+        "methods",
+        "status",
+        "nChanges",
+        "trace",
+    }
+    assert (
+        ov["stats"]["changes_total"]
+        == ov["stats"]["changes_lt"] + ov["stats"]["changes_b3it"]
+    )
 
 
 def test_endpoint_trace_is_downsampled_drift(fake_site):
-    ov = build_overview(fake_site)
+    ov = _build_overview(fake_site)
     ep = next(e for e in ov["endpoints"] if e["slug"] == "m2fa23p")
     assert ep["methods"] == ["lt", "b3it"]
     assert len(ep["trace"]) == 28
@@ -150,7 +181,7 @@ def test_endpoint_trace_is_downsampled_drift(fake_site):
 
 
 def test_status_changed_when_recent_change(fake_site):
-    ov = build_overview(fake_site)
+    ov = _build_overview(fake_site)
     ep = next(e for e in ov["endpoints"] if e["slug"] == "m2fa23p")
     assert ep["status"] == "changed"
     assert ep["nChanges"] == 1
@@ -161,14 +192,22 @@ def test_status_retired_when_no_recent_observation(tmp_path):
     root = tmp_path / "website"
     old_dates = [f"2025-01-{d:02d}T00:00:00Z" for d in range(1, 29)]
     recent_dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 29)]
-    _write_lt_endpoint(root, "old2fa23p", "old/a", "p", dates=old_dates, changes=[], drift=[0.1] * 28)
     _write_lt_endpoint(
-        root, "new2fa23p", "new/a", "p", dates=recent_dates, changes=[], drift=[0.1] * 28
+        root, "old2fa23p", "old/a", "p", dates=old_dates, changes=[], drift=[0.1] * 28
+    )
+    _write_lt_endpoint(
+        root,
+        "new2fa23p",
+        "new/a",
+        "p",
+        dates=recent_dates,
+        changes=[],
+        drift=[0.1] * 28,
     )
     (root / "data" / "changes.json").write_text(json.dumps([]))
     (root / "data" / "spend.json").write_text(json.dumps({"cumulative": {}}))
 
-    ov = build_overview(root)
+    ov = _build_overview(root)
     old_ep = next(e for e in ov["endpoints"] if e["slug"] == "old2fa23p")
     new_ep = next(e for e in ov["endpoints"] if e["slug"] == "new2fa23p")
     assert old_ep["status"] == "retired"
@@ -176,12 +215,14 @@ def test_status_retired_when_no_recent_observation(tmp_path):
 
 
 def test_feed_lt_item_has_drift_level_and_conf(fake_site):
-    ov = build_overview(fake_site)
+    ov = _build_overview(fake_site)
     lt_item = next(f for f in ov["feed"] if f["method"] == "lt")
     assert lt_item["primary"] == "drift 1.5"
     assert lt_item["secondary"] == "40σ conf"
     assert lt_item["sevKey"] == "alert"
-    assert lt_item["desc"] == "Logprob averages moved 1.5 nats from the reference period."
+    assert (
+        lt_item["desc"] == "Logprob averages moved 1.5 nats from the reference period."
+    )
     assert len(lt_item["trace"]) > 0
     assert lt_item["model"] == "a"
     assert lt_item["provider"] == "p"
@@ -190,12 +231,14 @@ def test_feed_lt_item_has_drift_level_and_conf(fake_site):
 def test_feed_includes_b3it_item_from_view_transition(tmp_path):
     root = tmp_path / "website"
     dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 6)]
-    _write_lt_endpoint(root, "m2fa23p", "m/a", "p", dates=dates, changes=[], drift=[0.1] * 5)
+    _write_lt_endpoint(
+        root, "m2fa23p", "m/a", "p", dates=dates, changes=[], drift=[0.1] * 5
+    )
     _write_b3it_with_transition(root, "m2fb23q", "m/b", "q")
     (root / "data" / "changes.json").write_text(json.dumps([]))
     (root / "data" / "spend.json").write_text(json.dumps({"cumulative": {}}))
 
-    ov = build_overview(root)
+    ov = _build_overview(root)
     b3it_items = [f for f in ov["feed"] if f["method"] == "b3it"]
     assert b3it_items, "expected a b3it feed item from the view's transition"
     item = b3it_items[0]
@@ -223,7 +266,7 @@ def test_providers_include_zero_change_providers(fake_site):
         changes=[],
         drift=[0.0] * len(long_span),
     )
-    ov = build_overview(root)
+    ov = _build_overview(root)
     prov_names = {p["name"] for p in ov["providers"]}
     assert "zeroprov" in prov_names
     zp = next(p for p in ov["providers"] if p["name"] == "zeroprov")
@@ -232,7 +275,7 @@ def test_providers_include_zero_change_providers(fake_site):
 
 
 def test_stats_counts_match_endpoint_and_changes_lists(fake_site):
-    ov = build_overview(fake_site)
+    ov = _build_overview(fake_site)
     assert ov["stats"]["endpoints"] == len(ov["endpoints"])
     assert ov["stats"]["lt_endpoints"] == 1
     assert ov["stats"]["b3it_endpoints"] == 1

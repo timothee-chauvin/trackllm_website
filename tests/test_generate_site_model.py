@@ -5,11 +5,24 @@ from pathlib import Path
 from trackllm_website.bi.phase_2 import save_results
 from trackllm_website.bi.state import EndpointBIState, Epoch
 from trackllm_website.config import Endpoint
+from trackllm_website.generate_site.b3it import discover_b3it_views
+from trackllm_website.generate_site.lt import discover_lt_endpoints
 from trackllm_website.generate_site.model import build_model_views
 from trackllm_website.util import slugify
 
 
-def _write_lt_endpoint(root: Path, slug: str, model: str, provider: str, *, dates, changes, drift):
+def _build_model_views(root: Path) -> dict:
+    lt_dir = root / "data" / "lt"
+    lt_endpoints = list(discover_lt_endpoints(lt_dir)) if lt_dir.exists() else []
+    b3it_views = discover_b3it_views(
+        root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
+    )
+    return build_model_views(root, lt_endpoints, b3it_views)
+
+
+def _write_lt_endpoint(
+    root: Path, slug: str, model: str, provider: str, *, dates, changes, drift
+):
     d = root / "data" / "lt" / slug
     prompt_dir = d / "default"
     prompt_dir.mkdir(parents=True)
@@ -83,10 +96,16 @@ def test_build_model_views_groups_two_providers_of_one_model(tmp_path):
         drift=[0.1] * 15 + [1.2] * 5,
     )
     _write_lt_endpoint(
-        root, "m2fa23p2", "m/a", "p2", dates=dates_b, changes=[], drift=[0.2] * len(dates_b)
+        root,
+        "m2fa23p2",
+        "m/a",
+        "p2",
+        dates=dates_b,
+        changes=[],
+        drift=[0.2] * len(dates_b),
     )
 
-    views = build_model_views(root)
+    views = _build_model_views(root)
     modelslug = slugify("m/a")
     assert modelslug in views
     view = views[modelslug]
@@ -113,10 +132,12 @@ def test_build_model_views_groups_two_providers_of_one_model(tmp_path):
 def test_build_model_views_includes_b3it_endpoint(tmp_path):
     root = tmp_path / "website"
     dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 6)]
-    _write_lt_endpoint(root, "m2fa23p1", "m/a", "p1", dates=dates, changes=[], drift=[0.1] * 5)
+    _write_lt_endpoint(
+        root, "m2fa23p1", "m/a", "p1", dates=dates, changes=[], drift=[0.1] * 5
+    )
     _write_b3it_with_transition(root, "m2fa23p2", "m/a", "p2")
 
-    views = build_model_views(root)
+    views = _build_model_views(root)
     view = views[slugify("m/a")]
     assert view["n_providers"] == 2
 
@@ -141,7 +162,7 @@ def test_endpoint_with_no_lt_scores_file_yields_null_lt(tmp_path):
     (md / "queries.json").write_text(json.dumps([["24 10:00:00", 0]]))
     # no lt_scores.json written
 
-    views = build_model_views(root)
+    views = _build_model_views(root)
     view = views[slugify("m/a")]
     ep = view["endpoints"][0]
     assert ep["methods"] == ["lt"]

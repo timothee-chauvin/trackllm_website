@@ -123,11 +123,13 @@ def render_site(website_dir: Path) -> None:
     (website_dir / "data" / "spend.json").write_text(json.dumps(spend))
 
     (website_dir / "data" / "overview.json").write_text(
-        json.dumps(overview_mod.build_overview(website_dir))
+        json.dumps(overview_mod.build_overview(website_dir, endpoints, b3it_views))
     )
     models_dir = website_dir / "data" / "models"
     models_dir.mkdir(parents=True, exist_ok=True)
-    for mslug, view in model_mod.build_model_views(website_dir).items():
+    for mslug, view in model_mod.build_model_views(
+        website_dir, endpoints, b3it_views
+    ).items():
         (models_dir / f"{mslug}.json").write_text(json.dumps(view))
 
     index_html = index_template.render(

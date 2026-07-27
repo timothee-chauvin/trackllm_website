@@ -8,9 +8,8 @@ from the view's tv_series.
 from collections import defaultdict
 from pathlib import Path
 
-from trackllm_website.generate_site import b3it as b3it_mod
 from trackllm_website.generate_site.b3it import B3ITView
-from trackllm_website.generate_site.lt import EndpointInfo, discover_lt_endpoints, load_lt_scores
+from trackllm_website.generate_site.lt import EndpointInfo, load_lt_scores
 from trackllm_website.lt_scores import normalize_sigma
 from trackllm_website.util import slugify
 
@@ -47,7 +46,11 @@ def _lt_changes(lt_scores: dict, drift_pairs: list[tuple[str, float]]) -> list[d
         day = lt_scores["dates"][c["index"]][:10]
         level = _peak_from(day, drift_pairs, LT_PEAK_WINDOW)
         out.append(
-            {"date": day, "sigma": _sigma_display(c["sigma"]), "drift": round(level or 0.0, 2)}
+            {
+                "date": day,
+                "sigma": _sigma_display(c["sigma"]),
+                "drift": round(level or 0.0, 2),
+            }
         )
     return out
 
@@ -78,7 +81,10 @@ def _build_endpoint(
     lt_scores = load_lt_scores(lt_dir, slug) if ep is not None else None
     if lt_scores is not None:
         drift_pairs = [
-            (d[:10], v) for d, v in zip(lt_scores.get("drift_dates", []), lt_scores.get("drift", []))
+            (d[:10], v)
+            for d, v in zip(
+                lt_scores.get("drift_dates", []), lt_scores.get("drift", [])
+            )
         ]
         if drift_pairs:
             lt_out = {
@@ -88,7 +94,10 @@ def _build_endpoint(
 
     b3it_out = None
     if view is not None and view.tv_series["dates"]:
-        tv_pairs = [(d[:10], v) for d, v in zip(view.tv_series["dates"], view.tv_series["values"])]
+        tv_pairs = [
+            (d[:10], v)
+            for d, v in zip(view.tv_series["dates"], view.tv_series["values"])
+        ]
         b3it_out = {
             "tv": [list(p) for p in _downsample_pairs(tv_pairs, TRACE_LEN)],
             "changes": _b3it_changes(view, tv_pairs),
@@ -118,15 +127,15 @@ def _build_endpoint(
     )
 
 
-def build_model_views(website_dir: Path) -> dict[str, dict]:
+def build_model_views(
+    website_dir: Path,
+    lt_endpoints: list[EndpointInfo],
+    b3it_views: dict[str, B3ITView],
+) -> dict[str, dict]:
     data_dir = website_dir / "data"
     lt_dir = data_dir / "lt"
 
-    lt_endpoints = discover_lt_endpoints(lt_dir) if lt_dir.exists() else []
     lt_by_slug = {e.slug: e for e in lt_endpoints}
-    b3it_views = b3it_mod.discover_b3it_views(
-        data_dir / "b3it" / "state", data_dir / "b3it" / "phase_2"
-    )
 
     slugs_by_model: dict[str, list[str]] = defaultdict(list)
     for slug in sorted(set(lt_by_slug) | set(b3it_views)):

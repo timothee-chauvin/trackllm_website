@@ -10,9 +10,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
-from trackllm_website.generate_site import b3it as b3it_mod
 from trackllm_website.generate_site.b3it import B3ITView
-from trackllm_website.generate_site.lt import discover_lt_endpoints, load_lt_scores
+from trackllm_website.generate_site.lt import EndpointInfo, load_lt_scores
 
 TRACE_LEN = 28
 RECENT_CHANGE_DAYS = 60
@@ -75,7 +74,9 @@ def _load_lt_data(lt_dir: Path, slug: str) -> _LTData | None:
 
 
 def _nearest_index(pairs: list[tuple[datetime, float]], target: datetime) -> int:
-    return min(range(len(pairs)), key=lambda i: abs((pairs[i][0] - target).total_seconds()))
+    return min(
+        range(len(pairs)), key=lambda i: abs((pairs[i][0] - target).total_seconds())
+    )
 
 
 def _feed_window(
@@ -89,7 +90,9 @@ def _feed_window(
     return downsample_trace(window, FEED_TRACE_LEN), round((k - lo) / (hi - lo), 3)
 
 
-def _build_lt_feed_item(change: dict, drift: list[tuple[datetime, float]], now: datetime) -> dict:
+def _build_lt_feed_item(
+    change: dict, drift: list[tuple[datetime, float]], now: datetime
+) -> dict:
     cd = datetime.fromisoformat(change["date"])
     drift_at = None
     ftrace: list[float] = []
@@ -177,11 +180,7 @@ def _build_feed(
         feed.append(_build_lt_feed_item(c, info.drift if info else [], now))
 
     b3it_changes = sorted(
-        (
-            (view, ch)
-            for view in b3it_views.values()
-            for ch in view.changes
-        ),
+        ((view, ch) for view in b3it_views.values() for ch in view.changes),
         key=lambda t: t[1]["date"],
         reverse=True,
     )[:FEED_B3IT_SIZE]
@@ -192,15 +191,15 @@ def _build_feed(
     return feed
 
 
-def build_overview(website_dir: Path) -> dict:
+def build_overview(
+    website_dir: Path,
+    lt_endpoints: list[EndpointInfo],
+    b3it_views: dict[str, B3ITView],
+) -> dict:
     data_dir = website_dir / "data"
     lt_dir = data_dir / "lt"
 
-    lt_endpoints = discover_lt_endpoints(lt_dir) if lt_dir.exists() else []
     lt_by_slug = {e.slug: e for e in lt_endpoints}
-    b3it_views = b3it_mod.discover_b3it_views(
-        data_dir / "b3it" / "state", data_dir / "b3it" / "phase_2"
-    )
 
     lt_data: dict[str, _LTData] = {}
     for slug in lt_by_slug:
@@ -253,9 +252,10 @@ def build_overview(website_dir: Path) -> dict:
             last_change_date = (
                 info.dates[info.changes[-1]["index"]] if info.changes else None
             )
-            recent = last_change_date is not None and (
-                now - last_change_date
-            ).days <= RECENT_CHANGE_DAYS
+            recent = (
+                last_change_date is not None
+                and (now - last_change_date).days <= RECENT_CHANGE_DAYS
+            )
             status = "retired" if not active else ("changed" if recent else "stable")
             stable_days = (
                 (now - last_change_date).days
@@ -298,7 +298,8 @@ def build_overview(website_dir: Path) -> dict:
                 "rate": round(s["n_changes"] / ey, 2) if ey else 0,
                 "conf": round(
                     PROVIDER_CONF_FLOOR
-                    + (1 - PROVIDER_CONF_FLOOR) * min(1.0, ey / PROVIDER_CONF_FULL_YEARS),
+                    + (1 - PROVIDER_CONF_FLOOR)
+                    * min(1.0, ey / PROVIDER_CONF_FULL_YEARS),
                     3,
                 ),
             }
@@ -311,10 +312,15 @@ def build_overview(website_dir: Path) -> dict:
     spend = json.loads(spend_path.read_text()) if spend_path.exists() else {}
 
     b3it_starts = [
-        e["start"] for view in b3it_views.values() for e in view.epochs if e.get("start")
+        e["start"]
+        for view in b3it_views.values()
+        for e in view.epochs
+        if e.get("start")
     ]
     b3it_endpoints = sum(1 for view in b3it_views.values() if view.epochs)
-    b3it_monitoring = sum(1 for view in b3it_views.values() if view.status == "monitoring")
+    b3it_monitoring = sum(
+        1 for view in b3it_views.values() if view.status == "monitoring"
+    )
 
     def _changes_in_window(lo_days: int, hi_days: int) -> int:
         if now is None:
@@ -354,4 +360,9 @@ def build_overview(website_dir: Path) -> dict:
         "now": now.strftime("%Y-%m-%d") if now else None,
     }
 
-    return {"stats": stats, "feed": feed, "providers": providers, "endpoints": endpoint_recs}
+    return {
+        "stats": stats,
+        "feed": feed,
+        "providers": providers,
+        "endpoints": endpoint_recs,
+    }
