@@ -1,6 +1,5 @@
 import json
-from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
@@ -12,55 +11,6 @@ from trackllm_website.generate_site import overview as overview_mod
 from trackllm_website.generate_site import spend as spend_mod
 
 from .lt import EndpointInfo, discover_lt_endpoints
-
-RECENT_CHANGE_DAYS = 14
-FEED_LIMIT = 25
-
-
-@dataclass
-class IndexRow:
-    slug: str
-    model: str
-    provider: str
-    lt_status: str | None
-    b3it_status: str | None
-    b3it_reason: str | None
-    recent_change: bool
-
-
-def build_index_rows(
-    lt_endpoints: list[EndpointInfo],
-    b3it_views: dict,
-    recent_slugs: set[str],
-) -> list[IndexRow]:
-    lt_by_slug = {e.slug: e for e in lt_endpoints}
-    all_slugs = sorted(
-        set(lt_by_slug) | set(b3it_views),
-        key=lambda s: (lt_by_slug.get(s) or b3it_views[s]).model.lower(),
-    )
-    rows = []
-    for slug in all_slugs:
-        ep = lt_by_slug.get(slug)
-        view = b3it_views.get(slug)
-        if ep:
-            model, provider = ep.model, ep.provider
-        else:
-            model, provider = view.model, view.provider
-        lt_status = ("monitoring" if ep.is_active else "retired") if ep else None
-        b3it_status = view.status if view else None
-        b3it_reason = view.retired_reason if view else None
-        rows.append(
-            IndexRow(
-                slug,
-                model,
-                provider,
-                lt_status,
-                b3it_status,
-                b3it_reason,
-                slug in recent_slugs,
-            )
-        )
-    return rows
 
 
 def render_site(website_dir: Path) -> None:
@@ -108,15 +58,9 @@ def render_site(website_dir: Path) -> None:
     (website_dir / "data").mkdir(parents=True, exist_ok=True)
     (website_dir / "data" / "changes.json").write_text(json.dumps(changes_json))
 
-    cutoff = datetime.now(timezone.utc) - timedelta(days=RECENT_CHANGE_DAYS)
-    recent_slugs: set[str] = {
-        e.slug for e in events if datetime.fromisoformat(e.date) > cutoff
-    }
-
-    rows = build_index_rows(endpoints, b3it_views, recent_slugs)
-
-    n_active = sum(1 for r in rows if r.lt_status == "monitoring")
-    print(f"\nFound {n_active} active, {len(rows) - n_active} inactive endpoints")
+    n_active = sum(1 for ep in endpoints if ep.is_active)
+    n_total = len(set(lt_by_slug) | set(b3it_views))
+    print(f"\nFound {n_active} active, {n_total - n_active} inactive endpoints")
 
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     spend = spend_mod.aggregate_spend(website_dir / "data" / "spend", today)
@@ -133,9 +77,6 @@ def render_site(website_dir: Path) -> None:
         (models_dir / f"{mslug}.json").write_text(json.dumps(view))
 
     index_html = index_template.render(
-        rows=rows,
-        changes=changes_json[:FEED_LIMIT],
-        spend=spend,
         css_path="style.css",
         body_class="index",
     )

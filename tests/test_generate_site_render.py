@@ -26,8 +26,11 @@ def test_render_site_produces_index_and_endpoint(tmp_path):
     _scaffold(tmp_path)
     render_site(tmp_path)
     index = (tmp_path / "index.html").read_text()
-    assert "m/a" in index
+    # index.html is now a static shell; the directory is populated client-side from overview.json
+    assert 'id="dirBody"' in index
     assert (tmp_path / "endpoints" / "m2fa23p.html").exists()
+    overview = json.loads((tmp_path / "data" / "overview.json").read_text())
+    assert "a" in {e["model"] for e in overview["endpoints"]}
 
 
 def test_render_emits_changes_and_unified_index(tmp_path):
@@ -51,10 +54,12 @@ def test_render_emits_changes_and_unified_index(tmp_path):
     )
 
     render_site(tmp_path)
-    assert (tmp_path / "data" / "changes.json").exists()
-    index = (tmp_path / "index.html").read_text()
-    assert "m/a" in index  # endpoint row
-    assert "2026-06-20" in index  # change feed entry
+    # index.html is a static shell now; the directory + feed are populated client-side
+    # from overview.json / changes.json rather than server-rendered into index.html.
+    changes = json.loads((tmp_path / "data" / "changes.json").read_text())
+    assert any("2026-06-20" in c["date"] for c in changes)  # change feed entry
+    overview = json.loads((tmp_path / "data" / "overview.json").read_text())
+    assert "a" in {e["model"] for e in overview["endpoints"]}  # endpoint row
 
 
 def test_render_emits_b3it_json_and_b3it_only_page(tmp_path):
