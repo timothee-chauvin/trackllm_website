@@ -1,0 +1,265 @@
+<title>TrackLLM — endpoint page mockup</title>
+<style>
+  :root {
+    --bg: #0B0F14; --surface: #12181F; --surface-2: #171F28; --surface-3: #1E2731;
+    --border: #232C38; --border-soft: #1A222C; --text: #E6EDF3; --text-muted: #91A0B2;
+    --text-dim: #5E6C7E; --accent: #37C2E0; --accent-quiet: rgba(55,194,224,0.12);
+    --accent-fill: rgba(55,194,224,0.14); --b3it: #B98BE8; --b3it-quiet: rgba(160,110,224,0.14); --b3it-fill: rgba(160,110,224,0.13);
+    --stable: #3FB77E; --changed: #E0A94A; --alert: #E5713B; --retired: #6B7686;
+    --stable-bg: rgba(63,183,126,0.13); --retired-bg: rgba(107,118,134,0.14);
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --maxw: 1180px; --radius: 10px; --radius-sm: 6px;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #FAFCFD; --surface: #F1F5F8; --surface-2: #FFFFFF; --surface-3: #FFFFFF;
+      --border: #DCE4EC; --border-soft: #E7EDF2; --text: #101720; --text-muted: #566072;
+      --text-dim: #8793A3; --accent: #0E86A6; --accent-quiet: rgba(14,134,166,0.09); --accent-fill: rgba(14,134,166,0.10);
+      --b3it: #7A3FB8; --b3it-quiet: rgba(122,63,184,0.10); --b3it-fill: rgba(122,63,184,0.10);
+      --stable: #1F9D5F; --changed: #B0791A; --alert: #C0521E; --retired: #78828F;
+      --stable-bg: rgba(31,157,95,0.11); --retired-bg: rgba(120,130,143,0.12);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0B0F14; --surface: #12181F; --surface-2: #171F28; --surface-3: #1E2731;
+    --border: #232C38; --border-soft: #1A222C; --text: #E6EDF3; --text-muted: #91A0B2;
+    --text-dim: #5E6C7E; --accent: #37C2E0; --accent-quiet: rgba(55,194,224,0.12); --accent-fill: rgba(55,194,224,0.14);
+    --b3it: #B98BE8; --b3it-quiet: rgba(160,110,224,0.14); --b3it-fill: rgba(160,110,224,0.13);
+    --stable: #3FB77E; --changed: #E0A94A; --alert: #E5713B; --retired: #6B7686;
+    --stable-bg: rgba(63,183,126,0.13); --retired-bg: rgba(107,118,134,0.14);
+  }
+  :root[data-theme="light"] {
+    --bg: #FAFCFD; --surface: #F1F5F8; --surface-2: #FFFFFF; --surface-3: #FFFFFF;
+    --border: #DCE4EC; --border-soft: #E7EDF2; --text: #101720; --text-muted: #566072;
+    --text-dim: #8793A3; --accent: #0E86A6; --accent-quiet: rgba(14,134,166,0.09); --accent-fill: rgba(14,134,166,0.10);
+    --b3it: #7A3FB8; --b3it-quiet: rgba(122,63,184,0.10); --b3it-fill: rgba(122,63,184,0.10);
+    --stable: #1F9D5F; --changed: #B0791A; --alert: #C0521E; --retired: #78828F;
+    --stable-bg: rgba(31,157,95,0.11); --retired-bg: rgba(120,130,143,0.12);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+  .nav { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 1.5rem;
+    padding: 0.7rem clamp(1rem, 4vw, 2rem); background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-soft); }
+  .brand { display: flex; align-items: center; gap: 0.6rem; font-weight: 650; letter-spacing: -0.01em; }
+  .brand .glyph { width: 26px; height: 26px; border-radius: 7px; background: linear-gradient(150deg, var(--accent), color-mix(in srgb, var(--accent) 55%, var(--stable)));
+    display: grid; place-items: center; box-shadow: 0 0 18px var(--accent-quiet); }
+  .brand .glyph svg { width: 15px; height: 15px; display: block; }
+  .brand .name { font-size: 0.98rem; } .brand .name b { color: var(--accent); }
+  .nav-links { display: flex; gap: 0.25rem; margin-left: 0.5rem; flex-wrap: wrap; }
+  .nav-links a { padding: 0.32rem 0.62rem; border-radius: var(--radius-sm); font-size: 0.83rem; color: var(--text-muted); }
+  .nav-links a:hover { color: var(--text); background: var(--surface-2); }
+  .nav-links a.active { color: var(--accent); background: var(--accent-quiet); }
+  .nav-right { margin-left: auto; } .mockpill { font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--changed);
+    background: rgba(224,169,74,0.14); border: 1px solid color-mix(in srgb, var(--changed) 40%, transparent); padding: 0.2rem 0.5rem; border-radius: 20px; white-space: nowrap; }
+
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); }
+  .crumb { font-size: 0.82rem; color: var(--text-dim); padding: 1.3rem 0 0.4rem; font-family: var(--mono); }
+  .crumb a:hover { color: var(--accent); } .crumb .sep { opacity: 0.5; margin: 0 0.15rem; }
+
+  .head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap; padding-bottom: 1.4rem; border-bottom: 1px solid var(--border-soft); }
+  .head h1 { font-size: clamp(1.4rem, 3vw, 1.9rem); font-weight: 660; letter-spacing: -0.02em; margin: 0.2rem 0 0.3rem; }
+  .head .prov { font-family: var(--mono); color: var(--text-muted); font-size: 0.95rem; }
+  .head .badges { display: flex; gap: 0.4rem; margin-top: 0.7rem; }
+  .badge { display: inline-block; font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.16rem 0.5rem; border-radius: 5px; border: 1px solid transparent; font-weight: 600; }
+  .badge.lt { color: var(--accent); background: var(--accent-quiet); border-color: color-mix(in srgb, var(--accent) 32%, transparent); }
+  .badge.b3it { color: var(--b3it); background: var(--b3it-quiet); border-color: color-mix(in srgb, var(--b3it) 34%, transparent); }
+
+  .statuscard { display: grid; grid-template-columns: repeat(3, auto); gap: 1.6rem; padding: 0.9rem 1.3rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+  .statuscard .k { font-size: 0.68rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.25rem; }
+  .statuscard .v { font-family: var(--mono); font-size: 0.95rem; font-weight: 600; }
+  .statuscard .v small { font-weight: 500; color: var(--text-dim); }
+  .pill { display: inline-flex; align-items: center; gap: 0.35rem; }
+  .pill .led { width: 7px; height: 7px; border-radius: 50%; }
+  .pill.retired { color: var(--retired); } .pill.retired .led { background: var(--retired); }
+  @media (max-width: 620px) { .statuscard { grid-template-columns: repeat(2, auto); } }
+
+  /* compare banner */
+  .compare { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1.4rem;
+    padding: 0.85rem 1.2rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); flex-wrap: wrap; }
+  .compare .t { font-size: 0.9rem; } .compare .t b { color: var(--accent); }
+  .compare .t span { color: var(--text-muted); }
+  .compare a.go { font-family: var(--mono); font-size: 0.82rem; color: var(--accent); white-space: nowrap; }
+  .compare a.go:hover { text-decoration: underline; }
+
+  section.block { padding: 2.4rem 0 0.4rem; }
+  .sec-head { margin-bottom: 1rem; }
+  .sec-head h2 { font-size: 1.16rem; font-weight: 640; letter-spacing: -0.015em; margin: 0 0 0.35rem; }
+  .sec-head p { color: var(--text-muted); font-size: 0.86rem; margin: 0; max-width: 82ch; }
+  .sec-head p b { color: var(--text); font-weight: 600; }
+  .sec-head p .lt { color: var(--accent); font-weight: 600; } .sec-head p .b3 { color: var(--b3it); font-weight: 600; }
+
+  .panel { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+  .chartwrap { padding: 0.8rem 1rem 0.4rem; } .chart svg { width: 100%; height: auto; display: block; }
+  .footnote { padding: 0 1.2rem 1rem; font-size: 0.76rem; color: var(--text-dim); }
+  .footnote b { color: var(--text-muted); font-weight: 600; }
+
+  .changes-tbl { width: 100%; border-collapse: collapse; }
+  .changes-tbl th { text-align: left; font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-dim); font-weight: 600; padding: 0.6rem 1.1rem; border-bottom: 1px solid var(--border); }
+  .changes-tbl th.r, .changes-tbl td.r { text-align: right; }
+  .changes-tbl td { padding: 0.6rem 1.1rem; border-bottom: 1px solid var(--border-soft); font-size: 0.88rem; }
+  .changes-tbl tr:last-child td { border-bottom: none; }
+  .changes-tbl .date { font-family: var(--mono); color: var(--text-muted); }
+  .changes-tbl .mag { font-family: var(--mono); font-weight: 600; }
+  .changes-tbl .desc { color: var(--text-muted); font-size: 0.82rem; }
+
+  .method-note { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .method-note .card { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: 1rem 1.2rem; }
+  .method-note .card h3 { font-size: 0.92rem; margin: 0 0 0.4rem; display: flex; align-items: center; gap: 0.5rem; }
+  .method-note .card p { font-size: 0.83rem; color: var(--text-muted); margin: 0; }
+  @media (max-width: 620px) { .method-note { grid-template-columns: 1fr; } }
+
+  footer.site { margin-top: 3rem; border-top: 1px solid var(--border-soft); padding: 1.6rem clamp(1rem, 4vw, 2rem); color: var(--text-dim); font-size: 0.8rem; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  footer.site a:hover { color: var(--accent); }
+  .note { max-width: var(--maxw); margin: 1.4rem auto 0; padding: 0 clamp(1rem, 4vw, 2rem); color: var(--text-dim); font-size: 0.78rem; font-style: italic; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<script id="site-data" type="application/json">{"model": "deepseek/deepseek-chat-v3-0324", "org": "deepseek", "provider": "fireworks", "slug": "deepseek2fdeepseek-chat-v3-032423fireworks", "n_providers": 11, "methods": ["lt", "b3it"], "first": "2025-06-26", "last": "2026-02-11", "lt": {"drift": [["2025-06-26", 0.165], ["2025-06-28", 0.159], ["2025-06-30", 0.14], ["2025-07-02", 0.332], ["2025-07-04", 0.198], ["2025-07-06", 0.178], ["2025-07-08", 0.294], ["2025-07-10", 0.035], ["2025-07-12", 0.296], ["2025-07-14", 0.297], ["2025-07-17", 0.182], ["2025-07-19", 0.18], ["2025-07-21", 0.18], ["2025-07-23", 0.06], ["2025-07-25", 0.176], ["2025-07-27", 0.157], ["2025-07-29", 0.163], ["2025-07-31", 0.132], ["2025-08-02", 0.038], ["2025-08-05", 0.382], ["2025-08-07", 0.382], ["2025-08-09", 0.32], ["2025-08-11", 0.36], ["2025-08-13", 0.364], ["2025-08-15", 0.325], ["2025-08-17", 0.346], ["2025-08-19", 0.331], ["2025-08-21", 0.309], ["2025-08-24", 0.459], ["2025-08-26", 0.47], ["2025-08-28", 0.399], ["2025-08-30", 0.366], ["2025-09-01", 0.378], ["2025-09-03", 0.392], ["2025-09-05", 0.41], ["2025-09-07", 0.411], ["2025-09-09", 0.414], ["2025-09-12", 0.305], ["2025-09-14", 0.49], ["2025-09-16", 0.521], ["2025-09-18", 0.551], ["2025-09-20", 0.784], ["2025-09-22", 0.785], ["2025-09-24", 0.777], ["2025-09-26", 0.676], ["2025-09-28", 0.725], ["2025-10-01", 0.728], ["2025-10-03", 0.823], ["2025-10-05", 0.732], ["2025-10-07", 0.724], ["2025-10-09", 0.805], ["2025-10-11", 0.731], ["2025-10-13", 0.682], ["2025-10-15", 0.674], ["2025-10-17", 0.703], ["2025-10-20", 0.744], ["2025-10-22", 0.977], ["2025-10-24", 0.681], ["2025-10-26", 0.738], ["2025-10-28", 0.721], ["2025-10-30", 0.714], ["2025-11-01", 0.722], ["2025-11-03", 0.723], ["2025-11-05", 0.814], ["2025-11-07", 1.269], ["2025-11-10", 1.269], ["2025-11-12", 1.269], ["2025-11-14", 1.269], ["2025-11-16", 1.076], ["2025-11-18", 1.267], ["2025-11-20", 0.545], ["2025-11-22", 0.586], ["2025-11-24", 0.655], ["2025-11-26", 0.632], ["2025-11-29", 1.06], ["2025-12-01", 0.799], ["2025-12-03", 1.079], ["2025-12-05", 0.486], ["2025-12-07", 1.278], ["2025-12-09", 0.607], ["2025-12-11", 0.56], ["2025-12-13", 0.469], ["2025-12-15", 0.597], ["2025-12-18", 0.872], ["2025-12-20", 0.899], ["2025-12-22", 0.82], ["2025-12-24", 0.836], ["2025-12-26", 1.024], ["2025-12-28", 1.031], ["2025-12-30", 0.898], ["2026-01-01", 0.934], ["2026-01-03", 0.901], ["2026-01-06", 0.783], ["2026-01-08", 0.921], ["2026-01-10", 0.907], ["2026-01-12", 0.814], ["2026-01-14", 0.87], ["2026-01-16", 0.783], ["2026-01-18", 0.855], ["2026-01-20", 1.081], ["2026-01-22", 0.625], ["2026-01-25", 0.769], ["2026-01-27", 1.034], ["2026-01-29", 1.255], ["2026-01-31", 1.149], ["2026-02-02", 0.893], ["2026-02-04", 0.868], ["2026-02-06", 0.612], ["2026-02-08", 0.772], ["2026-02-10", 0.842]], "changes": [{"date": "2025-09-18", "sigma": "15\u03c3", "drift": 0.551}, {"date": "2025-11-07", "sigma": "23\u03c3", "drift": 1.269}, {"date": "2025-11-20", "sigma": "53\u03c3", "drift": 0.545}]}, "b3it": {"tv": [["2026-01-15", 0.116], ["2026-01-16", 0.124], ["2026-01-17", 0.113], ["2026-01-18", 0.112], ["2026-01-19", 0.091], ["2026-01-20", 0.062], ["2026-01-21", 0.067], ["2026-01-22", 0.05], ["2026-01-23", 0.09], ["2026-01-24", 0.097], ["2026-01-25", 0.117], ["2026-01-26", 0.393], ["2026-01-27", 0.378], ["2026-01-28", 0.439], ["2026-01-29", 0.402], ["2026-01-30", 0.379], ["2026-01-31", 0.496], ["2026-02-01", 0.371], ["2026-02-03", 0.543], ["2026-02-04", 0.416], ["2026-02-05", 0.423], ["2026-02-06", 0.299], ["2026-02-11", 0.095]], "changes": [{"date": "2026-01-26", "peakTV": 0.543}]}}</script>
+
+<nav class="nav">
+  <a class="brand" href="#"><span class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="#0B0F14" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l2-7 4 14 2-7h8"/></svg></span><span class="name">Track<b>LLM</b></span></a>
+  <div class="nav-links"><a href="#">Overview</a><a class="active" href="#">Models</a><a href="#">Providers</a><a href="#">Changes</a><a href="#">Rankings</a><a href="#">Methodology</a><a href="#">Spend</a></div>
+  <div class="nav-right"><span class="mockpill">endpoint page · real data</span></div>
+</nav>
+
+<div class="wrap">
+  <div class="crumb" id="crumb"></div>
+  <div class="head">
+    <div>
+      <h1 id="model"></h1>
+      <div class="prov" id="prov"></div>
+      <div class="badges" id="badges"></div>
+    </div>
+    <div class="statuscard" id="statuscard"></div>
+  </div>
+  <div class="compare">
+    <div class="t" id="compare-t"></div>
+    <a class="go" href="#" id="compare-go"></a>
+  </div>
+</div>
+
+<main class="wrap">
+  <section class="block">
+    <div class="sec-head">
+      <h2>Drift from baseline</h2>
+      <p>Both signals measure how far this endpoint's behaviour has moved from its <b>reference period</b> (its first two weeks). <span class="lt">LT</span> tracks the average change in the returned tokens' log-probabilities (nats); <span class="b3">B3IT</span> tracks the total-variation distance of the border-input votes (0–1). Both read <b>0 when the endpoint matches its baseline</b> and rise — staying elevated — after a real change. Dashed lines mark detected changepoints; <b>σ</b> is the detector's statistical confidence, separate from how far the signal actually moved.</p>
+    </div>
+    <div class="panel">
+      <div class="chartwrap chart" id="mainchart"></div>
+      <div class="footnote" id="footnote"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="sec-head"><h2>Detected changes</h2></div>
+    <div class="panel">
+      <table class="changes-tbl">
+        <thead><tr><th>Date</th><th>Method</th><th class="r">Drift reached</th><th class="r">Confidence</th></tr></thead>
+        <tbody id="changerows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="method-note">
+      <div class="card"><h3><span class="badge lt">LT</span> Logprob tracking</h3><p>Primary signal where the provider returns logprobs. The drift is the mean absolute change in the returned tokens' log-probabilities versus the reference period (in nats — natural-log probability units). The detector also reports a statistical confidence σ, which can be high even when the drift is small.</p></div>
+      <div class="card"><h3><span class="badge b3it">B3IT</span> Border inputs</h3><p>Black-box fallback for endpoints that hide logprobs. Tracks how far the top-token votes on a ranked set of near-tie prompts have moved from the reference distribution (total variation, 0–1). Corroborates LT where both run on the same endpoint.</p></div>
+    </div>
+  </section>
+</main>
+
+<div class="note">Real TrackLLM data (snapshot 2026-07). B3IT changes recomputed over full epoch history with top-20 BI ranking (per #26). This is a design mockup — links are inert.</div>
+
+<footer class="site">
+  <span>Data collected via the OpenRouter API · sampled at T=0 on a fixed cadence.</span>
+  <span><a href="#">Methodology</a> · <a href="#">GitHub</a> · <a href="#">Paper</a></span>
+</footer>
+
+<script>
+(function () {
+  const D = JSON.parse(document.getElementById("site-data").textContent);
+  const model = D.model.split("/").pop();
+  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const td = s => Date.parse(s + "T00:00:00Z");
+  const fmtMon = s => { const d = new Date(td(s)); return `${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`; };
+
+  // header
+  document.getElementById("crumb").innerHTML = `<a href="#">Home</a><span class="sep">/</span><a href="#">${D.org}</a><span class="sep">/</span><a href="#">${model}</a><span class="sep">/</span><span style="color:var(--text-muted)">@ ${D.provider}</span>`;
+  document.getElementById("model").textContent = model;
+  document.getElementById("prov").innerHTML = `@ ${D.provider} <span style="color:var(--text-dim)">· ${D.org}</span>`;
+  document.getElementById("badges").innerHTML = D.methods.map(m => `<span class="badge ${m}">${m}</span>`).join("");
+
+  const nLT = D.lt.changes.length, nB3 = D.b3it.changes.length;
+  document.getElementById("statuscard").innerHTML = `
+    <div><div class="k">Status</div><div class="v"><span class="pill retired"><span class="led"></span>Retired</span></div></div>
+    <div><div class="k">Monitored</div><div class="v">${fmtMon(D.first)} – ${fmtMon(D.last)}</div></div>
+    <div><div class="k">Changes</div><div class="v">${nLT + nB3} <small>(${nLT} LT · ${nB3} B3IT)</small></div></div>`;
+
+  document.getElementById("compare-t").innerHTML = `<b>${model}</b> <span>is served by ${D.n_providers} providers — compare their drift side by side.</span>`;
+  document.getElementById("compare-go").textContent = `View model page →`;
+
+  // ---- stacked-lane drift chart ----
+  const VW = 1000, PL = 50, PR = 20;
+  const laneH = 108, gap = 34, top1 = 34, top2 = top1 + laneH + gap, VH = top2 + laneH + 40;
+  const pw = VW - PL - PR;
+  const D0 = td(D.first), D1 = td(D.last);
+  const fx = s => PL + (td(s) - D0) / (D1 - D0) * pw;
+
+  function monthTicks() { const out = []; const d = new Date(D0); d.setUTCDate(1);
+    while (d.getTime() <= D1) { if (d.getTime() >= D0 - 15 * 864e5) out.push(new Date(d)); d.setUTCMonth(d.getUTCMonth() + 1); } return out; }
+
+  function lane(series, topY, maxV, color, fill, label, axisFmt) {
+    const yv = v => topY + laneH * (1 - v / maxV);
+    const pts = series.map((p, i) => `${i ? "L" : "M"}${fx(p[0]).toFixed(1)} ${yv(p[1]).toFixed(1)}`).join(" ");
+    const area = `M${fx(series[0][0]).toFixed(1)} ${(topY + laneH).toFixed(1)} ` +
+      series.map(p => `L${fx(p[0]).toFixed(1)} ${yv(p[1]).toFixed(1)}`).join(" ") +
+      ` L${fx(series[series.length-1][0]).toFixed(1)} ${(topY + laneH).toFixed(1)} Z`;
+    const grid = monthTicks().map(d => { const x = fx(d.toISOString().slice(0,10)); return `<line x1="${x.toFixed(1)}" y1="${topY}" x2="${x.toFixed(1)}" y2="${topY+laneH}" stroke="var(--border-soft)" stroke-width="1"/>`; }).join("");
+    const ticks = [0, maxV/2, maxV].map(v => `<line x1="${PL}" y1="${yv(v).toFixed(1)}" x2="${VW-PR}" y2="${yv(v).toFixed(1)}" stroke="var(--border-soft)" stroke-width="0.7" opacity="0.6"/><text x="${PL-8}" y="${(yv(v)+3).toFixed(1)}" fill="${color}" font-size="10" font-family="var(--mono)" text-anchor="end">${axisFmt(v)}</text>`).join("");
+    return `${grid}${ticks}<path d="${area}" fill="${fill}" stroke="none"/><path d="${pts}" fill="none" stroke="${color}" stroke-width="1.7" vector-effect="non-scaling-stroke"/>
+      <text x="${PL}" y="${topY-8}" fill="${color}" font-size="11.5" font-family="var(--mono)" font-weight="600">${label}</text>`;
+  }
+
+  const ltMax = Math.max(1, ...D.lt.drift.map(p => p[1])) * 1.08;
+  const tvMax = 1;
+  const lt = lane(D.lt.drift, top1, ltMax, "var(--accent)", "var(--accent-fill)", "LT · drift from baseline (nats)", v => v.toFixed(1));
+  const b3 = D.b3it.tv.length
+    ? lane(D.b3it.tv, top2, tvMax, "var(--b3it)", "var(--b3it-fill)", "B3IT · total variation from baseline (0–1)", v => v.toFixed(1))
+    : `<text x="${PL}" y="${top2 + laneH/2}" fill="var(--text-dim)" font-size="11" font-family="var(--mono)">B3IT · no reference data in this window</text>`;
+
+  // changepoints across both lanes
+  const cps = [];
+  D.lt.changes.forEach(c => cps.push({ x: fx(c.date), col: "var(--accent)", lab: c.sigma, lane: "lt" }));
+  D.b3it.changes.forEach(c => cps.push({ x: fx(c.date), col: "var(--b3it)", lab: `TV ${c.peakTV}`, lane: "b3" }));
+  const cpSvg = cps.map(c => {
+    const labY = c.lane === "lt" ? top1 - 8 : top2 - 8;
+    return `<line x1="${c.x.toFixed(1)}" y1="${top1-4}" x2="${c.x.toFixed(1)}" y2="${top2+laneH}" stroke="${c.col}" stroke-width="1" stroke-dasharray="3 3" opacity="0.55"/>
+      <circle cx="${c.x.toFixed(1)}" cy="${labY+4}" r="2.6" fill="${c.col}"/>
+      <text x="${c.x.toFixed(1)}" y="${labY}" fill="${c.col}" font-size="10.5" font-family="var(--mono)" font-weight="600" text-anchor="middle">${c.lab}</text>`;
+  }).join("");
+
+  const xlabels = monthTicks().map(d => { const x = fx(d.toISOString().slice(0,10)); return `<text x="${x.toFixed(1)}" y="${VH-14}" fill="var(--text-dim)" font-size="10.5" font-family="var(--mono)" text-anchor="middle">${MONTHS[d.getUTCMonth()]} ${String(d.getUTCFullYear()).slice(2)}</text>`; }).join("");
+
+  document.getElementById("mainchart").innerHTML = `<svg viewBox="0 0 ${VW} ${VH}" preserveAspectRatio="xMidYMid meet">
+    ${lt}${b3}${cpSvg}${xlabels}
+    <line x1="${PL}" y1="${top2+laneH}" x2="${VW-PR}" y2="${top2+laneH}" stroke="var(--border)" stroke-width="1"/></svg>`;
+  document.getElementById("footnote").innerHTML =
+    `<b>Reading it:</b> both lanes share the time axis. A change reads as a step up that persists — the Sept→Nov LT rise (0.17→1.3 nats) is the served distribution moving well away from what it returned at launch, even though the model version never changed. B3IT only has reference data from Jan onward, so its lane starts there.`;
+
+  // ---- changes table ----
+  const rows = [];
+  D.lt.changes.forEach(c => rows.push({ date: c.date, method: "lt", mag: `${c.drift} nats`, conf: c.sigma, desc: "logprob distribution moved from baseline" }));
+  D.b3it.changes.forEach(c => rows.push({ date: c.date, method: "b3it", mag: `TV ${c.peakTV}`, conf: "—", desc: "border-input votes moved from reference" }));
+  rows.sort((a, b) => td(b.date) - td(a.date));
+  document.getElementById("changerows").innerHTML = rows.map(r => `<tr>
+    <td class="date">${r.date}</td>
+    <td><span class="badge ${r.method}">${r.method}</span></td>
+    <td class="r mag" style="color:${r.method === "lt" ? "var(--accent)" : "var(--b3it)"}">${r.mag}</td>
+    <td class="r num" style="color:var(--text-muted)">${r.conf}</td></tr>`).join("");
+})();
+</script>
