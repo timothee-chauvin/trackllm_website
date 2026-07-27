@@ -29,3 +29,16 @@ def test_sustained_shift_raises_drift():
 def test_unsorted_input_is_handled():
     s = compute_drift_series([_obs(d, {"A": -0.02}) for d in reversed(range(5))])
     assert [dt.day for dt, _ in s] == [1, 2, 3, 4, 5]
+
+
+def test_duplicate_timestamps_do_not_crash():
+    """Observations can share an exact timestamp (seen in real data, e.g.
+    x-ai/grok-3-beta @ xai). Sorting must not fall back to comparing dicts."""
+    ts = datetime(2026, 1, 1, 12, tzinfo=timezone.utc)
+    obs = []
+    for d in range(5):
+        obs.append((ts + timedelta(days=d), {"A": -0.02, "B": -4.0}))
+        obs.append((ts + timedelta(days=d), {"A": -0.03, "B": -4.1}))  # dup timestamp
+    s = compute_drift_series(obs)
+    assert [dt.day for dt, _ in s] == [1, 2, 3, 4, 5]
+    assert all(isinstance(v, float) for _, v in s)
