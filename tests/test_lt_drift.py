@@ -21,7 +21,9 @@ def test_sustained_shift_raises_drift():
     shifted = [_obs(d, {"A": -4.0, "B": -0.02}) for d in range(15, 30)]
     s = compute_drift_series(stable + shifted)
     assert max(v for dt, v in s if dt.day <= 10 and dt.month == 1) < 0.3
-    assert min(v for dt, v in s if dt >= datetime(2026, 1, 25, tzinfo=timezone.utc)) > 1.0
+    assert (
+        min(v for dt, v in s if dt >= datetime(2026, 1, 25, tzinfo=timezone.utc)) > 1.0
+    )
 
 
 def test_unsorted_input_is_handled():
