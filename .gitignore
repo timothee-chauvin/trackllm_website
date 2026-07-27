@@ -11,3 +11,6 @@ reports/
 /website/data/changes.json
 /website/data/spend.json
 /website/data/b3it/*/b3it.json
+/website/data/overview.json
+/website/data/models/
+/website/models/
