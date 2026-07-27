@@ -7,6 +7,8 @@ from jinja2 import Environment, FileSystemLoader
 
 from trackllm_website.generate_site import b3it as b3it_mod
 from trackllm_website.generate_site import changes as changes_mod
+from trackllm_website.generate_site import model as model_mod
+from trackllm_website.generate_site import overview as overview_mod
 from trackllm_website.generate_site import spend as spend_mod
 
 from .lt import EndpointInfo, discover_lt_endpoints
@@ -119,6 +121,14 @@ def render_site(website_dir: Path) -> None:
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     spend = spend_mod.aggregate_spend(website_dir / "data" / "spend", today)
     (website_dir / "data" / "spend.json").write_text(json.dumps(spend))
+
+    (website_dir / "data" / "overview.json").write_text(
+        json.dumps(overview_mod.build_overview(website_dir))
+    )
+    models_dir = website_dir / "data" / "models"
+    models_dir.mkdir(parents=True, exist_ok=True)
+    for mslug, view in model_mod.build_model_views(website_dir).items():
+        (models_dir / f"{mslug}.json").write_text(json.dumps(view))
 
     index_html = index_template.render(
         rows=rows,
