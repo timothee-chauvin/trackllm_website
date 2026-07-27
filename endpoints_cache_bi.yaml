@@ -327,6 +327,12 @@ too_expensive:
   - 1.25
 - api: openrouter
   model: google/gemini-2.5-flash-image
+  provider: google-ai-studio/priority
+  cost:
+  - 0.54
+  - 4.5
+- api: openrouter
+  model: google/gemini-2.5-flash-image
   provider: google-vertex/global
   cost:
   - 0.3
