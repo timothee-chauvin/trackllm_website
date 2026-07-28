@@ -1,4 +1,4 @@
-"""Append-only LT change-event log with stable first-detected dates."""
+"""LT change-event log: current detection, with stable first-detected dates."""
 
 from datetime import datetime
 from pathlib import Path
@@ -28,16 +28,25 @@ def merge_events(
     now: datetime,
 ) -> list[LTChangeEvent]:
     """A recomputed change within PEAK_DISTANCE indices of an existing event is
-    the same event: keep first_detected, refresh index/date/sigma."""
-    merged = list(existing)
+    the same event: keep first_detected, refresh index/date/sigma.
+
+    Each event is claimed by at most one change, so two nearby changes cannot
+    collapse onto one event. An event no current change claims is dropped:
+    detection is authoritative, and an event it no longer produces would
+    otherwise outlive the bug that created it.
+    """
+    unclaimed = list(existing)
+    merged: list[LTChangeEvent] = []
     for cp in changes:
         match = next(
-            (e for e in merged if abs(e.index - cp.index) <= PEAK_DISTANCE), None
+            (e for e in unclaimed if abs(e.index - cp.index) <= PEAK_DISTANCE), None
         )
         if match is not None:
+            unclaimed.remove(match)
             match.index = cp.index
             match.date = dates[cp.index]
             match.sigma = cp.sigma
+            merged.append(match)
         else:
             merged.append(
                 LTChangeEvent(
@@ -48,6 +57,7 @@ def merge_events(
                     first_detected=now,
                 )
             )
+    merged.sort(key=lambda e: e.index)
     return merged
 
 

@@ -19,7 +19,9 @@ def _mean_vector(
 ) -> tuple[dict[str, float], float]:
     """Left-censor missing tokens to the group minimum (mirroring build_tensor)."""
     floor = min(min(d.values()) for d in dicts)
-    tokens = {t for d in dicts for t in d} | extra_tokens
+    # sorted for the same reason as build_tensor: iteration order feeds the
+    # summation below, and hash order would make every recompute churn.
+    tokens = sorted({t for d in dicts for t in d} | extra_tokens)
     return {t: statistics.mean([d.get(t, floor) for d in dicts]) for t in tokens}, floor
 
 
@@ -48,7 +50,7 @@ def compute_drift_series(
     for day in sorted(by_day):
         day_mean, day_floor = _mean_vector(by_day[day], ref_tokens)
         floor = min(day_floor, ref_floor)
-        tokens = set(day_mean) | set(ref_mean)
+        tokens = sorted(set(day_mean) | set(ref_mean))
         drift = statistics.mean(
             abs(day_mean.get(t, floor) - ref_mean.get(t, floor)) for t in tokens
         )
