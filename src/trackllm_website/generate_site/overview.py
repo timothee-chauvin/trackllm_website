@@ -7,6 +7,7 @@ views, changes.json, spend.json) -- never raw logprobs.
 """
 
 import json
+from collections import Counter
 from datetime import datetime
 from pathlib import Path
 
@@ -78,6 +79,11 @@ def build_overview(
     changes_path = data_dir / "changes.json"
     changes = json.loads(changes_path.read_text()) if changes_path.exists() else []
     lt_changes = [c for c in changes if c["method"] == "LT"]
+    # Canonical per-endpoint counts. Never the changes recomputed into
+    # lt_scores.json: that recompute double-detects some changes on adjacent
+    # days, and the directory row sits on the same pages as the merged change
+    # list (the Overview feed, the provider tables, the Changes board).
+    changes_by_slug = Counter(c["slug"] for c in changes)
 
     all_slugs = sorted(set(lt_by_slug) | set(b3it_views))
     endpoint_recs = []
@@ -100,12 +106,10 @@ def build_overview(
         trace: list[float] = []
         status = "stable"
         stable_days: int | None = None
-        n_lt_changes = 0
 
         info = lt_data.get(slug)
         if info is not None and now is not None:
             active = (now - info.dates[-1]).days <= RETIRED_GAP_DAYS
-            n_lt_changes = len(info.changes)
             last_change_date = (
                 info.dates[info.changes[-1]["index"]] if info.changes else None
             )
@@ -123,7 +127,6 @@ def build_overview(
         elif view is not None and now is not None:
             status, trace, stable_days = _b3it_status_trace(view, now)
 
-        n_changes = n_lt_changes + (len(view.changes) if view else 0)
         endpoint_recs.append(
             {
                 "slug": slug,
@@ -136,7 +139,7 @@ def build_overview(
                 "methods": methods,
                 "status": status,
                 "stableDays": stable_days,
-                "nChanges": n_changes,
+                "nChanges": changes_by_slug[slug],
                 "trace": trace,
             }
         )

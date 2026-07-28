@@ -211,6 +211,22 @@ def test_b3it_only_retired_endpoint_gets_retired_status(tmp_path):
     assert ov["stats"]["active"] == 1  # only the still-monitoring LT endpoint
 
 
+def test_change_count_follows_changes_json_not_the_recomputed_scores(fake_site):
+    """changes.json is canonical; the build-time recompute stored in lt_scores.json
+    double-detects some changes on adjacent days, and those must not be counted --
+    the directory row and the change feed sit on the same page."""
+    scores_path = fake_site / "data" / "lt" / "m2fa23p" / "lt_scores.json"
+    scores = json.loads(scores_path.read_text())
+    scores["changes"] = [{"index": 24, "sigma": 40.0}, {"index": 25, "sigma": 38.0}]
+    scores_path.write_text(json.dumps(scores))
+
+    ov = _build_overview(fake_site)
+    ep = next(e for e in ov["endpoints"] if e["slug"] == "m2fa23p")
+    assert ep["nChanges"] == 1
+    assert ov["stats"]["changed_endpoints"] == 1
+    assert sum(e["nChanges"] for e in ov["endpoints"]) == ov["stats"]["changes_total"]
+
+
 def test_endpoint_rows_carry_model_slug(fake_site):
     ov = _build_overview(fake_site)
     ep = next(e for e in ov["endpoints"] if e["slug"] == "m2fa23p")
