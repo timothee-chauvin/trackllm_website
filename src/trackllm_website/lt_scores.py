@@ -26,7 +26,12 @@ STAT_SIGMA_THRESHOLD = 12.0
 STAT_RUNNING_STD_WINDOW = 100
 STAT_EXCLUSION_ZONE = 2 * N_PER_TEST
 STAT_ABSOLUTE_THRESHOLD = 1.0
-PEAK_DISTANCE = N_PER_TEST
+# The statistic at index i compares [i-N, i) against [i, i+N), so one change keeps
+# it elevated across 2*N_PER_TEST indices -- the same span the exclusion zone keeps
+# out of the running baseline. Peaks must be at least that far apart, or the two
+# crests of a single change's hump are both reported (one change, two dates a day
+# apart: this happened on 14 endpoint-pairs).
+PEAK_DISTANCE = STAT_EXCLUSION_ZONE
 # Deviations at/above this arise from a near-zero (but nonzero) baseline std and
 # are effectively infinite: represented as None, displayed as ∞ by all consumers.
 SIGMA_INF_THRESHOLD = 1e4
@@ -78,7 +83,10 @@ def load_prompt_logprobs(
 
 def build_tensor(logprob_dicts: list[dict[str, float]]) -> np.ndarray:
     """Build (N, n_tokens) array with left censoring for missing tokens."""
-    all_tokens = list({tok for d in logprob_dicts for tok in d})
+    # sorted, not set order: column order sets the summation order of the means
+    # below, so hash-seed ordering would change the last ULP of every score and
+    # make each recompute rewrite every lt_scores.json with pure churn.
+    all_tokens = sorted({tok for d in logprob_dicts for tok in d})
     tok_idx = {tok: i for i, tok in enumerate(all_tokens)}
     tensor = np.empty((len(logprob_dicts), len(all_tokens)), dtype=np.float64)
     for i, d in enumerate(logprob_dicts):

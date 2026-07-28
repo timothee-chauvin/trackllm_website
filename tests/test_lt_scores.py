@@ -1,4 +1,7 @@
 import math
+import os
+import subprocess
+import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -87,6 +90,81 @@ def test_near_zero_variance_jump_normalizes_huge_finite_sigma_to_none():
     changes, _ = detect_changes(scores)
     detected = next(cp for cp in changes if abs(cp.index - 175) <= 1)
     assert detected.sigma is None
+
+
+_REPRODUCIBILITY_PROBE = """
+import hashlib
+from datetime import datetime, timedelta, timezone
+from trackllm_website.lt_drift import compute_drift_series
+from trackllm_website.lt_scores import build_tensor
+
+toks = [f"tok{i}" for i in range(40)]
+dicts = [{t: -0.5 - (i * 0.017 + j * 0.003) for j, t in enumerate(toks)} for i in range(60)]
+start = datetime(2026, 1, 1, tzinfo=timezone.utc)
+obs = [(start + timedelta(hours=i), d) for i, d in enumerate(dicts)]
+payload = repr(build_tensor(dicts).tolist()) + repr(compute_drift_series(obs))
+print(hashlib.sha256(payload.encode()).hexdigest())
+"""
+
+
+def test_scoring_is_reproducible_across_hash_seeds():
+    """Token sets were iterated in hash order, so summation order -- and the last
+    ULP of every score and drift value -- changed between processes. That made a
+    recompute rewrite ~300 lt_scores.json files with pure noise, burying real
+    changes in the diff.
+    """
+    digests = set()
+    for seed in ("0", "1", "2"):
+        proc = subprocess.run(
+            [sys.executable, "-c", _REPRODUCIBILITY_PROBE],
+            capture_output=True,
+            text=True,
+            env={**os.environ, "PYTHONHASHSEED": seed},
+        )
+        assert proc.returncode == 0, proc.stderr
+        digests.add(proc.stdout.strip())
+    assert len(digests) == 1, f"output varies with hash seed: {digests}"
+
+
+def _bimodal_change(length: int = 400, first: int = 250) -> np.ndarray:
+    """One change whose exceedance hump has two crests, N_PER_TEST indices apart.
+
+    The two-sample statistic at index i compares [i-N, i) against [i, i+N), so a
+    single step change keeps it elevated across ~2*N_PER_TEST indices. Noise
+    inside that span can leave two local maxima -- real data does this on 14
+    endpoint-pairs, always exactly one day apart.
+    """
+    scores = 0.01 * (np.arange(length) % 3)  # tiny baseline variation so std > 0
+    second = first + N_PER_TEST
+    for k in range(13):
+        scores[first + k] = 5.0 - 0.15 * k
+        scores[second - k] = 5.0 - 0.15 * k
+    for k in range(1, 13):
+        scores[second + k] = max(5.0 - 0.4 * k, 0.03)
+    return scores
+
+
+def test_one_change_is_not_reported_twice_within_its_influence_window():
+    """Regression: PEAK_DISTANCE was N_PER_TEST, half a change's influence width,
+    so both crests of a single change's hump survived as separate changes."""
+    changes, _ = detect_changes(_bimodal_change())
+    assert len(changes) == 1, f"one change reported at {[c.index for c in changes]}"
+
+
+def test_peak_distance_matches_the_statistic_influence_width():
+    """Peak separation and the running-baseline exclusion zone describe the same
+    quantity -- how far a single change reaches into the statistic. They must not
+    drift apart: a smaller PEAK_DISTANCE double-counts changes."""
+    assert lt_scores.PEAK_DISTANCE == lt_scores.STAT_EXCLUSION_ZONE == 2 * N_PER_TEST
+
+
+def test_genuinely_separate_changes_are_still_reported_separately():
+    """The wider peak distance must not merge changes that are truly distinct."""
+    scores = _bimodal_change(length=700)
+    scores[500:513] = [5.0 - 0.15 * k for k in range(13)]
+    changes, _ = detect_changes(scores)
+    assert len(changes) == 2
+    assert changes[1].index - changes[0].index > 2 * N_PER_TEST
 
 
 def test_empty_logprob_response_is_skipped(tmp_path):
