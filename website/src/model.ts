@@ -83,11 +83,13 @@ async function init(): Promise<void> {
 
   const ledeEl = document.getElementById("lede");
   if (ledeEl) {
-    // n_endpoints counts serving variants, n_providers the companies behind them:
+    // n_endpoints counts serving endpoints, n_providers the companies behind them:
     // saying "providers" for the larger number would contradict the groups below.
-    const across =
-      D.n_endpoints === D.n_providers ? "" : ` across ${plural(D.n_endpoints, "serving endpoint")}`;
-    ledeEl.innerHTML = `Served by <b>${D.n_providers}</b> ${D.n_providers === 1 ? "provider" : "providers"}${across}. <span class="hl">${D.n_changed}</span> of those endpoints show at least one detected change since launch — evidence the served behaviour drifts even when the model version doesn't.`;
+    ledeEl.innerHTML =
+      `Served by <b>${D.n_providers}</b> ${D.n_providers === 1 ? "provider" : "providers"}` +
+      ` on ${plural(D.n_endpoints, "tracked endpoint")}. ` +
+      `<span class="hl">${D.n_changed}</span> of those ${D.n_changed === 1 ? "shows" : "show"}` +
+      ` at least one detected change since launch — evidence the served behaviour drifts even when the model version doesn't.`;
   }
   const summaryEl = document.getElementById("summary");
   if (summaryEl) {

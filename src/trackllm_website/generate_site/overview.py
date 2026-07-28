@@ -176,7 +176,9 @@ def build_overview(
     stats = {
         "endpoints": len(endpoint_recs),
         "providers": len({r["provider"] for r in endpoint_recs}),
-        "provider_companies": len({base_provider(r["provider"]) for r in endpoint_recs}),
+        "provider_companies": len(
+            {base_provider(r["provider"]) for r in endpoint_recs}
+        ),
         "models": len(models_set),
         "orgs": len({r["org"] for r in endpoint_recs}),
         "changes_total": len(changes),

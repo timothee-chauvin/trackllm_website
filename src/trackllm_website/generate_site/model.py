@@ -37,10 +37,14 @@ def _peak_from(day: str, pairs: list[tuple[str, float]], window: int) -> float |
 
 
 def _by_method(changes: list[dict], method: str) -> list[dict]:
-    return sorted((c for c in changes if c["method"] == method), key=lambda c: c["date"])
+    return sorted(
+        (c for c in changes if c["method"] == method), key=lambda c: c["date"]
+    )
 
 
-def _lt_changes(canonical: list[dict], drift_pairs: list[tuple[str, float]]) -> list[dict]:
+def _lt_changes(
+    canonical: list[dict], drift_pairs: list[tuple[str, float]]
+) -> list[dict]:
     out = []
     for c in canonical:
         day = c["date"][:10]
@@ -55,7 +59,9 @@ def _lt_changes(canonical: list[dict], drift_pairs: list[tuple[str, float]]) -> 
     return out
 
 
-def _b3it_changes(canonical: list[dict], tv_pairs: list[tuple[str, float]]) -> list[dict]:
+def _b3it_changes(
+    canonical: list[dict], tv_pairs: list[tuple[str, float]]
+) -> list[dict]:
     out = []
     for c in canonical:
         day = c["date"][:10]
@@ -136,9 +142,9 @@ def build_model_views(
     lt_dir = data_dir / "lt"
 
     changes_path = data_dir / "changes.json"
-    changes = json.loads(changes_path.read_text()) if changes_path.exists() else []
+    canonical = json.loads(changes_path.read_text()) if changes_path.exists() else []
     canonical_by_slug: dict[str, list[dict]] = defaultdict(list)
-    for c in changes:
+    for c in canonical:
         canonical_by_slug[c["slug"]].append(c)
 
     lt_by_slug = {e.slug: e for e in lt_endpoints}
