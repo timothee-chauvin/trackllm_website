@@ -8,7 +8,11 @@ import {
   LT_CAP,
   MIN_ENDPOINT_YEARS,
   esc,
+  magnitudeLabel,
   methodBadges,
+  monthLabel,
+  plural,
+  prettyDate,
   rateBar,
   sparkline,
   statusPill,
@@ -71,11 +75,7 @@ interface ProviderData {
 
 type SortKey = "model" | "provider" | "status" | "nChanges" | "stableDays";
 
-const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-const monthLabel = (m: string): string => MONTH_NAMES[+m.slice(5, 7) - 1] + " '" + m.slice(2, 4);
-const prettyDate = (d: string | null): string =>
-  d ? MONTH_NAMES[+d.slice(5, 7) - 1] + " " + d.slice(0, 4) : "—";
-const plural = (n: number, w: string): string => `${n} ${w}${n === 1 ? "" : "s"}`;
+const LANE_W = 600;
 
 async function init(): Promise<void> {
   const slugEl = document.getElementById("providerData");
@@ -94,10 +94,13 @@ async function init(): Promise<void> {
   const variantLabel = (v: string): string => (v ? esc(NAME) + "/" + esc(v) : esc(NAME));
 
   const variants = D.variants.slice().sort((a, b) => b.n_endpoints - a.n_endpoints);
-  // one scale for every bar on the page so variants are visually comparable
+  // one scale across the variant bars so they are comparable. Spans only what is
+  // drawn — the per-variant rates and their interval upper bounds, so no band is
+  // clipped. The provider aggregate is deliberately out of scope: it is never
+  // drawn as a bar, and it pools endpoints from below-gate variants, so it can
+  // exceed every drawn rate and shrink the bars toward a value shown nowhere.
   const maxRate = Math.max(
     1,
-    D.lt.rate ?? 0,
     ...variants.map((v) => v.lt.rate ?? 0),
     ...variants.map((v) => v.lt.ci?.[1] ?? 0)
   );
@@ -167,12 +170,15 @@ async function init(): Promise<void> {
   // monitoring lanes: grey area = endpoints under monitoring per month, dots = changes
   const MONTHS = D.months;
   const NM = Math.max(1, MONTHS.length - 1);
-  const laneX = (i: number): number => (i / NM) * 600;
+  const laneX = (i: number): number => (i / NM) * LANE_W;
 
   function laneSvg(v: Variant, changes: ProviderChange[]): string {
-    const W = 600, H = 46, base = H - 9;
+    const W = LANE_W, H = 46, base = H - 9;
     const max = Math.max(...v.monitoring, 1);
     const pts = v.monitoring.map((c, i): [number, number] => [laneX(i), base - (c / max) * (base - 6)]);
+    // one month is a band, not a run: hold it flat across the lane, or the closing
+    // segment would draw a wedge sloping to zero that the data does not say
+    if (pts.length === 1) pts.push([W, pts[0][1]]);
     const line = pts
       .map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1))
       .join(" ");
@@ -187,10 +193,10 @@ async function init(): Promise<void> {
         const r = 2.6 + Math.min(1, (c.magnitude ?? 0) / (isLT ? LT_CAP : B3IT_CAP)) * 3.2;
         const idx = MONTHS.indexOf(c.date.slice(0, 7));
         const cx = laneX(idx < 0 ? MONTHS.length - 1 : idx).toFixed(1);
-        const mag = c.magnitude === null ? "" : isLT ? ` · ${c.magnitude} nats` : ` · TV ${c.magnitude}`;
+        const mag = magnitudeLabel(c.method, c.magnitude);
         return `<line x1="${cx}" y1="${base}" x2="${cx}" y2="6" stroke="${col}" stroke-width="1" opacity="0.22"/>
           <circle cx="${cx}" cy="${base - 14}" r="${r.toFixed(1)}" fill="${col}" fill-opacity="0.75" stroke="${col}" stroke-width="1">
-          <title>${esc(c.date)} · ${esc(c.model)} · ${isLT ? "LT" : "B3IT"}${esc(mag)}</title></circle>`;
+          <title>${esc(c.date)} · ${esc(c.model)} · ${isLT ? "LT" : "B3IT"}${mag ? " · " + esc(mag) : ""}</title></circle>`;
       })
       .join("");
     return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">

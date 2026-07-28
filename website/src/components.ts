@@ -92,3 +92,27 @@ export function relDays(n: number): string {
   if (n < 365) return `${Math.round(n / 30)}mo ago`;
   return `${(n / 365).toFixed(1)}y ago`;
 }
+
+export const MONTH_NAMES = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+
+/** "2026-07" -> "Jul '26" — axis ticks and month headers. */
+export function monthLabel(month: string): string {
+  return MONTH_NAMES[+month.slice(5, 7) - 1] + " '" + month.slice(2, 4);
+}
+
+/** "2026-07-24" -> "Jul 2026"; null -> em dash. */
+export function prettyDate(date: string | null): string {
+  return date ? MONTH_NAMES[+date.slice(5, 7) - 1] + " " + date.slice(0, 4) : "—";
+}
+
+export function plural(n: number, word: string): string {
+  return `${n} ${word}${n === 1 ? "" : "s"}`;
+}
+
+/** How far the endpoint moved, in each method's own unit. */
+export function magnitudeLabel(method: string, magnitude: number | null): string {
+  if (magnitude === null) return "";
+  return method === "lt" ? `${magnitude} nats` : `TV ${magnitude}`;
+}
