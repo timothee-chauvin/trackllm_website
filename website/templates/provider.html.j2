@@ -1,0 +1,89 @@
+{% extends "base.html.j2" %}
+
+{% block title %}{{ provider }} | TrackLLM{% endblock %}
+
+{% block content %}
+<div class="wrap">
+  <div class="crumb">
+    <a href="{{ nav_prefix }}index.html">Home</a><span class="sep">/</span>
+    <span style="color:var(--text-muted)">{{ provider }}</span>
+  </div>
+  <div class="head">
+    <div>
+      <div class="eyebrow">Provider</div>
+      <h1>{{ provider }}</h1>
+      <p class="lede" id="lede"></p>
+      <div class="summary" id="summary"></div>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <section class="block">
+    <div class="sec-head">
+      <h2>Drift rate</h2>
+      <span class="hint">the two methods are kept apart: different sensitivity, very different monitoring lengths &mdash; pooling them would move the number when coverage grows rather than when behaviour does</span>
+    </div>
+    <div class="ratecards" id="ratecards"></div>
+  </section>
+
+  <section class="block">
+    <div class="sec-head">
+      <h2>Monitoring &amp; changes over time</h2>
+      <span class="hint">the grey area is how many endpoints were under monitoring each month &mdash; the exposure the rate divides by; dots are detected changes, sized by how far the endpoint moved</span>
+    </div>
+    <div class="panel" id="timeline"></div>
+    <div class="legend">
+      <span class="k"><i class="bar" style="background:var(--text-dim);opacity:0.4"></i> endpoints under monitoring</span>
+      <span class="k"><i style="background:var(--accent)"></i> LT change (size = drift in nats)</span>
+      <span class="k"><i style="background:var(--b3it)"></i> B3IT change (size = peak TV)</span>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="sec-head">
+      <h2>Serving variants</h2>
+      <span class="hint">a provider's quantizations are separate serving stacks and drift separately</span>
+    </div>
+    <div class="table-wrap"><table class="dir">
+      <thead><tr>
+        <th>Variant</th><th class="r">Endpoints</th><th>LT drift rate</th>
+        <th class="col-hide">Monitoring</th><th class="r col-hide">Changes</th><th class="r col-hide">B3IT</th>
+      </tr></thead>
+      <tbody id="variantBody"></tbody>
+    </table></div>
+  </section>
+
+  <section class="block">
+    <div class="sec-head"><h2>Endpoints</h2><span class="hint" id="epCount"></span></div>
+    <div class="toolbar">
+      <label class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+        <input id="epq" type="text" placeholder="Search model or org…" autocomplete="off">
+      </label>
+      <div class="chips" id="epChips">
+        <span class="chip state-changed" data-f="changed">Ever changed</span>
+        <span class="chip state-retired" data-f="retired">Retired</span>
+        <span class="chip" data-f="b3it">B3IT</span>
+      </div>
+    </div>
+    <div class="table-wrap"><div class="table-scroll"><table class="dir">
+      <thead><tr>
+        <th data-sort="model">Model <span class="arr"></span></th>
+        <th data-sort="provider" class="col-hide">Variant <span class="arr"></span></th>
+        <th data-sort="status">Status <span class="arr"></span></th>
+        <th data-sort="nChanges" class="r">Changes <span class="arr"></span></th>
+        <th class="col-hide">Methods</th>
+        <th data-sort="stableDays" class="r col-hide">Stable for <span class="arr"></span></th>
+        <th class="col-hide">Drift from baseline</th>
+      </tr></thead>
+      <tbody id="epBody"></tbody>
+    </table></div><div class="dir-foot" id="epFoot"></div></div>
+  </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+    <script type="application/json" id="providerData">{{ provider_slug|tojson }}</script>
+    <script type="module" src="../js/provider.js"></script>
+{% endblock %}

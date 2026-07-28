@@ -17,22 +17,45 @@
     <div class="sec-head">
       <h2>Latest detected changes</h2>
       <span class="hint">sparkline is the endpoint's drift around the changepoint (dashed): LT tracks how far the returned logprob averages have moved from the reference period (nats); B3IT the total-variation shift of border-input outputs (0–1)</span>
-      <a class="more" href="#">Full changelog →</a>
+      <a class="more" href="changes.html">Full changelog →</a>
     </div>
     <div class="feed" id="feed"></div>
   </section>
 
   <section class="block">
     <div class="sec-head">
-      <h2>Provider drift rate</h2>
-      <span class="hint">detected changes per endpoint-year — normalized for fleet size &amp; monitoring length. The square grid is total monitoring duration (1 square = one endpoint-month): more squares = more confidence in the rate</span>
-      <a class="more" href="#">All providers →</a>
+      <h2>Providers</h2>
+      <span class="hint">detected changes per <b>endpoint-year</b> of monitoring — normalized for fleet size &amp; monitoring length — with a 95% Poisson interval. Providers are grouped by company; their serving variants (fp8, fp4, …) are compared on the provider page</span>
     </div>
-    <div class="panel">
-      <div class="rate-head">
-        <span class="r">#</span><span>Provider</span><span>Drift rate (changes / endpoint-year)</span><span class="vol-h">Monitoring (1 sq = endpoint-month)</span><span class="r meta-h">detail</span>
+    <div class="boards" id="provBoards"></div>
+    <div class="toolbar">
+      <label class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+        <input id="provQ" type="text" placeholder="Search provider…" autocomplete="off">
+      </label>
+      <div class="chips" id="provChips">
+        <span class="chip state-changed" data-f="changed">Has changes</span>
+        <span class="chip" data-f="rateable">Rateable</span>
+        <span class="chip" data-f="b3it">Runs B3IT</span>
       </div>
-      <div id="rates"></div>
+    </div>
+    <div class="table-wrap">
+      <div class="table-scroll">
+        <table class="dir">
+          <thead>
+            <tr>
+              <th data-psort="name">Provider <span class="arr"></span></th>
+              <th data-psort="n_endpoints" class="r">Endpoints <span class="arr"></span></th>
+              <th data-psort="lt_rate">LT drift rate (changes / endpoint-year) <span class="arr"></span></th>
+              <th class="col-hide">Monitoring (1 sq = endpoint-month)</th>
+              <th class="col-hide">B3IT</th>
+              <th data-psort="last_change" class="r col-hide">Last change <span class="arr"></span></th>
+            </tr>
+          </thead>
+          <tbody id="provBody"></tbody>
+        </table>
+      </div>
+      <div class="dir-foot" id="provFoot"></div>
     </div>
   </section>
 

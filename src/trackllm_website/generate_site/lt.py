@@ -1,4 +1,5 @@
 import json
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -173,11 +174,51 @@ def discover_lt_endpoints(lt_dir: Path) -> list[EndpointInfo]:
 def load_lt_scores(lt_dir: Path, slug: str) -> dict | None:
     """Load an endpoint's already-generated lt_scores.json, if present and non-empty.
 
-    Shared by overview.py and model.py so both read the one on-disk contract
-    (n_per_test/dates/scores/changes/drift/drift_dates) the same way.
+    The raw reader behind load_lt_data, so every surface goes through the one
+    on-disk contract (n_per_test/dates/scores/changes/drift/drift_dates).
     """
     path = lt_dir / slug / SCORES_FILENAME
     if not path.exists():
         return None
     d = json.loads(path.read_text())
     return d if d.get("dates") else None
+
+
+@dataclass
+class LTData:
+    """lt_scores.json with its dates parsed and drift zipped into a series."""
+
+    dates: list[datetime]
+    scores: list[float]
+    n_per_test: int
+    changes: list[dict]
+    drift: list[tuple[datetime, float]]
+
+
+def load_lt_data(lt_dir: Path, slug: str) -> LTData | None:
+    d = load_lt_scores(lt_dir, slug)
+    if d is None:
+        return None
+    drift_dates = [datetime.fromisoformat(s) for s in d.get("drift_dates", [])]
+    return LTData(
+        dates=[datetime.fromisoformat(s) for s in d["dates"]],
+        scores=d["scores"],
+        n_per_test=d["n_per_test"],
+        changes=d["changes"],
+        drift=list(zip(drift_dates, d.get("drift", []))),
+    )
+
+
+def load_all_lt_data(lt_dir: Path, slugs: Iterable[str]) -> dict[str, LTData]:
+    """Parse every endpoint's scores once, so no two site surfaces parse them differently."""
+    out: dict[str, LTData] = {}
+    for slug in slugs:
+        d = load_lt_data(lt_dir, slug)
+        if d is not None:
+            out[slug] = d
+    return out
+
+
+def latest_date(lt_data: dict[str, LTData]) -> datetime | None:
+    """The build's clock: the most recent observation across all LT endpoints."""
+    return max((d.dates[-1] for d in lt_data.values()), default=None)

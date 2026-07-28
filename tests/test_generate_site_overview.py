@@ -1,24 +1,27 @@
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
 
-from trackllm_website.bi.phase_2 import save_results
-from trackllm_website.bi.state import EndpointBIState, Epoch, RetiredInfo
-from trackllm_website.config import Endpoint
+from conftest import write_b3it_series, write_b3it_state, write_lt_endpoint
+from trackllm_website.bi.state import RetiredInfo
 from trackllm_website.generate_site.b3it import discover_b3it_views
-from trackllm_website.generate_site.lt import discover_lt_endpoints
-from trackllm_website.generate_site.overview import build_overview, downsample_trace
+from trackllm_website.generate_site.changes import merge_changes, to_json
+from trackllm_website.generate_site.lt import discover_lt_endpoints, load_all_lt_data
+from trackllm_website.generate_site.feed import downsample_trace
+from trackllm_website.generate_site.overview import build_overview
+from trackllm_website.util import slugify
 
 
 def _build_overview(root: Path) -> dict:
     lt_dir = root / "data" / "lt"
     lt_endpoints = list(discover_lt_endpoints(lt_dir)) if lt_dir.exists() else []
+    lt_data = load_all_lt_data(lt_dir, [e.slug for e in lt_endpoints])
     b3it_views = discover_b3it_views(
         root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
     )
-    return build_overview(root, lt_endpoints, b3it_views)
+    return build_overview(root, lt_data, lt_endpoints, b3it_views)
 
 
 def test_downsample_trace_caps_length():
@@ -33,96 +36,19 @@ def test_downsample_trace_empty():
     assert downsample_trace([], 28) == []
 
 
-def _write_lt_endpoint(
-    root: Path, slug: str, model: str, provider: str, *, dates, changes, drift
-):
-    d = root / "data" / "lt" / slug
-    prompt_dir = d / "default"
-    prompt_dir.mkdir(parents=True)
-    (prompt_dir / "info.json").write_text(
-        json.dumps({"prompt": "hi", "endpoint": {"model": model, "provider": provider}})
-    )
-    month = dates[-1][:7]
-    day = dates[-1][8:10]
-    month_dir = prompt_dir / month
-    month_dir.mkdir()
-    (month_dir / "queries.json").write_text(json.dumps([[f"{day} 00:00:00", 0]]))
-    scores = [0.5] * len(dates)
-    (d / "lt_scores.json").write_text(
-        json.dumps(
-            {
-                "n_per_test": 24,
-                "dates": dates,
-                "scores": scores,
-                "sigmas": [None] * len(dates),
-                "changes": changes,
-                "drift_dates": dates,
-                "drift": drift,
-            }
-        )
-    )
-
-
-def _write_b3it_state(
-    root: Path, slug: str, model: str, provider: str, *, status="monitoring"
-):
-    state = {
-        "endpoint": {
-            "api": "openrouter",
-            "model": model,
-            "provider": provider,
-            "cost": [0.1, 0.2],
-            "max_logprobs": None,
-        },
-        "status": status,
-        "retired": None,
-        "epochs": [
-            {
-                "start": "2026-01-01T00:00:00Z",
-                "border_inputs": [],
-                "reference": {},
-                "end": None,
-            }
-        ],
-    }
-    sd = root / "data" / "b3it" / "state"
-    sd.mkdir(parents=True, exist_ok=True)
-    (sd / f"{slug}.json").write_text(json.dumps(state))
-
-
-def _daily_batch(day: int, token: str):
-    ts = f"2026-01-{day:02d}T00:00:00+00:00"
-    return ts, [(ts, token)] * 10
-
-
 def _write_b3it_with_transition(
-    root: Path, slug: str, model: str, provider: str, *, status, retired=None
+    root: Path, model: str, provider: str, *, status, retired=None
 ):
     """A b3it endpoint whose reference actually produces a TV transition."""
-    ep = Endpoint(api="openrouter", model=model, provider=provider, cost=(0.1, 0.2))
-    ref = {"p1": [("2026-01-01T00:00:00Z", "A")] * 10}
-    results = {
-        "p1": dict(
-            [_daily_batch(d, "A") for d in range(1, 13)]
-            + [_daily_batch(d, "B") for d in range(13, 25)]
-        )
-    }
-    state = EndpointBIState(
-        endpoint=ep,
+    write_b3it_series(
+        root,
+        model,
+        provider,
         status=status,
         retired=retired,
-        epochs=[
-            Epoch(
-                start=datetime(2026, 1, 1, tzinfo=timezone.utc),
-                border_inputs=["p1"],
-                reference=ref,
-            )
-        ],
+        month="2026-01",
+        tokens=["A"] * 12 + ["B"] * 12,
     )
-    state.save(root / "data" / "b3it" / "state")
-    p2_dir = root / "data" / "b3it" / "phase_2" / slug
-    p2_dir.mkdir(parents=True)
-    save_results(p2_dir / "p1.json", results)
 
 
 @pytest.fixture
@@ -131,10 +57,10 @@ def fake_site(tmp_path):
     dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 31)]
     drift = [0.1] * 24 + [1.5] * 6
     changes = [{"index": 24, "sigma": 40.0}]
-    _write_lt_endpoint(
+    write_lt_endpoint(
         root, "m2fa23p", "m/a", "p", dates=dates, changes=changes, drift=drift
     )
-    _write_b3it_state(root, "m2fa23p", "m/a", "p")
+    write_b3it_state(root, "m/a", "p", status="monitoring")
 
     (root / "data" / "changes.json").write_text(
         json.dumps(
@@ -157,7 +83,7 @@ def fake_site(tmp_path):
 
 def test_build_overview_shape(fake_site):
     ov = _build_overview(fake_site)
-    assert set(ov) == {"stats", "feed", "providers", "endpoints"}
+    assert set(ov) == {"stats", "feed", "endpoints"}
     ep = ov["endpoints"][0]
     assert set(ep) >= {
         "slug",
@@ -194,10 +120,10 @@ def test_status_retired_when_no_recent_observation(tmp_path):
     root = tmp_path / "website"
     old_dates = [f"2025-01-{d:02d}T00:00:00Z" for d in range(1, 29)]
     recent_dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 29)]
-    _write_lt_endpoint(
+    write_lt_endpoint(
         root, "old2fa23p", "old/a", "p", dates=old_dates, changes=[], drift=[0.1] * 28
     )
-    _write_lt_endpoint(
+    write_lt_endpoint(
         root,
         "new2fa23p",
         "new/a",
@@ -233,11 +159,17 @@ def test_feed_lt_item_has_drift_level_and_conf(fake_site):
 def test_feed_includes_b3it_item_from_view_transition(tmp_path):
     root = tmp_path / "website"
     dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 6)]
-    _write_lt_endpoint(
+    write_lt_endpoint(
         root, "m2fa23p", "m/a", "p", dates=dates, changes=[], drift=[0.1] * 5
     )
-    _write_b3it_with_transition(root, "m2fb23q", "m/b", "q", status="monitoring")
-    (root / "data" / "changes.json").write_text(json.dumps([]))
+    _write_b3it_with_transition(root, "m/b", "q", status="monitoring")
+    # the feed reads B3IT items from the merged change list, as render.py writes it
+    views = discover_b3it_views(
+        root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
+    )
+    (root / "data" / "changes.json").write_text(
+        json.dumps(to_json(merge_changes({}, {}, views)))
+    )
     (root / "data" / "spend.json").write_text(json.dumps({"cumulative": {}}))
 
     ov = _build_overview(root)
@@ -254,12 +186,11 @@ def test_feed_includes_b3it_item_from_view_transition(tmp_path):
 def test_b3it_only_retired_endpoint_gets_retired_status(tmp_path):
     root = tmp_path / "website"
     dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 6)]
-    _write_lt_endpoint(
+    write_lt_endpoint(
         root, "m2fa23p", "m/a", "p", dates=dates, changes=[], drift=[0.1] * 5
     )
     _write_b3it_with_transition(
         root,
-        "m2fb23q",
         "m/b",
         "q",
         status="retired",
@@ -280,29 +211,56 @@ def test_b3it_only_retired_endpoint_gets_retired_status(tmp_path):
     assert ov["stats"]["active"] == 1  # only the still-monitoring LT endpoint
 
 
-def test_providers_include_zero_change_providers(fake_site):
-    root = fake_site
-    long_span = [
-        (datetime(2025, 1, 1, tzinfo=timezone.utc) + timedelta(days=d)).strftime(
-            "%Y-%m-%dT00:00:00Z"
-        )
-        for d in range(0, 220)
-    ]
-    _write_lt_endpoint(
-        root,
-        "m2fc23zeroprov",
-        "m/c",
-        "zeroprov",
-        dates=long_span,
-        changes=[],
-        drift=[0.0] * len(long_span),
+def test_change_count_follows_changes_json_not_the_recomputed_scores(fake_site):
+    """changes.json is canonical; the build-time recompute stored in lt_scores.json
+    double-detects some changes on adjacent days, and those must not be counted --
+    the directory row and the change feed sit on the same page."""
+    scores_path = fake_site / "data" / "lt" / "m2fa23p" / "lt_scores.json"
+    scores = json.loads(scores_path.read_text())
+    scores["changes"] = [{"index": 24, "sigma": 40.0}, {"index": 25, "sigma": 38.0}]
+    scores_path.write_text(json.dumps(scores))
+
+    ov = _build_overview(fake_site)
+    ep = next(e for e in ov["endpoints"] if e["slug"] == "m2fa23p")
+    assert ep["nChanges"] == 1
+    assert ov["stats"]["changed_endpoints"] == 1
+    assert sum(e["nChanges"] for e in ov["endpoints"]) == ov["stats"]["changes_total"]
+
+
+def test_endpoint_rows_carry_model_slug(fake_site):
+    ov = _build_overview(fake_site)
+    ep = next(e for e in ov["endpoints"] if e["slug"] == "m2fa23p")
+    assert ep["modelSlug"] == slugify("m/a")
+
+
+def test_endpoint_rows_carry_provider_slug_of_the_base_provider(tmp_path):
+    """The link target is the provider *page*, which is keyed by company, not variant."""
+    root = tmp_path / "website"
+    dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 31)]
+    write_lt_endpoint(
+        root, "m2fa23p2ffp8", "m/a", "p/fp8", dates=dates, changes=[], drift=[0.1] * 30
     )
+    (root / "data" / "changes.json").write_text(json.dumps([]))
+    (root / "data" / "spend.json").write_text(json.dumps({"cumulative": {}}))
+
     ov = _build_overview(root)
-    prov_names = {p["name"] for p in ov["providers"]}
-    assert "zeroprov" in prov_names
-    zp = next(p for p in ov["providers"] if p["name"] == "zeroprov")
-    assert zp["n_changes"] == 0
-    assert 0.0 <= zp["conf"] <= 1.0
+    ep = next(e for e in ov["endpoints"] if e["provider"] == "p/fp8")
+    assert ep["providerSlug"] == slugify("p") == "p"
+
+
+def test_stats_count_provider_companies_and_variants(tmp_path):
+    root = tmp_path / "website"
+    dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 31)]
+    write_lt_endpoint(
+        root, "a23p", "org/a", "p", dates=dates, changes=[], drift=[0.1] * 30
+    )
+    write_lt_endpoint(
+        root, "b23p2ffp8", "org/b", "p/fp8", dates=dates, changes=[], drift=[0.1] * 30
+    )
+    (root / "data" / "changes.json").write_text(json.dumps([]))
+    ov = _build_overview(root)
+    assert ov["stats"]["providers"] == 2  # serving variants
+    assert ov["stats"]["provider_companies"] == 1
 
 
 def test_stats_counts_match_endpoint_and_changes_lists(fake_site):

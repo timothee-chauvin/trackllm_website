@@ -3,6 +3,7 @@ __pycache__
 /website/js/
 /website/index.html
 /website/spend.html
+/website/changes.html
 /website/endpoints/
 /website/node_modules/
 strategies_test_reasoning.json
@@ -12,5 +13,8 @@ reports/
 /website/data/spend.json
 /website/data/b3it/*/b3it.json
 /website/data/overview.json
+/website/data/changes_page.json
 /website/data/models/
+/website/data/providers/
 /website/models/
+/website/providers/

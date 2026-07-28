@@ -1,16 +1,18 @@
 """Per-model models/<slug>.json: every provider serving a model on one shared timeline.
 
-Reads only already-generated data (lt_scores.json's drift/drift_dates, B3IT build-time
-views) -- LT drift is already smoothed upstream (lt_drift.py); B3IT tv comes straight
-from the view's tv_series.
+Which changes exist comes from changes.json, the canonical merged list; how far
+each one moved comes from the series (lt_scores.json's drift/drift_dates, the B3IT
+build-time views) -- LT drift is already smoothed upstream (lt_drift.py); B3IT tv
+comes straight from the view's tv_series.
 """
 
+import json
 from collections import defaultdict
 from pathlib import Path
 
 from trackllm_website.generate_site.b3it import B3ITView
-from trackllm_website.generate_site.lt import EndpointInfo, load_lt_scores
-from trackllm_website.lt_scores import normalize_sigma
+from trackllm_website.generate_site.lt import EndpointInfo, load_lt_data
+from trackllm_website.generate_site.naming import base_provider
 from trackllm_website.util import slugify
 
 TRACE_LEN = 90
@@ -25,12 +27,6 @@ def _downsample_pairs(pairs: list[tuple], n: int) -> list[tuple]:
     return [pairs[i * len(pairs) // n] for i in range(n)]
 
 
-def _sigma_display(sigma: float | None) -> str:
-    if sigma is None or normalize_sigma(sigma) is None:
-        return "∞σ"
-    return f"{sigma:.0f}σ"
-
-
 def _peak_from(day: str, pairs: list[tuple[str, float]], window: int) -> float | None:
     """Peak value from the first point on/after `day`, over the next `window` points."""
     on_or_after = [v for d, v in pairs if d >= day][:window]
@@ -40,25 +36,35 @@ def _peak_from(day: str, pairs: list[tuple[str, float]], window: int) -> float |
     return same_day[-1] if same_day else None
 
 
-def _lt_changes(lt_scores: dict, drift_pairs: list[tuple[str, float]]) -> list[dict]:
+def _by_method(changes: list[dict], method: str) -> list[dict]:
+    return sorted(
+        (c for c in changes if c["method"] == method), key=lambda c: c["date"]
+    )
+
+
+def _lt_changes(
+    canonical: list[dict], drift_pairs: list[tuple[str, float]]
+) -> list[dict]:
     out = []
-    for c in lt_scores["changes"]:
-        day = lt_scores["dates"][c["index"]][:10]
+    for c in canonical:
+        day = c["date"][:10]
         level = _peak_from(day, drift_pairs, LT_PEAK_WINDOW)
         out.append(
             {
                 "date": day,
-                "sigma": _sigma_display(c["sigma"]),
+                "sigma": c["magnitude_display"],
                 "drift": round(level or 0.0, 2),
             }
         )
     return out
 
 
-def _b3it_changes(view: B3ITView, tv_pairs: list[tuple[str, float]]) -> list[dict]:
+def _b3it_changes(
+    canonical: list[dict], tv_pairs: list[tuple[str, float]]
+) -> list[dict]:
     out = []
-    for ch in view.changes:
-        day = ch["date"][:10]
+    for c in canonical:
+        day = c["date"][:10]
         peak = _peak_from(day, tv_pairs, B3IT_PEAK_WINDOW)
         out.append({"date": day, "peakTV": round(peak or 0.0, 3)})
     return out
@@ -70,7 +76,10 @@ def _build_endpoint(
     provider: str,
     view: B3ITView | None,
     lt_dir: Path,
+    canonical: list[dict],
 ) -> tuple[dict, list[str]]:
+    """`canonical` is this endpoint's slice of changes.json -- which changes happened.
+    The series only says how far each one moved."""
     methods = []
     if ep is not None:
         methods.append("lt")
@@ -78,18 +87,13 @@ def _build_endpoint(
         methods.append("b3it")
 
     lt_out = None
-    lt_scores = load_lt_scores(lt_dir, slug) if ep is not None else None
-    if lt_scores is not None:
-        drift_pairs = [
-            (d[:10], v)
-            for d, v in zip(
-                lt_scores.get("drift_dates", []), lt_scores.get("drift", [])
-            )
-        ]
+    lt = load_lt_data(lt_dir, slug) if ep is not None else None
+    if lt is not None:
+        drift_pairs = [(d.date().isoformat(), v) for d, v in lt.drift]
         if drift_pairs:
             lt_out = {
                 "drift": [list(p) for p in _downsample_pairs(drift_pairs, TRACE_LEN)],
-                "changes": _lt_changes(lt_scores, drift_pairs),
+                "changes": _lt_changes(_by_method(canonical, "LT"), drift_pairs),
             }
 
     b3it_out = None
@@ -100,7 +104,7 @@ def _build_endpoint(
         ]
         b3it_out = {
             "tv": [list(p) for p in _downsample_pairs(tv_pairs, TRACE_LEN)],
-            "changes": _b3it_changes(view, tv_pairs),
+            "changes": _b3it_changes(_by_method(canonical, "B3IT"), tv_pairs),
         }
 
     date_range: list[str] = []
@@ -116,6 +120,8 @@ def _build_endpoint(
         {
             "slug": slug,
             "provider": provider,
+            "base": base_provider(provider),
+            "providerSlug": slugify(base_provider(provider)),
             "methods": methods,
             "first": min(date_range) if date_range else None,
             "last": max(date_range) if date_range else None,
@@ -135,6 +141,12 @@ def build_model_views(
     data_dir = website_dir / "data"
     lt_dir = data_dir / "lt"
 
+    changes_path = data_dir / "changes.json"
+    canonical = json.loads(changes_path.read_text()) if changes_path.exists() else []
+    canonical_by_slug: dict[str, list[dict]] = defaultdict(list)
+    for c in canonical:
+        canonical_by_slug[c["slug"]].append(c)
+
     lt_by_slug = {e.slug: e for e in lt_endpoints}
 
     slugs_by_model: dict[str, list[str]] = defaultdict(list)
@@ -152,10 +164,29 @@ def build_model_views(
             ep = lt_by_slug.get(slug)
             view = b3it_views.get(slug)
             provider = ep.provider if ep else view.provider
-            rec, date_range = _build_endpoint(slug, ep, provider, view, lt_dir)
+            rec, date_range = _build_endpoint(
+                slug, ep, provider, view, lt_dir, canonical_by_slug[slug]
+            )
             endpoints.append(rec)
             alldates += date_range
         endpoints.sort(key=lambda e: (-e["n_changes"], e["provider"]))
+
+        # every change for the model, so the page can draw one all-providers strip
+        changes = sorted(
+            [
+                {"date": c["date"], "method": "lt", "provider": e["provider"]}
+                for e in endpoints
+                if e["lt"]
+                for c in e["lt"]["changes"]
+            ]
+            + [
+                {"date": c["date"], "method": "b3it", "provider": e["provider"]}
+                for e in endpoints
+                if e["b3it"]
+                for c in e["b3it"]["changes"]
+            ],
+            key=lambda c: c["date"],
+        )
 
         drift_values = [
             v for e in endpoints if e["lt"] for _, v in e["lt"]["drift"]
@@ -167,9 +198,13 @@ def build_model_views(
             "org": model.split("/")[0],
             "date_min": min(alldates) if alldates else None,
             "date_max": max(alldates) if alldates else None,
-            "n_providers": len(endpoints),
+            # Endpoints are serving variants: two of them can be the same company
+            # (chutes and chutes/fp8), so the two counts are not interchangeable.
+            "n_endpoints": len(endpoints),
+            "n_providers": len({e["base"] for e in endpoints}),
             "n_changed": sum(1 for e in endpoints if e["n_changes"]),
             "max_drift": max_drift,
+            "changes": changes,
             "endpoints": endpoints,
         }
     return out
