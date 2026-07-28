@@ -9,8 +9,10 @@ from trackllm_website.bi.phase_2 import save_results
 from trackllm_website.bi.state import EndpointBIState, Epoch, RetiredInfo
 from trackllm_website.config import Endpoint
 from trackllm_website.generate_site.b3it import discover_b3it_views
+from trackllm_website.generate_site.changes import merge_changes, to_json
 from trackllm_website.generate_site.lt import discover_lt_endpoints
-from trackllm_website.generate_site.overview import build_overview, downsample_trace
+from trackllm_website.generate_site.feed import downsample_trace
+from trackllm_website.generate_site.overview import build_overview
 
 
 def _build_overview(root: Path) -> dict:
@@ -181,7 +183,13 @@ def test_feed_includes_b3it_item_from_view_transition(tmp_path):
         root, "m2fa23p", "m/a", "p", dates=dates, changes=[], drift=[0.1] * 5
     )
     _write_b3it_with_transition(root, "m2fb23q", "m/b", "q", status="monitoring")
-    (root / "data" / "changes.json").write_text(json.dumps([]))
+    # the feed reads B3IT items from the merged change list, as render.py writes it
+    views = discover_b3it_views(
+        root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
+    )
+    (root / "data" / "changes.json").write_text(
+        json.dumps(to_json(merge_changes({}, {}, views)))
+    )
     (root / "data" / "spend.json").write_text(json.dumps({"cumulative": {}}))
 
     ov = _build_overview(root)
