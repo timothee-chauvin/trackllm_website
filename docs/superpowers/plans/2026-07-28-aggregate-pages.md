@@ -2085,9 +2085,12 @@ In `website/src/overview.ts`:
    chips. Rows with `lt_rate === null` sort to the bottom and render the
    "not enough monitoring" bar.
 2. Link the directory: model name → `models/${modelSlug}.html`, provider name →
-   `providers/${providerSlug}.html` (derive `providerSlug` from
-   `provider.split("/")[0]` — it needs no slugify for the provider names in use,
-   but read it from the row if `overview.py` already carries it).
+   `providers/${providerSlug}.html`. **Never derive the slug in TypeScript.**
+   Provider pages are keyed `slugify(base_provider(provider))` in Python; a
+   `provider.split("/")[0]` in TS reintroduces the 404 that Task 7 fixed. Read
+   `slug` from the provider row, and for directory rows use the `providerSlug`
+   the endpoint record carries (add it in `overview.py` alongside `modelSlug` if
+   it is not there yet).
 3. Point the two placeholder `href="#"` links in `website/templates/index.html.j2`
    at `changes.html` ("Full changelog →") and remove the "All providers →" link,
    since the section below it is now the full list.
