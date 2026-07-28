@@ -288,7 +288,46 @@ builder, assert on the emitted JSON).
 - Changing how B3IT accumulates `tv_series` history; the short series is why
   B3IT rates are withheld, and that resolves with monitoring time, not display.
 
-## 9. Build order
+## 9. Post-merge follow-ups
+
+Found during implementation and the branch review; none block this design.
+
+1. **The recompute double-detects changes on adjacent days.** `lt_scores.json`'s
+   build-time recompute reports 97 LT changes against `lt_changes.json`'s 90.
+   The seven extras are not pre-detector history — they are the same change
+   detected on two consecutive days (`grok-4@xai` 09-29 *and* 09-30;
+   `qwen3-coder@fireworks` 02-04 *and* 02-05). Every aggregate surface now counts
+   from the canonical `changes.json`, but fixing it at the source is what retires
+   the problem; until then `endpoint.ts` (which reads the recompute directly)
+   shows one extra change on those seven endpoints.
+2. **No JS test runner.** ~1300 lines of DOM-generating TypeScript across five
+   entrypoints, with `tsc` structurally unable to see the class of bug that
+   matters: an interface that simply lies about its JSON left the Overview
+   rendering `undefined/yr` across several commits with the typecheck green.
+   One happy-dom test loading each entrypoint against real generated JSON,
+   asserting nothing throws and every mount point is non-empty, would have caught
+   that plus the unsized sparkline and the `Infinity%` guard.
+3. **`components.sparkline` returns an unsized `<svg>`** and relies on each
+   caller's CSS; that bit two separate tasks. Give it intrinsic dimensions or a
+   `className` parameter so the next caller is safe by default.
+4. **Chip- and sort-wiring is duplicated across three entrypoints** — the exact
+   place the Overview bug lived. Extract into `components.ts`, but behind the
+   test runner from (2), not before it.
+5. **`render.py` still parses `lt_scores.json` twice**: `build_model_views` does
+   not receive the shared `lt_data`. Thread it through.
+6. **The build clock is `latest_date(lt_data)`**, so an all-B3IT future would
+   silently blank the Changes page. Derive it from LT ∪ B3IT.
+7. **`render_site`'s per-page-type emit blocks are near-duplicates**, and
+   `data/providers/*.json` / `data/models/*.json` are never swept for orphans.
+   Unify and sweep in one pass.
+8. **The build is not byte-reproducible**: `b3it.tv` float tails differ between
+   identical runs. Pre-existing, no displayed value affected.
+9. **Open questions for the ranking**: whether "Most drift-prone" should rank by
+   interval lower bound rather than point estimate, and whether the model page's
+   shared LT scale should be robust to a 13-nat outlier compressing every other
+   strip.
+
+## 10. Build order
 
 1. `rates.py` + tests (pure, no dependencies).
 2. `tests/conftest.py` — hoist the fixture writers duplicated across test files.
