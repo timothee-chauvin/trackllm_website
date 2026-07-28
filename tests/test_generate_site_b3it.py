@@ -116,15 +116,19 @@ def test_closed_epoch_with_results_yields_tv_and_changes():
 
 def test_derivation_restricts_to_top_k_ranked_bis(monkeypatch):
     """TV is computed over the top-k ranked BIs, not the full (diluting) set."""
-    ref = {"signal": [("t0", "A")] * 10, "noise": [("t0", "A")] * 10}
+    day1, day2 = "2026-01-01T00:00:00+00:00", "2026-01-02T00:00:00+00:00"
+    ref = {
+        "signal": [("2025-12-31T00:00:00+00:00", "A")] * 10,
+        "noise": [("2025-12-31T00:00:00+00:00", "A")] * 10,
+    }
     results = {
         "signal": {
-            "2026-01-01T00:00:00+00:00": [("x", "A")] * 10,
-            "2026-01-02T00:00:00+00:00": [("x", "B")] * 10,  # flips -> TV 1
+            day1: [(day1, "A")] * 10,
+            day2: [(day2, "B")] * 10,  # flips -> TV 1
         },
         "noise": {
-            "2026-01-01T00:00:00+00:00": [("x", "A")] * 10,
-            "2026-01-02T00:00:00+00:00": [("x", "A")] * 10,  # stable -> TV 0
+            day1: [(day1, "A")] * 10,
+            day2: [(day2, "A")] * 10,  # stable -> TV 0
         },
     }
     state = EndpointBIState(

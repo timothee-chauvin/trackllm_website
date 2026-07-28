@@ -12,6 +12,7 @@ from trackllm_website.bi.detection import (
 )
 from trackllm_website.bi.state import Epoch, EndpointBIState, load_all_states
 from trackllm_website.config import config
+from trackllm_website.generate_site.freshness import last_phase2_query
 
 
 @dataclass
@@ -26,6 +27,7 @@ class B3ITView:
     epochs: list[dict]
     tv_series: dict
     changes: list[dict]
+    last_query: str | None
 
 
 def _iso(dt) -> str | None:
@@ -83,6 +85,9 @@ def derive_b3it(state: EndpointBIState, results: dict) -> B3ITView:
         ],
         tv_series={"dates": [ts for ts, _ in tv], "values": [v for _, v in tv]},
         changes=[{"date": ts, "kind": "onset"} for ts in changes],
+        # From the raw results, not the TV series: the series drops the epoch's
+        # reference batch, so a freshly re-initialised endpoint has none.
+        last_query=last_phase2_query(results),
     )
 
 

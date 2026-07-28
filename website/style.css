@@ -109,6 +109,11 @@ h1.title em { font-style: normal; color: var(--accent); }
 .stat .value { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 1.6rem; font-weight: 600; letter-spacing: -0.02em; }
 .stat .value small { font-size: 0.9rem; color: var(--text-muted); font-weight: 500; }
 .stat .sub { font-size: 0.74rem; color: var(--text-muted); margin-top: 0.15rem; }
+.fresh { margin: 0.8rem 0 0; font-size: 0.78rem; color: var(--text-dim); }
+.fresh .num { color: var(--text-muted); }
+.fresh .lt { color: var(--accent); }
+.fresh .b3it { color: var(--b3it); }
+.fresh .sep { opacity: 0.55; margin: 0 0.4rem; }
 .cap { margin-top: 0.85rem; font-size: 0.82rem; color: var(--text-dim); }
 .cap b { color: var(--accent); font-weight: 600; }
 @media (max-width: 860px) { .telemetry { grid-template-columns: repeat(2, 1fr); } }
