@@ -359,9 +359,5 @@ td .methods { display: flex; gap: 0.3rem; }
   padding: 0.45rem 1.1rem; background: var(--surface-3); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
   font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
 .mohead .c { color: var(--text-dim); letter-spacing: 0; text-transform: none; }
-.delta-note { border: 1px dashed color-mix(in srgb, var(--changed) 45%, transparent); background: var(--changed-bg);
-  border-radius: var(--radius); padding: 0.8rem 1.1rem; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.2rem; }
-.delta-note b { color: var(--changed); font-weight: 600; }
-.delta-note ul { margin: 0.4rem 0 0; padding-left: 1.1rem; } .delta-note li { margin: 0.15rem 0; }
 
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }

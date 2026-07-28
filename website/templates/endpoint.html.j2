@@ -22,7 +22,7 @@
     <div class="t"><b>{{ model_name }}</b> <span>is tracked on {{ n_endpoints }} endpoint{{ "s" if n_endpoints != 1 else "" }} — compare {{ "its" if n_endpoints == 1 else "their" }} drift side by side.</span></div>
     <div style="display:flex;gap:1rem;flex-wrap:wrap">
       {% if model_slug %}<a class="go" href="{{ nav_prefix }}models/{{ model_slug }}.html">View model page →</a>{% endif %}
-      <a class="go" href="{{ nav_prefix }}providers/{{ provider_slug }}.html">All of {{ provider.split("/")[0] }} →</a>
+      <a class="go" href="{{ nav_prefix }}providers/{{ provider_slug }}.html">All of {{ provider_base }} →</a>
     </div>
   </div>
 </div>

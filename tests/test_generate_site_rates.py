@@ -38,5 +38,12 @@ def test_rate_published_at_exactly_the_threshold():
     assert drift_rate(1, MIN_ENDPOINT_YEARS) == pytest.approx(2.0)
 
 
+def test_zero_changes_over_enough_exposure_is_a_rate_of_zero():
+    """The Overview's "Nothing detected yet" board is exactly this case: past the
+    gate, no events is a measured 0.0, not a withheld rate."""
+    assert drift_rate(0, MIN_ENDPOINT_YEARS) == 0.0
+    assert drift_rate(0, 12.0) == 0.0
+
+
 def test_rate_is_changes_per_endpoint_year():
     assert drift_rate(49, 15.04) == pytest.approx(49 / 15.04)

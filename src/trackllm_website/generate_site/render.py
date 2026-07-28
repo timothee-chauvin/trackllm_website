@@ -73,8 +73,8 @@ def render_site(website_dir: Path) -> None:
     spend = spend_mod.aggregate_spend(website_dir / "data" / "spend", today)
     (website_dir / "data" / "spend.json").write_text(json.dumps(spend))
 
-    # Parsed once and threaded into every builder, so no two site surfaces can
-    # read the same scores differently (and the build parses ~400 files once).
+    # Parsed once for the overview, provider and changes-page builders (~400 files).
+    # build_model_views is not on it yet: it re-reads each lt_scores.json itself.
     lt_data = load_all_lt_data(data_dir, lt_by_slug)
 
     overview = overview_mod.build_overview(website_dir, lt_data, endpoints, b3it_views)
@@ -205,6 +205,7 @@ def render_site(website_dir: Path) -> None:
             css_path="../style.css",
             body_class="endpoint",
             nav_prefix="../",
+            provider_base=base_provider(provider),
             provider_slug=slugify(base_provider(provider)),
             model_slug=slug_to_model_slug.get(slug, ""),
             n_endpoints=slug_to_n_endpoints.get(slug, 1),
