@@ -1,11 +1,12 @@
-"""Site-wide overview.json: change feed, endpoint directory, provider drift rates.
+"""Site-wide overview.json: site stats, change feed, endpoint directory.
+
+Provider aggregation lives in provider.py; render.py injects its rows into overview.json.
 
 Reads only already-generated data (lt_scores.json's drift/drift_dates, B3IT build-time
 views, changes.json, spend.json) -- never raw logprobs.
 """
 
 import json
-from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 
@@ -20,16 +21,13 @@ from trackllm_website.generate_site.lt import (
     latest_date,
     load_all_lt_data,
 )
+from trackllm_website.util import slugify
 
 RECENT_CHANGE_DAYS = 60
 RETIRED_GAP_DAYS = 14
 
 FEED_LT_SIZE = 6
 FEED_B3IT_SIZE = 4
-
-PROVIDER_MIN_ENDPOINT_YEARS = 0.5
-PROVIDER_CONF_FLOOR = 0.3
-PROVIDER_CONF_FULL_YEARS = 4.0
 
 
 def _b3it_status_trace(
@@ -87,9 +85,6 @@ def build_overview(
 
     all_slugs = sorted(set(lt_by_slug) | set(b3it_views))
     endpoint_recs = []
-    provider_stats: dict[str, dict] = defaultdict(
-        lambda: {"endpoint_days": 0.0, "n_endpoints": 0, "n_changes": 0}
-    )
     models_set: set[str] = set()
 
     for slug in all_slugs:
@@ -113,12 +108,6 @@ def build_overview(
 
         info = lt_data.get(slug)
         if info is not None and now is not None:
-            ps = provider_stats[provider]
-            ps["endpoint_days"] += max(
-                1.0, (info.dates[-1] - info.dates[0]).total_seconds() / 86400
-            )
-            ps["n_endpoints"] += 1
-
             active = (now - info.dates[-1]).days <= RETIRED_GAP_DAYS
             n_lt_changes = len(info.changes)
             last_change_date = (
@@ -143,6 +132,7 @@ def build_overview(
             {
                 "slug": slug,
                 "model": full_model.split("/")[-1],
+                "modelSlug": slugify(full_model),
                 "org": org,
                 "provider": provider,
                 "methods": methods,
@@ -152,33 +142,6 @@ def build_overview(
                 "trace": trace,
             }
         )
-
-    for c in lt_changes:
-        if c["provider"]:
-            provider_stats[c["provider"]]["n_changes"] += 1
-
-    providers = []
-    for prov, s in provider_stats.items():
-        ey = s["endpoint_days"] / 365.25
-        if ey < PROVIDER_MIN_ENDPOINT_YEARS:
-            continue
-        providers.append(
-            {
-                "name": prov,
-                "n_endpoints": s["n_endpoints"],
-                "endpoint_years": round(ey, 2),
-                "months": round(ey * 12),
-                "n_changes": s["n_changes"],
-                "rate": round(s["n_changes"] / ey, 2) if ey else 0,
-                "conf": round(
-                    PROVIDER_CONF_FLOOR
-                    + (1 - PROVIDER_CONF_FLOOR)
-                    * min(1.0, ey / PROVIDER_CONF_FULL_YEARS),
-                    3,
-                ),
-            }
-        )
-    providers.sort(key=lambda x: (-x["rate"], -x["endpoint_years"]))
 
     drift_by_slug = {slug: d.drift for slug, d in lt_data.items()}
     all_items = build_feed_items(changes, drift_by_slug, b3it_views, now) if now else []
@@ -212,6 +175,7 @@ def build_overview(
     stats = {
         "endpoints": len(endpoint_recs),
         "providers": len({r["provider"] for r in endpoint_recs}),
+        "provider_companies": len({r["provider"].split("/")[0] for r in endpoint_recs}),
         "models": len(models_set),
         "orgs": len({r["org"] for r in endpoint_recs}),
         "changes_total": len(changes),
@@ -241,6 +205,5 @@ def build_overview(
     return {
         "stats": stats,
         "feed": feed,
-        "providers": providers,
         "endpoints": endpoint_recs,
     }

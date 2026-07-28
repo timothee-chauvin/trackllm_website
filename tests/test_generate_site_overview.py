@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -11,6 +11,7 @@ from trackllm_website.generate_site.changes import merge_changes, to_json
 from trackllm_website.generate_site.lt import discover_lt_endpoints
 from trackllm_website.generate_site.feed import downsample_trace
 from trackllm_website.generate_site.overview import build_overview
+from trackllm_website.util import slugify
 
 
 def _build_overview(root: Path) -> dict:
@@ -81,7 +82,7 @@ def fake_site(tmp_path):
 
 def test_build_overview_shape(fake_site):
     ov = _build_overview(fake_site)
-    assert set(ov) == {"stats", "feed", "providers", "endpoints"}
+    assert set(ov) == {"stats", "feed", "endpoints"}
     ep = ov["endpoints"][0]
     assert set(ep) >= {
         "slug",
@@ -209,29 +210,25 @@ def test_b3it_only_retired_endpoint_gets_retired_status(tmp_path):
     assert ov["stats"]["active"] == 1  # only the still-monitoring LT endpoint
 
 
-def test_providers_include_zero_change_providers(fake_site):
-    root = fake_site
-    long_span = [
-        (datetime(2025, 1, 1, tzinfo=timezone.utc) + timedelta(days=d)).strftime(
-            "%Y-%m-%dT00:00:00Z"
-        )
-        for d in range(0, 220)
-    ]
+def test_endpoint_rows_carry_model_slug(fake_site):
+    ov = _build_overview(fake_site)
+    ep = next(e for e in ov["endpoints"] if e["slug"] == "m2fa23p")
+    assert ep["modelSlug"] == slugify("m/a")
+
+
+def test_stats_count_provider_companies_and_variants(tmp_path):
+    root = tmp_path / "website"
+    dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 31)]
     write_lt_endpoint(
-        root,
-        "m2fc23zeroprov",
-        "m/c",
-        "zeroprov",
-        dates=long_span,
-        changes=[],
-        drift=[0.0] * len(long_span),
+        root, "a23p", "org/a", "p", dates=dates, changes=[], drift=[0.1] * 30
     )
+    write_lt_endpoint(
+        root, "b23p2ffp8", "org/b", "p/fp8", dates=dates, changes=[], drift=[0.1] * 30
+    )
+    (root / "data" / "changes.json").write_text(json.dumps([]))
     ov = _build_overview(root)
-    prov_names = {p["name"] for p in ov["providers"]}
-    assert "zeroprov" in prov_names
-    zp = next(p for p in ov["providers"] if p["name"] == "zeroprov")
-    assert zp["n_changes"] == 0
-    assert 0.0 <= zp["conf"] <= 1.0
+    assert ov["stats"]["providers"] == 2  # serving variants
+    assert ov["stats"]["provider_companies"] == 1
 
 
 def test_stats_counts_match_endpoint_and_changes_lists(fake_site):
