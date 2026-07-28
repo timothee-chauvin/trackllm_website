@@ -139,15 +139,16 @@ export interface FeedItem {
 }
 
 /** A change-feed row. Both surfaces that render it (index.html, changes.html) sit at
- *  the site root, so the link paths are root-relative with no prefix. */
+ *  the site root, so the link paths are root-relative with no prefix.
+ *  "model @ provider" names one endpoint, so it is one link to that endpoint's page. */
 export function eventRow(e: FeedItem): string {
   const isLT = e.method === "lt";
   const color = isLT ? "var(--accent)" : "var(--b3it)";
   return `<div class="event" style="--sev:var(--${e.sevKey})">
     <div class="when">${esc(e.date)}<span class="rel">${relDays(e.daysAgo)}</span></div>
     <div class="what">
-      <div><a class="model" href="models/${esc(e.modelSlug)}.html">${esc(e.model)}</a>
-        <span class="at">@ <a class="at" href="providers/${esc(e.providerSlug)}.html">${esc(e.provider)}</a></span></div>
+      <div><a href="endpoints/${esc(e.slug)}.html"><span class="model">${esc(e.model)}</span>
+        <span class="at">@ ${esc(e.provider)}</span></a></div>
       <div class="desc">${esc(e.desc)}</div>
     </div>
     <div class="spark">${sparkline(e.trace, isLT ? LT_CAP : B3IT_CAP, color, e.changeFrac)}</div>

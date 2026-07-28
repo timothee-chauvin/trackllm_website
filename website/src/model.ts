@@ -214,9 +214,12 @@ async function init(): Promise<void> {
     ]
       .sort()
       .pop();
+    // the row names a provider but identifies an endpoint: the endpoint page is where
+    // both this model and that provider are one click away.
+    const epHref = `../endpoints/${esc(ep.slug)}.html`;
     return `<div class="row">
-      <div class="pv"><a href="../providers/${esc(ep.providerSlug)}.html">${esc(ep.provider)}</a>
-        <div class="mm">${methodBadges(ep.methods)}<a href="../endpoints/${esc(ep.slug)}.html">endpoint →</a></div></div>
+      <div class="pv"><a href="${epHref}">${esc(ep.provider)}</a>
+        <div class="mm">${methodBadges(ep.methods)}<a href="${epHref}">endpoint →</a></div></div>
       <div class="spark">${strip(ep)}</div>
       <div class="meta"><span class="${ep.n_changes ? "some" : "zero"}">${ep.n_changes || "—"} chg</span>
         <div class="peak">${ep.n_changes && last ? "last " + esc(last) : peak}</div></div>

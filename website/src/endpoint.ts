@@ -3,6 +3,8 @@
 // when type-checked together as one tsc program.
 export {};
 
+import { readingCaption } from "./caption";
+
 interface ManifestData {
   model: string;
   provider: string;
@@ -299,8 +301,7 @@ function renderChart(lt: FocusLT | null, b3it: FocusB3IT | null): void {
     <line x1="${PL}" y1="${TOP2 + LANE_H}" x2="${VW - PR}" y2="${TOP2 + LANE_H}" stroke="var(--border)" stroke-width="1"/></svg>`;
 
   if (footEl) {
-    let note =
-      "<b>Reading it:</b> both lanes share the time axis. A change reads as a step up that persists; dashed lines mark detected changepoints, with the detector's confidence (LT: σ) or peak reached (B3IT: TV) labelled above.";
+    let note = readingCaption(!!lt, !!b3it);
     if (lt?.drift.length && b3it?.tv.length && b3it.tv[0][0] > lt.drift[0][0]) {
       note += ` B3IT only has reference data from ${b3it.tv[0][0]} onward, so its lane starts there.`;
     }
