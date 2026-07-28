@@ -21,6 +21,7 @@ from trackllm_website.generate_site.lt import (
     latest_date,
     load_all_lt_data,
 )
+from trackllm_website.generate_site.months import month_range
 from trackllm_website.generate_site.rates import drift_rate, poisson_interval
 from trackllm_website.util import slugify
 
@@ -46,14 +47,6 @@ def endpoint_years(first: str, last: str) -> float:
 
 def _day(dt: datetime) -> str:
     return dt.date().isoformat()
-
-
-def _months(first: str, last: str) -> list[str]:
-    out, y, m = [], int(first[:4]), int(first[5:7])
-    while f"{y:04d}-{m:02d}" <= last[:7]:
-        out.append(f"{y:04d}-{m:02d}")
-        y, m = (y + 1, 1) if m == 12 else (y, m + 1)
-    return out
 
 
 def _method_block(endpoints: int, years: float, changes: int) -> dict:
@@ -171,7 +164,7 @@ def build_provider_views(
         spans = [s for acc in accs for s in acc.spans]
         first = min((s[0] for s in spans), default=None)
         last = max((s[1] for s in spans), default=None)
-        months = _months(first, last) if first and last else []
+        months = month_range(first, last) if first and last else []
         slugs = {s for acc in accs for s in acc.slugs}
 
         variant_out = [
