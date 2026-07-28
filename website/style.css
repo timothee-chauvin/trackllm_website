@@ -253,7 +253,8 @@ td .methods { display: flex; gap: 0.3rem; }
 .cmp { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
 .cmp .grp-h { display: flex; align-items: baseline; gap: 0.6rem; padding: 0.4rem 1rem; background: var(--surface-3);
   border-top: 1px solid var(--border); font-family: var(--mono); font-size: 0.74rem; color: var(--text-muted); }
-.cmp .grp-h:first-child { border-top: none; }
+/* the all-providers strip is always first and carries the seam itself */
+.cmp .allrow + .grp-h, .cmp .allrow + .row { border-top: none; }
 .cmp .grp-h a:hover { color: var(--accent); }
 .cmp .grp-h span { color: var(--text-dim); font-size: 0.7rem; }
 .cmp .row { display: grid; grid-template-columns: 176px 1fr 108px; align-items: center; gap: 0.7rem; padding: 0.35rem 1rem; border-top: 1px solid var(--border-soft); }

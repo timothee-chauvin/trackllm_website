@@ -3,7 +3,7 @@
 // when type-checked together as one tsc program.
 export {};
 
-import { MONTH_NAMES, esc, methodBadges, plural, prettyDate } from "./components";
+import { B3IT_CAP, MONTH_NAMES, esc, methodBadges, plural, prettyDate } from "./components";
 
 interface LTChange {
   date: string;
@@ -113,52 +113,67 @@ async function init(): Promise<void> {
       .join("");
   }
 
-  // shared per-method scales so strip heights are directly comparable
+  // shared per-method scales so strip heights are directly comparable. The changes
+  // are unioned in because a change's peak drift can exceed the downsampled series.
   const LT_MAX = Math.max(
     0.5,
-    ...D.endpoints.filter((e) => e.lt).flatMap((e) => e.lt!.drift.map((p) => p[1]))
+    ...D.endpoints
+      .filter((e) => e.lt)
+      .flatMap((e) => e.lt!.drift.map((p) => p[1]).concat(e.lt!.changes.map((c) => c.drift)))
   );
 
-  /** One provider's drift line, with each change dot at the level that change reached. */
+  interface Mark {
+    date: string;
+    y: number;
+    color: string;
+    title: string;
+  }
+
+  /** One provider's drift line, with each change dot at the level that change reached.
+   *  An LT dot and a B3IT dot never share a scale: nats go through the model-wide LT
+   *  scale, total variation through its own 0..B3IT_CAP one. */
   function strip(ep: ModelEndpoint): string {
     const sig = ep.lt ? ep.lt.drift : ep.b3it ? ep.b3it.tv : [];
-    const dmax = ep.lt ? LT_MAX : 1;
     const H = 40, pad = 5;
-    const y = (v: number): number => H - pad - (Math.min(v, dmax) / dmax) * (H - 2 * pad);
+    const y = (v: number, dmax: number): number =>
+      H - pad - (Math.min(v, dmax) / dmax) * (H - 2 * pad);
     const path =
       sig.length > 1
         ? sig
-            .map((p, i) => `${i ? "L" : "M"}${xpos(p[0]).toFixed(1)} ${y(p[1]).toFixed(1)}`)
+            .map(
+              (p, i) =>
+                `${i ? "L" : "M"}${xpos(p[0]).toFixed(1)} ${y(p[1], ep.lt ? LT_MAX : B3IT_CAP).toFixed(1)}`
+            )
             .join(" ")
         : "";
     const col = ep.lt ? "var(--accent)" : "var(--b3it)";
-    const marks: [string, number, string, string][] = [
+    const marks: Mark[] = [
       ...(ep.lt
         ? ep.lt.changes.map(
-            (c): [string, number, string, string] => [
-              c.date,
-              y(c.drift),
-              "var(--accent)",
-              `LT ${c.date} · ${c.sigma}, drift ${c.drift} nats`,
-            ]
+            (c): Mark => ({
+              date: c.date,
+              y: y(c.drift, LT_MAX),
+              color: "var(--accent)",
+              title: `LT ${c.date} · ${c.sigma}, drift ${c.drift} nats`,
+            })
           )
         : []),
       ...(ep.b3it
         ? ep.b3it.changes.map(
-            (c): [string, number, string, string] => [
-              c.date,
-              y(c.peakTV),
-              "var(--b3it)",
-              `B3IT ${c.date} · peak TV ${c.peakTV}`,
-            ]
+            (c): Mark => ({
+              date: c.date,
+              y: y(c.peakTV, B3IT_CAP),
+              color: "var(--b3it)",
+              title: `B3IT ${c.date} · peak TV ${c.peakTV}`,
+            })
           )
         : []),
     ];
     const dots = marks
-      .map(([d, yy, c, t]) => {
-        const x = xpos(d).toFixed(1);
-        return `<line x1="${x}" y1="${H - 3}" x2="${x}" y2="${yy.toFixed(1)}" stroke="${c}" stroke-width="1" opacity="0.35"/>
-      <circle cx="${x}" cy="${yy.toFixed(1)}" r="3.4" fill="${c}"><title>${esc(t)}</title></circle>`;
+      .map((m) => {
+        const x = xpos(m.date).toFixed(1);
+        return `<line x1="${x}" y1="${H - 3}" x2="${x}" y2="${m.y.toFixed(1)}" stroke="${m.color}" stroke-width="1" opacity="0.35"/>
+      <circle cx="${x}" cy="${m.y.toFixed(1)}" r="3.4" fill="${m.color}"><title>${esc(m.title)}</title></circle>`;
       })
       .join("");
     return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${gridLines(H)}
