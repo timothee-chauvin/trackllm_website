@@ -7,9 +7,33 @@ from trackllm_website.bi.phase_2 import save_results
 from trackllm_website.bi.state import EndpointBIState, Epoch
 from trackllm_website.config import Endpoint
 from trackllm_website.generate_site.b3it import discover_b3it_views
-from trackllm_website.generate_site.lt import discover_lt_endpoints
+from trackllm_website.generate_site.changes import merge_changes, to_json
+from trackllm_website.generate_site.lt import discover_lt_endpoints, load_lt_data
 from trackllm_website.generate_site.model import build_model_views
 from trackllm_website.util import slugify
+
+
+def _write_changes_json(root: Path) -> None:
+    """The canonical merged list, as render.py writes it before model views are
+    built. Here the detector's events agree with the recompute in lt_scores.json;
+    where they don't, changes.json wins.
+    """
+    lt_dir = root / "data" / "lt"
+    lt_by_slug = {e.slug: e for e in discover_lt_endpoints(lt_dir)}
+    lt_changes = {}
+    for slug in lt_by_slug:
+        data = load_lt_data(lt_dir, slug)
+        if data is None:
+            continue
+        lt_changes[slug] = [
+            {"date": data.dates[c["index"]].isoformat(), "sigma": c["sigma"]}
+            for c in data.changes
+        ]
+    b3it_views = discover_b3it_views(
+        root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
+    )
+    events = merge_changes(lt_changes, lt_by_slug, b3it_views)
+    (root / "data" / "changes.json").write_text(json.dumps(to_json(events)))
 
 
 def _build_model_views(root: Path) -> dict:
@@ -75,6 +99,7 @@ def test_build_model_views_groups_two_providers_of_one_model(tmp_path):
         changes=[],
         drift=[0.2] * len(dates_b),
     )
+    _write_changes_json(root)
 
     views = _build_model_views(root)
     modelslug = slugify("m/a")
@@ -107,6 +132,7 @@ def test_build_model_views_includes_b3it_endpoint(tmp_path):
         root, "m2fa23p1", "m/a", "p1", dates=dates, changes=[], drift=[0.1] * 5
     )
     _write_b3it_with_transition(root, "m2fa23p2", "m/a", "p2")
+    _write_changes_json(root)
 
     views = _build_model_views(root)
     view = views[slugify("m/a")]
@@ -141,6 +167,7 @@ def _two_variant_model(root: Path):
         changes=[{"index": 10, "sigma": 30.0}],
         drift=[0.1] * 10 + [0.9] * 10,
     )
+    _write_changes_json(root)
 
 
 def test_model_endpoints_carry_base_provider(tmp_path):
@@ -163,6 +190,47 @@ def test_model_view_has_flattened_change_list(tmp_path):
     assert {c["provider"] for c in view["changes"]} == {"chutes", "chutes/fp8"}
 
 
+def test_change_count_follows_changes_json_not_the_recomputed_scores(tmp_path):
+    """changes.json is canonical; the build-time recompute stored in lt_scores.json
+    double-detects some changes on adjacent days, and those must neither be drawn
+    on the strip nor counted in the tiles."""
+    root = tmp_path / "website"
+    dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 21)]
+    write_lt_endpoint(
+        root,
+        "m2fa23p1",
+        "m/a",
+        "p1",
+        dates=dates,
+        changes=[{"index": 15, "sigma": 12.0}, {"index": 16, "sigma": 9.0}],
+        drift=[0.1] * 15 + [1.2] * 5,
+    )
+    (root / "data" / "changes.json").write_text(
+        json.dumps(
+            [
+                {
+                    "date": dates[15],
+                    "slug": "m2fa23p1",
+                    "model": "m/a",
+                    "provider": "p1",
+                    "method": "LT",
+                    "magnitude": 12.0,
+                    "magnitude_display": "12σ",
+                }
+            ]
+        )
+    )
+
+    view = _build_model_views(root)[slugify("m/a")]
+    ep = view["endpoints"][0]
+    assert [c["date"] for c in ep["lt"]["changes"]] == [dates[15][:10]]
+    assert ep["lt"]["changes"][0]["sigma"] == "12σ"
+    assert ep["lt"]["changes"][0]["drift"] == 1.2
+    assert ep["n_changes"] == 1
+    assert view["n_changed"] == 1
+    assert len(view["changes"]) == 1
+
+
 def test_endpoint_with_no_lt_scores_file_yields_null_lt(tmp_path):
     root = tmp_path / "website"
     d = root / "data" / "lt" / "m2fa23p1" / "default"
@@ -174,6 +242,7 @@ def test_endpoint_with_no_lt_scores_file_yields_null_lt(tmp_path):
     md.mkdir()
     (md / "queries.json").write_text(json.dumps([["24 10:00:00", 0]]))
     # no lt_scores.json written
+    _write_changes_json(root)
 
     views = _build_model_views(root)
     view = views[slugify("m/a")]
