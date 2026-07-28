@@ -13,6 +13,7 @@ import {
   methodBadges,
   plural,
   rateBar,
+  relativeAge,
   sparkline,
   statusPill,
   volGrid,
@@ -38,6 +39,9 @@ interface Stats {
   since: string | null;
   spend_cumulative: number;
   now: string | null;
+  // absolute instants (overview.py), turned into an age here at page load
+  last_query_lt: string | null;
+  last_query_b3it: string | null;
 }
 
 /** One provider *company*, with its serving variants pooled (provider.py::overview_rows).
@@ -79,6 +83,7 @@ type ProviderSortKey = "name" | "n_endpoints" | "lt_rate" | "last_change";
 
 const BOARD_SIZE = 5;
 const QUIET_MIN_YEARS = 1; // a "nothing detected yet" board entry needs real exposure
+const FRESH_TICK_MS = 60_000; // the line's own resolution, so no point ticking faster
 
 (async function (): Promise<void> {
   const DATA: {
@@ -129,6 +134,29 @@ const QUIET_MIN_YEARS = 1; // a "nothing detected yet" board entry needs real ex
   ];
   document.getElementById("telemetry")!.innerHTML = stats.map(s =>
     `<div class="stat"><div class="label">${s.label}</div><div class="value">${s.value}</div><div class="sub">${s.sub}</div></div>`).join("");
+  // How fresh each method's data is. The build emits absolute instants, so the age
+  // is computed here and re-computed as the tab stays open; a method with no data
+  // at all is left out rather than shown as an age since the epoch.
+  const lastQueries: [string, string | null][] = [
+    ["LT", S.last_query_lt],
+    ["B3IT", S.last_query_b3it],
+  ];
+  const freshEl = document.getElementById("freshness")!;
+  function paintFreshness(): void {
+    const now = Date.now();
+    const parts: string[] = [];
+    for (const [method, iso] of lastQueries) {
+      if (iso === null) continue;
+      parts.push(`<span class="num" title="${esc(iso)}">${relativeAge(iso, now)}</span>` +
+        ` <span class="${method.toLowerCase()}">(${method})</span>`);
+    }
+    freshEl.innerHTML = parts.length
+      ? `Last update ${parts.join('<span class="sep">·</span>')}`
+      : "";
+  }
+  paintFreshness();
+  setInterval(paintFreshness, FRESH_TICK_MS);
+
   const perM = S.spend_cumulative / (S.queries / 1e6);
   document.getElementById("cap")!.innerHTML =
     `Cheap enough to run continuously — <b>${fmtM(S.queries)}</b> logprob queries for <b>$${S.spend_cumulative.toFixed(2)}</b> total (~$${perM.toFixed(2)}/M). ` +

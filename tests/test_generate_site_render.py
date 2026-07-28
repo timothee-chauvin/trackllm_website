@@ -208,6 +208,31 @@ def test_nav_links_to_changes(tmp_path):
     assert 'href="changes.html"' in (tmp_path / "index.html").read_text()
 
 
+def test_render_emits_methodology_page(tmp_path):
+    _scaffold(tmp_path)
+    render_site(tmp_path)
+    page = (tmp_path / "methodology.html").read_text()
+    # both papers and the blog post must be reachable from the page
+    assert "arxiv.org/abs/2512.03816" in page
+    assert "arxiv.org/abs/2602.11083" in page
+    assert "tchauvin.com/change-detection-llm-apis" in page
+    assert 'href="methodology.html"' in (tmp_path / "index.html").read_text()
+
+
+def test_favicon_link_is_relative_to_page_depth(tmp_path):
+    _scaffold(tmp_path)
+    render_site(tmp_path)
+    model_slug = slugify("m/a")
+    assert 'href="favicon.svg"' in (tmp_path / "index.html").read_text()
+    assert (
+        'href="../favicon.svg"' in (tmp_path / "endpoints" / "m2fa23p.html").read_text()
+    )
+    assert (
+        'href="../favicon.svg"'
+        in (tmp_path / "models" / f"{model_slug}.html").read_text()
+    )
+
+
 def test_endpoint_page_links_to_its_provider(tmp_path):
     _scaffold(tmp_path)
     render_site(tmp_path)

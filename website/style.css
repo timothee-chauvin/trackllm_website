@@ -9,7 +9,7 @@
   --alert-bg: rgba(229,113,59,0.14); --retired-bg: rgba(107,118,134,0.14);
   --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
   --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --maxw: 1180px; --radius: 10px; --radius-sm: 6px;
+  --maxw: 1180px; --radius: 10px; --radius-sm: 6px; --nav-h: 55px;
 }
 @media (prefers-color-scheme: light) {
   :root {
@@ -109,6 +109,11 @@ h1.title em { font-style: normal; color: var(--accent); }
 .stat .value { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 1.6rem; font-weight: 600; letter-spacing: -0.02em; }
 .stat .value small { font-size: 0.9rem; color: var(--text-muted); font-weight: 500; }
 .stat .sub { font-size: 0.74rem; color: var(--text-muted); margin-top: 0.15rem; }
+.fresh { margin: 0.8rem 0 0; font-size: 0.78rem; color: var(--text-dim); }
+.fresh .num { color: var(--text-muted); }
+.fresh .lt { color: var(--accent); }
+.fresh .b3it { color: var(--b3it); }
+.fresh .sep { opacity: 0.55; margin: 0 0.4rem; }
 .cap { margin-top: 0.85rem; font-size: 0.82rem; color: var(--text-dim); }
 .cap b { color: var(--accent); font-weight: 600; }
 @media (max-width: 860px) { .telemetry { grid-template-columns: repeat(2, 1fr); } }
@@ -121,7 +126,10 @@ section.block { padding: 2.6rem 0 0.6rem; }
 .sec-head a.more { color: var(--accent); font-size: 0.85rem; }
 .sec-head a.more:hover { text-decoration: underline; }
 
-.feed { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--surface); }
+/* clip-path, not overflow: hidden -- the latter would make .feed the scrollport for
+   the sticky .mohead inside it, which then parks var(--nav-h) below the feed's own
+   top and covers the first change instead of tracking the nav. */
+.feed { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: var(--radius); clip-path: inset(0 round var(--radius)); background: var(--surface); }
 .event { display: grid; grid-template-columns: 104px 1fr 132px 118px; align-items: center; gap: 1rem;
   padding: 0.85rem 1.1rem 0.85rem 1.35rem; position: relative; border-top: 1px solid var(--border-soft); transition: background .14s; }
 .event:first-child { border-top: none; }
@@ -131,7 +139,7 @@ section.block { padding: 2.6rem 0 0.6rem; }
 .event .when .rel { display: block; color: var(--text-dim); font-size: 0.72rem; }
 .event .what { min-width: 0; }
 .event .what .model { font-weight: 580; letter-spacing: -0.01em; }
-.event .what .model:hover { color: var(--accent); }
+.event .what a:hover .model { color: var(--accent); }
 .event .what .at { color: var(--text-dim); font-weight: 400; }
 .event .what .desc { color: var(--text-muted); font-size: 0.83rem; margin-top: 0.1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .event .spark { height: 34px; }
@@ -355,9 +363,22 @@ td .methods { display: flex; gap: 0.3rem; }
 .hist .xaxis { display: flex; gap: 3px; margin-top: 0.4rem; }
 .hist .xaxis span { flex: 1; text-align: center; font-family: var(--mono); font-size: 0.6rem; color: var(--text-dim); min-width: 0; overflow: hidden; }
 .hist .xaxis span.q { color: var(--text-muted); }
-.mohead { position: sticky; top: 52px; z-index: 3; display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+.mohead { position: sticky; top: var(--nav-h); z-index: 3; display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
   padding: 0.45rem 1.1rem; background: var(--surface-3); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
   font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }
 .mohead .c { color: var(--text-dim); letter-spacing: 0; text-transform: none; }
 
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* methodology page */
+.sec-head h2 .badge { margin-right: 0.5rem; vertical-align: 0.12em; }
+.prose { color: var(--text-muted); font-size: 0.92rem; max-width: 78ch; margin: 0.9rem 0; }
+.prose b { color: var(--text); font-weight: 600; }
+/* the cards follow the measure -- a full-width panel around a 78ch column reads as empty */
+body.methodology .panel, body.methodology .reads { max-width: calc(78ch + 2.4rem); }
+.reads { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.7rem; }
+.reads li { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: 0.85rem 1.1rem; }
+.reads li:hover { border-color: var(--accent-line); }
+.reads li a { color: var(--accent); font-weight: 600; font-size: 0.95rem; }
+.reads li a:hover { text-decoration: underline; }
+.reads li .meta { display: block; margin-top: 0.2rem; color: var(--text-dim); font-size: 0.82rem; }
