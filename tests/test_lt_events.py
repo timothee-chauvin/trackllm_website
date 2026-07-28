@@ -34,6 +34,42 @@ def test_recomputed_change_near_existing_is_same_event():
     assert events[0].sigma == 15.0  # magnitude refreshed
 
 
+def test_event_with_no_corresponding_change_is_dropped():
+    """Detection is authoritative. An event it no longer produces was an artifact
+    -- keeping it forever would outlive the bug that created it."""
+    existing = [
+        LTChangeEvent(
+            endpoint="slug", index=150, date=DATES[150], sigma=14.0, first_detected=NOW
+        ),
+        LTChangeEvent(
+            endpoint="slug", index=175, date=DATES[175], sigma=13.0, first_detected=NOW
+        ),
+    ]
+    events = merge_events(
+        "slug", existing, [ChangePoint(index=150, sigma=14.0)], DATES, NOW
+    )
+    assert [e.index for e in events] == [150]
+
+
+def test_two_changes_cannot_claim_the_same_event():
+    """Each existing event matches at most one change; the second gets its own,
+    rather than overwriting the first and losing a change."""
+    existing = [
+        LTChangeEvent(
+            endpoint="slug", index=150, date=DATES[150], sigma=14.0, first_detected=NOW
+        )
+    ]
+    events = merge_events(
+        "slug",
+        existing,
+        [ChangePoint(index=150, sigma=14.0), ChangePoint(index=190, sigma=15.0)],
+        DATES,
+        NOW,
+    )
+    assert [e.index for e in events] == [150, 190]
+    assert events[0].first_detected == NOW
+
+
 def test_load_events_tolerates_null_sigma(tmp_path):
     """Regression: a `sigma: null` on disk (from a non-finite value serialized by
     orjson) must load instead of raising a ValidationError and stalling the job."""
