@@ -2,7 +2,7 @@
 
 Provider aggregation lives in provider.py; render.py injects its rows into overview.json.
 
-Reads only already-generated data (lt_scores.json's drift/drift_dates, B3IT build-time
+Reads only already-generated data (the parsed lt_scores.json series, B3IT build-time
 views, changes.json, spend.json) -- never raw logprobs.
 """
 
@@ -16,11 +16,7 @@ from trackllm_website.generate_site.feed import (
     build_feed_items,
     downsample_trace,
 )
-from trackllm_website.generate_site.lt import (
-    EndpointInfo,
-    latest_date,
-    load_all_lt_data,
-)
+from trackllm_website.generate_site.lt import EndpointInfo, LTData, latest_date
 from trackllm_website.util import slugify
 
 RECENT_CHANGE_DAYS = 60
@@ -68,15 +64,14 @@ def _b3it_status_trace(
 
 def build_overview(
     website_dir: Path,
+    lt_data: dict[str, LTData],
     lt_endpoints: list[EndpointInfo],
     b3it_views: dict[str, B3ITView],
 ) -> dict:
     data_dir = website_dir / "data"
-    lt_dir = data_dir / "lt"
 
     lt_by_slug = {e.slug: e for e in lt_endpoints}
 
-    lt_data = load_all_lt_data(lt_dir, lt_by_slug)
     now = latest_date(lt_data)
 
     changes_path = data_dir / "changes.json"

@@ -170,3 +170,45 @@ def test_render_endpoint_page_context_for_multi_provider_model(tmp_path):
     assert f'href="../models/{model_slug}.html"' in page
     # n_providers count text, sourced from view["n_providers"]
     assert "served by 2 providers" in page
+
+
+def test_render_emits_provider_pages_and_data(tmp_path):
+    _scaffold(tmp_path)
+    render_site(tmp_path)
+    view = json.loads((tmp_path / "data" / "providers" / "p.json").read_text())
+    assert view["name"] == "p"
+    assert view["n_endpoints"] == 1
+    assert (tmp_path / "providers" / "p.html").exists()
+    assert 'id="providerData"' in (tmp_path / "providers" / "p.html").read_text()
+
+
+def test_overview_providers_are_base_provider_rows(tmp_path):
+    _scaffold(tmp_path)
+    render_site(tmp_path)
+    overview = json.loads((tmp_path / "data" / "overview.json").read_text())
+    (row,) = overview["providers"]
+    assert row["name"] == "p"
+    assert row["slug"] == "p"
+    assert "lt_ci" in row
+
+
+def test_render_emits_changes_page(tmp_path):
+    _scaffold(tmp_path)
+    render_site(tmp_path)
+    page = json.loads((tmp_path / "data" / "changes_page.json").read_text())
+    assert set(page) == {"stats", "items", "months", "top_endpoints"}
+    assert (tmp_path / "changes.html").exists()
+    assert 'id="log"' in (tmp_path / "changes.html").read_text()
+
+
+def test_nav_links_to_changes(tmp_path):
+    _scaffold(tmp_path)
+    render_site(tmp_path)
+    assert 'href="changes.html"' in (tmp_path / "index.html").read_text()
+
+
+def test_endpoint_page_links_to_its_provider(tmp_path):
+    _scaffold(tmp_path)
+    render_site(tmp_path)
+    html = (tmp_path / "endpoints" / "m2fa23p.html").read_text()
+    assert 'href="../providers/p.html"' in html

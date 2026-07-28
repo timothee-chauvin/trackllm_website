@@ -20,7 +20,10 @@
   </div>
   <div class="compare">
     <div class="t"><b>{{ model_name }}</b> <span>is served by {{ n_providers }} provider{{ "s" if n_providers != 1 else "" }} — compare {{ "its" if n_providers == 1 else "their" }} drift side by side.</span></div>
-    {% if model_slug %}<a class="go" href="{{ nav_prefix }}models/{{ model_slug }}.html">View model page →</a>{% endif %}
+    <div style="display:flex;gap:1rem;flex-wrap:wrap">
+      {% if model_slug %}<a class="go" href="{{ nav_prefix }}models/{{ model_slug }}.html">View model page →</a>{% endif %}
+      <a class="go" href="{{ nav_prefix }}providers/{{ provider_slug }}.html">All of {{ provider.split("/")[0] }} →</a>
+    </div>
   </div>
 </div>
 

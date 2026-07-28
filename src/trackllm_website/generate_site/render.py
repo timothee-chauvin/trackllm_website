@@ -6,11 +6,15 @@ from jinja2 import Environment, FileSystemLoader
 
 from trackllm_website.generate_site import b3it as b3it_mod
 from trackllm_website.generate_site import changes as changes_mod
+from trackllm_website.generate_site import changes_page as changes_page_mod
 from trackllm_website.generate_site import model as model_mod
 from trackllm_website.generate_site import overview as overview_mod
+from trackllm_website.generate_site import provider as provider_mod
 from trackllm_website.generate_site import spend as spend_mod
+from trackllm_website.generate_site.naming import base_provider
+from trackllm_website.util import slugify
 
-from .lt import EndpointInfo, discover_lt_endpoints
+from .lt import EndpointInfo, discover_lt_endpoints, load_all_lt_data
 
 
 def render_site(website_dir: Path) -> None:
@@ -31,6 +35,8 @@ def render_site(website_dir: Path) -> None:
     endpoint_template = env.get_template("endpoint.html.j2")
     spend_template = env.get_template("spend.html.j2")
     model_template = env.get_template("model.html.j2")
+    provider_template = env.get_template("provider.html.j2")
+    changes_template = env.get_template("changes.html.j2")
 
     endpoints: list[EndpointInfo] = []
     for ep in discover_lt_endpoints(data_dir):
@@ -67,9 +73,46 @@ def render_site(website_dir: Path) -> None:
     spend = spend_mod.aggregate_spend(website_dir / "data" / "spend", today)
     (website_dir / "data" / "spend.json").write_text(json.dumps(spend))
 
-    (website_dir / "data" / "overview.json").write_text(
-        json.dumps(overview_mod.build_overview(website_dir, endpoints, b3it_views))
+    # Parsed once and threaded into every builder, so no two site surfaces can
+    # read the same scores differently (and the build parses ~400 files once).
+    lt_data = load_all_lt_data(data_dir, lt_by_slug)
+
+    overview = overview_mod.build_overview(website_dir, lt_data, endpoints, b3it_views)
+    provider_views = provider_mod.build_provider_views(
+        website_dir, lt_data, endpoints, b3it_views, overview["endpoints"]
     )
+    overview["providers"] = provider_mod.overview_rows(provider_views)
+    (website_dir / "data" / "overview.json").write_text(json.dumps(overview))
+
+    providers_data_dir = website_dir / "data" / "providers"
+    providers_data_dir.mkdir(parents=True, exist_ok=True)
+    for pslug, view in provider_views.items():
+        (providers_data_dir / f"{pslug}.json").write_text(json.dumps(view))
+
+    provider_pages_dir = website_dir / "providers"
+    provider_pages_dir.mkdir(parents=True, exist_ok=True)
+    for f in provider_pages_dir.glob("*.html"):
+        f.unlink()
+
+    for pslug, view in provider_views.items():
+        (provider_pages_dir / f"{pslug}.html").write_text(
+            provider_template.render(
+                provider=view["name"],
+                provider_slug=pslug,
+                css_path="../style.css",
+                body_class="provider",
+                nav_prefix="../",
+            )
+        )
+    print(f"Generated {len(provider_views)} provider pages in providers/")
+
+    changes_page = changes_page_mod.build_changes_page(website_dir, lt_data, b3it_views)
+    (website_dir / "data" / "changes_page.json").write_text(json.dumps(changes_page))
+    (website_dir / "changes.html").write_text(
+        changes_template.render(css_path="style.css", body_class="changes")
+    )
+    print("Generated changes.html")
+
     models_dir = website_dir / "data" / "models"
     models_dir.mkdir(parents=True, exist_ok=True)
     model_views = model_mod.build_model_views(website_dir, endpoints, b3it_views)
@@ -162,6 +205,7 @@ def render_site(website_dir: Path) -> None:
             css_path="../style.css",
             body_class="endpoint",
             nav_prefix="../",
+            provider_slug=slugify(base_provider(provider)),
             model_slug=slug_to_model_slug.get(slug, ""),
             n_providers=slug_to_n_providers.get(slug, 1),
         )

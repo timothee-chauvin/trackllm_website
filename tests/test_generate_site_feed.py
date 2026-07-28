@@ -6,7 +6,7 @@ import pytest
 from conftest import write_b3it_state, write_lt_endpoint
 from trackllm_website.generate_site.b3it import B3ITView, discover_b3it_views
 from trackllm_website.generate_site.feed import build_feed_items, downsample_trace
-from trackllm_website.generate_site.lt import discover_lt_endpoints
+from trackllm_website.generate_site.lt import discover_lt_endpoints, load_all_lt_data
 from trackllm_website.generate_site.overview import build_overview
 
 NOW = datetime(2026, 6, 30, tzinfo=timezone.utc)
@@ -154,11 +154,13 @@ def fake_site_feed_agreement(tmp_path):
     ]
     (root / "data" / "changes.json").write_text(json.dumps(changes))
     (root / "data" / "spend.json").write_text(json.dumps({"cumulative": {"lt": 1.0}}))
-    lt_endpoints = list(discover_lt_endpoints(root / "data" / "lt"))
+    lt_dir = root / "data" / "lt"
+    lt_endpoints = list(discover_lt_endpoints(lt_dir))
+    lt_data = load_all_lt_data(lt_dir, [e.slug for e in lt_endpoints])
     views = discover_b3it_views(
         root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
     )
-    return build_overview(root, lt_endpoints, views), changes
+    return build_overview(root, lt_data, lt_endpoints, views), changes
 
 
 def test_overview_feed_entries_come_from_changes_json(fake_site_feed_agreement):

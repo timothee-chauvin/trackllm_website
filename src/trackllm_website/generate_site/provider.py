@@ -4,7 +4,7 @@ A provider is the company -- the part of the OpenRouter provider string before
 the "/". Its serving variants (fp8, fp4, ...) are separate serving stacks and
 drift separately, so they stay visible as rows inside the provider.
 
-Reads only already-generated data (lt_scores.json's drift/drift_dates, B3IT
+Reads only already-generated data (the parsed lt_scores.json series, B3IT
 build-time views, changes.json) -- never raw logprobs.
 """
 
@@ -16,27 +16,15 @@ from pathlib import Path
 
 from trackllm_website.generate_site.b3it import B3ITView
 from trackllm_website.generate_site.feed import build_feed_items
-from trackllm_website.generate_site.lt import (
-    EndpointInfo,
-    latest_date,
-    load_all_lt_data,
-)
+from trackllm_website.generate_site.lt import EndpointInfo, LTData, latest_date
 from trackllm_website.generate_site.months import month_range
+from trackllm_website.generate_site.naming import base_provider, variant_name
 from trackllm_website.generate_site.rates import drift_rate, poisson_interval
 from trackllm_website.util import slugify
 
 DAYS_PER_YEAR = 365.25
 
 METHODS = ("lt", "b3it")
-
-
-def base_provider(provider: str) -> str:
-    return provider.split("/")[0]
-
-
-def variant_name(provider: str) -> str:
-    """The serving variant, or "" for a provider's default serving stack."""
-    return provider.split("/", 1)[1] if "/" in provider else ""
 
 
 def endpoint_years(first: str, last: str) -> float:
@@ -100,19 +88,18 @@ def _total_block(accs: list[_Span], method: str) -> dict:
 
 def build_provider_views(
     website_dir: Path,
+    lt_data: dict[str, LTData],
     lt_endpoints: list[EndpointInfo],
     b3it_views: dict[str, B3ITView],
     endpoint_rows: list[dict],
 ) -> dict[str, dict]:
     data_dir = website_dir / "data"
-    lt_dir = data_dir / "lt"
     lt_by_slug = {e.slug: e for e in lt_endpoints}
     rows_by_slug = {r["slug"]: r for r in endpoint_rows}
 
     changes_path = data_dir / "changes.json"
     changes = json.loads(changes_path.read_text()) if changes_path.exists() else []
 
-    lt_data = load_all_lt_data(lt_dir, lt_by_slug)
     lt_span = {
         slug: (_day(d.dates[0]), _day(d.dates[-1])) for slug, d in lt_data.items()
     }
@@ -195,8 +182,9 @@ def build_provider_views(
             "lt": _total_block(accs, "lt"),
             "b3it": _total_block(accs, "b3it"),
             "variants": variant_out,
-            # Feed items carry the raw provider prefix, which is what `base` is.
-            "changes": [i for i in items if i["providerSlug"] == base],
+            # Matched on the raw provider string: the item's providerSlug is the
+            # slugified base, and `base` is not.
+            "changes": [i for i in items if base_provider(i["provider"]) == base],
             "endpoints": sorted(
                 (rows_by_slug[s] for s in slugs if s in rows_by_slug),
                 key=lambda r: (-r["nChanges"], r["model"]),

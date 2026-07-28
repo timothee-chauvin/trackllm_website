@@ -4,7 +4,7 @@ import pytest
 
 from conftest import write_b3it_series, write_lt_endpoint
 from trackllm_website.generate_site.b3it import discover_b3it_views
-from trackllm_website.generate_site.lt import discover_lt_endpoints
+from trackllm_website.generate_site.lt import discover_lt_endpoints, load_all_lt_data
 from trackllm_website.generate_site.overview import build_overview
 from trackllm_website.generate_site.provider import (
     base_provider,
@@ -12,6 +12,7 @@ from trackllm_website.generate_site.provider import (
     overview_rows,
     variant_name,
 )
+from trackllm_website.util import slugify
 
 
 def test_base_provider_and_variant_split():
@@ -70,12 +71,14 @@ def fake_site(tmp_path):
 
 
 def _views(root):
-    lt_endpoints = list(discover_lt_endpoints(root / "data" / "lt"))
+    lt_dir = root / "data" / "lt"
+    lt_endpoints = list(discover_lt_endpoints(lt_dir))
+    lt_data = load_all_lt_data(lt_dir, [e.slug for e in lt_endpoints])
     b3it = discover_b3it_views(
         root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
     )
-    rows = build_overview(root, lt_endpoints, b3it)["endpoints"]
-    return build_provider_views(root, lt_endpoints, b3it, rows)
+    rows = build_overview(root, lt_data, lt_endpoints, b3it)["endpoints"]
+    return build_provider_views(root, lt_data, lt_endpoints, b3it, rows)
 
 
 def test_variants_group_under_one_provider(fake_site):
@@ -186,6 +189,47 @@ def test_change_count_follows_changes_json_not_the_recomputed_scores(fake_site):
     view = _views(fake_site)["p"]
     assert view["lt"]["changes"] == 1
     assert view["lt"]["changes"] == len(view["changes"])
+
+
+def test_change_links_use_the_slug_the_provider_view_is_keyed_by(tmp_path):
+    """A provider whose name does not slugify to itself must still resolve: the
+    feed item's providerSlug is what the page links to, and provider pages are
+    written under slugify(base)."""
+    root = tmp_path / "website"
+    provider = "acme corp"
+    slug = slugify(provider)
+    assert slug != provider
+    dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 31)]
+    write_lt_endpoint(
+        root,
+        "org2fa23acme-corp",
+        "org/a",
+        provider,
+        dates=dates,
+        changes=[{"index": 24, "sigma": 40.0}],
+        drift=[0.1] * 24 + [1.5] * 6,
+    )
+    (root / "data" / "changes.json").write_text(
+        json.dumps(
+            [
+                {
+                    "date": dates[24],
+                    "slug": "org2fa23acme-corp",
+                    "model": "org/a",
+                    "provider": provider,
+                    "method": "LT",
+                    "magnitude": 40.0,
+                    "magnitude_display": "40σ",
+                }
+            ]
+        )
+    )
+    (root / "data" / "spend.json").write_text(json.dumps({"cumulative": {}}))
+
+    views = _views(root)
+    assert list(views) == [slug]
+    (item,) = views[slug]["changes"]
+    assert item["providerSlug"] == slug
 
 
 def test_overview_rows_are_one_per_provider_with_last_change(fake_site):

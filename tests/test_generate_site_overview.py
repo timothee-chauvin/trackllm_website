@@ -8,7 +8,7 @@ from conftest import write_b3it_series, write_b3it_state, write_lt_endpoint
 from trackllm_website.bi.state import RetiredInfo
 from trackllm_website.generate_site.b3it import discover_b3it_views
 from trackllm_website.generate_site.changes import merge_changes, to_json
-from trackllm_website.generate_site.lt import discover_lt_endpoints
+from trackllm_website.generate_site.lt import discover_lt_endpoints, load_all_lt_data
 from trackllm_website.generate_site.feed import downsample_trace
 from trackllm_website.generate_site.overview import build_overview
 from trackllm_website.util import slugify
@@ -17,10 +17,11 @@ from trackllm_website.util import slugify
 def _build_overview(root: Path) -> dict:
     lt_dir = root / "data" / "lt"
     lt_endpoints = list(discover_lt_endpoints(lt_dir)) if lt_dir.exists() else []
+    lt_data = load_all_lt_data(lt_dir, [e.slug for e in lt_endpoints])
     b3it_views = discover_b3it_views(
         root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
     )
-    return build_overview(root, lt_endpoints, b3it_views)
+    return build_overview(root, lt_data, lt_endpoints, b3it_views)
 
 
 def test_downsample_trace_caps_length():

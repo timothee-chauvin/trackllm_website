@@ -68,7 +68,9 @@ def build_changes_page(
         )
         rec["n"] += 1
 
-    lt_drifts = [i["magnitude"] for i in items if i["method"] == "lt" and i["magnitude"]]
+    lt_drifts = [
+        i["magnitude"] for i in items if i["method"] == "lt" and i["magnitude"]
+    ]
     return {
         "stats": {
             "total": len(items),

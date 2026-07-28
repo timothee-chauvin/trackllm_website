@@ -1,0 +1,66 @@
+{% extends "base.html.j2" %}
+
+{% block title %}Changes | TrackLLM{% endblock %}
+
+{% block content %}
+<div class="wrap">
+  <div class="crumb">
+    <a href="index.html">Home</a><span class="sep">/</span>
+    <span style="color:var(--text-muted)">Changes</span>
+  </div>
+  <div class="head">
+    <div>
+      <div class="eyebrow">Change log</div>
+      <h1>Every change we have detected.</h1>
+      <p class="lede" id="lede"></p>
+      <div class="summary" id="summary"></div>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <section class="block">
+    <div class="sec-head">
+      <h2>Timeline</h2>
+      <span class="hint">click a month to filter the log below</span>
+    </div>
+    <div class="panel"><div class="hist" id="hist"></div></div>
+    <div class="legend">
+      <span class="k"><i class="bar" style="background:var(--accent)"></i> LT — logprob tracking</span>
+      <span class="k"><i class="bar" style="background:var(--b3it)"></i> B3IT — border inputs</span>
+      <span class="k" id="monthSel" style="color:var(--text-dim)"></span>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="sec-head">
+      <h2>Most-changed endpoints</h2>
+      <span class="hint">the overview directory sorts the same field</span>
+    </div>
+    <div class="board" id="topEndpoints"></div>
+  </section>
+
+  <section class="block">
+    <div class="sec-head"><h2>Log</h2><span class="hint" id="logCount"></span></div>
+    <div class="toolbar">
+      <label class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+        <input id="q" type="text" placeholder="Search model, provider, or org…" autocomplete="off">
+      </label>
+      <div class="chips" id="chips">
+        <span class="chip" data-f="lt">LT</span>
+        <span class="chip" data-f="b3it">B3IT</span>
+        <span class="chip state-changed" data-f="recent">Last 90 days</span>
+        <span class="chip state-changed" data-f="big">Large drift</span>
+      </div>
+    </div>
+    <div class="feed" id="log"></div>
+  </section>
+</main>
+
+<div class="note">Magnitude is the drift level reached after the changepoint — nats for LT, total variation for B3IT. σ is confidence, not size: a change can be certain and behaviourally small.</div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="module" src="js/changes.js"></script>
+{% endblock %}

@@ -7,6 +7,7 @@ the two never disagree about what a change looked like.
 from datetime import datetime
 
 from trackllm_website.generate_site.b3it import B3ITView
+from trackllm_website.generate_site.naming import base_provider
 from trackllm_website.util import slugify
 
 TRACE_LEN = 28
@@ -68,7 +69,8 @@ def _links(change: dict) -> dict:
         "org": model.split("/")[0],
         "modelSlug": slugify(model),
         "provider": provider,
-        "providerSlug": provider.split("/")[0],
+        # The slug provider pages are written under, so the link can never 404.
+        "providerSlug": slugify(base_provider(provider)),
     }
 
 
