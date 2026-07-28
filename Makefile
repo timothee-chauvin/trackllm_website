@@ -25,5 +25,13 @@ clean:
 	rm -rf website/js website/endpoints website/models website/index.html website/node_modules website/data/overview.json website/data/models
 
 .PHONY: test
-test:
+# Full suite. The JS smoke tests render the generated site, so they need a build.
+test: test-py test-js
+
+.PHONY: test-py
+test-py:
 	uv run pytest
+
+.PHONY: test-js
+test-js: build
+	cd website && bun test
