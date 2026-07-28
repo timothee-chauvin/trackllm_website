@@ -16,7 +16,11 @@ from pathlib import Path
 
 from trackllm_website.generate_site.b3it import B3ITView
 from trackllm_website.generate_site.feed import build_feed_items
-from trackllm_website.generate_site.lt import EndpointInfo, load_lt_scores
+from trackllm_website.generate_site.lt import (
+    EndpointInfo,
+    latest_date,
+    load_all_lt_data,
+)
 from trackllm_website.generate_site.rates import drift_rate, poisson_interval
 from trackllm_website.util import slugify
 
@@ -38,6 +42,10 @@ def endpoint_years(first: str, last: str) -> float:
     """Monitoring exposure in endpoint-years; a single observation counts as a day."""
     span = (datetime.fromisoformat(last) - datetime.fromisoformat(first)).days
     return max(1, span) / DAYS_PER_YEAR
+
+
+def _day(dt: datetime) -> str:
+    return dt.date().isoformat()
 
 
 def _months(first: str, last: str) -> list[str]:
@@ -70,9 +78,8 @@ class _Span:
         self.changes: dict[str, int] = dict.fromkeys(METHODS, 0)
         self.years: dict[str, float] = {m: 0.0 for m in METHODS}
 
-    def add(self, method: str, span: tuple[str, str], changes: int) -> None:
+    def add(self, method: str, span: tuple[str, str]) -> None:
         self.endpoints[method] += 1
-        self.changes[method] += changes
         self.years[method] += endpoint_years(*span)
 
     def add_endpoint(self, slug: str, spans: list[tuple[str, str]]) -> None:
@@ -112,21 +119,10 @@ def build_provider_views(
     changes_path = data_dir / "changes.json"
     changes = json.loads(changes_path.read_text()) if changes_path.exists() else []
 
-    drift_by_slug: dict[str, list[tuple[datetime, float]]] = {}
-    lt_span: dict[str, tuple[str, str]] = {}
-    lt_change_count: dict[str, int] = {}
-    lt_last: list[datetime] = []
-    for slug in lt_by_slug:
-        d = load_lt_scores(lt_dir, slug)
-        if d is None:
-            continue
-        drift_by_slug[slug] = [
-            (datetime.fromisoformat(s), v)
-            for s, v in zip(d.get("drift_dates", []), d.get("drift", []))
-        ]
-        lt_span[slug] = (d["dates"][0][:10], d["dates"][-1][:10])
-        lt_change_count[slug] = len(d["changes"])
-        lt_last.append(datetime.fromisoformat(d["dates"][-1]))
+    lt_data = load_all_lt_data(lt_dir, lt_by_slug)
+    lt_span = {
+        slug: (_day(d.dates[0]), _day(d.dates[-1])) for slug, d in lt_data.items()
+    }
 
     b3it_span: dict[str, tuple[str, str]] = {}
     for slug, view in b3it_views.items():
@@ -134,9 +130,8 @@ def build_provider_views(
         if dates:
             b3it_span[slug] = (dates[0][:10], dates[-1][:10])
 
-    # Full timestamps, not the date-only spans: change dates are timezone-aware
-    # and a naive `now` cannot be subtracted from them.
-    now = max(lt_last, default=None)
+    now = latest_date(lt_data)
+    drift_by_slug = {slug: d.drift for slug, d in lt_data.items()}
     items = build_feed_items(changes, drift_by_slug, b3it_views, now) if now else []
 
     by_provider: dict[str, dict[str, _Span]] = defaultdict(lambda: defaultdict(_Span))
@@ -151,12 +146,24 @@ def build_provider_views(
         models[base].add(model)
         spans = []
         if slug in lt_span:
-            acc.add("lt", lt_span[slug], lt_change_count[slug])
+            acc.add("lt", lt_span[slug])
             spans.append(lt_span[slug])
         if slug in b3it_span:
-            acc.add("b3it", b3it_span[slug], len(view.changes))
+            acc.add("b3it", b3it_span[slug])
             spans.append(b3it_span[slug])
         acc.add_endpoint(slug, spans)
+
+    # Counted from the same enriched items the page lists, keyed by the item's own
+    # provider string, so a provider's change count can never disagree with the
+    # changes shown beneath it. Recomputing from lt_scores.json would: the
+    # build-time recompute double-detects some changes on adjacent days, which the
+    # canonical merged list does not carry.
+    for item in items:
+        base = base_provider(item["provider"])
+        if base in by_provider:
+            by_provider[base][variant_name(item["provider"])].changes[
+                item["method"]
+            ] += 1
 
     views: dict[str, dict] = {}
     for base, variants in sorted(by_provider.items()):

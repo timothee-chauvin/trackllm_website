@@ -46,7 +46,6 @@ def fake_site(tmp_path):
     )
     write_b3it_series(
         root,
-        "org2fa23p",
         "org/a",
         "p",
         status="monitoring",
@@ -92,12 +91,19 @@ def test_variants_group_under_one_provider(fake_site):
 
 def test_exposure_summed_across_endpoints_and_rate_withheld_when_thin(fake_site):
     view = _views(fake_site)["p"]
-    # two endpoints x 29 days each, well under MIN_ENDPOINT_YEARS
+    # two endpoints x 29 days each: the sum, not either variant's 0.08 alone
     assert view["lt"]["endpoints"] == 2
     assert view["lt"]["changes"] == 1
-    assert view["lt"]["years"] < 0.5
+    assert view["lt"]["years"] == pytest.approx(0.16, abs=0.01)
+    assert [v["lt"]["years"] for v in view["variants"]] == [
+        pytest.approx(0.08, abs=0.01)
+    ] * 2
+    # b3it is observed over its own 24-day series, not the LT span
+    assert view["b3it"]["years"] == pytest.approx(0.06, abs=0.01)
+    # still well under MIN_ENDPOINT_YEARS, so no rate is published
     assert view["lt"]["rate"] is None
     assert view["lt"]["ci"] is None
+    assert view["b3it"]["rate"] is None
 
 
 def test_methods_kept_separate(fake_site):
@@ -141,6 +147,10 @@ def test_rate_published_once_exposure_clears_threshold(tmp_path):
     assert view["lt"]["years"] == pytest.approx(1.0, abs=0.05)
     assert view["lt"]["rate"] == pytest.approx(1.0, abs=0.06)
     assert view["lt"]["ci"][0] < view["lt"]["rate"] < view["lt"]["ci"][1]
+    # the variant row clears the threshold on its own and publishes the same rate
+    (variant,) = view["variants"]
+    assert variant["lt"]["rate"] == view["lt"]["rate"]
+    assert variant["lt"]["ci"] == view["lt"]["ci"]
 
 
 def test_monthly_monitoring_counts_match_endpoint_spans(fake_site):
@@ -154,6 +164,28 @@ def test_provider_carries_its_changes_and_endpoint_rows(fake_site):
     view = _views(fake_site)["p"]
     assert [c["date"] for c in view["changes"]] == ["2026-06-25"]
     assert {e["slug"] for e in view["endpoints"]} == {"org2fa23p", "org2fb23p2ffp8"}
+
+
+def test_change_count_equals_the_changes_listed(fake_site):
+    view = _views(fake_site)["p"]
+    lt_items = [c for c in view["changes"] if c["method"] == "lt"]
+    assert view["lt"]["changes"] == len(lt_items)
+    for variant in view["variants"]:
+        listed = [c for c in lt_items if variant_name(c["provider"]) == variant["name"]]
+        assert variant["lt"]["changes"] == len(listed)
+
+
+def test_change_count_follows_changes_json_not_the_recomputed_scores(fake_site):
+    """changes.json is canonical; the build-time recompute stored in lt_scores.json
+    double-detects some changes on adjacent days, and those must not be counted."""
+    scores_path = fake_site / "data" / "lt" / "org2fa23p" / "lt_scores.json"
+    scores = json.loads(scores_path.read_text())
+    scores["changes"] = [{"index": 24, "sigma": 40.0}, {"index": 25, "sigma": 38.0}]
+    scores_path.write_text(json.dumps(scores))
+
+    view = _views(fake_site)["p"]
+    assert view["lt"]["changes"] == 1
+    assert view["lt"]["changes"] == len(view["changes"])
 
 
 def test_overview_rows_are_one_per_provider_with_last_change(fake_site):
