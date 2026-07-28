@@ -12,7 +12,9 @@
 
 ## Global Constraints
 
-- All commands run through `uv`: `uv run pytest`, `uv run python -m trackllm_website.generate_site`.
+- All commands run through `uv`. Use `uv run --frozen pytest tests -q` for the suite: `--frozen` stops `uv sync` from churning `uv.lock`, and scoping to `tests` avoids a pre-existing collection error under `reference/`.
+- **beartype is active package-wide** (`beartype_this_package()` in `src/trackllm_website/__init__.py`). Type annotations are enforced at runtime and the implicit numeric tower is off: passing an `int` where a parameter is annotated `float` raises. Annotate honestly and pass `0.0`, not `0`.
+- Tests alone do not prove the build works. Before committing any task that touches the generator, run it against the real repo data: `uv run --frozen python -m trackllm_website.generate_site` must exit 0.
 - Filenames for generated output always go through `slugify` from `src/trackllm_website/util.py`.
 - Plots use plotly; the sparklines/strips here are hand-rolled inline SVG, matching the existing `overview.ts` / `model.ts` — do not introduce a chart library for them.
 - Comment sparingly (~10% of what feels natural); never delete an existing comment.
@@ -517,7 +519,7 @@ def _lt_item(
         "desc": f"Logprob averages moved {display} nats from the reference period.",
         "primary": f"drift {display}",
         "secondary": f"{change['magnitude_display']} conf",
-        "sevKey": _severity(magnitude or 0, LT_ALERT_THRESHOLD),
+        "sevKey": _severity(magnitude or 0.0, LT_ALERT_THRESHOLD),
         "trace": trace,
         "changeFrac": frac,
         **_links(change),
