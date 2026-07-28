@@ -369,6 +369,8 @@ td .methods { display: flex; gap: 0.3rem; }
 .sec-head h2 .badge { margin-right: 0.5rem; vertical-align: 0.12em; }
 .prose { color: var(--text-muted); font-size: 0.92rem; max-width: 78ch; margin: 0.9rem 0; }
 .prose b { color: var(--text); font-weight: 600; }
+/* the cards follow the measure -- a full-width panel around a 78ch column reads as empty */
+body.methodology .panel, body.methodology .reads { max-width: calc(78ch + 2.4rem); }
 .reads { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.7rem; }
 .reads li { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: 0.85rem 1.1rem; }
 .reads li:hover { border-color: var(--accent-line); }
