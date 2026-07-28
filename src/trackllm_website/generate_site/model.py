@@ -192,7 +192,10 @@ def build_model_views(
             "org": model.split("/")[0],
             "date_min": min(alldates) if alldates else None,
             "date_max": max(alldates) if alldates else None,
-            "n_providers": len(endpoints),
+            # Endpoints are serving variants: two of them can be the same company
+            # (chutes and chutes/fp8), so the two counts are not interchangeable.
+            "n_endpoints": len(endpoints),
+            "n_providers": len({e["base"] for e in endpoints}),
             "n_changed": sum(1 for e in endpoints if e["n_changes"]),
             "max_drift": max_drift,
             "changes": changes,

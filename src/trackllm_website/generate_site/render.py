@@ -136,15 +136,15 @@ def render_site(website_dir: Path) -> None:
         (model_pages_dir / f"{mslug}.html").write_text(model_html)
     print(f"Generated {len(model_views)} model pages in models/")
 
-    # slug -> (model_slug, n_providers) so endpoint pages can link to their model
-    # page with a provider count consistent with that model's own page (Task 7).
+    # slug -> (model_slug, n_endpoints) so endpoint pages can link to their model
+    # page with an endpoint count consistent with that model's own page (Task 7).
     slug_to_model_slug: dict[str, str] = {}
-    slug_to_n_providers: dict[str, int] = {}
+    slug_to_n_endpoints: dict[str, int] = {}
     for mslug, view in model_views.items():
-        n_providers = view["n_providers"]
+        n_endpoints = view["n_endpoints"]
         for e in view["endpoints"]:
             slug_to_model_slug[e["slug"]] = mslug
-            slug_to_n_providers[e["slug"]] = n_providers
+            slug_to_n_endpoints[e["slug"]] = n_endpoints
 
     index_html = index_template.render(
         css_path="style.css",
@@ -207,7 +207,7 @@ def render_site(website_dir: Path) -> None:
             nav_prefix="../",
             provider_slug=slugify(base_provider(provider)),
             model_slug=slug_to_model_slug.get(slug, ""),
-            n_providers=slug_to_n_providers.get(slug, 1),
+            n_endpoints=slug_to_n_endpoints.get(slug, 1),
         )
         (endpoints_dir / f"{slug}.html").write_text(endpoint_html)
 

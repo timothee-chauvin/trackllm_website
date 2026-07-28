@@ -108,7 +108,7 @@ def test_build_model_views_groups_two_providers_of_one_model(tmp_path):
 
     assert view["model"] == "m/a"
     assert view["org"] == "m"
-    assert view["n_providers"] == 2
+    assert view["n_endpoints"] == 2
     assert view["n_changed"] == 1
     assert {e["provider"] for e in view["endpoints"]} == {"p1", "p2"}
     assert view["date_min"] == min(dates_a[0][:10], dates_b[0][:10])
@@ -136,7 +136,7 @@ def test_build_model_views_includes_b3it_endpoint(tmp_path):
 
     views = _build_model_views(root)
     view = views[slugify("m/a")]
-    assert view["n_providers"] == 2
+    assert view["n_endpoints"] == 2
 
     b3_ep = next(e for e in view["endpoints"] if e["provider"] == "p2")
     assert b3_ep["lt"] is None
@@ -168,6 +168,15 @@ def _two_variant_model(root: Path):
         drift=[0.1] * 10 + [0.9] * 10,
     )
     _write_changes_json(root)
+
+
+def test_endpoint_and_provider_counts_are_separate_quantities(tmp_path):
+    """Two serving variants of one company are two endpoints, one provider."""
+    root = tmp_path / "website"
+    _two_variant_model(root)
+    view = _build_model_views(root)[slugify("m/a")]
+    assert view["n_endpoints"] == 2
+    assert view["n_providers"] == 1
 
 
 def test_model_endpoints_carry_base_provider(tmp_path):

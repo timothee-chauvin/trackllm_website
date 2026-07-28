@@ -50,6 +50,7 @@ interface ModelData {
   org: string;
   date_min: string | null;
   date_max: string | null;
+  n_endpoints: number;
   n_providers: number;
   n_changed: number;
   max_drift: number;
@@ -82,12 +83,16 @@ async function init(): Promise<void> {
 
   const ledeEl = document.getElementById("lede");
   if (ledeEl) {
-    ledeEl.innerHTML = `Served by <b>${D.n_providers}</b> providers. <span class="hl">${D.n_changed}</span> of them show at least one detected change since launch — evidence the served behaviour drifts even when the model version doesn't.`;
+    // n_endpoints counts serving variants, n_providers the companies behind them:
+    // saying "providers" for the larger number would contradict the groups below.
+    const across =
+      D.n_endpoints === D.n_providers ? "" : ` across ${plural(D.n_endpoints, "serving endpoint")}`;
+    ledeEl.innerHTML = `Served by <b>${D.n_providers}</b> ${D.n_providers === 1 ? "provider" : "providers"}${across}. <span class="hl">${D.n_changed}</span> of those endpoints show at least one detected change since launch — evidence the served behaviour drifts even when the model version doesn't.`;
   }
   const summaryEl = document.getElementById("summary");
   if (summaryEl) {
     summaryEl.innerHTML = `
-      <div class="s"><div class="v">${D.n_providers}</div><div class="k">Providers</div></div>
+      <div class="s"><div class="v">${D.n_endpoints}</div><div class="k">Endpoints</div></div>
       <div class="s"><div class="v" style="color:var(--changed)">${D.n_changed}</div><div class="k">With changes</div></div>
       <div class="s"><div class="v">${changes.length}</div><div class="k">Changes total</div></div>
       <div class="s"><div class="v">${prettyDate(D.date_min)} – ${prettyDate(D.date_max)}</div><div class="k">Monitored</div></div>`;
@@ -227,9 +232,9 @@ async function init(): Promise<void> {
 
   cmpEl.innerHTML =
     `<div class="allrow">
-      <div class="k">All providers<small>${plural(changes.length, "change")}</small></div>
+      <div class="k">All endpoints<small>${plural(changes.length, "change")}</small></div>
       <div>${allStrip()}</div>
-      <div class="meta"><span class="${D.n_changed ? "some" : "zero"}">${D.n_changed}/${D.n_providers}</span><div class="peak">affected</div></div>
+      <div class="meta"><span class="${D.n_changed ? "some" : "zero"}">${D.n_changed}/${D.n_endpoints}</span><div class="peak">affected</div></div>
     </div>` +
     groups
       .map(([base, list]) => {
