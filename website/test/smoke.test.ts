@@ -39,7 +39,7 @@ const PAGES: Page[] = [
     html: "index.html",
     entry: "../src/overview.ts",
     ready: "#dirBody tr",
-    mounts: ["telemetry", "feed", "provBoards", "provBody", "dirBody"],
+    mounts: ["telemetry", "freshness", "feed", "provBoards", "provBody", "dirBody"],
   },
   {
     name: "changes",

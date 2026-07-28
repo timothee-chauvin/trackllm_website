@@ -17,6 +17,7 @@ from trackllm_website.generate_site.feed import (
     build_feed_items,
     downsample_trace,
 )
+from trackllm_website.generate_site.freshness import latest
 from trackllm_website.generate_site.lt import EndpointInfo, LTData, latest_date
 from trackllm_website.generate_site.naming import base_provider
 from trackllm_website.util import slugify
@@ -203,6 +204,10 @@ def build_overview(
         ),
         "spend_cumulative": round(sum(spend.get("cumulative", {}).values()), 2),
         "now": now.strftime("%Y-%m-%d") if now else None,
+        # Absolute instants, not ages: overview.ts turns them into "14m ago" at
+        # page load, so a stale build cannot claim to be fresh.
+        "last_query_lt": latest(e.last_query_date for e in lt_endpoints),
+        "last_query_b3it": latest(v.last_query for v in b3it_views.values()),
     }
 
     return {

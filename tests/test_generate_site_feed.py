@@ -36,6 +36,7 @@ def _b3it_view(slug: str) -> B3ITView:
         epochs=[],
         tv_series={"dates": dates, "values": values},
         changes=[{"date": dates[12], "kind": "onset"}],
+        last_query=dates[-1],
     )
 
 
