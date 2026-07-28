@@ -115,6 +115,8 @@ def test_build_model_views_groups_two_providers_of_one_model(tmp_path):
     assert view["date_max"] == max(dates_a[-1][:10], dates_b[-1][:10])
 
     ep1 = next(e for e in view["endpoints"] if e["provider"] == "p1")
+    # the model page rows link to ../endpoints/<slug>.html
+    assert ep1["slug"] == "m2fa23p1"
     assert ep1["lt"] is not None
     assert ep1["lt"]["changes"][0]["sigma"] == "12σ"
     assert ep1["lt"]["changes"][0]["drift"] == 1.2

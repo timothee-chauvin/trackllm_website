@@ -131,7 +131,7 @@ section.block { padding: 2.6rem 0 0.6rem; }
 .event .when .rel { display: block; color: var(--text-dim); font-size: 0.72rem; }
 .event .what { min-width: 0; }
 .event .what .model { font-weight: 580; letter-spacing: -0.01em; }
-.event .what .model:hover { color: var(--accent); }
+.event .what a:hover .model { color: var(--accent); }
 .event .what .at { color: var(--text-dim); font-weight: 400; }
 .event .what .desc { color: var(--text-muted); font-size: 0.83rem; margin-top: 0.1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .event .spark { height: 34px; }
