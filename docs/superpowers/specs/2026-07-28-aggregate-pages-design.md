@@ -118,10 +118,17 @@ Overview section.
 to the latest 10 changes only. The Changes page needs the same enrichment for
 all of them.
 
-Move that logic into `feed.py` unchanged in behaviour, exposing
+Move that logic into `feed.py`, exposing
 `build_feed_items(changes, lt_data, b3it_views, now)` over an arbitrary change
 list. `overview.py` calls it for its slice; the changes page calls it for
 everything. No duplicated windowing.
+
+One deliberate behaviour change comes with the move: B3IT feed items are built
+from `changes.json` — the canonical merged list, which includes live epoch
+closures — instead of from `B3ITView.changes`, which carries TV onsets only. The
+Overview's latest-changes feed and the Changes log therefore cannot disagree
+about which changes exist. Feed items also gain the link slugs (`slug`,
+`modelSlug`, `providerSlug`) that the cross-linking in §6.5 needs.
 
 ### 5.3 New module: `generate_site/provider.py`
 
@@ -284,9 +291,14 @@ builder, assert on the emitted JSON).
 ## 9. Build order
 
 1. `rates.py` + tests (pure, no dependencies).
-2. `feed.py` extraction + tests (behaviour-preserving refactor).
-3. `provider.py` + tests → provider page data.
-4. `overview.py` provider section swap + tests.
-5. `changes_page.py` + tests.
-6. Frontend: `components.ts`, `provider.ts`, `changes.ts`, templates, nav.
-7. Model page edits + endpoint provider link.
+2. `tests/conftest.py` — hoist the fixture writers duplicated across test files.
+3. `feed.py` extraction + tests.
+4. `provider.py` + tests → provider page data.
+5. `overview.py` provider section swap + tests.
+6. `changes_page.py` + tests.
+7. `render.py` + the two new templates, nav, endpoint provider link.
+8. Frontend: `components.ts` + `provider.ts`.
+9. Frontend: `changes.ts` + the Overview's provider section.
+10. Model page edits.
+
+Detailed plan: [../plans/2026-07-28-aggregate-pages.md](../plans/2026-07-28-aggregate-pages.md).
