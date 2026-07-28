@@ -127,6 +127,12 @@ endpoints_lt:
   - 0.3
 - api: openrouter
   model: deepseek/deepseek-v4-flash
+  provider: io-net/fp8
+  cost:
+  - 0.139
+  - 0.278
+- api: openrouter
+  model: deepseek/deepseek-v4-flash
   provider: morph
   cost:
   - 0.139
@@ -178,12 +184,6 @@ endpoints_lt:
   provider: open-inference/bf16
   cost:
   - 0.1
-  - 0.35
-- api: openrouter
-  model: google/gemma-4-26b-a4b-it
-  provider: nextbit/bf16
-  cost:
-  - 0.12
   - 0.35
 - api: openrouter
   model: google/gemma-4-31b-it
@@ -261,20 +261,20 @@ endpoints_lt:
   model: openai/gpt-oss-120b
   provider: mancer/fp8
   cost:
-  - 0.05
+  - 0.055
   - 0.5
+- api: openrouter
+  model: google/gemma-4-26b-a4b-it
+  provider: nextbit/bf16
+  cost:
+  - 0.14
+  - 0.42
 - api: openrouter
   model: mistralai/ministral-8b-2512
   provider: nextbit/fp8
   cost:
   - 0.3
   - 0.3
-- api: openrouter
-  model: deepseek/deepseek-v4-flash
-  provider: io-net/fp8
-  cost:
-  - 0.239
-  - 0.379
 - api: openrouter
   model: inclusionai/ling-2.6-1t
   provider: novita
@@ -669,8 +669,8 @@ endpoints_lt:
   model: z-ai/glm-5.2
   provider: wafer/fp4
   cost:
-  - 1.4
-  - 4.4
+  - 1.26
+  - 3.96
 - api: openrouter
   model: x-ai/grok-build-0.1
   provider: xai/priority
