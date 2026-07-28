@@ -103,7 +103,9 @@ def _lt_item(change: dict, drift: list[tuple[datetime, float]], now: datetime) -
 
 def _b3it_item(change: dict, view: B3ITView | None, now: datetime) -> dict:
     cd = datetime.fromisoformat(change["date"])
-    peak = 0.0
+    # None, never 0.0: without the view the TV this change reached is unknown, and a
+    # published "TV 0.00" would read as a change that moved nothing.
+    peak: float | None = None
     trace: list[float] = []
     frac = FEED_DEFAULT_CHANGE_FRAC
     pairs = (
@@ -121,16 +123,17 @@ def _b3it_item(change: dict, view: B3ITView | None, now: datetime) -> dict:
         peak_hi = min(len(pairs), k + FEED_B3IT_PEAK_WINDOW)
         peak = round(max(v for _, v in pairs[k:peak_hi]), 3)
         trace, frac = _window(pairs, k)
+    display = f"{peak:.2f}" if peak is not None else "—"
     return {
         "date": change["date"][:10],
         "iso": change["date"],
         "daysAgo": (now - cd).days,
         "method": "b3it",
         "magnitude": peak,
-        "desc": f"Border-input output distribution moved (TV {peak:.2f}) from the reference.",
-        "primary": f"TV {peak:.2f}",
+        "desc": f"Border-input output distribution moved (TV {display}) from the reference.",
+        "primary": f"TV {display}",
         "secondary": "border-input shift",
-        "sevKey": _severity(peak, B3IT_ALERT_THRESHOLD),
+        "sevKey": _severity(peak or 0.0, B3IT_ALERT_THRESHOLD),
         "trace": trace,
         "changeFrac": frac,
         **_links(change),
@@ -146,9 +149,15 @@ def build_feed_items(
     """Enrich merged change events (changes.json shape) for display, newest first."""
     items = []
     for change in changes:
+        # No fallback branch: a method this file does not know how to enrich would
+        # otherwise be published as B3IT, wrong scale and wrong badge included.
         if change["method"] == "LT":
             items.append(_lt_item(change, drift_by_slug.get(change["slug"], []), now))
-        else:
+        elif change["method"] == "B3IT":
             items.append(_b3it_item(change, b3it_by_slug.get(change["slug"]), now))
+        else:
+            raise ValueError(
+                f"unknown change method {change['method']!r} for {change['slug']}"
+            )
     items.sort(key=lambda i: i["iso"], reverse=True)
     return items

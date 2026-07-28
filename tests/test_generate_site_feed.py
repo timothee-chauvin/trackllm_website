@@ -110,6 +110,43 @@ def test_b3it_item_uses_peak_tv_from_the_view():
     assert item["sevKey"] == "alert"
 
 
+def test_b3it_item_without_a_view_reports_no_magnitude():
+    """A real detected change whose B3IT view is missing must not publish a
+    fabricated TV of 0.00 -- the magnitude is unknown, and says so."""
+    changes = [
+        {
+            "date": "2026-06-13T00:00:00Z",
+            "slug": "s1",
+            "model": "org/model-x",
+            "provider": "p/fp8",
+            "method": "B3IT",
+            "magnitude": None,
+            "magnitude_display": "",
+        }
+    ]
+    (item,) = build_feed_items(changes, {}, {}, NOW)
+    assert item["magnitude"] is None
+    assert item["primary"] == "TV —"
+    assert "TV —" in item["desc"]
+    assert item["trace"] == []
+
+
+def test_unrecognised_method_raises():
+    changes = [
+        {
+            "date": "2026-06-13T00:00:00Z",
+            "slug": "s1",
+            "model": "org/model-x",
+            "provider": "p",
+            "method": "SOMETHING_NEW",
+            "magnitude": None,
+            "magnitude_display": "",
+        }
+    ]
+    with pytest.raises(ValueError, match="SOMETHING_NEW"):
+        build_feed_items(changes, {}, {}, NOW)
+
+
 def test_items_sorted_newest_first():
     changes = [
         {
@@ -167,5 +204,6 @@ def test_overview_feed_entries_come_from_changes_json(fake_site_feed_agreement):
     # the Overview's slice must be a subset of the canonical merged change list
     ov, changes = fake_site_feed_agreement
     canonical = {(c["date"][:10], c["slug"], c["method"].lower()) for c in changes}
+    assert ov["feed"], "no feed to compare against"
     for item in ov["feed"]:
         assert (item["date"], item["slug"], item["method"]) in canonical
