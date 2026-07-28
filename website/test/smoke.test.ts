@@ -86,6 +86,17 @@ function stubFetch(pageDir: string): void {
   }) as typeof fetch;
 }
 
+/** Relative hrefs that point at a file the generator did not emit. */
+function deadLinks(root: ParentNode, pageDir: string): string[] {
+  const missing: string[] = [];
+  for (const a of root.querySelectorAll("a[href]")) {
+    const href = a.getAttribute("href") ?? "";
+    if (!href || href.startsWith("http") || href.startsWith("#")) continue;
+    if (!existsSync(resolve(SITE, pageDir, href.split("#")[0]))) missing.push(href);
+  }
+  return missing;
+}
+
 async function waitFor(selector: string, timeoutMs = 10_000): Promise<void> {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
@@ -131,14 +142,44 @@ describe.each(PAGES)("$name page", (page) => {
   });
 
   test("every internal link resolves to a generated file", () => {
-    const pageDir = dirname(page.html);
-    const missing: string[] = [];
-    for (const a of document.querySelectorAll("a[href]")) {
-      const href = a.getAttribute("href") ?? "";
-      if (!href || href.startsWith("http") || href.startsWith("#")) continue;
-      const target = resolve(SITE, pageDir, href.split("#")[0]);
-      if (!existsSync(target)) missing.push(href);
+    const missing = deadLinks(document, dirname(page.html));
+    expect(missing, `dead links: ${missing.slice(0, 5).join(", ")}`).toHaveLength(0);
+  });
+});
+
+/** The favicon href is depth-relative, so a page nested one level down needs its
+ *  own prefix -- exactly the mistake a root-only check would miss. */
+test("the favicon link resolves from every page depth", () => {
+  for (const path of [...PAGES.map((p) => p.html), "methodology.html"]) {
+    const html = readFileSync(requireBuilt(path), "utf8");
+    const href = html.match(/<link rel="icon" href="([^"]+)"/)?.[1];
+    expect(href, `${path} has no favicon link`).toBeDefined();
+    expect(existsSync(resolve(SITE, dirname(path), href!)), `${path}: ${href}`).toBe(
+      true,
+    );
+  }
+});
+
+/** The methodology page is static -- no entrypoint, nothing fetched -- so the
+ *  only ways it can break are a missing file and a dead link. */
+describe("methodology page", () => {
+  test("is generated and links out to the blog post and both papers", () => {
+    const html = readFileSync(requireBuilt("methodology.html"), "utf8");
+    for (const url of [
+      "tchauvin.com/change-detection-llm-apis",
+      "arxiv.org/abs/2512.03816",
+      "arxiv.org/abs/2602.11083",
+    ]) {
+      expect(html, `${url} is not linked`).toContain(url);
     }
+  });
+
+  test("every internal link resolves to a generated file", () => {
+    document.documentElement.innerHTML = readFileSync(
+      requireBuilt("methodology.html"),
+      "utf8",
+    );
+    const missing = deadLinks(document, ".");
     expect(missing, `dead links: ${missing.slice(0, 5).join(", ")}`).toHaveLength(0);
   });
 });

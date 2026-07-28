@@ -1,0 +1,63 @@
+{% extends "base.html.j2" %}
+
+{% block title %}Methodology | TrackLLM{% endblock %}
+
+{% block content %}
+<div class="wrap">
+  <div class="crumb">
+    <a href="index.html">Home</a><span class="sep">/</span>
+    <span style="color:var(--text-muted)">Methodology</span>
+  </div>
+  <div class="head">
+    <div>
+      <div class="eyebrow">Methodology</div>
+      <h1>How we detect changes.</h1>
+      <p class="lede">LLM APIs are opaque black boxes, even for open-weight models. Can we continuously monitor them for changes? LLM API stability is important for the reliability of downstream applications, for the reproducibility of research and for initial audits to remain relevant. TrackLLM uses two methods, depending on what the API gives us back.</p>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <section class="block">
+    <div class="sec-head">
+      <h2><span class="badge lt">LT</span> Logprob tracking</h2>
+      <span class="hint">used wherever the provider returns logprobs</span>
+    </div>
+    <div class="panel">
+      <p class="prose">When logprobs are returned by the API provider, we can use this for extremely sensitive and cost-effective change detection. LT is a simple statistical test on the average value of each token logprob, requesting only a single token of output.</p>
+      <p class="prose">Logprobs are non-deterministic, because inference on GPUs is non-deterministic, but we can still basically track logprob averages and this works great. The test detects changes as small as <b>one step of fine-tuning</b>, and is more sensitive than existing methods while being <b>1,000x cheaper</b> — logprobs can be used to monitor for changes at extremely low cost, e.g. $0.14/year for hourly sampling of GPT-4.1.</p>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="sec-head">
+      <h2><span class="badge b3it">B3IT</span> Black-box border input tracking</h2>
+      <span class="hint">used where logprobs aren't exposed</span>
+    </div>
+    <div class="panel">
+      <p class="prose">Where logprobs aren't exposed, we operate in a strict black box, observing only output tokens. The first phase identifies <b>border inputs</b>: inputs for which sampling at T=0 doesn't always give the same output, i.e. for which there exists more than one output top token. They can easily be found just from black-box sampling, trying thousands of short inputs and keeping the border inputs. These inputs are then sampled repeatedly, to check whether the endpoint has moved away from its borders.</p>
+      <p class="prose">Optimal change detection depends on the model's Jacobian and the Fisher information of the output distribution; analyzing these in low-temperature regimes shows that border inputs enable powerful change detection tests. B3IT performs <b>on par with the best available grey-box approaches</b> while reducing costs by <b>30x</b>.</p>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="sec-head"><h2>Read more</h2></div>
+    <ul class="reads">
+      <li>
+        <a href="https://tchauvin.com/change-detection-llm-apis" target="_blank" rel="noopener">Change detection in LLM APIs →</a>
+        <span class="meta">Blog post — the short version of both methods.</span>
+      </li>
+      <li>
+        <a href="https://arxiv.org/abs/2512.03816" target="_blank" rel="noopener">Log Probability Tracking of LLM APIs →</a>
+        <span class="meta">ICLR 2026 · arXiv:2512.03816 — the LT test, and the TinyChange benchmark.</span>
+      </li>
+      <li>
+        <a href="https://arxiv.org/abs/2602.11083" target="_blank" rel="noopener">Token-Efficient Change Detection in LLM APIs →</a>
+        <span class="meta">ICML 2026 · arXiv:2602.11083 — border inputs and B3IT.</span>
+      </li>
+    </ul>
+  </section>
+</main>
+
+<div class="note">Every endpoint page shows which of the two methods it is monitored with.</div>
+{% endblock %}

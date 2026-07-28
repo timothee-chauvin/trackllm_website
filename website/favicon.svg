@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Standalone copy of the nav brand glyph. The CSS custom properties are resolved to
+       their dark-theme literals: accent #37C2E0, mixed 55/45 with stable #3FB77E. -->
+  <linearGradient id="g" x1="0.159" y1="-0.092" x2="0.841" y2="1.092">
+    <stop offset="0" stop-color="#37C2E0"/>
+    <stop offset="1" stop-color="#3BBDB4"/>
+  </linearGradient>
+  <rect width="32" height="32" rx="8.6" fill="url(#g)"/>
+  <g transform="translate(2.2 2.2) scale(1.15)" fill="none" stroke="#0B0F14" stroke-width="2.4"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path d="M2 12h4l2-7 4 14 2-7h8"/>
+  </g>
+</svg>
