@@ -121,6 +121,48 @@ def test_build_model_views_includes_b3it_endpoint(tmp_path):
     assert b3_ep["n_changes"] == len(b3_ep["b3it"]["changes"])
 
 
+def _two_variant_model(root: Path):
+    dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 21)]
+    write_lt_endpoint(
+        root,
+        "m2fa23chutes",
+        "m/a",
+        "chutes",
+        dates=dates,
+        changes=[{"index": 15, "sigma": 12.0}],
+        drift=[0.1] * 15 + [1.2] * 5,
+    )
+    write_lt_endpoint(
+        root,
+        "m2fa23chutes2ffp8",
+        "m/a",
+        "chutes/fp8",
+        dates=dates,
+        changes=[{"index": 10, "sigma": 30.0}],
+        drift=[0.1] * 10 + [0.9] * 10,
+    )
+
+
+def test_model_endpoints_carry_base_provider(tmp_path):
+    root = tmp_path / "website"
+    _two_variant_model(root)
+    view = _build_model_views(root)[slugify("m/a")]
+    assert {e["base"] for e in view["endpoints"]} == {"chutes"}
+    assert {e["providerSlug"] for e in view["endpoints"]} == {"chutes"}
+    assert {e["provider"] for e in view["endpoints"]} == {"chutes", "chutes/fp8"}
+
+
+def test_model_view_has_flattened_change_list(tmp_path):
+    root = tmp_path / "website"
+    _two_variant_model(root)
+    view = _build_model_views(root)[slugify("m/a")]
+    dates = [c["date"] for c in view["changes"]]
+    assert dates == sorted(dates)
+    assert sum(e["n_changes"] for e in view["endpoints"]) == len(view["changes"])
+    assert {c["method"] for c in view["changes"]} == {"lt"}
+    assert {c["provider"] for c in view["changes"]} == {"chutes", "chutes/fp8"}
+
+
 def test_endpoint_with_no_lt_scores_file_yields_null_lt(tmp_path):
     root = tmp_path / "website"
     d = root / "data" / "lt" / "m2fa23p1" / "default"

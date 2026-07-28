@@ -174,8 +174,8 @@ def discover_lt_endpoints(lt_dir: Path) -> list[EndpointInfo]:
 def load_lt_scores(lt_dir: Path, slug: str) -> dict | None:
     """Load an endpoint's already-generated lt_scores.json, if present and non-empty.
 
-    Shared by overview.py and model.py so both read the one on-disk contract
-    (n_per_test/dates/scores/changes/drift/drift_dates) the same way.
+    The raw reader behind load_lt_data, so every surface goes through the one
+    on-disk contract (n_per_test/dates/scores/changes/drift/drift_dates).
     """
     path = lt_dir / slug / SCORES_FILENAME
     if not path.exists():

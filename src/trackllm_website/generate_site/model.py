@@ -9,7 +9,8 @@ from collections import defaultdict
 from pathlib import Path
 
 from trackllm_website.generate_site.b3it import B3ITView
-from trackllm_website.generate_site.lt import EndpointInfo, load_lt_scores
+from trackllm_website.generate_site.lt import EndpointInfo, LTData, load_lt_data
+from trackllm_website.generate_site.naming import base_provider
 from trackllm_website.lt_scores import normalize_sigma
 from trackllm_website.util import slugify
 
@@ -40,10 +41,10 @@ def _peak_from(day: str, pairs: list[tuple[str, float]], window: int) -> float |
     return same_day[-1] if same_day else None
 
 
-def _lt_changes(lt_scores: dict, drift_pairs: list[tuple[str, float]]) -> list[dict]:
+def _lt_changes(lt: LTData, drift_pairs: list[tuple[str, float]]) -> list[dict]:
     out = []
-    for c in lt_scores["changes"]:
-        day = lt_scores["dates"][c["index"]][:10]
+    for c in lt.changes:
+        day = lt.dates[c["index"]].date().isoformat()
         level = _peak_from(day, drift_pairs, LT_PEAK_WINDOW)
         out.append(
             {
@@ -78,18 +79,13 @@ def _build_endpoint(
         methods.append("b3it")
 
     lt_out = None
-    lt_scores = load_lt_scores(lt_dir, slug) if ep is not None else None
-    if lt_scores is not None:
-        drift_pairs = [
-            (d[:10], v)
-            for d, v in zip(
-                lt_scores.get("drift_dates", []), lt_scores.get("drift", [])
-            )
-        ]
+    lt = load_lt_data(lt_dir, slug) if ep is not None else None
+    if lt is not None:
+        drift_pairs = [(d.date().isoformat(), v) for d, v in lt.drift]
         if drift_pairs:
             lt_out = {
                 "drift": [list(p) for p in _downsample_pairs(drift_pairs, TRACE_LEN)],
-                "changes": _lt_changes(lt_scores, drift_pairs),
+                "changes": _lt_changes(lt, drift_pairs),
             }
 
     b3it_out = None
@@ -116,6 +112,8 @@ def _build_endpoint(
         {
             "slug": slug,
             "provider": provider,
+            "base": base_provider(provider),
+            "providerSlug": slugify(base_provider(provider)),
             "methods": methods,
             "first": min(date_range) if date_range else None,
             "last": max(date_range) if date_range else None,
@@ -157,6 +155,23 @@ def build_model_views(
             alldates += date_range
         endpoints.sort(key=lambda e: (-e["n_changes"], e["provider"]))
 
+        # every change for the model, so the page can draw one all-providers strip
+        changes = sorted(
+            [
+                {"date": c["date"], "method": "lt", "provider": e["provider"]}
+                for e in endpoints
+                if e["lt"]
+                for c in e["lt"]["changes"]
+            ]
+            + [
+                {"date": c["date"], "method": "b3it", "provider": e["provider"]}
+                for e in endpoints
+                if e["b3it"]
+                for c in e["b3it"]["changes"]
+            ],
+            key=lambda c: c["date"],
+        )
+
         drift_values = [
             v for e in endpoints if e["lt"] for _, v in e["lt"]["drift"]
         ] + [c["drift"] for e in endpoints if e["lt"] for c in e["lt"]["changes"]]
@@ -170,6 +185,7 @@ def build_model_views(
             "n_providers": len(endpoints),
             "n_changed": sum(1 for e in endpoints if e["n_changes"]),
             "max_drift": max_drift,
+            "changes": changes,
             "endpoints": endpoints,
         }
     return out
