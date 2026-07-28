@@ -183,6 +183,9 @@ table.dir thead th.r, table.dir tbody td.r { text-align: right; }
 table.dir tbody td { padding: 0.6rem 1.1rem; border-bottom: 1px solid var(--border-soft); font-size: 0.88rem; vertical-align: middle; }
 table.dir tbody tr:last-child td { border-bottom: none; }
 table.dir tbody tr:hover { background: var(--surface-2); }
+/* components.sparkline emits a bare <svg>; the cell fixes the column, the rule the glyph */
+table.dir tbody td.spark-cell { width: 130px; }
+table.dir tbody td.spark-cell > svg { width: 100%; height: 26px; display: block; }
 td .model-cell { font-weight: 560; letter-spacing: -0.01em; }
 td .model-cell:hover { color: var(--accent); }
 td .org-cell { color: var(--text-dim); font-size: 0.74rem; }

@@ -47,12 +47,10 @@ interface ChangesData {
   top_endpoints: TopEndpoint[];
 }
 
-const BARS_H = 118; // px of the .hist .bars box the tallest month fills
+// One px short of the 132px `.hist .bars` box in style.css, so the 1px gap between a
+// stacked column's two segments cannot push the tallest month past the box.
+const BARS_H = 131;
 const RECENT_DAYS = 90;
-// "Large" is per method: the two magnitudes are in different units (nats vs total
-// variation). Mirrors feed.py's alert thresholds.
-const LARGE_LT = 0.8;
-const LARGE_B3IT = 0.6;
 
 async function init(): Promise<void> {
   const res = await fetch("data/changes_page.json").catch(() => null);
@@ -111,7 +109,7 @@ async function init(): Promise<void> {
 
   const topEl = document.getElementById("topEndpoints");
   if (topEl) {
-    const most = D.top_endpoints[0]?.n ?? 1;
+    const most = D.top_endpoints[0]?.n || 1;
     topEl.innerHTML = D.top_endpoints
       .map(
         (e, i) => `<a class="brow" href="models/${esc(e.modelSlug)}.html">
@@ -130,10 +128,9 @@ async function init(): Promise<void> {
   const logEl = document.getElementById("log");
   if (!qEl || !logEl) return;
 
-  function isLarge(e: FeedItem): boolean {
-    if (e.magnitude === null) return false;
-    return e.magnitude >= (e.method === "lt" ? LARGE_LT : LARGE_B3IT);
-  }
+  // "Large" is per method — nats and total variation are different units — so the
+  // verdict comes from feed.py's own alert thresholds via sevKey, never re-derived here.
+  const isLarge = (e: FeedItem): boolean => e.sevKey === "alert";
 
   function render(): void {
     const q = qEl!.value.trim().toLowerCase();

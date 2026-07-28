@@ -189,8 +189,12 @@ const QUIET_MIN_YEARS = 1; // a "nothing detected yet" board entry needs real ex
     });
     list.sort((a, b) => {
       let av: string | number, bv: string | number;
-      // an unmeasurable rate is not a low rate: park those rows at the bottom
-      if (provSort === "lt_rate") { av = a.lt_rate ?? -1; bv = b.lt_rate ?? -1; }
+      if (provSort === "lt_rate") {
+        // an unmeasurable rate is not a low rate: park those rows at the bottom in
+        // both directions, so reversing the sort never promotes them to the top
+        if ((a.lt_rate === null) !== (b.lt_rate === null)) return a.lt_rate === null ? 1 : -1;
+        av = a.lt_rate ?? 0; bv = b.lt_rate ?? 0;
+      }
       else if (provSort === "n_endpoints") { av = a.n_endpoints; bv = b.n_endpoints; }
       else if (provSort === "last_change") { av = a.last_change ?? ""; bv = b.last_change ?? ""; }
       else { av = a.name.toLowerCase(); bv = b.name.toLowerCase(); }
@@ -275,7 +279,7 @@ const QUIET_MIN_YEARS = 1; // a "nothing detected yet" board entry needs real ex
         <td class="r"><span class="cc ${r.nChanges ? "some" : "zero"}">${r.nChanges}</span></td>
         <td class="col-hide"><span class="methods">${methodBadges(r.methods)}</span></td>
         <td class="r col-hide">${stableCell(r)}</td>
-        <td class="col-hide" style="width:130px">${sparkline(r.trace, isLT ? LT_CAP : B3IT_CAP, isLT ? "var(--accent)" : "var(--b3it)", null)}</td>
+        <td class="col-hide spark-cell">${sparkline(r.trace, isLT ? LT_CAP : B3IT_CAP, isLT ? "var(--accent)" : "var(--b3it)", null)}</td>
       </tr>`;
     }).join("") || '<tr><td colspan="7"><div class="empty">No endpoints match.</div></td></tr>';
     document.getElementById("dirFoot")!.textContent = `${list.length} of ${rows.length} endpoints`;

@@ -292,7 +292,7 @@ async function init(): Promise<void> {
         <td class="r"><span class="cc ${r.nChanges ? "some" : "zero"}">${r.nChanges}</span></td>
         <td class="col-hide"><span class="methods">${methodBadges(r.methods)}</span></td>
         <td class="r col-hide">${stableCell(r)}</td>
-        <td class="col-hide" style="width:130px">${sparkline(r.trace, isLT ? LT_CAP : B3IT_CAP, isLT ? "var(--accent)" : "var(--b3it)", null)}</td>
+        <td class="col-hide spark-cell">${sparkline(r.trace, isLT ? LT_CAP : B3IT_CAP, isLT ? "var(--accent)" : "var(--b3it)", null)}</td>
       </tr>`;
         })
         .join("") || '<tr><td colspan="7"><div class="empty">No endpoints match.</div></td></tr>';
