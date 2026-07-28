@@ -2,6 +2,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
+from conftest import write_lt_endpoint
 from trackllm_website.bi.phase_2 import save_results
 from trackllm_website.bi.state import EndpointBIState, Epoch
 from trackllm_website.config import Endpoint
@@ -18,36 +19,6 @@ def _build_model_views(root: Path) -> dict:
         root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
     )
     return build_model_views(root, lt_endpoints, b3it_views)
-
-
-def _write_lt_endpoint(
-    root: Path, slug: str, model: str, provider: str, *, dates, changes, drift
-):
-    d = root / "data" / "lt" / slug
-    prompt_dir = d / "default"
-    prompt_dir.mkdir(parents=True)
-    (prompt_dir / "info.json").write_text(
-        json.dumps({"prompt": "hi", "endpoint": {"model": model, "provider": provider}})
-    )
-    month = dates[-1][:7]
-    day = dates[-1][8:10]
-    month_dir = prompt_dir / month
-    month_dir.mkdir()
-    (month_dir / "queries.json").write_text(json.dumps([[f"{day} 00:00:00", 0]]))
-    scores = [0.5] * len(dates)
-    (d / "lt_scores.json").write_text(
-        json.dumps(
-            {
-                "n_per_test": 24,
-                "dates": dates,
-                "scores": scores,
-                "sigmas": [None] * len(dates),
-                "changes": changes,
-                "drift_dates": dates,
-                "drift": drift,
-            }
-        )
-    )
 
 
 def _daily_batch(day: int, token: str):
@@ -86,7 +57,7 @@ def test_build_model_views_groups_two_providers_of_one_model(tmp_path):
     root = tmp_path / "website"
     dates_a = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 21)]
     dates_b = [f"2026-06-{d:02d}T00:00:00Z" for d in range(5, 25)]
-    _write_lt_endpoint(
+    write_lt_endpoint(
         root,
         "m2fa23p1",
         "m/a",
@@ -95,7 +66,7 @@ def test_build_model_views_groups_two_providers_of_one_model(tmp_path):
         changes=[{"index": 15, "sigma": 12.0}],
         drift=[0.1] * 15 + [1.2] * 5,
     )
-    _write_lt_endpoint(
+    write_lt_endpoint(
         root,
         "m2fa23p2",
         "m/a",
@@ -132,7 +103,7 @@ def test_build_model_views_groups_two_providers_of_one_model(tmp_path):
 def test_build_model_views_includes_b3it_endpoint(tmp_path):
     root = tmp_path / "website"
     dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 6)]
-    _write_lt_endpoint(
+    write_lt_endpoint(
         root, "m2fa23p1", "m/a", "p1", dates=dates, changes=[], drift=[0.1] * 5
     )
     _write_b3it_with_transition(root, "m2fa23p2", "m/a", "p2")

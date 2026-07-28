@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from conftest import write_b3it_state, write_lt_endpoint
 from trackllm_website.bi.phase_2 import save_results
 from trackllm_website.bi.state import EndpointBIState, Epoch, RetiredInfo
 from trackllm_website.config import Endpoint
@@ -31,63 +32,6 @@ def test_downsample_trace_short_input_untouched():
 
 def test_downsample_trace_empty():
     assert downsample_trace([], 28) == []
-
-
-def _write_lt_endpoint(
-    root: Path, slug: str, model: str, provider: str, *, dates, changes, drift
-):
-    d = root / "data" / "lt" / slug
-    prompt_dir = d / "default"
-    prompt_dir.mkdir(parents=True)
-    (prompt_dir / "info.json").write_text(
-        json.dumps({"prompt": "hi", "endpoint": {"model": model, "provider": provider}})
-    )
-    month = dates[-1][:7]
-    day = dates[-1][8:10]
-    month_dir = prompt_dir / month
-    month_dir.mkdir()
-    (month_dir / "queries.json").write_text(json.dumps([[f"{day} 00:00:00", 0]]))
-    scores = [0.5] * len(dates)
-    (d / "lt_scores.json").write_text(
-        json.dumps(
-            {
-                "n_per_test": 24,
-                "dates": dates,
-                "scores": scores,
-                "sigmas": [None] * len(dates),
-                "changes": changes,
-                "drift_dates": dates,
-                "drift": drift,
-            }
-        )
-    )
-
-
-def _write_b3it_state(
-    root: Path, slug: str, model: str, provider: str, *, status="monitoring"
-):
-    state = {
-        "endpoint": {
-            "api": "openrouter",
-            "model": model,
-            "provider": provider,
-            "cost": [0.1, 0.2],
-            "max_logprobs": None,
-        },
-        "status": status,
-        "retired": None,
-        "epochs": [
-            {
-                "start": "2026-01-01T00:00:00Z",
-                "border_inputs": [],
-                "reference": {},
-                "end": None,
-            }
-        ],
-    }
-    sd = root / "data" / "b3it" / "state"
-    sd.mkdir(parents=True, exist_ok=True)
-    (sd / f"{slug}.json").write_text(json.dumps(state))
 
 
 def _daily_batch(day: int, token: str):
@@ -131,10 +75,10 @@ def fake_site(tmp_path):
     dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 31)]
     drift = [0.1] * 24 + [1.5] * 6
     changes = [{"index": 24, "sigma": 40.0}]
-    _write_lt_endpoint(
+    write_lt_endpoint(
         root, "m2fa23p", "m/a", "p", dates=dates, changes=changes, drift=drift
     )
-    _write_b3it_state(root, "m2fa23p", "m/a", "p")
+    write_b3it_state(root, "m2fa23p", "m/a", "p", status="monitoring")
 
     (root / "data" / "changes.json").write_text(
         json.dumps(
@@ -194,10 +138,10 @@ def test_status_retired_when_no_recent_observation(tmp_path):
     root = tmp_path / "website"
     old_dates = [f"2025-01-{d:02d}T00:00:00Z" for d in range(1, 29)]
     recent_dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 29)]
-    _write_lt_endpoint(
+    write_lt_endpoint(
         root, "old2fa23p", "old/a", "p", dates=old_dates, changes=[], drift=[0.1] * 28
     )
-    _write_lt_endpoint(
+    write_lt_endpoint(
         root,
         "new2fa23p",
         "new/a",
@@ -233,7 +177,7 @@ def test_feed_lt_item_has_drift_level_and_conf(fake_site):
 def test_feed_includes_b3it_item_from_view_transition(tmp_path):
     root = tmp_path / "website"
     dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 6)]
-    _write_lt_endpoint(
+    write_lt_endpoint(
         root, "m2fa23p", "m/a", "p", dates=dates, changes=[], drift=[0.1] * 5
     )
     _write_b3it_with_transition(root, "m2fb23q", "m/b", "q", status="monitoring")
@@ -254,7 +198,7 @@ def test_feed_includes_b3it_item_from_view_transition(tmp_path):
 def test_b3it_only_retired_endpoint_gets_retired_status(tmp_path):
     root = tmp_path / "website"
     dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 6)]
-    _write_lt_endpoint(
+    write_lt_endpoint(
         root, "m2fa23p", "m/a", "p", dates=dates, changes=[], drift=[0.1] * 5
     )
     _write_b3it_with_transition(
@@ -288,7 +232,7 @@ def test_providers_include_zero_change_providers(fake_site):
         )
         for d in range(0, 220)
     ]
-    _write_lt_endpoint(
+    write_lt_endpoint(
         root,
         "m2fc23zeroprov",
         "m/c",
