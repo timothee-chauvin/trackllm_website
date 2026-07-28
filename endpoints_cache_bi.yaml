@@ -602,6 +602,36 @@ too_expensive:
   - 0.95
   - 4.0
 - api: openrouter
+  model: moonshotai/kimi-k3
+  provider: digitalocean
+  cost:
+  - 3.0
+  - 15.0
+- api: openrouter
+  model: moonshotai/kimi-k3
+  provider: fireworks
+  cost:
+  - 3.0
+  - 15.0
+- api: openrouter
+  model: moonshotai/kimi-k3
+  provider: fireworks/fast
+  cost:
+  - 4.5
+  - 22.5
+- api: openrouter
+  model: moonshotai/kimi-k3
+  provider: moonshotai/mxfp4
+  cost:
+  - 3.0
+  - 15.0
+- api: openrouter
+  model: moonshotai/kimi-k3
+  provider: nebius/fp4
+  cost:
+  - 3.0
+  - 15.0
+- api: openrouter
   model: morph/morph-v3-fast
   provider: morph
   cost:
@@ -937,6 +967,12 @@ too_expensive:
   cost:
   - 0.325
   - 1.95
+- api: openrouter
+  model: qwen/qwen3.7-flash
+  provider: alibaba
+  cost:
+  - 0.03
+  - 0.13
 - api: openrouter
   model: qwen/qwen3.7-max
   provider: alibaba
