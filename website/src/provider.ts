@@ -106,12 +106,16 @@ async function init(): Promise<void> {
   );
 
   // lede
-  const rated = variants.filter((v) => v.lt.rate !== null);
+  const rated = variants.filter((v) => v.lt.rate !== null && v.lt.ci !== null);
   let spread = "";
   if (rated.length > 1) {
     const worst = rated.reduce((a, b) => (a.lt.rate! > b.lt.rate! ? a : b));
     const best = rated.reduce((a, b) => (a.lt.rate! < b.lt.rate! ? a : b));
-    if (worst.lt.rate! > best.lt.rate! * 1.8) {
+    // A ratio alone is not a difference: with a handful of changes per variant the
+    // 95% intervals usually overlap, and the page publishes those intervals right
+    // below. Only claim the variants differ when the intervals are disjoint.
+    const separated = worst.lt.ci![0] > best.lt.ci![1];
+    if (separated && worst.lt.rate! > best.lt.rate! * 1.8) {
       spread =
         ` Its serving variants do not behave alike: <span class="hl">${variantLabel(worst.name)}</span>` +
         ` shows ${worst.lt.rate!.toFixed(2)} LT changes per endpoint-year against` +
