@@ -217,6 +217,21 @@ def test_endpoint_rows_carry_model_slug(fake_site):
     assert ep["modelSlug"] == slugify("m/a")
 
 
+def test_endpoint_rows_carry_provider_slug_of_the_base_provider(tmp_path):
+    """The link target is the provider *page*, which is keyed by company, not variant."""
+    root = tmp_path / "website"
+    dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 31)]
+    write_lt_endpoint(
+        root, "m2fa23p2ffp8", "m/a", "p/fp8", dates=dates, changes=[], drift=[0.1] * 30
+    )
+    (root / "data" / "changes.json").write_text(json.dumps([]))
+    (root / "data" / "spend.json").write_text(json.dumps({"cumulative": {}}))
+
+    ov = _build_overview(root)
+    ep = next(e for e in ov["endpoints"] if e["provider"] == "p/fp8")
+    assert ep["providerSlug"] == slugify("p") == "p"
+
+
 def test_stats_count_provider_companies_and_variants(tmp_path):
     root = tmp_path / "website"
     dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 31)]

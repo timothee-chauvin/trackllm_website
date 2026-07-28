@@ -116,3 +116,44 @@ export function magnitudeLabel(method: string, magnitude: number | null): string
   if (magnitude === null) return "";
   return method === "lt" ? `${magnitude} nats` : `TV ${magnitude}`;
 }
+
+/** One detected change, as feed.py enriches it for both the Overview and the change log. */
+export interface FeedItem {
+  date: string;
+  iso: string;
+  daysAgo: number;
+  slug: string;
+  model: string;
+  org: string;
+  modelSlug: string;
+  provider: string;
+  providerSlug: string;
+  method: "lt" | "b3it";
+  desc: string;
+  primary: string;
+  secondary: string;
+  sevKey: "alert" | "changed" | "stable";
+  trace: number[];
+  changeFrac: number;
+  magnitude: number | null;
+}
+
+/** A change-feed row. Both surfaces that render it (index.html, changes.html) sit at
+ *  the site root, so the link paths are root-relative with no prefix. */
+export function eventRow(e: FeedItem): string {
+  const isLT = e.method === "lt";
+  const color = isLT ? "var(--accent)" : "var(--b3it)";
+  return `<div class="event" style="--sev:var(--${e.sevKey})">
+    <div class="when">${esc(e.date)}<span class="rel">${relDays(e.daysAgo)}</span></div>
+    <div class="what">
+      <div><a class="model" href="models/${esc(e.modelSlug)}.html">${esc(e.model)}</a>
+        <span class="at">@ <a class="at" href="providers/${esc(e.providerSlug)}.html">${esc(e.provider)}</a></span></div>
+      <div class="desc">${esc(e.desc)}</div>
+    </div>
+    <div class="spark">${sparkline(e.trace, isLT ? LT_CAP : B3IT_CAP, color, e.changeFrac)}</div>
+    <div class="mag">${methodBadges([e.method])}
+      <div class="delta">${esc(e.primary)}</div>
+      <div class="conf">${esc(e.secondary)}</div>
+    </div>
+  </div>`;
+}

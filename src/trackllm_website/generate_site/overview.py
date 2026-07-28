@@ -17,6 +17,7 @@ from trackllm_website.generate_site.feed import (
     downsample_trace,
 )
 from trackllm_website.generate_site.lt import EndpointInfo, LTData, latest_date
+from trackllm_website.generate_site.naming import base_provider
 from trackllm_website.util import slugify
 
 RECENT_CHANGE_DAYS = 60
@@ -130,6 +131,8 @@ def build_overview(
                 "modelSlug": slugify(full_model),
                 "org": org,
                 "provider": provider,
+                # The slug provider pages are written under, so the link can never 404.
+                "providerSlug": slugify(base_provider(provider)),
                 "methods": methods,
                 "status": status,
                 "stableDays": stable_days,

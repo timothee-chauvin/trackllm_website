@@ -1,4 +1,4 @@
-// `export {}` makes this a module so its top-level names (MONTH_NAMES, init, ...)
+// `export {}` makes this a module so its top-level names (LANE_W, init, ...)
 // don't collide with the same names in other bundler-entrypoint scripts (endpoint.ts)
 // when type-checked together as one tsc program.
 export {};
