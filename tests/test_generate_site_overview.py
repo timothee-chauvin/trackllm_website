@@ -4,10 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from conftest import write_b3it_state, write_lt_endpoint
-from trackllm_website.bi.phase_2 import save_results
-from trackllm_website.bi.state import EndpointBIState, Epoch, RetiredInfo
-from trackllm_website.config import Endpoint
+from conftest import write_b3it_series, write_b3it_state, write_lt_endpoint
+from trackllm_website.bi.state import RetiredInfo
 from trackllm_website.generate_site.b3it import discover_b3it_views
 from trackllm_website.generate_site.changes import merge_changes, to_json
 from trackllm_website.generate_site.lt import discover_lt_endpoints
@@ -36,39 +34,20 @@ def test_downsample_trace_empty():
     assert downsample_trace([], 28) == []
 
 
-def _daily_batch(day: int, token: str):
-    ts = f"2026-01-{day:02d}T00:00:00+00:00"
-    return ts, [(ts, token)] * 10
-
-
 def _write_b3it_with_transition(
     root: Path, slug: str, model: str, provider: str, *, status, retired=None
 ):
     """A b3it endpoint whose reference actually produces a TV transition."""
-    ep = Endpoint(api="openrouter", model=model, provider=provider, cost=(0.1, 0.2))
-    ref = {"p1": [("2026-01-01T00:00:00Z", "A")] * 10}
-    results = {
-        "p1": dict(
-            [_daily_batch(d, "A") for d in range(1, 13)]
-            + [_daily_batch(d, "B") for d in range(13, 25)]
-        )
-    }
-    state = EndpointBIState(
-        endpoint=ep,
+    write_b3it_series(
+        root,
+        slug,
+        model,
+        provider,
         status=status,
         retired=retired,
-        epochs=[
-            Epoch(
-                start=datetime(2026, 1, 1, tzinfo=timezone.utc),
-                border_inputs=["p1"],
-                reference=ref,
-            )
-        ],
+        month="2026-01",
+        tokens=["A"] * 12 + ["B"] * 12,
     )
-    state.save(root / "data" / "b3it" / "state")
-    p2_dir = root / "data" / "b3it" / "phase_2" / slug
-    p2_dir.mkdir(parents=True)
-    save_results(p2_dir / "p1.json", results)
 
 
 @pytest.fixture
