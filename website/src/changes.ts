@@ -146,22 +146,26 @@ async function init(): Promise<void> {
       return true;
     });
 
-    const perMonth = new Map<string, number>();
+    // Each month gets its own element rather than a flat run of siblings: a sticky
+    // .mohead only unpins at the bottom of its containing block, so sharing one
+    // would pile every month's banner up under the nav over the same change row.
+    const groups: { month: string; events: FeedItem[] }[] = [];
     for (const e of rows) {
       const m = e.date.slice(0, 7);
-      perMonth.set(m, (perMonth.get(m) ?? 0) + 1);
-    }
-    let html = "";
-    let current: string | null = null;
-    for (const e of rows) {
-      const m = e.date.slice(0, 7);
-      if (m !== current) {
-        current = m;
-        html += `<div class="mohead"><span>${monthLabel(m)}</span>
-          <span class="c">${plural(perMonth.get(m)!, "change")}</span></div>`;
+      let last = groups[groups.length - 1];
+      // items arrive sorted by date desc (feed.py), so a month is always contiguous
+      if (!last || last.month !== m) {
+        last = { month: m, events: [] };
+        groups.push(last);
       }
-      html += eventRow(e);
+      last.events.push(e);
     }
+    const html = groups
+      .map(
+        (g) => `<section class="mogroup"><div class="mohead"><span>${monthLabel(g.month)}</span>
+          <span class="c">${plural(g.events.length, "change")}</span></div>${g.events.map(eventRow).join("")}</section>`,
+      )
+      .join("");
     logEl!.innerHTML = html || '<div class="empty">No changes match these filters.</div>';
 
     const countEl = document.getElementById("logCount");

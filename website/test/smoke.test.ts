@@ -115,6 +115,20 @@ describe.each(PAGES)("$name page", (page) => {
     await waitFor(page.ready);
   });
 
+  // A sticky element only unpins at the bottom of its containing block. With one
+  // flat run of siblings every month's banner stayed pinned under the nav, stacked
+  // on top of each other and over the newest change -- which is what shipped.
+  test.if(page.name === "changes")("gives each month its own containing block", () => {
+    const heads = document.querySelectorAll("#log .mohead");
+    expect(heads.length, "no month banners rendered").toBeGreaterThan(1);
+    for (const h of heads) {
+      expect(h.parentElement?.className, `${h.textContent?.trim()} is not in a group`).toBe(
+        "mogroup",
+      );
+      expect(h.parentElement?.firstElementChild, "banner is not first in its group").toBe(h);
+    }
+  });
+
   test("fills every mount point", () => {
     for (const id of page.mounts) {
       const el = document.getElementById(id);
@@ -141,4 +155,15 @@ describe.each(PAGES)("$name page", (page) => {
     }
     expect(missing, `dead links: ${missing.slice(0, 5).join(", ")}`).toHaveLength(0);
   });
+});
+
+/** The other half of the same bug, and the half no DOM assertion can see: happy-dom
+ *  has no layout engine, so guard the CSS precondition instead. `overflow: hidden`
+ *  makes .feed the scrollport for the sticky .mohead inside it, which then parks
+ *  var(--nav-h) below the feed's own top -- on top of the newest change. */
+test("the change feed is not a scroll container", () => {
+  const css = readFileSync(join(SITE, "style.css"), "utf8");
+  const rule = css.match(/^\.feed \{[^}]*\}/m)?.[0];
+  expect(rule, ".feed rule not found in style.css").toBeDefined();
+  expect(rule!).not.toContain("overflow");
 });
