@@ -140,7 +140,7 @@ def fake_site_feed_agreement(tmp_path):
         changes=[{"index": 24, "sigma": 40.0}],
         drift=[0.1] * 24 + [1.5] * 6,
     )
-    write_b3it_state(root, "m2fa23p", "m/a", "p", status="monitoring")
+    write_b3it_state(root, "m/a", "p", status="monitoring")
     changes = [
         {
             "date": dates[24],

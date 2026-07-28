@@ -35,12 +35,11 @@ def test_downsample_trace_empty():
 
 
 def _write_b3it_with_transition(
-    root: Path, slug: str, model: str, provider: str, *, status, retired=None
+    root: Path, model: str, provider: str, *, status, retired=None
 ):
     """A b3it endpoint whose reference actually produces a TV transition."""
     write_b3it_series(
         root,
-        slug,
         model,
         provider,
         status=status,
@@ -59,7 +58,7 @@ def fake_site(tmp_path):
     write_lt_endpoint(
         root, "m2fa23p", "m/a", "p", dates=dates, changes=changes, drift=drift
     )
-    write_b3it_state(root, "m2fa23p", "m/a", "p", status="monitoring")
+    write_b3it_state(root, "m/a", "p", status="monitoring")
 
     (root / "data" / "changes.json").write_text(
         json.dumps(
@@ -161,7 +160,7 @@ def test_feed_includes_b3it_item_from_view_transition(tmp_path):
     write_lt_endpoint(
         root, "m2fa23p", "m/a", "p", dates=dates, changes=[], drift=[0.1] * 5
     )
-    _write_b3it_with_transition(root, "m2fb23q", "m/b", "q", status="monitoring")
+    _write_b3it_with_transition(root, "m/b", "q", status="monitoring")
     # the feed reads B3IT items from the merged change list, as render.py writes it
     views = discover_b3it_views(
         root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
@@ -190,7 +189,6 @@ def test_b3it_only_retired_endpoint_gets_retired_status(tmp_path):
     )
     _write_b3it_with_transition(
         root,
-        "m2fb23q",
         "m/b",
         "q",
         status="retired",

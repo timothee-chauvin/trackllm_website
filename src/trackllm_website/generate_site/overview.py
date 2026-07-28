@@ -6,7 +6,6 @@ views, changes.json, spend.json) -- never raw logprobs.
 
 import json
 from collections import defaultdict
-from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
@@ -16,7 +15,11 @@ from trackllm_website.generate_site.feed import (
     build_feed_items,
     downsample_trace,
 )
-from trackllm_website.generate_site.lt import EndpointInfo, load_lt_scores
+from trackllm_website.generate_site.lt import (
+    EndpointInfo,
+    latest_date,
+    load_all_lt_data,
+)
 
 RECENT_CHANGE_DAYS = 60
 RETIRED_GAP_DAYS = 14
@@ -65,30 +68,6 @@ def _b3it_status_trace(
     return status, trace, stable_days
 
 
-@dataclass
-class _LTData:
-    dates: list[datetime]
-    scores: list[float]
-    n_per_test: int
-    changes: list[dict]
-    drift: list[tuple[datetime, float]]
-
-
-def _load_lt_data(lt_dir: Path, slug: str) -> _LTData | None:
-    d = load_lt_scores(lt_dir, slug)
-    if d is None:
-        return None
-    drift_dates = [datetime.fromisoformat(s) for s in d.get("drift_dates", [])]
-    drift = list(zip(drift_dates, d.get("drift", [])))
-    return _LTData(
-        dates=[datetime.fromisoformat(s) for s in d["dates"]],
-        scores=d["scores"],
-        n_per_test=d["n_per_test"],
-        changes=d["changes"],
-        drift=drift,
-    )
-
-
 def build_overview(
     website_dir: Path,
     lt_endpoints: list[EndpointInfo],
@@ -99,13 +78,8 @@ def build_overview(
 
     lt_by_slug = {e.slug: e for e in lt_endpoints}
 
-    lt_data: dict[str, _LTData] = {}
-    for slug in lt_by_slug:
-        d = _load_lt_data(lt_dir, slug)
-        if d is not None:
-            lt_data[slug] = d
-
-    now = max((d.dates[-1] for d in lt_data.values()), default=None)
+    lt_data = load_all_lt_data(lt_dir, lt_by_slug)
+    now = latest_date(lt_data)
 
     changes_path = data_dir / "changes.json"
     changes = json.loads(changes_path.read_text()) if changes_path.exists() else []

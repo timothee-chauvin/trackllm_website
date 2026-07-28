@@ -5,6 +5,17 @@ from pathlib import Path
 from trackllm_website.bi.phase_2 import save_results
 from trackllm_website.bi.state import EndpointBIState, Epoch
 from trackllm_website.config import Endpoint
+from trackllm_website.util import slugify
+
+
+def b3it_slug(model: str, provider: str) -> str:
+    """The slug both b3it state files and phase-2 dirs are keyed by.
+
+    EndpointBIState derives its own slug from the endpoint, so a caller-supplied
+    one that disagreed would silently split the state file from its phase-2 data
+    and yield a view with an empty tv_series.
+    """
+    return slugify(f"{model}#{provider}")
 
 
 def write_lt_endpoint(
@@ -36,7 +47,8 @@ def write_lt_endpoint(
     )
 
 
-def write_b3it_state(root: Path, slug: str, model: str, provider: str, *, status):
+def write_b3it_state(root: Path, model: str, provider: str, *, status):
+    """A b3it endpoint with no phase-2 data, so its view has an empty tv_series."""
     state = {
         "endpoint": {
             "api": "openrouter",
@@ -58,11 +70,11 @@ def write_b3it_state(root: Path, slug: str, model: str, provider: str, *, status
     }
     sd = root / "data" / "b3it" / "state"
     sd.mkdir(parents=True, exist_ok=True)
-    (sd / f"{slug}.json").write_text(json.dumps(state))
+    (sd / f"{b3it_slug(model, provider)}.json").write_text(json.dumps(state))
 
 
 def write_b3it_series(
-    root: Path, slug: str, model: str, provider: str, *, status, retired, month, tokens
+    root: Path, model: str, provider: str, *, status, retired, month, tokens
 ):
     """A b3it endpoint with one epoch and a daily phase-2 series of `tokens`.
 
@@ -91,6 +103,6 @@ def write_b3it_series(
         ],
     )
     state.save(root / "data" / "b3it" / "state")
-    p2_dir = root / "data" / "b3it" / "phase_2" / slug
+    p2_dir = root / "data" / "b3it" / "phase_2" / b3it_slug(model, provider)
     p2_dir.mkdir(parents=True)
     save_results(p2_dir / "p1.json", results)
