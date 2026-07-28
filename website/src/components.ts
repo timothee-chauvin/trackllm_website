@@ -93,6 +93,27 @@ export function relDays(n: number): string {
   return `${(n / 365).toFixed(1)}y ago`;
 }
 
+const MINUTE_MS = 60_000;
+const HOUR_MS = 60 * MINUTE_MS;
+const DAY_MS = 24 * HOUR_MS;
+const COARSE_DAYS = 30; // past a month, the hour is noise
+
+/** Age of an absolute instant: "14m ago", "3h07m ago", "2d 4h ago", "45d ago".
+ *  Takes `now` from the caller because a static build must never bake in an age.
+ *  A timestamp from the future (clock skew) reads "0m ago", not a countdown. */
+export function relativeAge(iso: string, now: number): string {
+  const then = Date.parse(iso);
+  if (!Number.isFinite(then)) throw new Error(`unparseable timestamp: ${iso}`);
+  const age = Math.max(0, now - then);
+  const d = Math.floor(age / DAY_MS);
+  const h = Math.floor((age % DAY_MS) / HOUR_MS);
+  const m = Math.floor((age % HOUR_MS) / MINUTE_MS);
+  if (age < HOUR_MS) return `${m}m ago`;
+  if (age < DAY_MS) return `${h}h${String(m).padStart(2, "0")}m ago`;
+  if (d < COARSE_DAYS) return `${d}d ${h}h ago`;
+  return `${d}d ago`;
+}
+
 export const MONTH_NAMES = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
@@ -139,15 +160,16 @@ export interface FeedItem {
 }
 
 /** A change-feed row. Both surfaces that render it (index.html, changes.html) sit at
- *  the site root, so the link paths are root-relative with no prefix. */
+ *  the site root, so the link paths are root-relative with no prefix.
+ *  "model @ provider" names one endpoint, so it is one link to that endpoint's page. */
 export function eventRow(e: FeedItem): string {
   const isLT = e.method === "lt";
   const color = isLT ? "var(--accent)" : "var(--b3it)";
   return `<div class="event" style="--sev:var(--${e.sevKey})">
     <div class="when">${esc(e.date)}<span class="rel">${relDays(e.daysAgo)}</span></div>
     <div class="what">
-      <div><a class="model" href="models/${esc(e.modelSlug)}.html">${esc(e.model)}</a>
-        <span class="at">@ <a class="at" href="providers/${esc(e.providerSlug)}.html">${esc(e.provider)}</a></span></div>
+      <div><a href="endpoints/${esc(e.slug)}.html"><span class="model">${esc(e.model)}</span>
+        <span class="at">@ ${esc(e.provider)}</span></a></div>
       <div class="desc">${esc(e.desc)}</div>
     </div>
     <div class="spark">${sparkline(e.trace, isLT ? LT_CAP : B3IT_CAP, color, e.changeFrac)}</div>

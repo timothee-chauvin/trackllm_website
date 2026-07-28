@@ -263,6 +263,26 @@ def test_stats_count_provider_companies_and_variants(tmp_path):
     assert ov["stats"]["provider_companies"] == 1
 
 
+def test_stats_carry_the_last_query_of_each_method(tmp_path):
+    root = tmp_path / "website"
+    dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 31)]
+    write_lt_endpoint(
+        root, "m2fa23p", "m/a", "p", dates=dates, changes=[], drift=[0.1] * 30
+    )
+    _write_b3it_with_transition(root, "m/b", "q", status="monitoring")
+
+    stats = _build_overview(root)["stats"]
+    assert stats["last_query_lt"] == "2026-06-30T00:00:00Z"
+    assert stats["last_query_b3it"] == "2026-01-24T00:00:00Z"
+
+
+def test_stats_last_query_is_none_for_a_method_with_no_data(fake_site):
+    """The fixture's b3it endpoint has a state file but no phase-2 results."""
+    stats = _build_overview(fake_site)["stats"]
+    assert stats["last_query_lt"] == "2026-06-30T00:00:00Z"
+    assert stats["last_query_b3it"] is None
+
+
 def test_stats_counts_match_endpoint_and_changes_lists(fake_site):
     ov = _build_overview(fake_site)
     assert ov["stats"]["endpoints"] == len(ov["endpoints"])

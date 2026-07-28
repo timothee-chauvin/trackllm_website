@@ -37,6 +37,7 @@ def render_site(website_dir: Path) -> None:
     model_template = env.get_template("model.html.j2")
     provider_template = env.get_template("provider.html.j2")
     changes_template = env.get_template("changes.html.j2")
+    methodology_template = env.get_template("methodology.html.j2")
 
     endpoints: list[EndpointInfo] = []
     for ep in discover_lt_endpoints(data_dir):
@@ -112,6 +113,11 @@ def render_site(website_dir: Path) -> None:
         changes_template.render(css_path="style.css", body_class="changes")
     )
     print("Generated changes.html")
+
+    (website_dir / "methodology.html").write_text(
+        methodology_template.render(css_path="style.css", body_class="methodology")
+    )
+    print("Generated methodology.html")
 
     models_dir = website_dir / "data" / "models"
     models_dir.mkdir(parents=True, exist_ok=True)
