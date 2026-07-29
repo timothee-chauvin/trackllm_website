@@ -11,7 +11,6 @@ from datetime import datetime, timezone
 
 REFERENCE_DAYS = 14
 LOGPROB_FLOOR = -30.0
-SMOOTH_WINDOW = 5
 
 
 def _mean_vector(
@@ -46,7 +45,10 @@ def compute_drift_series(
     by_day = defaultdict(list)
     for dt, d in obs:
         by_day[dt.date()].append(d)
-    raw = []
+    # The daily mean is the only aggregation. There used to be a 5-point rolling
+    # median on top of it; it erased single-day excursions -- the exact shape this
+    # site exists to surface -- and collapsed distinct days into constant runs.
+    series = []
     for day in sorted(by_day):
         day_mean, day_floor = _mean_vector(by_day[day], ref_tokens)
         floor = min(day_floor, ref_floor)
@@ -54,10 +56,10 @@ def compute_drift_series(
         drift = statistics.mean(
             abs(day_mean.get(t, floor) - ref_mean.get(t, floor)) for t in tokens
         )
-        raw.append((datetime(day.year, day.month, day.day, tzinfo=timezone.utc), drift))
-    vals = [v for _, v in raw]
-    half = SMOOTH_WINDOW // 2
-    return [
-        (dt, round(statistics.median(vals[max(0, i - half) : i + half + 1]), 4))
-        for i, (dt, _) in enumerate(raw)
-    ]
+        series.append(
+            (
+                datetime(day.year, day.month, day.day, tzinfo=timezone.utc),
+                round(drift, 4),
+            )
+        )
+    return series

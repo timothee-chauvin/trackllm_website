@@ -36,7 +36,7 @@ def _scaffold(website: Path):
 
 def test_render_site_produces_index_and_endpoint(tmp_path):
     _scaffold(tmp_path)
-    render_site(tmp_path)
+    render_site(tmp_path, None)
     index = (tmp_path / "index.html").read_text()
     # index.html is now a static shell; the directory is populated client-side from overview.json
     assert 'id="dirBody"' in index
@@ -65,7 +65,7 @@ def test_render_emits_changes_and_unified_index(tmp_path):
         )
     )
 
-    render_site(tmp_path)
+    render_site(tmp_path, None)
     # index.html is a static shell now; the directory + feed are populated client-side
     # from overview.json / changes.json rather than server-rendered into index.html.
     changes = json.loads((tmp_path / "data" / "changes.json").read_text())
@@ -87,7 +87,7 @@ def test_render_emits_b3it_json_and_b3it_only_page(tmp_path):
     )
     assert b3it_slug("b/x", "q") == "b2fx23q"
 
-    render_site(tmp_path)
+    render_site(tmp_path, None)
     assert (tmp_path / "data" / "b3it" / "b2fx23q" / "b3it.json").exists()
     assert (tmp_path / "endpoints" / "b2fx23q.html").exists()
 
@@ -127,7 +127,7 @@ def test_render_emits_spend(tmp_path):
     zp.mkdir(parents=True)
     (zp / "2026-06.jsonl").write_text(_spend_line("lt", 0.0) + "\n")
 
-    render_site(tmp_path)
+    render_site(tmp_path, None)
     assert (tmp_path / "data" / "spend.json").exists()
     assert (tmp_path / "spend.html").exists()
     assert "spend" in (tmp_path / "index.html").read_text().lower()
@@ -152,7 +152,7 @@ def test_render_endpoint_page_context_for_multi_provider_model(tmp_path):
     # the model is served by 2 providers.
     _lt_endpoint(tmp_path, "m2fa23p2", "m/a", "p2")
 
-    render_site(tmp_path)
+    render_site(tmp_path, None)
 
     model_slug = slugify("m/a")
     page = (tmp_path / "endpoints" / "m2fa23p.html").read_text()
@@ -168,7 +168,7 @@ def test_render_endpoint_page_context_for_multi_provider_model(tmp_path):
 
 def test_render_emits_provider_pages_and_data(tmp_path):
     _scaffold(tmp_path)
-    render_site(tmp_path)
+    render_site(tmp_path, None)
     view = json.loads((tmp_path / "data" / "providers" / "p.json").read_text())
     assert view["name"] == "p"
     assert view["n_endpoints"] == 1
@@ -178,7 +178,7 @@ def test_render_emits_provider_pages_and_data(tmp_path):
 
 def test_overview_providers_are_base_provider_rows(tmp_path):
     _scaffold(tmp_path)
-    render_site(tmp_path)
+    render_site(tmp_path, None)
     overview = json.loads((tmp_path / "data" / "overview.json").read_text())
     (row,) = overview["providers"]
     assert row["name"] == "p"
@@ -188,7 +188,7 @@ def test_overview_providers_are_base_provider_rows(tmp_path):
 
 def test_render_emits_changes_page(tmp_path):
     _scaffold(tmp_path)
-    render_site(tmp_path)
+    render_site(tmp_path, None)
     page = json.loads((tmp_path / "data" / "changes_page.json").read_text())
     assert set(page) == {"stats", "items", "months", "top_endpoints"}
     assert (tmp_path / "changes.html").exists()
@@ -197,13 +197,13 @@ def test_render_emits_changes_page(tmp_path):
 
 def test_nav_links_to_changes(tmp_path):
     _scaffold(tmp_path)
-    render_site(tmp_path)
+    render_site(tmp_path, None)
     assert 'href="changes.html"' in (tmp_path / "index.html").read_text()
 
 
 def test_render_emits_methodology_page(tmp_path):
     _scaffold(tmp_path)
-    render_site(tmp_path)
+    render_site(tmp_path, None)
     page = (tmp_path / "methodology.html").read_text()
     # both papers and the blog post must be reachable from the page
     assert "arxiv.org/abs/2512.03816" in page
@@ -214,7 +214,7 @@ def test_render_emits_methodology_page(tmp_path):
 
 def test_favicon_link_is_relative_to_page_depth(tmp_path):
     _scaffold(tmp_path)
-    render_site(tmp_path)
+    render_site(tmp_path, None)
     model_slug = slugify("m/a")
     assert 'href="favicon.svg"' in (tmp_path / "index.html").read_text()
     assert (
@@ -228,7 +228,7 @@ def test_favicon_link_is_relative_to_page_depth(tmp_path):
 
 def test_endpoint_page_links_to_its_provider(tmp_path):
     _scaffold(tmp_path)
-    render_site(tmp_path)
+    render_site(tmp_path, None)
     html = (tmp_path / "endpoints" / "m2fa23p.html").read_text()
     assert 'href="../providers/p.html"' in html
 
@@ -242,7 +242,7 @@ def test_endpoint_head_links_model_provider_and_org(tmp_path):
     """The h1 names a model, the @ names a provider, the trailing tag names an org:
     each is a page, so each is a link."""
     _scaffold(tmp_path)
-    render_site(tmp_path)
+    render_site(tmp_path, None)
     head = _head((tmp_path / "endpoints" / "m2fa23p.html").read_text())
     assert f'href="../models/{slugify("m/a")}.html"' in head
     assert 'href="../providers/p.html"' in head
@@ -251,7 +251,7 @@ def test_endpoint_head_links_model_provider_and_org(tmp_path):
 
 def test_endpoint_and_model_crumbs_link_the_org(tmp_path):
     _scaffold(tmp_path)
-    render_site(tmp_path)
+    render_site(tmp_path, None)
     org_href = f'href="../orgs/{slugify("m")}.html"'
     for path in ("endpoints/m2fa23p.html", f"models/{slugify('m/a')}.html"):
         crumb = (tmp_path / path).read_text().split('<div class="crumb">')[1]
@@ -260,7 +260,7 @@ def test_endpoint_and_model_crumbs_link_the_org(tmp_path):
 
 def test_render_emits_org_pages(tmp_path):
     _scaffold(tmp_path)
-    render_site(tmp_path)
+    render_site(tmp_path, None)
     page = (tmp_path / "orgs" / f"{slugify('m')}.html").read_text()
     assert f'href="../models/{slugify("m/a")}.html"' in page
     assert "<h1>m</h1>" in page
@@ -272,7 +272,7 @@ def test_org_pages_are_rewritten_from_scratch(tmp_path):
     orgs = tmp_path / "orgs"
     orgs.mkdir()
     (orgs / "gone.html").write_text("stale")
-    render_site(tmp_path)
+    render_site(tmp_path, None)
     assert not (orgs / "gone.html").exists()
 
 
@@ -293,7 +293,7 @@ def test_endpoint_with_nothing_to_show_is_not_rendered_anywhere(tmp_path):
     )
     write_b3it_state(tmp_path, "m/a", "gone", status="retired")
 
-    render_site(tmp_path)
+    render_site(tmp_path, None)
 
     assert not (tmp_path / "endpoints" / "m2fa23dead.html").exists()
     assert not (tmp_path / "endpoints" / f"{b3it_slug('m/a', 'gone')}.html").exists()
@@ -330,7 +330,7 @@ def test_a_dead_lt_series_does_not_hide_a_live_b3it_one(tmp_path):
         tokens=["A"] * 10,
     )
 
-    render_site(tmp_path)
+    render_site(tmp_path, None)
 
     assert (tmp_path / "endpoints" / f"{slug}.html").exists()
     overview = json.loads((tmp_path / "data" / "overview.json").read_text())
@@ -348,7 +348,7 @@ def test_spend_rows_only_link_endpoints_that_have_a_page(tmp_path):
         d.mkdir(parents=True)
         (d / "2026-06.jsonl").write_text(_spend_line("lt", 0.05) + "\n")
 
-    render_site(tmp_path)
+    render_site(tmp_path, None)
 
     html = (tmp_path / "spend.html").read_text()
     assert 'href="endpoints/m2fa23p.html"' in html
@@ -359,7 +359,7 @@ def test_spend_rows_only_link_endpoints_that_have_a_page(tmp_path):
 def test_methodology_links_each_paper_from_its_own_section(tmp_path):
     """The paper belongs beside the method it describes, not only in Read more."""
     _scaffold(tmp_path)
-    render_site(tmp_path)
+    render_site(tmp_path, None)
     page = (tmp_path / "methodology.html").read_text()
     lt_section, b3it_section, read_more = (
         page.split("Black-box border input tracking")[0],

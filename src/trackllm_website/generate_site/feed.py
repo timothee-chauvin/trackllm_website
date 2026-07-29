@@ -60,7 +60,8 @@ def _severity(value: float, alert: float) -> str:
     return "changed" if value >= CHANGED_THRESHOLD else "stable"
 
 
-def _links(change: dict) -> dict:
+def change_links(change: dict) -> dict:
+    """Display names and page slugs for one change -- shared with hero.py."""
     model = change["model"]
     provider = change["provider"] or ""
     return {
@@ -97,7 +98,7 @@ def _lt_item(change: dict, drift: list[tuple[datetime, float]], now: datetime) -
         "sevKey": _severity(magnitude or 0.0, LT_ALERT_THRESHOLD),
         "trace": trace,
         "changeFrac": frac,
-        **_links(change),
+        **change_links(change),
     }
 
 
@@ -136,7 +137,7 @@ def _b3it_item(change: dict, view: B3ITView | None, now: datetime) -> dict:
         "sevKey": _severity(peak or 0.0, B3IT_ALERT_THRESHOLD),
         "trace": trace,
         "changeFrac": frac,
-        **_links(change),
+        **change_links(change),
     }
 
 

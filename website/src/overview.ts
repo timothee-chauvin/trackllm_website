@@ -10,9 +10,11 @@ import {
   MIN_ENDPOINT_YEARS,
   esc,
   eventRow,
+  magnitudeLabel,
   methodBadges,
   plural,
   rateBar,
+  relDays,
   relativeAge,
   sparkline,
   statusPill,
@@ -78,6 +80,24 @@ interface EndpointRow {
   trace: number[];
 }
 
+/** The one real change event the hero draws, chosen at build time (hero.py). */
+interface Hero {
+  slug: string;
+  model: string;
+  org: string;
+  provider: string;
+  method: "lt" | "b3it";
+  date: string;
+  daysAgo: number;
+  magnitude: number;
+  baseline: number;
+  start: string;
+  end: string;
+  values: number[];
+  changeFrac: number;
+  yMax: number;
+}
+
 type SortKey = "model" | "provider" | "status" | "nChanges" | "stableDays";
 type ProviderSortKey = "name" | "n_endpoints" | "lt_rate" | "last_change";
 
@@ -85,9 +105,21 @@ const BOARD_SIZE = 5;
 const QUIET_MIN_YEARS = 1; // a "nothing detected yet" board entry needs real exposure
 const FRESH_TICK_MS = 60_000; // the line's own resolution, so no point ticking faster
 
+// Hero trace geometry, in the SVG's own box. Both hero layers are sized to the clear
+// space above the stat cards, so the curve is never half-hidden behind them however
+// the hero reflows: zero drift sits on the cards' top edge and the fill between them
+// is the area under the curve.
+const HERO_W = 1200;
+const HERO_VB_H = 200; // also the zero line
+const HERO_TOP = 14;
+const HERO_HIT_WIDTH = 18; // invisible fat stroke: the curve is 1.6 units thin
+const HERO_TIP_DX = 16;
+const HERO_TIP_DY = 18;
+
 (async function (): Promise<void> {
   const DATA: {
     stats: Stats;
+    hero: Hero | null;
     feed: FeedItem[];
     providers: ProviderRate[];
     endpoints: EndpointRow[];
@@ -97,32 +129,66 @@ const FRESH_TICK_MS = 60_000; // the line's own resolution, so no point ticking 
   const fmtM = (n: number): string =>
     n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e3 ? (n / 1e3).toFixed(0) + "k" : "" + n;
 
-  // hero trace: real drift series concatenated, autoscaled — the only place that
-  // wants a min/max fit rather than the fixed LT_CAP/B3IT_CAP sparkline scale.
-  function sparkPath(vals: number[], w: number, h: number, pad: number): string {
-    const min = Math.min(...vals), max = Math.max(...vals);
-    const rng = max - min || 1;
-    const step = (w - pad * 2) / (vals.length - 1);
-    return vals.map((v, i) => {
-      const x = pad + i * step, y = pad + (h - pad * 2) * (1 - (v - min) / rng);
-      return (i ? "L" : "M") + x.toFixed(1) + " " + y.toFixed(1);
-    }).join(" ");
-  }
-
-  (function () {
+  // ---- hero trace: one real change event, picked at build time (hero.py) ----
+  // Full-bleed by construction -- x runs 0..HERO_W with no padding and no end fade,
+  // so the line never appears to stop short of either edge.
+  function renderHero(h: Hero): void {
     const svg = document.getElementById("heroTrace") as unknown as SVGSVGElement;
-    let vals: number[] = [];
-    DATA.endpoints.filter(e => e.trace && e.trace.length > 10).slice(0, 6).forEach(e => vals.push(...e.trace));
-    if (vals.length < 20) vals = [0.1, 0.3, 0.2, 0.4, 0.25];
-    const d = sparkPath(vals, 1200, 300, 8);
-    svg.innerHTML = `<defs><linearGradient id="hg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="var(--accent)" stop-opacity="0"/><stop offset="0.5" stop-color="var(--accent)" stop-opacity="0.85"/>
-      <stop offset="1" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>
-      <path d="${d}" fill="none" stroke="url(#hg)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>`;
-    const path = svg.querySelector("path") as SVGPathElement, len = path.getTotalLength();
-    path.style.strokeDasharray = String(len); path.style.strokeDashoffset = String(len);
-    path.animate([{ strokeDashoffset: len }, { strokeDashoffset: 0 }], { duration: 2400, easing: "ease-out", fill: "forwards" });
-  })();
+    const hitLayer = document.getElementById("heroHit") as unknown as SVGSVGElement;
+    const tip = document.getElementById("heroTip")!;
+    const hero = svg.parentElement!;
+
+    const color = h.method === "lt" ? "var(--accent)" : "var(--b3it)";
+    const x = (i: number): number => (i / (h.values.length - 1)) * HERO_W;
+    const y = (v: number): number => HERO_VB_H - (v / h.yMax) * (HERO_VB_H - HERO_TOP);
+    const line = h.values
+      .map((v, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + y(v).toFixed(1))
+      .join(" ");
+    const cut = (h.changeFrac * HERO_W).toFixed(1);
+    svg.innerHTML = `
+      <line x1="${cut}" y1="0" x2="${cut}" y2="${HERO_VB_H}" stroke="${color}"
+        stroke-width="1" stroke-dasharray="5 5" opacity="0.55" vector-effect="non-scaling-stroke"/>
+      <path d="${line}" fill="none" stroke="${color}" stroke-width="1.6"
+        stroke-linejoin="round" vector-effect="non-scaling-stroke"/>`;
+
+    // The hover target has to sit *above* .hero-inner, which covers the whole hero and
+    // would otherwise swallow every pointer event before the trace behind it sees one.
+    hitLayer.innerHTML = `<a href="endpoints/${esc(h.slug)}.html" class="hero-hit">
+      <path d="${line}" fill="none" stroke="transparent" stroke-width="${HERO_HIT_WIDTH}"/></a>`;
+
+    const method = h.method === "lt" ? "LT" : "B3IT";
+    tip.innerHTML = `<div class="who">${methodBadges([h.method])}
+        <b>${esc(h.model)}</b><span class="at">@ ${esc(h.provider)}</span></div>
+      <div class="what">Live data from this endpoint — ${method} detected a change on
+        ${esc(h.date)} (${relDays(h.daysAgo)}), moving from
+        ${magnitudeLabel(h.method, h.baseline)} to ${magnitudeLabel(h.method, h.magnitude)}.
+        Showing ${esc(h.start)} to ${esc(h.end)}, one point per day.</div>
+      <div class="go">Open the endpoint →</div>`;
+
+    // Both layers stop where the stat cards begin, so no part of the curve is drawn
+    // behind them and no pointer event over a card reaches the hit stroke.
+    const cards = document.getElementById("telemetry")!;
+    function fitLayers(): void {
+      const top = cards.getBoundingClientRect().top - hero.getBoundingClientRect().top;
+      for (const el of [svg, hitLayer]) el.style.height = Math.max(0, top) + "px";
+    }
+    for (const el of [svg, hitLayer]) {
+      el.setAttribute("viewBox", `0 0 ${HERO_W} ${HERO_VB_H}`);
+    }
+    fitLayers();
+    new ResizeObserver(fitLayers).observe(hero);
+
+    const hit = hitLayer.querySelector(".hero-hit")!;
+    hit.addEventListener("pointermove", ev => {
+      const e = ev as PointerEvent;
+      const box = hero.getBoundingClientRect();
+      tip.hidden = false;
+      const left = e.clientX - box.left + HERO_TIP_DX;
+      tip.style.left = Math.max(0, Math.min(left, box.width - tip.offsetWidth)) + "px";
+      tip.style.top = e.clientY - box.top + HERO_TIP_DY + "px";
+    });
+    hit.addEventListener("pointerleave", () => { tip.hidden = true; });
+  }
 
   document.getElementById("eyebrow")!.innerHTML = `<span class="dot"></span> Continuously monitoring ${S.active} active endpoints`;
   const stats = [
@@ -134,6 +200,10 @@ const FRESH_TICK_MS = 60_000; // the line's own resolution, so no point ticking 
   ];
   document.getElementById("telemetry")!.innerHTML = stats.map(s =>
     `<div class="stat"><div class="label">${s.label}</div><div class="value">${s.value}</div><div class="sub">${s.sub}</div></div>`).join("");
+  // after the cards: the hero layers are sized against where they land
+  if (DATA.hero && DATA.hero.values.length > 1) renderHero(DATA.hero);
+  else document.querySelectorAll(".hero-trace, .hero-hit-layer, .hero-tip").forEach(el => el.remove());
+
   // How fresh each method's data is. The build emits absolute instants, so the age
   // is computed here and re-computed as the tab stays open; a method with no data
   // at all is left out rather than shown as an age since the epoch.
