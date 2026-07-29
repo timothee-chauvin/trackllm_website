@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- All commands run through `uv`. Use `uv run --frozen pytest tests -q` for the suite: `--frozen` stops `uv sync` from churning `uv.lock`, and scoping to `tests` avoids a pre-existing collection error under `reference/`.
+- All commands run through `uv`. Use `uv run --frozen pytest tests -q` for the suite: `--frozen` stops `uv sync` from churning `uv.lock`. (The `tests` scope used to also dodge a collection error under a local `reference/` checkout; that directory was deleted on 2026-07-28, so a bare `uv run --frozen pytest` now collects cleanly too.)
 - **beartype is active package-wide** (`beartype_this_package()` in `src/trackllm_website/__init__.py`). Type annotations are enforced at runtime and the implicit numeric tower is off: passing an `int` where a parameter is annotated `float` raises. Annotate honestly and pass `0.0`, not `0`.
 - Tests alone do not prove the build works. Before committing any task that touches the generator, run it against the real repo data: `uv run --frozen python -m trackllm_website.generate_site` must exit 0.
 - Filenames for generated output always go through `slugify` from `src/trackllm_website/util.py`.
