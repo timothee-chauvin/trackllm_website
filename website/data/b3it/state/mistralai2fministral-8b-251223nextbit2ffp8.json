@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "mistralai/ministral-8b-2512",
+    "provider": "nextbit/fp8",
+    "cost": [
+      0.3,
+      0.3
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 1.5e-6,
+    "created": "2025-12-02T13:20:54Z",
+    "last_seen": "2026-07-29T04:00:13Z",
+    "supports_temperature": true
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "no_bis",
+    "since": "2026-07-29T04:10:56Z",
+    "last_recheck": "2026-07-29T04:10:56Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}

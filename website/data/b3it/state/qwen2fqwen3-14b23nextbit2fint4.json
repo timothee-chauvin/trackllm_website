@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "qwen/qwen3-14b",
+    "provider": "nextbit/int4",
+    "cost": [
+      0.1,
+      0.24
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 1.72e-6,
+    "created": "2025-04-28T21:41:18Z",
+    "last_seen": "2026-07-29T04:00:13Z",
+    "supports_temperature": true
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "no_bis",
+    "since": "2026-07-29T04:10:56Z",
+    "last_recheck": "2026-07-29T04:10:56Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}

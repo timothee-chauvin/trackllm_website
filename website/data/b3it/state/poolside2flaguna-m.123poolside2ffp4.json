@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "poolside/laguna-m.1",
+    "provider": "poolside/fp4",
+    "cost": [
+      0.2,
+      0.4
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 2.9e-6,
+    "created": "2026-04-28T15:01:44Z",
+    "last_seen": "2026-07-28T03:58:01Z",
+    "supports_temperature": null
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "unreachable",
+    "since": "2026-07-29T04:10:56Z",
+    "last_recheck": "2026-07-29T04:10:56Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}

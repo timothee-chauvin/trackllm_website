@@ -1,0 +1,24 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "moonshotai/kimi-k2.6",
+    "provider": "sail-research/int4",
+    "cost": [
+      1.0,
+      4.0
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 6.6e-6,
+    "created": "2026-04-20T15:36:42Z",
+    "last_seen": "2026-07-29T04:00:13Z",
+    "supports_temperature": true
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "no_bis",
+    "since": "2026-07-29T04:10:56Z",
+    "last_recheck": "2026-07-29T04:10:56Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}
