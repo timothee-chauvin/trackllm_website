@@ -77,7 +77,7 @@ def _views(root):
     b3it = discover_b3it_views(
         root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
     )
-    rows = build_overview(root, lt_data, lt_endpoints, b3it)["endpoints"]
+    rows = build_overview(root, lt_data, lt_endpoints, b3it, None)["endpoints"]
     return build_provider_views(root, lt_data, lt_endpoints, b3it, rows)
 
 

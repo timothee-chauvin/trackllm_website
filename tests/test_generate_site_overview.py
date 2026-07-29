@@ -1,11 +1,12 @@
 import json
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 import pytest
 
 from conftest import write_b3it_series, write_b3it_state, write_lt_endpoint
 from trackllm_website.bi.state import RetiredInfo
+from trackllm_website.config import HeroConfig
 from trackllm_website.generate_site.b3it import discover_b3it_views
 from trackllm_website.generate_site.changes import merge_changes, to_json
 from trackllm_website.generate_site.lt import discover_lt_endpoints, load_all_lt_data
@@ -21,7 +22,7 @@ def _build_overview(root: Path) -> dict:
     b3it_views = discover_b3it_views(
         root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
     )
-    return build_overview(root, lt_data, lt_endpoints, b3it_views)
+    return build_overview(root, lt_data, lt_endpoints, b3it_views, None)
 
 
 def test_downsample_trace_caps_length():
@@ -83,7 +84,7 @@ def fake_site(tmp_path):
 
 def test_build_overview_shape(fake_site):
     ov = _build_overview(fake_site)
-    assert set(ov) == {"stats", "feed", "endpoints"}
+    assert set(ov) == {"stats", "hero", "feed", "endpoints"}
     ep = ov["endpoints"][0]
     assert set(ep) >= {
         "slug",
@@ -289,3 +290,66 @@ def test_stats_counts_match_endpoint_and_changes_lists(fake_site):
     assert ov["stats"]["lt_endpoints"] == 1
     assert ov["stats"]["b3it_endpoints"] == 1
     assert ov["stats"]["spend_cumulative"] == 1.23
+
+
+def test_pinned_hero_reaches_overview_json(tmp_path):
+    """End-to-end: the configured pin, not a per-build scoring pass, decides the
+    hero -- and it arrives at full daily resolution."""
+    root = tmp_path / "website"
+    dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 31)]
+    write_lt_endpoint(
+        root,
+        "m2fa23p",
+        "m/a",
+        "p",
+        dates=dates,
+        changes=[{"index": 20, "sigma": 99.0}],
+        drift=[0.05] * 20 + [1.4] * 10,
+    )
+    changes = [
+        {
+            "date": dates[20],
+            "slug": "m2fa23p",
+            "model": "m/a",
+            "provider": "p",
+            "method": "LT",
+            "magnitude": 99.0,
+            "magnitude_display": "99σ",
+        }
+    ]
+    (root / "data" / "changes.json").write_text(json.dumps(changes))
+
+    lt_dir = root / "data" / "lt"
+    lt_endpoints = list(discover_lt_endpoints(lt_dir))
+    lt_data = load_all_lt_data(lt_dir, [e.slug for e in lt_endpoints])
+    pin = HeroConfig(
+        slug="m2fa23p", method="lt", start=date(2026, 6, 1), end=date(2026, 6, 30)
+    )
+    ov = build_overview(root, lt_data, lt_endpoints, {}, pin)
+
+    hero = ov["hero"]
+    assert hero["slug"] == "m2fa23p"
+    assert hero["start"] == "2026-06-01" and hero["end"] == "2026-06-30"
+    assert len(hero["values"]) == 30, "the series was downsampled or clipped"
+    assert hero["magnitude"] == 1.4 and hero["baseline"] == 0.05
+
+
+def test_stale_hero_pin_fails_the_build(tmp_path):
+    root = tmp_path / "website"
+    write_lt_endpoint(
+        root,
+        "m2fa23p",
+        "m/a",
+        "p",
+        dates=[f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 31)],
+        changes=[],
+        drift=[0.05] * 30,
+    )
+    lt_dir = root / "data" / "lt"
+    lt_endpoints = list(discover_lt_endpoints(lt_dir))
+    lt_data = load_all_lt_data(lt_dir, [e.slug for e in lt_endpoints])
+    pin = HeroConfig(
+        slug="gone2fmissing", method="lt", start=date(2026, 6, 1), end=date(2026, 6, 30)
+    )
+    with pytest.raises(ValueError, match="hero pin"):
+        build_overview(root, lt_data, lt_endpoints, {}, pin)
