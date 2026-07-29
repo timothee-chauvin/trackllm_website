@@ -3,8 +3,23 @@ import pytest
 import shutil
 from pathlib import Path
 
+from conftest import b3it_slug, write_b3it_series, write_b3it_state, write_lt_endpoint
 from trackllm_website.generate_site.render import render_site
 from trackllm_website.util import slugify
+
+DATES = [f"2026-06-{d:02d}T00:00:00Z" for d in range(20, 25)]
+
+
+def _lt_endpoint(website: Path, slug: str, model: str, provider: str):
+    write_lt_endpoint(
+        website,
+        slug,
+        model,
+        provider,
+        dates=DATES,
+        changes=[],
+        drift=[0.1] * len(DATES),
+    )
 
 
 def _scaffold(website: Path):
@@ -14,13 +29,9 @@ def _scaffold(website: Path):
     for t in (src / "templates").glob("*.j2"):
         shutil.copy(t, website / "templates" / t.name)
     (website / "style.css").write_text((src / "style.css").read_text())
-    ep = website / "data" / "lt" / "m2fa23p" / "default"
-    ep.mkdir(parents=True)
-    ep_info = {"prompt": "hi", "endpoint": {"model": "m/a", "provider": "p"}}
-    (ep / "info.json").write_text(json.dumps(ep_info))
-    md = ep / "2026-06"
-    md.mkdir()
-    (md / "queries.json").write_text(json.dumps([["24 10:00:00", 0]]))
+    # a series, not just a directory: an endpoint with no observations is not
+    # rendered at all (tracked.py)
+    _lt_endpoint(website, "m2fa23p", "m/a", "p")
 
 
 def test_render_site_produces_index_and_endpoint(tmp_path):
@@ -65,28 +76,16 @@ def test_render_emits_changes_and_unified_index(tmp_path):
 
 def test_render_emits_b3it_json_and_b3it_only_page(tmp_path):
     _scaffold(tmp_path)
-    sd = tmp_path / "data" / "b3it" / "state"
-    sd.mkdir(parents=True)
-    state = {
-        "endpoint": {
-            "api": "openrouter",
-            "model": "b/x",
-            "provider": "q",
-            "cost": [0.1, 0.2],
-            "max_logprobs": None,
-        },
-        "status": "monitoring",
-        "retired": None,
-        "epochs": [
-            {
-                "start": "2026-06-01T00:00:00Z",
-                "border_inputs": [],
-                "reference": {},
-                "end": None,
-            }
-        ],
-    }
-    (sd / "b2fx23q.json").write_text(json.dumps(state))
+    write_b3it_series(
+        tmp_path,
+        "b/x",
+        "q",
+        status="monitoring",
+        retired=None,
+        month="2026-06",
+        tokens=["A"] * 10,
+    )
+    assert b3it_slug("b/x", "q") == "b2fx23q"
 
     render_site(tmp_path)
     assert (tmp_path / "data" / "b3it" / "b2fx23q" / "b3it.json").exists()
@@ -151,13 +150,7 @@ def test_render_endpoint_page_context_for_multi_provider_model(tmp_path):
     _scaffold(tmp_path)
     # second endpoint for the same model ("m/a") but a different provider, so
     # the model is served by 2 providers.
-    ep2 = tmp_path / "data" / "lt" / "m2fa23p2" / "default"
-    ep2.mkdir(parents=True)
-    ep2_info = {"prompt": "hi", "endpoint": {"model": "m/a", "provider": "p2"}}
-    (ep2 / "info.json").write_text(json.dumps(ep2_info))
-    md2 = ep2 / "2026-06"
-    md2.mkdir()
-    (md2 / "queries.json").write_text(json.dumps([["24 10:00:00", 0]]))
+    _lt_endpoint(tmp_path, "m2fa23p2", "m/a", "p2")
 
     render_site(tmp_path)
 
@@ -238,3 +231,142 @@ def test_endpoint_page_links_to_its_provider(tmp_path):
     render_site(tmp_path)
     html = (tmp_path / "endpoints" / "m2fa23p.html").read_text()
     assert 'href="../providers/p.html"' in html
+
+
+def _head(html: str) -> str:
+    """The endpoint page's title block -- everything the crumb links can't cover."""
+    return html.split('<div class="head">')[1].split("</div>\n    <div")[0]
+
+
+def test_endpoint_head_links_model_provider_and_org(tmp_path):
+    """The h1 names a model, the @ names a provider, the trailing tag names an org:
+    each is a page, so each is a link."""
+    _scaffold(tmp_path)
+    render_site(tmp_path)
+    head = _head((tmp_path / "endpoints" / "m2fa23p.html").read_text())
+    assert f'href="../models/{slugify("m/a")}.html"' in head
+    assert 'href="../providers/p.html"' in head
+    assert f'href="../orgs/{slugify("m")}.html"' in head
+
+
+def test_endpoint_and_model_crumbs_link_the_org(tmp_path):
+    _scaffold(tmp_path)
+    render_site(tmp_path)
+    org_href = f'href="../orgs/{slugify("m")}.html"'
+    for path in ("endpoints/m2fa23p.html", f"models/{slugify('m/a')}.html"):
+        crumb = (tmp_path / path).read_text().split('<div class="crumb">')[1]
+        assert org_href in crumb.split("</div>")[0], path
+
+
+def test_render_emits_org_pages(tmp_path):
+    _scaffold(tmp_path)
+    render_site(tmp_path)
+    page = (tmp_path / "orgs" / f"{slugify('m')}.html").read_text()
+    assert f'href="../models/{slugify("m/a")}.html"' in page
+    assert "<h1>m</h1>" in page
+
+
+def test_org_pages_are_rewritten_from_scratch(tmp_path):
+    """A model that leaves the fleet must not leave a stale org page behind."""
+    _scaffold(tmp_path)
+    orgs = tmp_path / "orgs"
+    orgs.mkdir()
+    (orgs / "gone.html").write_text("stale")
+    render_site(tmp_path)
+    assert not (orgs / "gone.html").exists()
+
+
+def test_endpoint_with_nothing_to_show_is_not_rendered_anywhere(tmp_path):
+    """No series, no endpoint: no page, no directory row, no model row, and it
+    is not counted in the stats that describe the fleet."""
+    _scaffold(tmp_path)
+    # an LT endpoint whose queries all errored, and a B3IT one retired before its
+    # first post-reference batch -- the two ways to end up with no series
+    dead_lt = tmp_path / "data" / "lt" / "m2fa23dead" / "default"
+    dead_lt.mkdir(parents=True)
+    (dead_lt / "info.json").write_text(
+        json.dumps({"prompt": "hi", "endpoint": {"model": "m/a", "provider": "dead"}})
+    )
+    (dead_lt / "2026-06").mkdir()
+    (dead_lt / "2026-06" / "queries.json").write_text(
+        json.dumps([["24 10:00:00", "e0"]])
+    )
+    write_b3it_state(tmp_path, "m/a", "gone", status="retired")
+
+    render_site(tmp_path)
+
+    assert not (tmp_path / "endpoints" / "m2fa23dead.html").exists()
+    assert not (tmp_path / "endpoints" / f"{b3it_slug('m/a', 'gone')}.html").exists()
+
+    overview = json.loads((tmp_path / "data" / "overview.json").read_text())
+    assert {e["slug"] for e in overview["endpoints"]} == {"m2fa23p"}
+    assert overview["stats"]["endpoints"] == 1
+
+    model = json.loads(
+        (tmp_path / "data" / "models" / f"{slugify('m/a')}.json").read_text()
+    )
+    assert [e["provider"] for e in model["endpoints"]] == ["p"]
+    assert model["n_endpoints"] == 1 and model["n_providers"] == 1
+
+
+def test_a_dead_lt_series_does_not_hide_a_live_b3it_one(tmp_path):
+    """The endpoint survives on its B3IT series; only the empty lt badge goes."""
+    _scaffold(tmp_path)
+    slug = b3it_slug("m/a", "half")
+    half = tmp_path / "data" / "lt" / slug / "default"
+    half.mkdir(parents=True)
+    (half / "info.json").write_text(
+        json.dumps({"prompt": "hi", "endpoint": {"model": "m/a", "provider": "half"}})
+    )
+    (half / "2026-06").mkdir()
+    (half / "2026-06" / "queries.json").write_text(json.dumps([["24 10:00:00", "e0"]]))
+    write_b3it_series(
+        tmp_path,
+        "m/a",
+        "half",
+        status="monitoring",
+        retired=None,
+        month="2026-06",
+        tokens=["A"] * 10,
+    )
+
+    render_site(tmp_path)
+
+    assert (tmp_path / "endpoints" / f"{slug}.html").exists()
+    overview = json.loads((tmp_path / "data" / "overview.json").read_text())
+    row = next(e for e in overview["endpoints"] if e["slug"] == slug)
+    assert row["methods"] == ["b3it"]
+
+
+def test_spend_rows_only_link_endpoints_that_have_a_page(tmp_path):
+    """Spend covers every slug we were ever billed for -- discovery probes and
+    endpoints that never produced a series included. Those have no page, so the
+    slug is named but not linked."""
+    _scaffold(tmp_path)
+    for slug in ("m2fa23p", "probe2fonly23q"):
+        d = tmp_path / "data" / "spend" / slug
+        d.mkdir(parents=True)
+        (d / "2026-06.jsonl").write_text(_spend_line("lt", 0.05) + "\n")
+
+    render_site(tmp_path)
+
+    html = (tmp_path / "spend.html").read_text()
+    assert 'href="endpoints/m2fa23p.html"' in html
+    assert "probe2fonly23q" in html
+    assert 'href="endpoints/probe2fonly23q.html"' not in html
+
+
+def test_methodology_links_each_paper_from_its_own_section(tmp_path):
+    """The paper belongs beside the method it describes, not only in Read more."""
+    _scaffold(tmp_path)
+    render_site(tmp_path)
+    page = (tmp_path / "methodology.html").read_text()
+    lt_section, b3it_section, read_more = (
+        page.split("Black-box border input tracking")[0],
+        page.split("Black-box border input tracking")[1].split("Read more")[0],
+        page.split("Read more")[1],
+    )
+    assert "arxiv.org/abs/2512.03816" in lt_section
+    assert "arxiv.org/abs/2602.11083" in b3it_section
+    assert "arxiv.org/abs/2512.03816" in read_more
+    assert "arxiv.org/abs/2602.11083" in read_more

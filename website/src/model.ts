@@ -244,8 +244,11 @@ async function init(): Promise<void> {
     groups
       .map(([base, list]) => {
         const n = total(list);
+        // The banner exists to tie sibling rows to one company. Over a lone row it
+        // says nothing the row's own name doesn't -- `venice/fp8` already reads as
+        // venice -- so it is a band of surface for no information.
         const header =
-          list.length > 1 || base !== list[0].provider
+          list.length > 1
             ? `<div class="grp-h"><a href="../providers/${esc(list[0].providerSlug)}.html">${esc(base)}</a>
                  <span>${plural(list.length, "variant")} · ${plural(n, "change")} · provider page →</span></div>`
             : "";

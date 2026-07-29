@@ -50,7 +50,10 @@
         <tbody>
         {% for ep in spend.by_endpoint %}
           <tr>
-            <td><a href="endpoints/{{ ep.slug }}.html">{{ ep.slug }}</a></td>
+            {# spend covers every slug we were billed for, including discovery probes
+               and endpoints with no series -- neither of which has a page #}
+            <td>{% if ep.slug in tracked %}<a href="endpoints/{{ ep.slug }}.html">{{ ep.slug }}</a>
+              {%- else %}<span class="untracked">{{ ep.slug }}</span>{% endif %}</td>
             {% for g in spend.group_order %}
             <td class="r num">{% if g in ep.groups %}${{ "%.4f"|format(ep.groups[g]) }}{% else %}—{% endif %}</td>
             {% endfor %}
