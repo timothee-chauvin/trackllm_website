@@ -8,10 +8,12 @@ from trackllm_website.generate_site import b3it as b3it_mod
 from trackllm_website.generate_site import changes as changes_mod
 from trackllm_website.generate_site import changes_page as changes_page_mod
 from trackllm_website.generate_site import model as model_mod
+from trackllm_website.generate_site import org as org_mod
 from trackllm_website.generate_site import overview as overview_mod
 from trackllm_website.generate_site import provider as provider_mod
 from trackllm_website.generate_site import spend as spend_mod
 from trackllm_website.generate_site.naming import base_provider
+from trackllm_website.generate_site.tracked import with_observations
 from trackllm_website.util import slugify
 
 from .lt import EndpointInfo, discover_lt_endpoints, load_all_lt_data
@@ -36,21 +38,35 @@ def render_site(website_dir: Path) -> None:
     spend_template = env.get_template("spend.html.j2")
     model_template = env.get_template("model.html.j2")
     provider_template = env.get_template("provider.html.j2")
+    org_template = env.get_template("org.html.j2")
     changes_template = env.get_template("changes.html.j2")
     methodology_template = env.get_template("methodology.html.j2")
 
-    endpoints: list[EndpointInfo] = []
+    discovered: list[EndpointInfo] = []
     for ep in discover_lt_endpoints(data_dir):
-        endpoints.append(ep)
+        discovered.append(ep)
         status = "active" if ep.is_active else f"inactive ({ep.last_query_str})"
         print(f"  {ep.model} @ {ep.provider}: {status}")
-
-    lt_by_slug = {e.slug: e for e in endpoints}
 
     b3it_views = b3it_mod.discover_b3it_views(
         website_dir / "data" / "b3it" / "state",
         website_dir / "data" / "b3it" / "phase_2",
     )
+
+    # Parsed once for the overview, provider and changes-page builders (~400
+    # files); build_model_views is not on it yet, it re-reads each
+    # lt_scores.json itself. Loaded here, ahead of every builder, because the
+    # fleet the site shows is the one that has a series at all (tracked.py).
+    lt_data = load_all_lt_data(data_dir, [e.slug for e in discovered])
+    n_discovered = len({e.slug for e in discovered} | set(b3it_views))
+    lt_by_slug, b3it_views = with_observations(
+        {e.slug: e for e in discovered}, lt_data, b3it_views
+    )
+    endpoints = [e for e in discovered if e.slug in lt_by_slug]
+    n_skipped = n_discovered - len(set(lt_by_slug) | set(b3it_views))
+    if n_skipped:
+        print(f"Skipping {n_skipped} endpoints with nothing to show (no series)")
+
     for slug, view in b3it_views.items():
         out_dir = website_dir / "data" / "b3it" / slug
         out_dir.mkdir(parents=True, exist_ok=True)
@@ -73,10 +89,6 @@ def render_site(website_dir: Path) -> None:
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     spend = spend_mod.aggregate_spend(website_dir / "data" / "spend", today)
     (website_dir / "data" / "spend.json").write_text(json.dumps(spend))
-
-    # Parsed once for the overview, provider and changes-page builders (~400 files).
-    # build_model_views is not on it yet: it re-reads each lt_scores.json itself.
-    lt_data = load_all_lt_data(data_dir, lt_by_slug)
 
     overview = overview_mod.build_overview(website_dir, lt_data, endpoints, b3it_views)
     provider_views = provider_mod.build_provider_views(
@@ -135,12 +147,31 @@ def render_site(website_dir: Path) -> None:
             model_slug=mslug,
             model=view["model"],
             org=view["org"],
+            org_slug=slugify(view["org"]),
             css_path="../style.css",
             body_class="model",
             nav_prefix="../",
         )
         (model_pages_dir / f"{mslug}.html").write_text(model_html)
     print(f"Generated {len(model_views)} model pages in models/")
+
+    org_views = org_mod.build_org_views(model_views)
+    org_pages_dir = website_dir / "orgs"
+    org_pages_dir.mkdir(parents=True, exist_ok=True)
+    for f in org_pages_dir.glob("*.html"):
+        f.unlink()
+
+    for oslug, view in org_views.items():
+        (org_pages_dir / f"{oslug}.html").write_text(
+            org_template.render(
+                org=view["name"],
+                view=view,
+                css_path="../style.css",
+                body_class="org",
+                nav_prefix="../",
+            )
+        )
+    print(f"Generated {len(org_views)} org pages in orgs/")
 
     # slug -> (model_slug, n_endpoints) so endpoint pages can link to their model
     # page with an endpoint count consistent with that model's own page (Task 7).
@@ -161,6 +192,7 @@ def render_site(website_dir: Path) -> None:
 
     spend_html = spend_template.render(
         spend=spend,
+        tracked=set(lt_by_slug) | set(b3it_views),
         css_path="style.css",
         body_class="spend",
     )
@@ -204,6 +236,7 @@ def render_site(website_dir: Path) -> None:
             endpoint=ep,
             model=model,
             org=model.split("/")[0],
+            org_slug=slugify(model.split("/")[0]),
             model_name=model.split("/")[-1],
             provider=provider,
             methods=methods,

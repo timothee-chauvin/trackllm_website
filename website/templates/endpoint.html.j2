@@ -6,14 +6,16 @@
 <div class="wrap">
   <div class="crumb">
     <a href="{{ nav_prefix }}index.html">Home</a><span class="sep">/</span>
-    <a href="{{ nav_prefix }}index.html">{{ org }}</a><span class="sep">/</span>
+    <a href="{{ nav_prefix }}orgs/{{ org_slug }}.html">{{ org }}</a><span class="sep">/</span>
     {% if model_slug %}<a href="{{ nav_prefix }}models/{{ model_slug }}.html">{{ model_name }}</a>{% else %}<span>{{ model_name }}</span>{% endif %}<span class="sep">/</span>
     <span style="color:var(--text-muted)">@ {{ provider }}</span>
   </div>
   <div class="head">
     <div>
-      <h1>{{ model_name }}</h1>
-      <div class="prov">@ {{ provider }} <span style="color:var(--text-dim)">· {{ org }}</span></div>
+      {# every name here is a page: the model, the company serving it, the company that trained it #}
+      <h1>{% if model_slug %}<a href="{{ nav_prefix }}models/{{ model_slug }}.html">{{ model_name }}</a>{% else %}{{ model_name }}{% endif %}</h1>
+      <div class="prov">@ <a href="{{ nav_prefix }}providers/{{ provider_slug }}.html">{{ provider }}</a>
+        <span style="color:var(--text-dim)">· <a href="{{ nav_prefix }}orgs/{{ org_slug }}.html">{{ org }}</a></span></div>
       <div class="badges">{% for m in methods %}<span class="badge {{ m|lower }}">{{ m|lower }}</span>{% endfor %}</div>
     </div>
     <div class="statuscard" id="statuscard"></div>

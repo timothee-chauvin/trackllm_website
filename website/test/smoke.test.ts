@@ -56,8 +56,10 @@ const PAGES: Page[] = [
     mounts: ["lede", "summary", "ratecards", "timeline", "variantBody", "epBody"],
   },
   {
+    // Chosen for its provider mix: one company serving two variants, nine serving
+    // one each -- both shapes the group banner has to tell apart.
     name: "model",
-    html: "models/deepseek2fdeepseek-chat-v3-0324.html",
+    html: "models/qwen2fqwen3-coder.html",
     entry: "../src/model.ts",
     ready: "#cmp .row",
     mounts: ["lede", "summary", "cmp"],
@@ -140,6 +142,24 @@ describe.each(PAGES)("$name page", (page) => {
     }
   });
 
+  // A group banner exists to say "these rows are the same company"; over a lone
+  // row it says nothing and just costs a full-width band of surface-3.
+  test.if(page.name === "model")("banners only over groups of more than one row", () => {
+    const banners = document.querySelectorAll("#cmp .grp-h");
+    expect(
+      banners.length,
+      "no banner at all -- the page above no longer has a multi-variant provider",
+    ).toBeGreaterThan(0);
+    for (const b of banners) {
+      let rows = 0;
+      for (let el = b.nextElementSibling; el; el = el.nextElementSibling) {
+        if (!el.classList.contains("row")) break;
+        rows++;
+      }
+      expect(rows, `${b.textContent?.trim()} banners a single row`).toBeGreaterThan(1);
+    }
+  });
+
   test("fills every mount point", () => {
     for (const id of page.mounts) {
       const el = document.getElementById(id);
@@ -161,10 +181,14 @@ describe.each(PAGES)("$name page", (page) => {
   });
 });
 
+/** Pages the generator renders whole: nothing is fetched, so the only ways they
+ *  can break are a missing file and a dead link. */
+const STATIC_PAGES = ["methodology.html", "orgs/deepseek.html"];
+
 /** The favicon href is depth-relative, so a page nested one level down needs its
  *  own prefix -- exactly the mistake a root-only check would miss. */
 test("the favicon link resolves from every page depth", () => {
-  for (const path of [...PAGES.map((p) => p.html), "methodology.html"]) {
+  for (const path of [...PAGES.map((p) => p.html), ...STATIC_PAGES]) {
     const html = readFileSync(requireBuilt(path), "utf8");
     const href = html.match(/<link rel="icon" href="([^"]+)"/)?.[1];
     expect(href, `${path} has no favicon link`).toBeDefined();
@@ -174,28 +198,32 @@ test("the favicon link resolves from every page depth", () => {
   }
 });
 
-/** The methodology page is static -- no entrypoint, nothing fetched -- so the
- *  only ways it can break are a missing file and a dead link. */
-describe("methodology page", () => {
-  test("is generated and links out to the blog post and both papers", () => {
-    const html = readFileSync(requireBuilt("methodology.html"), "utf8");
-    for (const url of [
-      "tchauvin.com/change-detection-llm-apis",
-      "arxiv.org/abs/2512.03816",
-      "arxiv.org/abs/2602.11083",
-    ]) {
-      expect(html, `${url} is not linked`).toContain(url);
-    }
-  });
-
+describe.each(STATIC_PAGES)("%s", (path) => {
   test("every internal link resolves to a generated file", () => {
-    document.documentElement.innerHTML = readFileSync(
-      requireBuilt("methodology.html"),
-      "utf8",
-    );
-    const missing = deadLinks(document, ".");
+    document.documentElement.innerHTML = readFileSync(requireBuilt(path), "utf8");
+    const missing = deadLinks(document, dirname(path));
     expect(missing, `dead links: ${missing.slice(0, 5).join(", ")}`).toHaveLength(0);
   });
+});
+
+test("the methodology page links out to the blog post and both papers", () => {
+  const html = readFileSync(requireBuilt("methodology.html"), "utf8");
+  for (const url of [
+    "tchauvin.com/change-detection-llm-apis",
+    "arxiv.org/abs/2512.03816",
+    "arxiv.org/abs/2602.11083",
+  ]) {
+    expect(html, `${url} is not linked`).toContain(url);
+  }
+});
+
+test("the org page lists models and links each one", () => {
+  document.documentElement.innerHTML = readFileSync(
+    requireBuilt("orgs/deepseek.html"),
+    "utf8",
+  );
+  const links = document.querySelectorAll('#modelBody a[href^="../models/"]');
+  expect(links.length, "no model rows on the org page").toBeGreaterThan(1);
 });
 
 /** The other half of the same bug, and the half no DOM assertion can see: happy-dom
@@ -207,4 +235,15 @@ test("the change feed is not a scroll container", () => {
   const rule = css.match(/^\.feed \{[^}]*\}/m)?.[0];
   expect(rule, ".feed rule not found in style.css").toBeDefined();
   expect(rule!).not.toContain("overflow");
+});
+
+/** Same blind spot, same remedy: the footer was full-bleed while every page above
+ *  it sits in a var(--maxw) column, so on the narrow methodology page it ran far
+ *  past the text on both sides. Nothing in a layout-less DOM can see that. */
+test("the footer is constrained to the content column", () => {
+  const css = readFileSync(join(SITE, "style.css"), "utf8");
+  const rule = css.match(/^footer\.site \{[^}]*\}/m)?.[0];
+  expect(rule, "footer.site rule not found in style.css").toBeDefined();
+  expect(rule!, "footer runs full-bleed").toContain("max-width: var(--maxw)");
+  expect(rule!, "footer is not centred in the column").toContain("auto");
 });
