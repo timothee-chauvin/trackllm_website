@@ -41,5 +41,7 @@ def last_phase2_query(results: Results) -> str | None:
     if not batch_keys:
         return None
     last_batch = max(batch_keys, key=as_utc)
-    samples = [ts for batches in results.values() for ts, _ in batches.get(last_batch, [])]
+    samples = [
+        ts for batches in results.values() for ts, _ in batches.get(last_batch, [])
+    ]
     return latest([last_batch, *samples])
