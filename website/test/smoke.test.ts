@@ -110,11 +110,14 @@ async function waitFor(selector: string, timeoutMs = 10_000): Promise<void> {
 
 beforeAll(() => {
   GlobalRegistrator.register();
-  // happy-dom ships no Web Animations API. The Overview animates the hero
-  // trace's stroke, and an unhandled TypeError there aborts init() before
-  // anything renders -- a gap in the environment, not in the page.
-  const proto = globalThis.Element.prototype as unknown as Record<string, unknown>;
-  proto.animate ??= () => ({ finished: Promise.resolve(), cancel: () => {} });
+  // happy-dom ships neither the Web Animations API nor ResizeObserver. Nothing on
+  // the Overview animates any more, so only the observer needs a stand-in -- and
+  // leaving `animate` undefined is what keeps the hero from growing one back.
+  globalThis.ResizeObserver ??= class {
+    observe(): void {}
+    unobserve(): void {}
+    disconnect(): void {}
+  } as unknown as typeof ResizeObserver;
 });
 afterAll(() => GlobalRegistrator.unregister());
 
@@ -158,6 +161,24 @@ describe.each(PAGES)("$name page", (page) => {
       }
       expect(rows, `${b.textContent?.trim()} banners a single row`).toBeGreaterThan(1);
     }
+  });
+
+  /** The hero curve is one real endpoint's series around one real changepoint. It
+   *  shipped once as six unrelated traces concatenated and autoscaled, which drew a
+   *  flat line pinned to the bottom edge with a few spikes -- and said so nowhere. */
+  test.if(page.name === "overview")("draws the hero from one named endpoint", () => {
+    const line = document.querySelector("#heroTrace path:last-of-type");
+    expect(line, "no hero curve rendered").not.toBeNull();
+    const xs = [...line!.getAttribute("d")!.matchAll(/[ML]([\d.]+) /g)].map((m) => +m[1]);
+    expect(Math.min(...xs), "curve starts short of the left edge").toBe(0);
+    expect(Math.max(...xs), "curve stops short of the right edge").toBe(1200);
+
+    // hovering has to say whose data this is: the endpoint, the method, the date
+    const href = document.querySelector(".hero-hit")?.getAttribute("href");
+    expect(href, "the curve is not attributed to an endpoint").toMatch(/^endpoints\/.+\.html$/);
+    const tip = document.getElementById("heroTip")!.textContent ?? "";
+    expect(tip, "the hover card names no endpoint").toMatch(/\S+\s*@\s*\S+/);
+    expect(tip, "the hover card gives no change date").toMatch(/\d{4}-\d{2}-\d{2}/);
   });
 
   test("fills every mount point", () => {

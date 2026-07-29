@@ -1,6 +1,6 @@
 import logging
 import os
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from typing import Literal
 
@@ -193,6 +193,20 @@ class ApiConfig(BaseModel):
     openrouter_avoid_free_endpoints: bool
 
 
+class HeroConfig(BaseModel):
+    """The change event the Overview hero draws.
+
+    Pinned rather than auto-selected: the hero is the site's first claim, so the
+    curve is one vetted endpoint over one vetted window, not whatever this build
+    happened to score highest.
+    """
+
+    slug: str
+    method: Literal["lt", "b3it"]
+    start: date
+    end: date
+
+
 class PlottingConfig(BaseModel):
     template: str
     font_family: str
@@ -219,6 +233,7 @@ class Config(BaseSettings):
     data_dir: Path
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
     plotting: PlottingConfig
+    hero: HeroConfig
 
     # read from endpoints_....yaml
     endpoints_lt: list[Endpoint] = []

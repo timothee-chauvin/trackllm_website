@@ -11,6 +11,7 @@ from collections import Counter
 from datetime import datetime
 from pathlib import Path
 
+from trackllm_website.config import HeroConfig
 from trackllm_website.generate_site.b3it import B3ITView
 from trackllm_website.generate_site.feed import (
     TRACE_LEN,
@@ -18,6 +19,7 @@ from trackllm_website.generate_site.feed import (
     downsample_trace,
 )
 from trackllm_website.generate_site.freshness import latest
+from trackllm_website.generate_site.hero import build_hero
 from trackllm_website.generate_site.lt import EndpointInfo, LTData, latest_date
 from trackllm_website.generate_site.naming import base_provider
 from trackllm_website.util import slugify
@@ -70,6 +72,7 @@ def build_overview(
     lt_data: dict[str, LTData],
     lt_endpoints: list[EndpointInfo],
     b3it_views: dict[str, B3ITView],
+    hero_pin: HeroConfig | None,
 ) -> dict:
     data_dir = website_dir / "data"
 
@@ -150,6 +153,13 @@ def build_overview(
     lt_items = [i for i in all_items if i["method"] == "lt"][:FEED_LT_SIZE]
     b3it_items = [i for i in all_items if i["method"] == "b3it"][:FEED_B3IT_SIZE]
     feed = sorted(lt_items + b3it_items, key=lambda i: i["iso"], reverse=True)
+    # None only where a caller has no hero to draw (fixtures); the site build always
+    # passes config.hero, and a pin that cannot resolve raises rather than blanking.
+    hero = (
+        build_hero(changes, drift_by_slug, b3it_views, now, hero_pin)
+        if now and hero_pin
+        else None
+    )
 
     spend_path = data_dir / "spend.json"
     spend = json.loads(spend_path.read_text()) if spend_path.exists() else {}
@@ -212,6 +222,7 @@ def build_overview(
 
     return {
         "stats": stats,
+        "hero": hero,
         "feed": feed,
         "endpoints": endpoint_recs,
     }

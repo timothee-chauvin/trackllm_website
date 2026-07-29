@@ -4,6 +4,7 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
+from trackllm_website.config import HeroConfig
 from trackllm_website.generate_site import b3it as b3it_mod
 from trackllm_website.generate_site import changes as changes_mod
 from trackllm_website.generate_site import changes_page as changes_page_mod
@@ -19,8 +20,13 @@ from trackllm_website.util import slugify
 from .lt import EndpointInfo, discover_lt_endpoints, load_all_lt_data
 
 
-def render_site(website_dir: Path) -> None:
-    """Generate the static site."""
+def render_site(website_dir: Path, hero_pin: HeroConfig | None) -> None:
+    """Generate the static site.
+
+    `hero_pin` is threaded in rather than read from config so a synthetic site can
+    be rendered without the pinned endpoint's data; the real build always passes
+    `config.hero`, and a pin that cannot resolve raises.
+    """
     data_dir = website_dir / "data" / "lt"
     endpoints_dir = website_dir / "endpoints"
     templates_dir = website_dir / "templates"
@@ -90,7 +96,9 @@ def render_site(website_dir: Path) -> None:
     spend = spend_mod.aggregate_spend(website_dir / "data" / "spend", today)
     (website_dir / "data" / "spend.json").write_text(json.dumps(spend))
 
-    overview = overview_mod.build_overview(website_dir, lt_data, endpoints, b3it_views)
+    overview = overview_mod.build_overview(
+        website_dir, lt_data, endpoints, b3it_views, hero_pin
+    )
     provider_views = provider_mod.build_provider_views(
         website_dir, lt_data, endpoints, b3it_views, overview["endpoints"]
     )

@@ -86,6 +86,14 @@ max_concurrent_endpoints = 20
 [bi.popularity]
 top_n = 5
 
+# The Overview hero curve: deepseek-chat-v3-0324 @ crusoe/fp8, 43 days either side
+# of its 2026-01-11 changepoint (99 sigma). Vetted by eye; see generate_site/hero.py.
+[hero]
+slug = "deepseek2fdeepseek-chat-v3-032423crusoe2ffp8"
+method = "lt"
+start = 2025-11-29
+end = 2026-02-23
+
 [plotting]
 template = "plotly_white"
 font_family = "Spectral"

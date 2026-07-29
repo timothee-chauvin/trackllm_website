@@ -198,7 +198,7 @@ def fake_site_feed_agreement(tmp_path):
     views = discover_b3it_views(
         root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
     )
-    return build_overview(root, lt_data, lt_endpoints, views), changes
+    return build_overview(root, lt_data, lt_endpoints, views, None), changes
 
 
 def test_overview_feed_entries_come_from_changes_json(fake_site_feed_agreement):
