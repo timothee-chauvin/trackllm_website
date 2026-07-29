@@ -1,0 +1,62 @@
+{% extends "base.html.j2" %}
+
+{% block title %}{{ org }} | TrackLLM{% endblock %}
+
+{% macro s(n) %}{{ "s" if n != 1 else "" }}{% endmacro %}
+
+{% block content %}
+<div class="wrap">
+  <div class="crumb">
+    <a href="{{ nav_prefix }}index.html">Home</a><span class="sep">/</span>
+    <span style="color:var(--text-muted)">{{ org }}</span>
+  </div>
+  <div class="head">
+    <div>
+      <div class="eyebrow">Organization</div>
+      <h1>{{ org }}</h1>
+      <p class="lede">{{ view.n_models }} model{{ s(view.n_models) }} tracked on {{ view.n_endpoints }} endpoint{{ s(view.n_endpoints) }}
+        across {{ view.n_providers }} provider{{ s(view.n_providers) }}.
+        <span class="hl">{{ view.n_changed }}</span> of {{ "it" if view.n_models == 1 else "them" }}
+        {{ "shows" if view.n_changed == 1 else "show" }} at least one detected change &mdash;
+        the model version is nominally fixed, so the movement is in how it is served.</p>
+      <div class="summary">
+        <div class="s"><div class="v">{{ view.n_models }}</div><div class="k">Models</div></div>
+        <div class="s"><div class="v">{{ view.n_endpoints }}</div><div class="k">Endpoints</div></div>
+        <div class="s"><div class="v" style="color:var(--changed)">{{ view.n_changes }}</div><div class="k">Changes total</div></div>
+        <div class="s"><div class="v">{{ view.n_providers }}</div><div class="k">Providers</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <section class="block">
+    <div class="sec-head">
+      <h2>Models</h2>
+      <span class="hint">most-changed first &mdash; a model is one page, where every provider serving it is compared on one timeline</span>
+    </div>
+    <div class="table-wrap"><table class="dir">
+      <thead><tr>
+        <th>Model</th>
+        <th class="r">Endpoints</th>
+        <th class="r col-hide">Providers</th>
+        <th class="r">Changes</th>
+        <th class="r col-hide">Endpoints changed</th>
+        <th class="r col-hide">Last change</th>
+      </tr></thead>
+      <tbody id="modelBody">
+      {% for m in view.models %}
+        <tr>
+          <td><a class="model-cell" href="{{ nav_prefix }}models/{{ m.slug }}.html">{{ m.name }}</a></td>
+          <td class="r"><span class="cc">{{ m.n_endpoints }}</span></td>
+          <td class="r col-hide"><span class="cc">{{ m.n_providers }}</span></td>
+          <td class="r"><span class="cc {{ "some" if m.n_changes else "zero" }}">{{ m.n_changes or "—" }}</span></td>
+          <td class="r col-hide"><span class="cc {{ "some" if m.n_changed else "zero" }}">{{ m.n_changed }}/{{ m.n_endpoints }}</span></td>
+          <td class="r col-hide"><span class="cc {{ "" if m.last_change else "zero" }}">{{ m.last_change or "—" }}</span></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table><div class="dir-foot">{{ view.n_models }} model{{ s(view.n_models) }}{% if view.first %} · monitored since {{ view.first }}{% endif %}</div></div>
+  </section>
+</main>
+{% endblock %}

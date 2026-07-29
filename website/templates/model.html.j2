@@ -6,12 +6,12 @@
 <div class="wrap">
   <div class="crumb">
     <a href="{{ nav_prefix }}index.html">Home</a><span class="sep">/</span>
-    <a href="{{ nav_prefix }}index.html">{{ org }}</a><span class="sep">/</span>
+    <a href="{{ nav_prefix }}orgs/{{ org_slug }}.html">{{ org }}</a><span class="sep">/</span>
     <span style="color:var(--text-muted)">{{ model.split("/")[-1] }}</span>
   </div>
   <div class="head">
     <div>
-      <h1>{{ model.split("/")[-1] }} <span class="org">· {{ org }}</span></h1>
+      <h1>{{ model.split("/")[-1] }} <span class="org">· <a href="{{ nav_prefix }}orgs/{{ org_slug }}.html">{{ org }}</a></span></h1>
       <p class="lede" id="lede"></p>
       <div class="summary" id="summary"></div>
     </div>

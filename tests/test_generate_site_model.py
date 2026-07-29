@@ -243,6 +243,9 @@ def test_change_count_follows_changes_json_not_the_recomputed_scores(tmp_path):
 
 
 def test_endpoint_with_no_lt_scores_file_yields_null_lt(tmp_path):
+    """The shape build_model_views produces for a seriesless endpoint. render.py
+    never hands it one -- tracked.with_observations drops them from the fleet
+    first -- so this pins the fallback, not something the site renders."""
     root = tmp_path / "website"
     d = root / "data" / "lt" / "m2fa23p1" / "default"
     d.mkdir(parents=True)
