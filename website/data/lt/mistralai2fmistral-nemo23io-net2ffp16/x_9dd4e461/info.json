@@ -1,0 +1,17 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "mistralai/mistral-nemo",
+    "provider": "io-net/fp16",
+    "cost": [
+      0.035,
+      0.13
+    ],
+    "max_logprobs": null,
+    "cost_per_request": null,
+    "created": null,
+    "last_seen": null,
+    "supports_temperature": null
+  }
+}
