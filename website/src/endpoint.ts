@@ -62,8 +62,9 @@ interface FocusB3IT {
 
 type Status = "stable" | "changed" | "retired";
 
-// downsampling/windowing constants mirror generate_site/model.py so the endpoint
-// page and the model page read the same drift level for the same changepoint.
+// downsampling/windowing constants mirror generate_site/model.py and peaks.py so
+// the endpoint page and the model page read the same drift level for the same
+// changepoint.
 const TRACE_LEN = 110;
 const LT_PEAK_WINDOW = 20;
 const B3IT_PEAK_WINDOW = 8;
@@ -87,12 +88,10 @@ function downsamplePairs(pairs: [string, number][], n: number): [string, number]
 }
 
 // first point on/after `day`, max over the next `window` points -- same rule as
-// generate_site/model.py's _peak_from, so drift levels agree across pages.
+// generate_site/peaks.py's peak_from, so drift levels agree across pages.
 function peakFrom(day: string, pairs: [string, number][], window: number): number | null {
   const onOrAfter = pairs.filter(([d]) => d >= day).slice(0, window);
-  if (onOrAfter.length) return Math.max(...onOrAfter.map(([, v]) => v));
-  const sameDay = pairs.filter(([d]) => d === day);
-  return sameDay.length ? sameDay[sameDay.length - 1][1] : null;
+  return onOrAfter.length ? Math.max(...onOrAfter.map(([, v]) => v)) : null;
 }
 
 function sigmaDisplay(sigma: number | null): string {
