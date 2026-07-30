@@ -11,6 +11,7 @@ import {
   monthLabel,
   plural,
   prettyDate,
+  showLoadError,
 } from "./components";
 
 interface ChangeStats {
@@ -54,9 +55,15 @@ const BARS_H = 131;
 const RECENT_DAYS = 90;
 
 async function init(): Promise<void> {
-  const res = await fetch("data/changes_page.json").catch(() => null);
-  const D: ChangesData | null = res && res.ok ? await res.json() : null;
-  if (!D) return;
+  let D: ChangesData;
+  try {
+    const res = await fetch("data/changes_page.json");
+    if (!res.ok) throw new Error(`changes_page.json: HTTP ${res.status}`);
+    D = await res.json();
+  } catch (err) {
+    showLoadError("lede", "the change log");
+    throw err;
+  }
   const S = D.stats;
 
   const ledeEl = document.getElementById("lede");

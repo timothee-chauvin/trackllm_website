@@ -1,7 +1,13 @@
 import json
 from pathlib import Path
 
-from conftest import b3it_slug, write_b3it_series, write_b3it_state, write_lt_endpoint
+from conftest import (
+    b3it_slug,
+    write_b3it_series,
+    write_b3it_state,
+    write_lt_endpoint,
+    write_month_dir,
+)
 from trackllm_website.generate_site.b3it import discover_b3it_views
 from trackllm_website.generate_site.lt import discover_lt_endpoints, load_all_lt_data
 from trackllm_website.generate_site.tracked import with_observations
@@ -17,9 +23,7 @@ def write_lt_endpoint_without_scores(root: Path, slug: str, model: str, provider
     (d / "info.json").write_text(
         json.dumps({"prompt": "hi", "endpoint": {"model": model, "provider": provider}})
     )
-    md = d / "2026-06"
-    md.mkdir()
-    (md / "queries.json").write_text(json.dumps([["24 10:00:00", "e0"]]))
+    write_month_dir(d, "2026-06", [["24 10:00:00", "e0"]])
 
 
 def _fleets(root: Path):

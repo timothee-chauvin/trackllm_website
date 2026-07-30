@@ -66,6 +66,27 @@ def b3it_slug(model: str, provider: str) -> str:
     return slugify(f"{model}#{provider}")
 
 
+def write_month_dir(prompt_dir: Path, month: str, queries: list) -> None:
+    """A production-shaped month dir. serialize always writes all three files, so
+    load_existing treats a partial set as a crashed write and raises; fixtures must
+    not hand-write bare queries.json. Includes one logprob vector and one error so
+    queries may reference index 0 or "e0"."""
+    md = prompt_dir / month
+    md.mkdir(parents=True, exist_ok=True)
+    (md / "logprobs.json").write_text(
+        json.dumps(
+            {
+                "seen_tokens": ["A"],
+                "seen_logprobs": [{"tokens": [0], "logprobs": [-0.1]}],
+            }
+        )
+    )
+    (md / "errors.json").write_text(
+        json.dumps({"seen_errors": [{"http_code": 500, "message": "err"}]})
+    )
+    (md / "queries.json").write_text(json.dumps(queries))
+
+
 def write_lt_endpoint(
     root: Path, slug: str, model: str, provider: str, *, dates, changes, drift
 ):
@@ -77,9 +98,7 @@ def write_lt_endpoint(
     )
     month = dates[-1][:7]
     day = dates[-1][8:10]
-    month_dir = prompt_dir / month
-    month_dir.mkdir()
-    (month_dir / "queries.json").write_text(json.dumps([[f"{day} 00:00:00", 0]]))
+    write_month_dir(prompt_dir, month, [[f"{day} 00:00:00", 0]])
     (d / "lt_scores.json").write_text(
         json.dumps(
             {

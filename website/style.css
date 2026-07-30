@@ -343,6 +343,7 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 .untracked { color: var(--text-dim); }
 
 .empty { padding: 2rem 1.1rem; text-align: center; color: var(--text-dim); font-size: 0.86rem; }
+.empty.load-error { color: var(--alert); background: var(--alert-bg); border-radius: var(--radius); }
 
 /* drift rate bar: filled bar = point estimate, faint band = 95% Poisson interval */
 .rbar { position: relative; height: 22px; background: var(--surface-2); border-radius: 5px; }

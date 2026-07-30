@@ -43,6 +43,7 @@ class OpenRouterClient:
         """Fetch actual cost from OpenRouter generation endpoint."""
         should_close = session is None
         session = session or aiohttp.ClientSession()
+        last_failure: str | None = None
         try:
             for delay in (5, 10, 20, 40):
                 await asyncio.sleep(delay)
@@ -56,13 +57,22 @@ class OpenRouterClient:
                         timeout=aiohttp.ClientTimeout(total=10),
                     ) as resp:
                         if not resp.ok:
+                            last_failure = f"HTTP {resp.status}"
                             continue
                         data = await resp.json()
                         cost = data.get("data", {}).get("total_cost")
                         if cost is not None:
                             return cost
-                except Exception:
-                    continue
+                        last_failure = f"no total_cost in payload: {str(data)[:200]}"
+                except Exception as e:
+                    last_failure = repr(e)
+            # A None return stalls callers (vetting retries forever), so the reason
+            # must leave a trace: a systematic failure looks identical to a
+            # transient one without it.
+            logger.warning(
+                f"get_generation_cost({generation_id}): giving up after retries; "
+                f"last failure: {last_failure}"
+            )
             return None
         finally:
             if should_close:
@@ -229,9 +239,15 @@ class OpenRouterClient:
             if isinstance(e, aiohttp.ClientResponseError):
                 http_code, message_json = e.status, e.message
                 try:
-                    message = orjson.dumps(
-                        orjson.loads(message_json.encode()).get("error", e)
-                    ).decode()
+                    body = orjson.loads(message_json.encode())
+                    if isinstance(body, dict):
+                        message = orjson.dumps(body.get("error", e)).decode()
+                    elif isinstance(body, str):
+                        message = body
+                    else:
+                        # Valid JSON but not a dict (e.g. null, a list): the raw
+                        # body is the best error message we have.
+                        message = message_json
                 # For some reason, orjson.JSONDecodeError | orjson.JSONEncodeError fails with:
                 # "catching classes that do not inherit from BaseException is not allowed"
                 except (orjson.JSONDecodeError, orjson.JSONEncodeError):

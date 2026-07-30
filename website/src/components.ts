@@ -101,6 +101,15 @@ export function highlight(text: string, q: string): string {
   );
 }
 
+/** Render an explicit "failed to load" card into `mountId`. A fetch failure must
+ *  read as a failure — never as a blank page or, worse, a "no data" claim. */
+export function showLoadError(mountId: string, what: string): void {
+  const el = document.getElementById(mountId);
+  if (!el) return;
+  el.innerHTML = `<div class="empty load-error">Failed to load ${esc(what)}.
+    This is a loading error, not an absence of data — try reloading the page.</div>`;
+}
+
 /** Headline status badge; must stay in sync with the Jinja macro (_macros.html.j2). */
 export function headlineBadge(headline: string): string {
   return `<span class="badge st st-${headline.replace(/_/g, "-")}">${esc(headline.replace(/_/g, " "))}</span>`;

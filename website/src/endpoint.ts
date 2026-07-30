@@ -3,12 +3,11 @@
 // when type-checked together as one tsc program.
 export {};
 
+import { showLoadError } from "./components";
 import { readingCaption } from "./caption";
 import { DAY_MS, MONTH_NAMES, monthTicks, td } from "./components";
 
 interface ManifestData {
-  model: string;
-  provider: string;
   slug: string;
 }
 
@@ -105,13 +104,13 @@ const fmtDrift = (v: number | null): string => (v === null ? "—" : `${v} nats`
 const fmtTV = (v: number | null): string => (v === null ? "TV —" : `TV ${v}`);
 
 async function fetchJSON<T>(url: string): Promise<T | null> {
-  try {
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    return (await res.json()) as T;
-  } catch {
-    return null;
-  }
+  const res = await fetch(url);
+  // 404 is a real state -- the file is absent because that method never ran for
+  // this endpoint. Any other failure must throw rather than masquerade as
+  // "not monitored".
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
+  return (await res.json()) as T;
 }
 
 // Read drift straight from lt_scores.json's own drift/drift_dates -- this is
@@ -326,10 +325,16 @@ async function init(): Promise<void> {
   }
   const manifest: ManifestData = JSON.parse(manifestEl.textContent || "{}");
 
-  const [scores, b3itData] = await Promise.all([
-    fetchJSON<LTScoresData>(`../data/lt/${manifest.slug}/lt_scores.json`),
-    fetchJSON<B3ITData>(`../data/b3it/${manifest.slug}/b3it.json`),
-  ]);
+  let scores: LTScoresData | null, b3itData: B3ITData | null;
+  try {
+    [scores, b3itData] = await Promise.all([
+      fetchJSON<LTScoresData>(`../data/lt/${manifest.slug}/lt_scores.json`),
+      fetchJSON<B3ITData>(`../data/b3it/${manifest.slug}/b3it.json`),
+    ]);
+  } catch (err) {
+    showLoadError("mainchart", "this endpoint's monitoring data");
+    throw err;
+  }
 
   const lt = buildLT(scores);
   const b3it = buildB3IT(b3itData);
