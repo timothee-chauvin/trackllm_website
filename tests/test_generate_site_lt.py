@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+from conftest import write_month_dir
 from trackllm_website.generate_site.lt import discover_lt_endpoints
 
 
@@ -10,9 +11,7 @@ def _make_lt_endpoint(root: Path, slug: str, model: str, provider: str):
     (d / "info.json").write_text(
         json.dumps({"prompt": "hi", "endpoint": {"model": model, "provider": provider}})
     )
-    md = d / "2026-06"
-    md.mkdir()
-    (md / "queries.json").write_text(json.dumps([["24 10:00:00", 0]]))
+    write_month_dir(d, "2026-06", [["24 10:00:00", 0]])
 
 
 def test_discover_lt_endpoints(tmp_path):
