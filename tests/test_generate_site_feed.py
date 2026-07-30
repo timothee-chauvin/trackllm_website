@@ -3,7 +3,12 @@ from datetime import datetime, timezone
 
 import pytest
 
-from conftest import write_b3it_state, write_lt_endpoint
+from conftest import (
+    empty_status_inputs,
+    site_statuses_for,
+    write_b3it_state,
+    write_lt_endpoint,
+)
 from trackllm_website.generate_site.b3it import B3ITView, discover_b3it_views
 from trackllm_website.generate_site.feed import build_feed_items, downsample_trace
 from trackllm_website.generate_site.lt import discover_lt_endpoints, load_all_lt_data
@@ -198,7 +203,8 @@ def fake_site_feed_agreement(tmp_path):
     views = discover_b3it_views(
         root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
     )
-    return build_overview(root, lt_data, lt_endpoints, views, None), changes
+    site = site_statuses_for(root, empty_status_inputs())
+    return build_overview(root, lt_data, lt_endpoints, views, None, site), changes
 
 
 def test_overview_feed_entries_come_from_changes_json(fake_site_feed_agreement):

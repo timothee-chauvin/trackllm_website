@@ -22,6 +22,8 @@ from trackllm_website.generate_site.freshness import latest
 from trackllm_website.generate_site.hero import build_hero
 from trackllm_website.generate_site.lt import EndpointInfo, LTData, latest_date
 from trackllm_website.generate_site.naming import base_provider
+from trackllm_website.generate_site.status import EndpointStatus, one_line_reason
+from trackllm_website.generate_site.status_io import SiteStatuses
 from trackllm_website.util import slugify
 
 RECENT_CHANGE_DAYS = 60
@@ -67,12 +69,41 @@ def _b3it_status_trace(
     return status, trace, stable_days
 
 
+def _status_fields(st: EndpointStatus) -> dict:
+    return {
+        "headline": st.headline,
+        "ltStatus": st.lt,
+        "biStatus": st.bi,
+        "reason": one_line_reason(st),
+    }
+
+
+def _untracked_row(slug: str, site: SiteStatuses) -> dict:
+    """A directory row for an endpoint with no series: a status in place of a trace."""
+    model, provider = site.names[slug]
+    return {
+        "slug": slug,
+        "model": model.split("/")[-1],
+        "modelSlug": slugify(model),
+        "org": model.split("/")[0],
+        "provider": provider,
+        "providerSlug": slugify(base_provider(provider)),
+        "methods": [],
+        "status": None,
+        "stableDays": None,
+        "nChanges": 0,
+        "trace": [],
+        **_status_fields(site.statuses[slug]),
+    }
+
+
 def build_overview(
     website_dir: Path,
     lt_data: dict[str, LTData],
     lt_endpoints: list[EndpointInfo],
     b3it_views: dict[str, B3ITView],
     hero_pin: HeroConfig | None,
+    site: SiteStatuses,
 ) -> dict:
     data_dir = website_dir / "data"
 
@@ -145,6 +176,7 @@ def build_overview(
                 "stableDays": stable_days,
                 "nChanges": changes_by_slug[slug],
                 "trace": trace,
+                **_status_fields(site.statuses[slug]),
             }
         )
 
@@ -220,9 +252,16 @@ def build_overview(
         "last_query_b3it": latest(v.last_query for v in b3it_views.values()),
     }
 
+    # Catalog/previously-tracked endpoints with no series: rows with a status in
+    # place of a trace. The stats above describe the tracked fleet only.
+    untracked_recs = [
+        _untracked_row(slug, site)
+        for slug in sorted(set(site.statuses) - set(all_slugs))
+    ]
+
     return {
         "stats": stats,
         "hero": hero,
         "feed": feed,
-        "endpoints": endpoint_recs,
+        "endpoints": endpoint_recs + untracked_recs,
     }

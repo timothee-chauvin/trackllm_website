@@ -2,7 +2,13 @@ import json
 
 import pytest
 
-from conftest import write_b3it_series, write_lt_endpoint
+from conftest import (
+    catalog_entry,
+    empty_status_inputs,
+    site_statuses_for,
+    write_b3it_series,
+    write_lt_endpoint,
+)
 from trackllm_website.generate_site.b3it import discover_b3it_views
 from trackllm_website.generate_site.lt import discover_lt_endpoints, load_all_lt_data
 from trackllm_website.generate_site.overview import build_overview
@@ -70,15 +76,20 @@ def fake_site(tmp_path):
     return root
 
 
-def _views(root):
+def _views_with(root, inputs):
     lt_dir = root / "data" / "lt"
     lt_endpoints = list(discover_lt_endpoints(lt_dir))
     lt_data = load_all_lt_data(lt_dir, [e.slug for e in lt_endpoints])
     b3it = discover_b3it_views(
         root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
     )
-    rows = build_overview(root, lt_data, lt_endpoints, b3it, None)["endpoints"]
+    site = site_statuses_for(root, inputs)
+    rows = build_overview(root, lt_data, lt_endpoints, b3it, None, site)["endpoints"]
     return build_provider_views(root, lt_data, lt_endpoints, b3it, rows)
+
+
+def _views(root):
+    return _views_with(root, empty_status_inputs())
 
 
 def test_variants_group_under_one_provider(fake_site):
@@ -176,6 +187,22 @@ def test_change_count_equals_the_changes_listed(fake_site):
     for variant in view["variants"]:
         listed = [c for c in lt_items if variant_name(c["provider"]) == variant["name"]]
         assert variant["lt"]["changes"] == len(listed)
+
+
+def test_untracked_catalog_endpoints_join_their_provider_page(fake_site):
+    inputs = empty_status_inputs()
+    inputs.catalog = [
+        catalog_entry("org/new", "p/fp4", supports_logprobs=False),
+        catalog_entry("org/new", "unknown-provider", supports_logprobs=False),
+    ]
+    views = _views_with(fake_site, inputs)
+    view = views["p"]
+    untracked = [e for e in view["endpoints"] if not e["methods"]]
+    assert [e["slug"] for e in untracked] == [slugify("org/new#p/fp4")]
+    assert untracked[0]["headline"]
+    # exposure/rate stats stay tracked-only, and unknown providers get no page
+    assert view["n_endpoints"] == 2
+    assert "unknown-provider" not in views
 
 
 def test_change_count_follows_changes_json_not_the_recomputed_scores(fake_site):

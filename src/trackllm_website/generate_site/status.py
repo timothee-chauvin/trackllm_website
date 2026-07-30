@@ -13,6 +13,7 @@ BI-too-expensive), and one derived headline summarises the endpoint. All
 user-facing status text lives in STATUS_COPY; templates never invent wording.
 """
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -52,6 +53,17 @@ ERRORS_OUT = frozenset({"liar", "probe_failed", "retired:unreachable"})
 # retired headline would otherwise shadow errors_out entirely.
 _RETIRED_HEADLINE = frozenset({"retired:no_bis", "retired:delisted", "retired:stalled"})
 
+HEADLINE_ORDER = [
+    "tracked",
+    "retired",
+    "untrackable",
+    "too_expensive",
+    "not_selected",
+    "errors_out",
+    "pending",
+    "free_excluded",
+]
+
 
 class CatalogEntry(BaseModel):
     """One endpoints_catalog.yaml entry, as parsed by the caller."""
@@ -72,6 +84,16 @@ class CatalogEntry(BaseModel):
         return Endpoint(
             api="openrouter", model=self.model, provider=self.provider, cost=self.cost
         )
+
+    def as_meta(self) -> dict:
+        """Catalog metadata an untracked endpoint page shows instead of a chart."""
+        return {
+            "cost": list(self.cost),
+            "created": self.created.isoformat() if self.created else None,
+            "supports_temperature": self.supports_temperature,
+            "supports_logprobs": self.supports_logprobs,
+            "free": self.free,
+        }
 
 
 @dataclass
@@ -107,6 +129,54 @@ def headline_for(lt: str, bi: str) -> str:
     if "free_excluded" in (lt, bi):
         return "free_excluded"
     return "pending"
+
+
+def dominant_headline(headlines: Iterable[str]) -> str:
+    """The strongest headline in the chain's priority order (a model-level badge)."""
+    return min(headlines, key=HEADLINE_ORDER.index)
+
+
+def _headline_of(status: str) -> str | None:
+    """What this one method status alone contributes to the headline; None for
+    statuses (no_logprobs, bad_temperature) that only matter jointly."""
+    if status in ("tracked", "monitoring"):
+        return "tracked"
+    if status == "stalled" or status in _RETIRED_HEADLINE:
+        return "retired"
+    if status == "too_expensive":
+        return "too_expensive"
+    if status in ("not_selected", "excluded"):
+        return "not_selected"
+    if status in ERRORS_OUT:
+        return "errors_out"
+    if status in ("pending", "free_excluded"):
+        return status
+    return None
+
+
+def one_line_reason(st: EndpointStatus) -> str:
+    """The fleet row's single line: the copy of the method status that drove the
+    headline (with its recorded detail), or the headline's own copy when the
+    headline is a joint conclusion (untrackable)."""
+    for status, detail in ((st.lt, st.lt_detail), (st.bi, st.bi_detail)):
+        if _headline_of(status) == st.headline:
+            copy = STATUS_COPY[status]
+            return f"{copy.rstrip('.')} ({detail})." if detail else copy
+    return STATUS_COPY[st.headline]
+
+
+def status_json(st: EndpointStatus) -> dict:
+    """The status object every page JSON carries; templates only echo it."""
+    return {
+        "lt": st.lt,
+        "bi": st.bi,
+        "headline": st.headline,
+        "ltCopy": STATUS_COPY[st.lt],
+        "biCopy": STATUS_COPY[st.bi],
+        "ltDetail": st.lt_detail,
+        "biDetail": st.bi_detail,
+        "reason": one_line_reason(st),
+    }
 
 
 def _slug(model: str, provider: str) -> str:

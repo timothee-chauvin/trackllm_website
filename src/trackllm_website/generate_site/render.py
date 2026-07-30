@@ -4,6 +4,7 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
+from trackllm_website.bi.state import load_all_states
 from trackllm_website.config import HeroConfig
 from trackllm_website.generate_site import b3it as b3it_mod
 from trackllm_website.generate_site import changes as changes_mod
@@ -14,18 +15,27 @@ from trackllm_website.generate_site import overview as overview_mod
 from trackllm_website.generate_site import provider as provider_mod
 from trackllm_website.generate_site import spend as spend_mod
 from trackllm_website.generate_site.naming import base_provider
+from trackllm_website.generate_site.status import status_json
+from trackllm_website.generate_site.status_io import (
+    StatusInputs,
+    lt_stalled_slugs,
+    resolve_site_statuses,
+)
 from trackllm_website.generate_site.tracked import with_observations
 from trackllm_website.util import slugify
 
 from .lt import EndpointInfo, discover_lt_endpoints, load_all_lt_data
 
 
-def render_site(website_dir: Path, hero_pin: HeroConfig | None) -> None:
+def render_site(
+    website_dir: Path, hero_pin: HeroConfig | None, status_inputs: StatusInputs
+) -> None:
     """Generate the static site.
 
-    `hero_pin` is threaded in rather than read from config so a synthetic site can
-    be rendered without the pinned endpoint's data; the real build always passes
-    `config.hero`, and a pin that cannot resolve raises.
+    `hero_pin` and `status_inputs` are threaded in rather than read from
+    config/committed files so a synthetic site can be rendered without them; the
+    real build passes `config.hero` and `load_status_inputs()`, and a pin that
+    cannot resolve raises.
     """
     data_dir = website_dir / "data" / "lt"
     endpoints_dir = website_dir / "endpoints"
@@ -73,6 +83,12 @@ def render_site(website_dir: Path, hero_pin: HeroConfig | None) -> None:
     if n_skipped:
         print(f"Skipping {n_skipped} endpoints with nothing to show (no series)")
 
+    # Every catalog / previously-tracked endpoint gets a status (status.py); the
+    # series-bearing fleet above additionally gets charts (tracked.py).
+    bi_states = load_all_states(website_dir / "data" / "b3it" / "state")
+    lt_stalled = lt_stalled_slugs(data_dir, status_inputs.endpoints_lt, set(lt_by_slug))
+    site = resolve_site_statuses(status_inputs, lt_by_slug, lt_stalled, bi_states)
+
     for slug, view in b3it_views.items():
         out_dir = website_dir / "data" / "b3it" / slug
         out_dir.mkdir(parents=True, exist_ok=True)
@@ -97,7 +113,7 @@ def render_site(website_dir: Path, hero_pin: HeroConfig | None) -> None:
     (website_dir / "data" / "spend.json").write_text(json.dumps(spend))
 
     overview = overview_mod.build_overview(
-        website_dir, lt_data, endpoints, b3it_views, hero_pin
+        website_dir, lt_data, endpoints, b3it_views, hero_pin, site
     )
     provider_views = provider_mod.build_provider_views(
         website_dir, lt_data, endpoints, b3it_views, overview["endpoints"]
@@ -141,7 +157,7 @@ def render_site(website_dir: Path, hero_pin: HeroConfig | None) -> None:
 
     models_dir = website_dir / "data" / "models"
     models_dir.mkdir(parents=True, exist_ok=True)
-    model_views = model_mod.build_model_views(website_dir, endpoints, b3it_views)
+    model_views = model_mod.build_model_views(website_dir, endpoints, b3it_views, site)
     for mslug, view in model_views.items():
         (models_dir / f"{mslug}.json").write_text(json.dumps(view))
 
@@ -210,7 +226,9 @@ def render_site(website_dir: Path, hero_pin: HeroConfig | None) -> None:
     for f in endpoints_dir.glob("*.html"):
         f.unlink()
 
-    for slug in sorted(set(lt_by_slug) | set(b3it_views)):
+    # One page per status universe entry: tracked ones with their series, the
+    # rest with the status + catalog metadata explaining why there is no chart.
+    for slug in sorted(site.statuses):
         methods: list[str] = []
         if slug in lt_by_slug:
             ep = lt_by_slug[slug]
@@ -226,7 +244,7 @@ def render_site(website_dir: Path, hero_pin: HeroConfig | None) -> None:
                 ],
             }
             methods.append("LT")
-        else:
+        elif slug in b3it_views:
             ep = None
             view = b3it_views[slug]
             model = view.model
@@ -237,8 +255,21 @@ def render_site(website_dir: Path, hero_pin: HeroConfig | None) -> None:
                 "slug": slug,
                 "prompts": [],
             }
+        else:
+            ep = None
+            model, provider = site.names[slug]
+            manifest = {
+                "model": model,
+                "provider": provider,
+                "slug": slug,
+                "prompts": [],
+            }
         if slug in b3it_views:
             methods.append("B3IT")
+
+        entry = site.entries.get(slug)
+        manifest["status"] = status_json(site.statuses[slug])
+        manifest["meta"] = entry.as_meta() if entry else None
 
         endpoint_html = endpoint_template.render(
             endpoint=ep,
@@ -259,6 +290,5 @@ def render_site(website_dir: Path, hero_pin: HeroConfig | None) -> None:
         )
         (endpoints_dir / f"{slug}.html").write_text(endpoint_html)
 
-    total = len(set(lt_by_slug) | set(b3it_views))
-    print(f"Generated {total} endpoint pages in endpoints/")
+    print(f"Generated {len(site.statuses)} endpoint pages in endpoints/")
     print(f"\nSite generated in {website_dir}/")

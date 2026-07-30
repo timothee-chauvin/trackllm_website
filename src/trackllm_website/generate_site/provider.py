@@ -190,6 +190,13 @@ def build_provider_views(
                 key=lambda r: (-r["nChanges"], r["model"]),
             ),
         }
+
+    # Untracked catalog endpoints join their provider's table after the tracked
+    # ones (headline badge rows); they carry no exposure, so every rate/count
+    # block above ignores them. Providers with no tracked endpoint get no page.
+    for row in endpoint_rows:
+        if not row["methods"] and row["providerSlug"] in views:
+            views[row["providerSlug"]]["endpoints"].append(row)
     return views
 
 

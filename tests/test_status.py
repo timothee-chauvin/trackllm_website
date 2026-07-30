@@ -13,8 +13,12 @@ from trackllm_website.config import Endpoint
 from trackllm_website.generate_site.status import (
     STATUS_COPY,
     CatalogEntry,
+    EndpointStatus,
+    dominant_headline,
     headline_for,
+    one_line_reason,
     resolve_statuses,
+    status_json,
 )
 from trackllm_website.update_endpoints import LTFailure, LTFailureCache
 from trackllm_website.util import slugify
@@ -285,6 +289,78 @@ class TestResolveUnion:
             "free_excluded",
             "free_excluded",
         )
+
+
+class TestReasonAndJson:
+    def test_reason_is_the_driving_methods_copy_with_detail(self):
+        st = EndpointStatus(
+            lt="probe_failed",
+            bi="pending",
+            headline="errors_out",
+            lt_detail="error: 404",
+            bi_detail=None,
+        )
+        assert one_line_reason(st) == (
+            "This endpoint claims logprob support, but our probe could not "
+            "obtain usable logprobs (error: 404)."
+        )
+
+    def test_reason_retired_carries_the_since_detail(self):
+        st = EndpointStatus(
+            lt="pending",
+            bi="retired:delisted",
+            headline="retired",
+            lt_detail=None,
+            bi_detail="since 2026-07-30",
+        )
+        assert one_line_reason(st) == (
+            "Monitoring was retired: the endpoint left the OpenRouter catalog "
+            "(since 2026-07-30)."
+        )
+
+    def test_reason_falls_back_to_headline_copy_for_joint_conclusions(self):
+        st = EndpointStatus(
+            lt="no_logprobs",
+            bi="bad_temperature",
+            headline="untrackable",
+            lt_detail=None,
+            bi_detail=None,
+        )
+        assert one_line_reason(st) == STATUS_COPY["untrackable"]
+
+    def test_status_json_shape(self):
+        st = EndpointStatus(
+            lt="tracked",
+            bi="monitoring",
+            headline="tracked",
+            lt_detail=None,
+            bi_detail=None,
+        )
+        assert status_json(st) == {
+            "lt": "tracked",
+            "bi": "monitoring",
+            "headline": "tracked",
+            "ltCopy": STATUS_COPY["tracked"],
+            "biCopy": STATUS_COPY["monitoring"],
+            "ltDetail": None,
+            "biDetail": None,
+            "reason": STATUS_COPY["tracked"],
+        }
+
+    def test_dominant_headline_follows_priority(self):
+        assert dominant_headline(["pending", "untrackable"]) == "untrackable"
+        assert dominant_headline(["untrackable", "tracked"]) == "tracked"
+        assert dominant_headline(["free_excluded"]) == "free_excluded"
+
+    def test_catalog_entry_as_meta(self):
+        e = entry("org/m", "p", cost=(2.0, 8.0), supports_logprobs=False)
+        assert e.as_meta() == {
+            "cost": [2.0, 8.0],
+            "created": NOW.isoformat(),
+            "supports_temperature": True,
+            "supports_logprobs": False,
+            "free": False,
+        }
 
 
 class TestCopy:
