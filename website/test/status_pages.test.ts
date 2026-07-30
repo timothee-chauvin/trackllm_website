@@ -20,6 +20,7 @@ interface FleetRow {
   provider: string;
   providerSlug: string;
   methods: string[];
+  nChanges: number;
   headline: string;
   reason: string;
 }
@@ -104,6 +105,24 @@ describe("overview status chips", () => {
     const body = document.getElementById("dirBody")!;
     expect(body.querySelectorAll(".badge.st-untrackable").length).toBeGreaterThan(0);
     expect(body.textContent).toContain("no tracking method can work");
+  });
+
+  test("change-history chips bypass the status group", async () => {
+    // a retired-headline endpoint with past changes must appear under "Ever
+    // changed" while the default tracked chip is on, as before status chips
+    const retiredChanged = rowWith(
+      (r) => r.headline === "retired" && r.nChanges > 0,
+      "retired-headline row with changes",
+    );
+    await renderOverview();
+    document
+      .querySelector('#chips .chip[data-f="everchanged"]')!
+      .dispatchEvent(new Event("click", { bubbles: true }));
+    const changed = ROWS.filter((r) => r.nChanges > 0);
+    expect(shownCount()).toBe(changed.length);
+    expect(
+      document.querySelector(`#dirBody a[href="endpoints/${retiredChanged.slug}.html"]`),
+    ).not.toBeNull();
   });
 
   test("no status chip active means no status constraint", async () => {

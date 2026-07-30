@@ -359,11 +359,15 @@ export async function init(): Promise<void> {
     const q = (document.getElementById("q") as HTMLInputElement).value.trim();
     const ql = q.toLowerCase();
     const mf = [...active].filter(f => f === "lt" || f === "b3it");
+    // a change-history chip bypasses the status group: its result set is defined
+    // by the change criterion alone (only observed endpoints can have changes),
+    // exactly as before the status chips existed
+    const changeChip = active.has("everchanged") || active.has("recent");
     // a search spans every row: chips must never hide a hit
     const list = q
       ? rows.filter(r => `${r.model} ${r.provider} ${r.org}`.toLowerCase().includes(ql))
       : rows.filter(r => {
-          if (statusFilters.size && !statusFilters.has(r.headline)) return false;
+          if (!changeChip && statusFilters.size && !statusFilters.has(r.headline)) return false;
           if (mf.length && !mf.every(m => r.methods.includes(m))) return false;
           if (active.has("everchanged") && r.nChanges === 0) return false;
           if (active.has("recent") && r.status !== "changed") return false;
