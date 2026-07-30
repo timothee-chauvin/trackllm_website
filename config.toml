@@ -86,6 +86,7 @@ top_k_bis = 20
 min_bis = 10
 stall_days = 7
 recheck_days = 14
+unprobeable_after_failures = 3  # consecutive failed vets before we stop probing
 onboard_concurrency = 40
 deselection_grace_days = 30
 onboard_timeout_seconds = 10800

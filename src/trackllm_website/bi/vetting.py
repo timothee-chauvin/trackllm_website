@@ -41,6 +41,7 @@ class FailureStreak(BaseModel):
 class VetResult(BaseModel):
     bucket: Bucket
     cost_per_request: float | None = None
+    detail: str | None = None  # transient only: the error, for the failure streak
 
 
 async def vet_endpoint(
@@ -62,16 +63,17 @@ async def vet_endpoint(
     )
     if response.error:
         logger.info(f"{endpoint} vet: transient error {response.error.message[:80]}")
-        return VetResult(bucket="transient")
+        return VetResult(bucket="transient", detail=response.error.message)
     expected = response.cost  # compute_cost(usage): token math at advertised price
     if not response.generation_id:
-        return VetResult(bucket="transient")
+        return VetResult(bucket="transient", detail="response has no generation id")
     # Blocks 5-75s by design (get_generation_cost backoff); callers fan out concurrently.
     actual = await client.get_generation_cost(
         response.generation_id, session=client.session
     )
     if actual is None:
-        return VetResult(bucket="transient")  # couldn't price it; retry later
+        # couldn't price it; retry later
+        return VetResult(bucket="transient", detail="could not fetch generation cost")
     if expected > 0 and actual > expected * (1 + PRICE_TOLERANCE):
         logger.info(
             f"{endpoint} vet: liar (billed {actual:.8f} vs expected {expected:.8f})"
@@ -210,6 +212,17 @@ class EndpointCache(BaseModel):
             },
             last_recheck=datetime.fromisoformat(raw_recheck) if raw_recheck else None,
         )
+
+
+def clear_recheckable(cache: EndpointCache) -> int:
+    """Empty the buckets due for periodic re-vetting (everything but liars),
+    plus the in-progress failure streaks; returns how many entries were cleared."""
+    n = len(cache.too_expensive) + len(cache.bad_temperature) + len(cache.unprobeable)
+    cache.too_expensive = []
+    cache.bad_temperature = []
+    cache.unprobeable = []
+    cache.failure_streaks = {}
+    return n
 
 
 def should_recheck(cache: EndpointCache, now: datetime, recheck_days: int) -> bool:
