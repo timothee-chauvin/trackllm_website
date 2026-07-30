@@ -4,6 +4,7 @@ into every page."""
 
 from datetime import datetime, timezone
 
+import pytest
 from conftest import catalog_entry, empty_status_inputs
 from trackllm_website.bi.state import EndpointBIState
 from trackllm_website.config import Endpoint
@@ -55,6 +56,16 @@ def test_load_catalog_parses_the_committed_shape(tmp_path):
 
 def test_load_catalog_missing_file_is_empty(tmp_path):
     assert load_catalog(tmp_path / "nope.yaml") == []
+
+
+def test_load_catalog_present_but_misshapen_raises(tmp_path):
+    """A present file without an endpoints_catalog mapping is a writer regression,
+    not an empty catalog -- silently returning [] would drop every untracked page."""
+    path = tmp_path / "endpoints_catalog.yaml"
+    for bad in ["something_else: []\n", "- not\n- a mapping\n", ""]:
+        path.write_text(bad)
+        with pytest.raises(ValueError, match="endpoints_catalog"):
+            load_catalog(path)
 
 
 def test_resolve_site_statuses_builds_union_lookups():

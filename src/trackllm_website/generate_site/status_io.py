@@ -48,8 +48,12 @@ class StatusInputs:
 def load_catalog(path: Path) -> list[CatalogEntry]:
     if not path.exists():
         return []
-    data = yaml.safe_load(path.read_text()) or {}
-    return [CatalogEntry(**e) for e in data.get("endpoints_catalog") or []]
+    data = yaml.safe_load(path.read_text())
+    if not isinstance(data, dict) or "endpoints_catalog" not in data:
+        # A present-but-misshapen file is a writer regression, not an empty
+        # catalog: returning [] here would silently drop every untracked page.
+        raise ValueError(f"{path} has no endpoints_catalog mapping")
+    return [CatalogEntry(**e) for e in data["endpoints_catalog"] or []]
 
 
 def load_status_inputs() -> StatusInputs:

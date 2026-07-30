@@ -171,10 +171,17 @@ def update_lt_failure_cache(
     cache: LTFailureCache,
     valid: list[Endpoint],
     failures: dict[Endpoint, str],
+    claiming: list[Endpoint],
     now: datetime,
 ) -> None:
     """Record this run's probe failures (refreshing reason/last_seen) and clear
-    endpoints that now pass."""
+    endpoints that now pass. Entries outside the claiming-logprobs-under-cap set
+    are pruned: their status is derivable from the catalog, and a stale failure
+    would outrank that fresher evidence in the resolver."""
+    claiming_keys = {(e.model, e.provider) for e in claiming}
+    cache.failures = [
+        f for f in cache.failures if (f.model, f.provider) in claiming_keys
+    ]
     for endpoint, reason in failures.items():
         cache.record(endpoint, reason, now)
     for endpoint in valid:
@@ -434,7 +441,9 @@ async def update_endpoints_lt():
 
     lt_cache = LTFailureCache.load(ENDPOINTS_CACHE_LT_PATH)
     now = datetime.now(tz=timezone.utc).replace(microsecond=0)
-    update_lt_failure_cache(lt_cache, valid_endpoints, failures, now)
+    update_lt_failure_cache(
+        lt_cache, valid_endpoints, failures, endpoints_claiming_logprobs, now
+    )
     lt_cache.save(ENDPOINTS_CACHE_LT_PATH)
     final_endpoints = endpoints_to_keep | set(valid_endpoints)
     # Sort endpoints by total cost, then api, model and provider

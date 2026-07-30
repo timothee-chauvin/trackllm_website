@@ -77,8 +77,29 @@ def test_update_lt_failure_cache_records_and_clears():
     cache.record(passes_now, "error: old failure", NOW)
     still_failing = ep("org/broken", "p")
     update_lt_failure_cache(
-        cache, [passes_now], {still_failing: "returned 5 logprobs, expected 20"}, LATER
+        cache,
+        [passes_now],
+        {still_failing: "returned 5 logprobs, expected 20"},
+        [passes_now, still_failing],
+        LATER,
     )
     assert [(f.model, f.provider, f.reason, f.last_seen) for f in cache.failures] == [
         ("org/broken", "p", "returned 5 logprobs, expected 20", LATER)
+    ]
+
+
+def test_update_lt_failure_cache_prunes_endpoints_no_longer_claiming():
+    """A cached failure whose endpoint leaves the claiming-logprobs-under-cap set
+    is pruned (its status is derivable from the catalog); one that stays in the
+    set and keeps failing is retained."""
+    cache = LTFailureCache(failures=[])
+    gone = ep("org/gone", "p")
+    still_failing = ep("org/broken", "p")
+    cache.record(gone, "error: old failure", NOW)
+    cache.record(still_failing, "error: old failure", NOW)
+    update_lt_failure_cache(
+        cache, [], {still_failing: "error: boom"}, [still_failing], LATER
+    )
+    assert [(f.model, f.provider, f.reason, f.last_seen) for f in cache.failures] == [
+        ("org/broken", "p", "error: boom", LATER)
     ]
