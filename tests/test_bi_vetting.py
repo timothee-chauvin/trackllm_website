@@ -78,6 +78,13 @@ def test_vet_transient_error_is_not_cached():
     client = FakeClient(resp, gen_cost=None)
     res = asyncio.run(vet_endpoint(client, EP, PlainStrategy()))
     assert res.bucket == "transient"  # don't cache; retry next run
+    assert res.detail == "boom"  # the error, for the failure streak
+
+
+def test_vet_transient_no_generation_cost_carries_detail():
+    client = FakeClient(ok_response(cost=0.00001), gen_cost=None)
+    res = asyncio.run(vet_endpoint(client, EP, PlainStrategy()))
+    assert res.detail is not None
 
 
 def _ceiling_policy(ceiling, flagships):
