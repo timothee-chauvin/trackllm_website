@@ -125,6 +125,21 @@ describe("overview status chips", () => {
     ).not.toBeNull();
   });
 
+  test("bypassed chips are marked inactive", async () => {
+    // change-history chips bypass the status group; a search bypasses every chip
+    await renderOverview();
+    const chipsEl = document.getElementById("chips")!;
+    expect(chipsEl.classList.contains("bypass-status")).toBe(false);
+    document
+      .querySelector('#chips .chip[data-f="everchanged"]')!
+      .dispatchEvent(new Event("click", { bubbles: true }));
+    expect(chipsEl.classList.contains("bypass-status")).toBe(true);
+    search("gpt-5");
+    expect(chipsEl.classList.contains("bypass-all")).toBe(true);
+    search("");
+    expect(chipsEl.classList.contains("bypass-all")).toBe(false);
+  });
+
   test("no status chip active means no status constraint", async () => {
     await renderOverview();
     chip("tracked").dispatchEvent(new Event("click", { bubbles: true }));
@@ -226,6 +241,8 @@ describe("untracked model page", () => {
     );
     expect(document.getElementById("lede")!.textContent).toContain(model.status_summary);
     expect(document.querySelector("#cmp .allrow")).toBeNull();
+    // no drift to show: the section must not promise "Drift by provider"
+    expect(document.getElementById("cmpTitle")!.textContent).toBe("Endpoints");
   });
 });
 

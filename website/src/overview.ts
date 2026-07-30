@@ -363,6 +363,11 @@ export async function init(): Promise<void> {
     // by the change criterion alone (only observed endpoints can have changes),
     // exactly as before the status chips existed
     const changeChip = active.has("everchanged") || active.has("recent");
+    // grey out whatever the current mode ignores, so chips never look
+    // toggleable while having no effect
+    const chipsEl = document.getElementById("chips")!;
+    chipsEl.classList.toggle("bypass-all", !!q);
+    chipsEl.classList.toggle("bypass-status", changeChip);
     // a search spans every row: chips must never hide a hit
     const list = q
       ? rows.filter(r => `${r.model} ${r.provider} ${r.org}`.toLowerCase().includes(ql))

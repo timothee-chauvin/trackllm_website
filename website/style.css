@@ -209,6 +209,8 @@ section.block { padding: 2.6rem 0 0.6rem; }
 .chip.on { color: var(--accent); border-color: var(--accent); background: var(--accent-quiet); }
 .chip.on.state-changed { color: var(--changed); border-color: var(--changed); background: var(--changed-bg); }
 .chip.on.state-retired { color: var(--retired); border-color: var(--retired); background: var(--retired-bg); }
+/* chips the current mode ignores: search bypasses every chip, change-history chips the status group */
+.chips.bypass-all .chip, .chips.bypass-status .chip[data-st] { opacity: 0.45; }
 
 .table-wrap { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--surface); }
 .table-scroll { max-height: 580px; overflow-y: auto; }

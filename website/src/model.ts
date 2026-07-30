@@ -98,6 +98,9 @@ export async function init(): Promise<void> {
   if (!hasTimeline) {
     document.getElementById("cmpDesc")?.remove();
     document.getElementById("cmpLegend")?.remove();
+    // there is no drift to show, only per-endpoint status rows
+    const title = document.getElementById("cmpTitle");
+    if (title) title.textContent = "Endpoints";
   }
 
   const changes = D.changes; // hoisted so the nested renderers keep the non-null narrowing
