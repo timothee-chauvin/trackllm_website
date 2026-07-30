@@ -15,6 +15,7 @@ import {
   rateBar,
   relDays,
   relativeAge,
+  showLoadError,
   sparkline,
   statusPill,
   statusRank,
@@ -120,13 +121,24 @@ const HERO_TIP_DX = 16;
 const HERO_TIP_DY = 18;
 
 export async function init(): Promise<void> {
-  const DATA: {
+  let DATA: {
     stats: Stats;
     hero: Hero | null;
     feed: FeedItem[];
     providers: ProviderRate[];
     endpoints: EndpointRow[];
-  } = await (await fetch("data/overview.json")).json();
+  };
+  try {
+    const res = await fetch("data/overview.json");
+    if (!res.ok) throw new Error(`overview.json: HTTP ${res.status}`);
+    DATA = await res.json();
+  } catch (err) {
+    showLoadError("telemetry", "the overview data");
+    // no half-broken hero above the error card: drop its layers and the live dot
+    document.getElementById("eyebrow")?.remove();
+    document.querySelectorAll(".hero-trace, .hero-hit-layer, .hero-tip").forEach(el => el.remove());
+    throw err;
+  }
   const S = DATA.stats;
   const fmtInt = (n: number): string => n.toLocaleString("en-US");
   const fmtM = (n: number): string =>

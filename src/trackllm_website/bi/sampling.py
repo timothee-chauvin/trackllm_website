@@ -57,9 +57,8 @@ async def sample_prompts(
             if i < n_per_prompt - 1:
                 await asyncio.sleep(cfg.request_delay_seconds)
 
-    results = await asyncio.gather(*(one(p) for p in prompts), return_exceptions=True)
-    for prompt, result in zip(prompts, results):
-        if isinstance(result, Exception):
-            logger.warning(f"Sampling failed for {endpoint}: {prompt!r}: {result!r}")
-            n_errors += 1
+    # client.query normalizes API/network errors into response.error (counted
+    # above), so an exception escaping one() is a programming error: propagate it
+    # rather than converting it into a warning + error count.
+    await asyncio.gather(*(one(p) for p in prompts))
     return samples, n_errors

@@ -127,7 +127,10 @@ describe.each(PAGES)("$name page", (page) => {
     document.documentElement.innerHTML = html;
     stubFetch(dirname(page.html));
 
-    await import(page.entry);
+    // the import side effect renders only on the first import; when another test
+    // file imported this module first, re-render through the exported init
+    const mod = await import(page.entry);
+    await mod.init?.();
     await waitFor(page.ready);
   });
 

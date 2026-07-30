@@ -128,3 +128,29 @@ def test_dict_error_body_still_extracts_error_field():
     assert r.error is not None
     assert r.error.http_code == 404
     assert "No allowed providers" in r.error.message
+
+
+def test_get_generation_cost_logs_last_failure(monkeypatch, caplog):
+    """Exhausting the retries must leave a log trail: a systematic failure (auth,
+    schema change) would otherwise stall every caller with zero log lines."""
+    from trackllm_website import api as api_mod
+
+    async def no_sleep(_delay):
+        pass
+
+    monkeypatch.setattr(api_mod.asyncio, "sleep", no_sleep)
+
+    def boom_get(*args, **kwargs):
+        raise RuntimeError("boom")
+
+    async def run():
+        client = OpenRouterClient()
+        monkeypatch.setattr(client.session, "get", boom_get)
+        try:
+            return await client.get_generation_cost("gen-123", session=client.session)
+        finally:
+            await client.close()
+
+    with caplog.at_level("WARNING", logger="trackllm-website"):
+        assert asyncio.run(run()) is None
+    assert any("gen-123" in r.message and "boom" in r.message for r in caplog.records)
