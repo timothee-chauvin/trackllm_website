@@ -7,7 +7,9 @@ from trackllm_website.update_endpoints import save_endpoints_catalog
 
 
 def ep(model, provider, cost, **kwargs):
-    return Endpoint(api="openrouter", model=model, provider=provider, cost=cost, **kwargs)
+    return Endpoint(
+        api="openrouter", model=model, provider=provider, cost=cost, **kwargs
+    )
 
 
 def test_catalog_round_trip(tmp_path):
@@ -22,7 +24,9 @@ def test_catalog_round_trip(tmp_path):
             supports_temperature=True,
             supports_logprobs=True,
         ),
-        ep("org/a", "free", (0, 0), supports_temperature=False, supports_logprobs=False),
+        ep(
+            "org/a", "free", (0, 0), supports_temperature=False, supports_logprobs=False
+        ),
         ep("org/a", "bare", (0.5, 1.5)),  # upstream omitted supported_parameters
     ]
     save_endpoints_catalog(endpoints, path)

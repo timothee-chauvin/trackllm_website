@@ -56,9 +56,9 @@ def test_persist_round_trip(tmp_path):
     ]
 
     loaded = LTFailureCache.load(path)
-    assert sorted((f.model, f.provider, f.reason, f.last_seen) for f in loaded.failures) == sorted(
-        (f.model, f.provider, f.reason, f.last_seen) for f in cache.failures
-    )
+    assert sorted(
+        (f.model, f.provider, f.reason, f.last_seen) for f in loaded.failures
+    ) == sorted((f.model, f.provider, f.reason, f.last_seen) for f in cache.failures)
 
 
 def test_load_missing_file(tmp_path):
