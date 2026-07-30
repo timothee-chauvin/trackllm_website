@@ -239,9 +239,15 @@ class OpenRouterClient:
             if isinstance(e, aiohttp.ClientResponseError):
                 http_code, message_json = e.status, e.message
                 try:
-                    message = orjson.dumps(
-                        orjson.loads(message_json.encode()).get("error", e)
-                    ).decode()
+                    body = orjson.loads(message_json.encode())
+                    if isinstance(body, dict):
+                        message = orjson.dumps(body.get("error", e)).decode()
+                    elif isinstance(body, str):
+                        message = body
+                    else:
+                        # Valid JSON but not a dict (e.g. null, a list): the raw
+                        # body is the best error message we have.
+                        message = message_json
                 # For some reason, orjson.JSONDecodeError | orjson.JSONEncodeError fails with:
                 # "catching classes that do not inherit from BaseException is not allowed"
                 except (orjson.JSONDecodeError, orjson.JSONEncodeError):

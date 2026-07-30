@@ -1,6 +1,7 @@
 import json
 import pytest
 import shutil
+from datetime import datetime, timezone
 from pathlib import Path
 
 from conftest import (
@@ -10,9 +11,11 @@ from conftest import (
     write_b3it_series,
     write_b3it_state,
     write_lt_endpoint,
+    write_month_dir,
 )
 from trackllm_website.config import Endpoint
 from trackllm_website.generate_site.render import render_site
+from trackllm_website.update_endpoints import LTFailure, LTFailureCache
 from trackllm_website.util import slugify
 
 DATES = [f"2026-06-{d:02d}T00:00:00Z" for d in range(20, 25)]
@@ -302,10 +305,7 @@ def test_endpoint_with_nothing_to_show_gets_a_status_page_if_ever_tracked(tmp_pa
     (dead_lt / "info.json").write_text(
         json.dumps({"prompt": "hi", "endpoint": {"model": "m/a", "provider": "dead"}})
     )
-    (dead_lt / "2026-06").mkdir()
-    (dead_lt / "2026-06" / "queries.json").write_text(
-        json.dumps([["24 10:00:00", "e0"]])
-    )
+    write_month_dir(dead_lt, "2026-06", [["24 10:00:00", "e0"]])
     write_b3it_state(tmp_path, "m/a", "gone", status="retired")
 
     render_site(tmp_path, None, empty_status_inputs())
@@ -329,6 +329,33 @@ def test_endpoint_with_nothing_to_show_gets_a_status_page_if_ever_tracked(tmp_pa
 
 def _manifest(html: str) -> dict:
     return json.loads(html.split('id="manifest">')[1].split("</script>")[0])
+
+
+def test_manifest_escapes_hostile_names_and_error_details(tmp_path):
+    """Provider names and probe-failure reasons are attacker-influenced; a
+    </script> inside them must not break out of the manifest JSON block."""
+    _scaffold(tmp_path)
+    hostile = "p</script><script>alert(1)</script>"
+    inputs = empty_status_inputs()
+    inputs.catalog = [catalog_entry("m/evil", hostile)]
+    inputs.lt_failures = LTFailureCache(
+        failures=[
+            LTFailure(
+                model="m/evil",
+                provider=hostile,
+                reason=hostile,
+                last_seen=datetime(2026, 7, 1, tzinfo=timezone.utc),
+            )
+        ]
+    )
+
+    render_site(tmp_path, None, inputs)
+
+    page = (tmp_path / "endpoints" / f"{slugify(f'm/evil#{hostile}')}.html").read_text()
+    block = page.split('id="manifest">')[1].split("</script>")[0]
+    assert "<" not in block
+    json.loads(block)
+    assert "<script>alert(1)</script>" not in page
 
 
 def test_render_emits_status_pages_for_catalog_endpoints(tmp_path):
@@ -356,17 +383,16 @@ def test_render_emits_status_pages_for_catalog_endpoints(tmp_path):
 
     slug = slugify("openai/gpt-5.4#openai")
     page = (tmp_path / "endpoints" / f"{slug}.html").read_text()
-    manifest = _manifest(page)
-    assert manifest["prompts"] == []
-    assert manifest["status"]["headline"] == "untrackable"
-    assert manifest["status"]["ltCopy"] and manifest["status"]["reason"]
-    assert manifest["meta"]["supports_logprobs"] is False
-    assert manifest["meta"]["cost"] == [1.0, 2.0]
+    # the manifest carries only what endpoint.js reads; status + metadata are
+    # rendered server-side
+    assert _manifest(page) == {"slug": slug}
+    assert 'class="badge st st-untrackable"' in page
+    assert '<b class="st-name">no logprobs</b>' in page
+    assert "$1.00 in · $2.00 out" in page
 
-    # the tracked page gains the same status object plus its catalog metadata
-    tracked = _manifest((tmp_path / "endpoints" / "m2fa23p.html").read_text())
-    assert tracked["status"]["lt"] == "tracked"
-    assert tracked["meta"]["free"] is False
+    tracked_page = (tmp_path / "endpoints" / "m2fa23p.html").read_text()
+    assert _manifest(tracked_page) == {"slug": "m2fa23p"}
+    assert '<b class="st-name">tracked</b>' in tracked_page
 
     model = json.loads(
         (tmp_path / "data" / "models" / f"{slugify('openai/gpt-5.4')}.json").read_text()
@@ -426,8 +452,7 @@ def test_a_dead_lt_series_does_not_hide_a_live_b3it_one(tmp_path):
     (half / "info.json").write_text(
         json.dumps({"prompt": "hi", "endpoint": {"model": "m/a", "provider": "half"}})
     )
-    (half / "2026-06").mkdir()
-    (half / "2026-06" / "queries.json").write_text(json.dumps([["24 10:00:00", "e0"]]))
+    write_month_dir(half, "2026-06", [["24 10:00:00", "e0"]])
     write_b3it_series(
         tmp_path,
         "m/a",
