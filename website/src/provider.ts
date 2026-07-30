@@ -12,6 +12,7 @@ import {
   plural,
   prettyDate,
   rateBar,
+  showLoadError,
   sparkline,
   statusPill,
   statusRank,
@@ -83,9 +84,15 @@ export async function init(): Promise<void> {
   const slugEl = document.getElementById("providerData");
   if (!slugEl) return;
   const slug: string = JSON.parse(slugEl.textContent || '""');
-  const res = await fetch(`../data/providers/${slug}.json`).catch(() => null);
-  const D: ProviderData | null = res && res.ok ? await res.json() : null;
-  if (!D) return;
+  let D: ProviderData;
+  try {
+    const res = await fetch(`../data/providers/${slug}.json`);
+    if (!res.ok) throw new Error(`providers/${slug}.json: HTTP ${res.status}`);
+    D = await res.json();
+  } catch (err) {
+    showLoadError("lede", "this provider's data");
+    throw err;
+  }
 
   const NAME = D.name;
   const FIRST = D.first;

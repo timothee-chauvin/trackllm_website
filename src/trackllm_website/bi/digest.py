@@ -22,6 +22,7 @@ OUTCOME = {
     "reonboarded": ("re-onboarded", "#1a7f37"),
     "reonboard_no_bis": ("re-onboard → no BIs", "#cf222e"),
     "retired_stalled": ("retired (stalled)", "#6e7781"),
+    "all_errors": ("all queries errored", "#cf222e"),
 }
 
 
@@ -59,7 +60,8 @@ class MonitorReport:
     rows: list[MonitorRow]
     n_endpoints: int
     # endpoints where an exception escaped run_endpoint (never expected:
-    # API errors are handled inside; this means e.g. a failure to save)
+    # API errors are handled inside; this means e.g. a failure to save),
+    # plus endpoints skipped because no query strategy could be resolved
     failures: list[str] = field(default_factory=list)
 
     def notable(self) -> bool:
