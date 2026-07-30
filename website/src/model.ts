@@ -7,8 +7,10 @@ import {
   esc,
   headlineBadge,
   methodBadges,
+  monthTicks,
   plural,
   prettyDate,
+  td,
 } from "./components";
 
 interface LTChange {
@@ -75,9 +77,6 @@ interface ModelData {
   endpoints: ModelEndpoint[];
 }
 
-const td = (s: string): number => Date.parse(s + "T00:00:00Z");
-const DAY_MS = 86400_000;
-
 export async function init(): Promise<void> {
   const cmpEl = document.getElementById("cmp");
   const slugEl = document.getElementById("model-slug");
@@ -134,19 +133,8 @@ export async function init(): Promise<void> {
       <div class="s"><div class="v">${headlineBadge(D.headline)}</div><div class="k">Status</div></div>`;
   }
 
-  function monthTicks(): Date[] {
-    const out: Date[] = [];
-    const d = new Date(D0);
-    d.setUTCDate(1);
-    while (d.getTime() <= D1) {
-      if (d.getTime() >= D0 - 15 * DAY_MS) out.push(new Date(d));
-      d.setUTCMonth(d.getUTCMonth() + 1);
-    }
-    return out;
-  }
-
   function gridLines(H: number): string {
-    return monthTicks()
+    return monthTicks(D0, D1)
       .map((d) => {
         const x = xpos(d.toISOString().slice(0, 10)).toFixed(1);
         return `<line x1="${x}" y1="2" x2="${x}" y2="${H - 2}" stroke="var(--border-soft)" stroke-width="1"/>`;
@@ -310,7 +298,7 @@ export async function init(): Promise<void> {
 
   const ticksEl = document.getElementById("ticks");
   if (ticksEl) {
-    ticksEl.innerHTML = monthTicks()
+    ticksEl.innerHTML = monthTicks(D0, D1)
       .filter((_, i) => i % 2 === 0)
       .map(
         (d) =>

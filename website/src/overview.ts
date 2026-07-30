@@ -6,6 +6,7 @@ import {
   FeedItem,
   LT_CAP,
   MIN_ENDPOINT_YEARS,
+  bindFilterChips,
   esc,
   eventRow,
   highlight,
@@ -18,6 +19,7 @@ import {
   sparkline,
   statusPill,
   statusRank,
+  toggleChip,
   untrackedDirCells,
   volGrid,
 } from "./components";
@@ -324,14 +326,7 @@ export async function init(): Promise<void> {
     });
   }
   provQ.addEventListener("input", renderProviders);
-  document.getElementById("provChips")!.addEventListener("click", e => {
-    const chip = (e.target as HTMLElement).closest(".chip") as HTMLElement | null;
-    if (!chip) return;
-    const f = chip.dataset.f!;
-    if (provFilters.has(f)) { provFilters.delete(f); chip.classList.remove("on"); }
-    else { provFilters.add(f); chip.classList.add("on"); }
-    renderProviders();
-  });
+  bindFilterChips(document.getElementById("provChips")!, provFilters, renderProviders);
   document.querySelectorAll<HTMLElement>("th[data-psort]").forEach(th => th.addEventListener("click", () => {
     const k = th.dataset.psort as ProviderSortKey;
     if (provSort === k) provDir *= -1;
@@ -410,13 +405,12 @@ export async function init(): Promise<void> {
   }
   document.getElementById("dirCount")!.innerHTML = `${fmtInt(rows.length)} endpoints · <b style="color:var(--changed)">${S.changes_total} changes</b> across ${S.changed_endpoints} of them`;
   document.getElementById("q")!.addEventListener("input", render);
+  // two chip groups share the toolbar: data-st chips toggle the status set,
+  // data-f chips the method/change set
   document.getElementById("chips")!.addEventListener("click", e => {
     const chip = (e.target as HTMLElement).closest(".chip") as HTMLElement | null; if (!chip) return;
     const st = chip.dataset.st;
-    const set = st ? statusFilters : active;
-    const f = st ?? chip.dataset.f!;
-    if (set.has(f)) { set.delete(f); chip.classList.remove("on"); }
-    else { set.add(f); chip.classList.add("on"); }
+    toggleChip(chip, st ? statusFilters : active, st ?? chip.dataset.f!);
     render();
   });
   document.querySelectorAll<HTMLElement>("thead th[data-sort]").forEach(th => th.addEventListener("click", () => {

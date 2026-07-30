@@ -5,6 +5,7 @@ import {
   B3IT_CAP,
   LT_CAP,
   MIN_ENDPOINT_YEARS,
+  bindFilterChips,
   esc,
   magnitudeLabel,
   methodBadges,
@@ -316,14 +317,8 @@ export async function init(): Promise<void> {
     countEl.textContent = `${rows.length} endpoints from ${NAME} · model names link to the model page, the status pill to the endpoint page`;
   }
   qEl.addEventListener("input", render);
-  document.getElementById("epChips")?.addEventListener("click", (e) => {
-    const chip = (e.target as HTMLElement).closest(".chip") as HTMLElement | null;
-    if (!chip) return;
-    const f = chip.dataset.f!;
-    if (filters.has(f)) { filters.delete(f); chip.classList.remove("on"); }
-    else { filters.add(f); chip.classList.add("on"); }
-    render();
-  });
+  const chipsEl = document.getElementById("epChips");
+  if (chipsEl) bindFilterChips(chipsEl, filters, render);
   document.querySelectorAll<HTMLElement>("th[data-sort]").forEach((th) =>
     th.addEventListener("click", () => {
       const k = th.dataset.sort as SortKey;

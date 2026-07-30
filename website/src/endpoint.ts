@@ -1,9 +1,10 @@
-// `export {}` makes this a module so its top-level names (MONTHS, td, init, ...)
+// `export {}` makes this a module so its top-level names (init, ...)
 // don't collide with the same names in other bundler-entrypoint scripts (overview.ts, model.ts)
 // when type-checked together as one tsc program.
 export {};
 
 import { readingCaption } from "./caption";
+import { DAY_MS, MONTH_NAMES, monthTicks, td } from "./components";
 
 interface ManifestData {
   model: string;
@@ -70,11 +71,9 @@ const RETIRED_GAP_DAYS = 14;
 const RECENT_CHANGE_DAYS = 60;
 const SIGMA_INF_THRESHOLD = 1e4;
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-const td = (s: string): number => Date.parse(s.slice(0, 10) + "T00:00:00Z");
 const fmtMon = (s: string): string => {
   const d = new Date(td(s));
-  return `${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+  return `${MONTH_NAMES[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
 };
 const round = (v: number, n: number): number => {
   const f = 10 ** n;
@@ -160,9 +159,9 @@ function buildB3IT(data: B3ITData | null): FocusB3IT | null {
 
 function computeStatus(lastObserved: string | null, lastChange: string | null): Status {
   if (!lastObserved) return "stable";
-  const gapDays = (Date.now() - td(lastObserved)) / 86400_000;
+  const gapDays = (Date.now() - td(lastObserved)) / DAY_MS;
   if (gapDays > RETIRED_GAP_DAYS) return "retired";
-  if (lastChange && (Date.now() - td(lastChange)) / 86400_000 <= RECENT_CHANGE_DAYS) {
+  if (lastChange && (Date.now() - td(lastChange)) / DAY_MS <= RECENT_CHANGE_DAYS) {
     return "changed";
   }
   return "stable";
@@ -219,17 +218,6 @@ function renderChart(lt: FocusLT | null, b3it: FocusB3IT | null): void {
   const span = Math.max(1, d1 - d0);
   const fx = (s: string): number => PL + ((td(s) - d0) / span) * PW;
 
-  function monthTicks(): Date[] {
-    const out: Date[] = [];
-    const d = new Date(d0);
-    d.setUTCDate(1);
-    while (d.getTime() <= d1) {
-      if (d.getTime() >= d0 - 15 * 86400_000) out.push(new Date(d));
-      d.setUTCMonth(d.getUTCMonth() + 1);
-    }
-    return out;
-  }
-
   function lane(
     series: [string, number][],
     topY: number,
@@ -247,7 +235,7 @@ function renderChart(lt: FocusLT | null, b3it: FocusB3IT | null): void {
       `M${fx(series[0][0]).toFixed(1)} ${(topY + LANE_H).toFixed(1)} ` +
       series.map(([d, v]) => `L${fx(d).toFixed(1)} ${yv(v).toFixed(1)}`).join(" ") +
       ` L${fx(last(series)![0]).toFixed(1)} ${(topY + LANE_H).toFixed(1)} Z`;
-    const grid = monthTicks()
+    const grid = monthTicks(d0, d1)
       .map((d) => {
         const x = fx(d.toISOString().slice(0, 10));
         return `<line x1="${x.toFixed(1)}" y1="${topY}" x2="${x.toFixed(1)}" y2="${topY + LANE_H}" stroke="var(--border-soft)" stroke-width="1"/>`;
@@ -289,10 +277,10 @@ function renderChart(lt: FocusLT | null, b3it: FocusB3IT | null): void {
     })
     .join("");
 
-  const xlabels = monthTicks()
+  const xlabels = monthTicks(d0, d1)
     .map((d) => {
       const x = fx(d.toISOString().slice(0, 10));
-      return `<text x="${x.toFixed(1)}" y="${VH - 14}" fill="var(--text-dim)" font-size="10.5" font-family="var(--mono)" text-anchor="middle">${MONTHS[d.getUTCMonth()]} ${String(d.getUTCFullYear()).slice(2)}</text>`;
+      return `<text x="${x.toFixed(1)}" y="${VH - 14}" fill="var(--text-dim)" font-size="10.5" font-family="var(--mono)" text-anchor="middle">${MONTH_NAMES[d.getUTCMonth()]} ${String(d.getUTCFullYear()).slice(2)}</text>`;
     })
     .join("");
 
