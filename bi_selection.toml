@@ -14,6 +14,12 @@
 # simulated +$2.7/mo on top of popular, ~$7-11 one-time onboarding); budget
 # raised to $15/mo for headroom, since the providers wildcard silently skips
 # endpoints once the budget is hit.
+# 2026-07-30: added flagships (cheapest provider each, budget/ceiling-exempt):
+# est. ~$4.7 one-time onboarding, ~$1.4/mo from measured cost_per_request.
+# Deliberately left out (reasoning burn, ~100 billed tokens/request):
+# x-ai/grok-4.5 (~$3.6/mo) and moonshotai/kimi-k3 (~$9/mo, unmeasured — vet
+# manually first). qwen3.6-max-preview is too_expensive-cached until the next
+# recheck clears it; the flagship ceiling exemption then admits it.
 
 budget_per_month = 15.0
 max_endpoint_cost = 0.50
@@ -23,6 +29,22 @@ exclude = [
     "*image*", "*-fast", "*:extended", "*customtools*", "*-beta",
     "switchpoint/router",
 ]
+
+[[rule]]
+name = "flagships"           # models people care about, cheapest provider each
+kind = "models"
+patterns = [
+    "anthropic/claude-sonnet-4.6",
+    "google/gemini-3.1-pro-preview",
+    "mistralai/mistral-large-2512",
+    "qwen/qwen3-max",
+    "qwen/qwen3-max-thinking",
+    "qwen/qwen3.5-397b-a17b",
+    "qwen/qwen3.6-max-preview",
+    "z-ai/glm-5",
+]
+providers_per_model = 1
+flagship = true              # exempt from budget_per_month and max_endpoint_cost
 
 [[rule]]
 name = "popular"             # top-N models by token usage; N = config bi.popularity.top_n
