@@ -32,6 +32,9 @@ class Endpoint(BaseModel):
     supports_temperature: bool | None = (
         None  # from /models supported_parameters; transient (not persisted)
     )
+    supports_logprobs: bool | None = (
+        None  # supported_parameters claims logprobs AND top_logprobs; transient
+    )
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Endpoint):
