@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import orjson
+import pytest
 
 from trackllm_website.bi.detection import (
     adaptive_transitions,
@@ -8,6 +9,7 @@ from trackllm_website.bi.detection import (
     is_unstable,
     select_top_bis,
 )
+from trackllm_website.config import DetectionConfig, config
 
 FIXTURES = Path("tests/fixtures/phase_2")
 
@@ -60,6 +62,73 @@ def test_changed_endpoint_with_stale_reference_is_not_unstable():
     # endpoint's own day-to-day dispersion, not distance to the reference.
     assert not is_unstable(load_fixture("tencent2fhy323atlas-cloud2ffp8"))
     assert not is_unstable(load_fixture("z-ai2fglm-5.223deepinfra2ffp4"))
+
+
+SYNTHETIC_DETECTION = DetectionConfig(
+    window=5,
+    exclusion=2,
+    min_baseline=2,
+    sigma_k=2.0,
+    abs_delta=0.1,
+    persistence=2,
+    cooldown=10,
+    instability_window=14,
+    instability_threshold=0.35,
+)
+
+
+@pytest.fixture
+def synthetic_detection(monkeypatch):
+    monkeypatch.setattr(config.bi, "detection", SYNTHETIC_DETECTION)
+    return SYNTHETIC_DETECTION
+
+
+def tv_series(vals: list[float]) -> list[tuple[str, float]]:
+    return [(f"2026-01-{i + 1:02d}T00:00:00", v) for i, v in enumerate(vals)]
+
+
+def test_early_days_never_compared_to_future(synthetic_detection):
+    # Two spikes at the start, flat afterwards. Days 0-1 have no trailing
+    # baseline (i < exclusion + min_baseline): they must be skipped, not
+    # evaluated against a negative-end slice vals[0:i-exclusion] that wraps
+    # around to include the (flat) future and makes the spikes "deviate".
+    vals = [0.6, 0.6] + [0.0] * 20
+    assert adaptive_transitions(tv_series(vals)) == []
+
+
+def test_streak_resets_across_skipped_days(synthetic_detection, monkeypatch):
+    monkeypatch.setattr(
+        config.bi,
+        "detection",
+        SYNTHETIC_DETECTION.model_copy(update={"exclusion": 3}),
+    )
+    # Spike at day 2 (only "deviating" via the wrapped negative-end slice) and
+    # at day 5 (first legitimately evaluated day). Days 3-4 in between are
+    # skipped for insufficient baseline; a streak carried across them would
+    # reach persistence=2 and date an event at never-evaluated day 4.
+    vals = [0.0, 0.0, 0.6, 0.0, 0.0, 0.6] + [0.0] * 16
+    assert adaptive_transitions(tv_series(vals)) == []
+
+
+def test_level_shift_fires_at_onset(synthetic_detection):
+    vals = [0.05] * 8 + [0.5] * 4
+    events = adaptive_transitions(tv_series(vals))
+    assert events == ["2026-01-09T00:00:00"]
+
+
+def test_cooldown_suppresses_nearby_second_event(synthetic_detection, monkeypatch):
+    vals = [0.05] * 8 + [0.5, 0.5, 0.05, 0.05, 1.0, 1.0]
+    # Second onset (day 12) is 4 days after the first (day 8).
+    assert adaptive_transitions(tv_series(vals)) == ["2026-01-09T00:00:00"]
+    monkeypatch.setattr(
+        config.bi,
+        "detection",
+        SYNTHETIC_DETECTION.model_copy(update={"cooldown": 1}),
+    )
+    assert adaptive_transitions(tv_series(vals)) == [
+        "2026-01-09T00:00:00",
+        "2026-01-13T00:00:00",
+    ]
 
 
 def test_select_top_bis_by_balance():

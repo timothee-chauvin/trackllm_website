@@ -26,9 +26,7 @@ def test_segment_finds_single_split():
 
 
 def test_segment_recurses_into_both_sides():
-    results = _results(
-        (range(1, 11), "A"), (range(11, 21), "B"), (range(21, 31), "C")
-    )
+    results = _results((range(1, 11), "A"), (range(11, 21), "B"), (range(21, 31), "C"))
     events = segment_events(results)
     assert [e.split_ts[8:10] for e in events] == ["11", "21"]
 
