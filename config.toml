@@ -17,6 +17,7 @@ fireworks = 5
 azure = 5
 inference-net = 5
 xai = 8
+alibaba = 5  # rejects top_logprobs > 5 with a 400; kept every alibaba endpoint out of LT
 
 [bi]
 data_dir = "website/data/b3it"
