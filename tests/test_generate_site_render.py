@@ -10,6 +10,7 @@ from conftest import (
     write_b3it_series,
     write_b3it_state,
     write_lt_endpoint,
+    write_month_dir,
 )
 from trackllm_website.config import Endpoint
 from trackllm_website.generate_site.render import render_site
@@ -296,10 +297,7 @@ def test_endpoint_with_nothing_to_show_gets_a_status_page_if_ever_tracked(tmp_pa
     (dead_lt / "info.json").write_text(
         json.dumps({"prompt": "hi", "endpoint": {"model": "m/a", "provider": "dead"}})
     )
-    (dead_lt / "2026-06").mkdir()
-    (dead_lt / "2026-06" / "queries.json").write_text(
-        json.dumps([["24 10:00:00", "e0"]])
-    )
+    write_month_dir(dead_lt, "2026-06", [["24 10:00:00", "e0"]])
     write_b3it_state(tmp_path, "m/a", "gone", status="retired")
 
     render_site(tmp_path, None, empty_status_inputs())
@@ -420,8 +418,7 @@ def test_a_dead_lt_series_does_not_hide_a_live_b3it_one(tmp_path):
     (half / "info.json").write_text(
         json.dumps({"prompt": "hi", "endpoint": {"model": "m/a", "provider": "half"}})
     )
-    (half / "2026-06").mkdir()
-    (half / "2026-06" / "queries.json").write_text(json.dumps([["24 10:00:00", "e0"]]))
+    write_month_dir(half, "2026-06", [["24 10:00:00", "e0"]])
     write_b3it_series(
         tmp_path,
         "m/a",
