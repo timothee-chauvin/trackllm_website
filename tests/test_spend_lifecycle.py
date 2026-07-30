@@ -3,11 +3,15 @@ from datetime import datetime, timezone
 
 import trackllm_website.update_endpoints as ue
 from trackllm_website.bi.reinit import ReinitResult
+from trackllm_website.bi.selection import SelectionPolicy
 from trackllm_website.bi.state import EndpointBIState, Epoch, RetiredInfo
 from trackllm_website.config import Endpoint, config
 from trackllm_website.spend import cumulative_by_kind, record_query
 
 NOW = datetime(2026, 6, 15, tzinfo=timezone.utc)
+_POLICY = SelectionPolicy(
+    budget_per_month=10, max_endpoint_cost=10, exclude=[], rules=[]
+)
 
 
 def ep(model):
@@ -232,7 +236,7 @@ def test_vetting_writes_vetting_spend(monkeypatch, tmp_path):
     monkeypatch.setattr(config, "endpoints_bi", [])
     monkeypatch.setattr(
         "trackllm_website.update_endpoints.load_policy",
-        lambda path: None,
+        lambda path: _POLICY,
     )
     monkeypatch.setattr(
         "trackllm_website.update_endpoints.exceeds_ceiling",

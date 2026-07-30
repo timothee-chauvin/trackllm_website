@@ -188,6 +188,23 @@ class TestBIStatus:
         statuses = resolve(catalog=[entry("org/m", "p")], bi_cache=cache)
         assert statuses[S].bi == expected
 
+    def test_unprobeable_flaky_carries_last_error_detail(self):
+        cache = empty_cache()
+        cache.add_unprobeable(ep("org/m", "p"), reason="flaky", detail="timeout")
+        statuses = resolve(catalog=[entry("org/m", "p")], bi_cache=cache)
+        assert statuses[S].bi == "unprobeable:flaky"
+        assert statuses[S].bi_detail == "timeout"
+        assert statuses[S].headline == "errors_out"
+
+    def test_unprobeable_batch_is_untrackable(self):
+        cache = empty_cache()
+        cache.add_unprobeable(ep("org/m:batch", "p"), reason="batch", detail=None)
+        statuses = resolve(catalog=[entry("org/m:batch", "p")], bi_cache=cache)
+        s = statuses[slug("org/m:batch", "p")]
+        assert s.bi == "unprobeable:batch"
+        assert s.bi_detail is None
+        assert s.headline == "untrackable"
+
     def test_excluded_by_policy_glob(self):
         e = entry("org/image-gen", "p")
         statuses = resolve(catalog=[e])
@@ -235,6 +252,10 @@ class TestHeadline:
             ("no_logprobs", "free_excluded", "free_excluded"),
             # policy-excluded reads as a selection decision, not an error
             ("no_logprobs", "excluded", "not_selected"),
+            ("pending", "unprobeable:flaky", "errors_out"),
+            # batch is structural: neither method can query it synchronously
+            ("no_logprobs", "unprobeable:batch", "untrackable"),
+            ("pending", "unprobeable:batch", "untrackable"),
         ],
     )
     def test_priority_chain(self, lt, bi, expected):
