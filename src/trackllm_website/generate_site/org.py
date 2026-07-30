@@ -19,8 +19,11 @@ def _model_row(model_slug: str, view: dict) -> dict:
         "slug": model_slug,
         "n_endpoints": view["n_endpoints"],
         "n_providers": view["n_providers"],
+        "n_endpoints_total": view["n_endpoints_total"],
         "n_changed": view["n_changed"],
         "n_changes": len(changes),
+        "headline": view["headline"],
+        "status_summary": view["status_summary"],
         "last_change": changes[-1]["date"] if changes else None,
         "first": view["date_min"],
         "last": view["date_max"],
@@ -39,8 +42,11 @@ def build_org_views(model_views: dict[str, dict]) -> dict[str, dict]:
             key=lambda m: (-m["n_changes"], -m["n_endpoints"], m["name"]),
         )
         # Unioned, not summed: one provider serving three of an org's models is
-        # still one provider, whereas each of those is its own endpoint.
-        providers = {e["base"] for _, v in entries for e in v["endpoints"]}
+        # still one provider, whereas each of those is its own endpoint. Untracked
+        # endpoints stay out, so the count keeps describing the tracked fleet.
+        providers = {
+            e["base"] for _, v in entries for e in v["endpoints"] if e["methods"]
+        }
         dates = [d for m in models for d in (m["first"], m["last"]) if d]
 
         views[slugify(org)] = {

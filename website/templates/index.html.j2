@@ -73,11 +73,18 @@
         <input id="q" type="text" placeholder="Search model, provider, or org…" autocomplete="off">
       </label>
       <div class="chips" id="chips">
+        <span class="chip on" data-st="tracked">Tracked</span>
+        <span class="chip state-retired" data-st="retired">Retired</span>
+        <span class="chip" data-st="untrackable">Untrackable</span>
+        <span class="chip" data-st="too_expensive">Too expensive</span>
+        <span class="chip" data-st="not_selected">Not selected</span>
+        <span class="chip" data-st="errors_out">Errors</span>
+        <span class="chip" data-st="pending">Pending</span>
+        <span class="chip" data-st="free_excluded">Free</span>
         <span class="chip" data-f="lt">LT</span>
         <span class="chip" data-f="b3it">B3IT</span>
         <span class="chip state-changed" data-f="everchanged">Ever changed</span>
         <span class="chip state-changed" data-f="recent">Recent (60d)</span>
-        <span class="chip state-retired" data-f="retired">Retired</span>
       </div>
     </div>
     <div class="table-wrap">

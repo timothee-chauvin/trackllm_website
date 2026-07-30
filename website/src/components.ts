@@ -76,6 +76,62 @@ export function volGrid(years: number): string {
     <span class="lbl${low}">${years.toFixed(1)} ep-yr</span></span>`;
 }
 
+/** Mirrors status.py::HEADLINE_ORDER — the priority chain, strongest first. */
+export const HEADLINE_ORDER = [
+  "tracked",
+  "retired",
+  "untrackable",
+  "too_expensive",
+  "not_selected",
+  "errors_out",
+  "pending",
+  "free_excluded",
+];
+
+/** esc() the text, wrapping the first case-insensitive match of q in <mark>. */
+export function highlight(text: string, q: string): string {
+  const i = q ? text.toLowerCase().indexOf(q.toLowerCase()) : -1;
+  if (i < 0) return esc(text);
+  return (
+    esc(text.slice(0, i)) +
+    "<mark>" +
+    esc(text.slice(i, i + q.length)) +
+    "</mark>" +
+    esc(text.slice(i + q.length))
+  );
+}
+
+/** Headline status badge; must stay in sync with the Jinja macro (_macros.html.j2). */
+export function headlineBadge(headline: string): string {
+  return `<span class="badge st st-${headline.replace(/_/g, "-")}">${esc(headline.replace(/_/g, " "))}</span>`;
+}
+
+/** Sort rank for a directory's Status column: tracked rows by trace status,
+ *  untracked rows after them in headline priority order. */
+export function statusRank(r: {
+  methods: string[];
+  status: string | null;
+  headline: string;
+}): number {
+  const TRACE: Record<string, number> = { changed: 0, stable: 1, retired: 2 };
+  return r.methods.length
+    ? (TRACE[r.status ?? ""] ?? 3)
+    : 3 + HEADLINE_ORDER.indexOf(r.headline);
+}
+
+/** The five directory cells after model/provider for a row with no series:
+ *  headline badge in the status column, the one-line reason in the trace column. */
+export function untrackedDirCells(
+  r: { slug: string; headline: string; reason: string },
+  root: string
+): string {
+  return `<td><a href="${root}endpoints/${esc(r.slug)}.html">${headlineBadge(r.headline)}</a></td>
+    <td class="r"><span class="cc zero">—</span></td>
+    <td class="col-hide"></td>
+    <td class="r col-hide"><span class="org-cell">—</span></td>
+    <td class="col-hide reason-cell"><span class="reason" title="${esc(r.reason)}">${esc(r.reason)}</span></td>`;
+}
+
 export function methodBadges(methods: string[]): string {
   return methods
     .map((m) => `<span class="badge ${m}">${m === "lt" ? "LT" : "B3IT"}</span>`)

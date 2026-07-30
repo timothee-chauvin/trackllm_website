@@ -78,6 +78,16 @@ a { color: inherit; text-decoration: none; }
 .badge.lt { color: var(--accent); background: var(--accent-quiet); border-color: color-mix(in srgb, var(--accent) 32%, transparent); }
 .badge.b3it { color: var(--b3it); background: var(--b3it-quiet); border-color: color-mix(in srgb, var(--b3it) 34%, transparent); }
 
+/* headline status badges (components.ts::headlineBadge / _macros.html.j2); the
+   quieter fates share the dim base, the notable ones get a colour of their own */
+.badge.st { text-transform: none; letter-spacing: 0.02em; white-space: nowrap; color: var(--text-dim); background: var(--surface-2); border-color: var(--border); }
+.badge.st-tracked { color: var(--stable); background: var(--stable-bg); border-color: color-mix(in srgb, var(--stable) 32%, transparent); }
+.badge.st-retired { color: var(--retired); background: var(--retired-bg); border-color: color-mix(in srgb, var(--retired) 36%, transparent); }
+.badge.st-untrackable { color: var(--changed); background: var(--changed-bg); border-color: color-mix(in srgb, var(--changed) 34%, transparent); }
+.badge.st-errors-out { color: var(--alert); background: var(--alert-bg); border-color: color-mix(in srgb, var(--alert) 34%, transparent); }
+
+mark { background: var(--accent-quiet); color: var(--accent); border-radius: 3px; padding: 0 1px; }
+
 .pill { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.74rem; font-weight: 560; padding: 0.18rem 0.5rem 0.18rem 0.42rem; border-radius: 20px; }
 .pill .led { width: 6px; height: 6px; border-radius: 50%; }
 .pill.stable { color: var(--stable); background: var(--stable-bg); } .pill.stable .led { background: var(--stable); }
@@ -199,6 +209,8 @@ section.block { padding: 2.6rem 0 0.6rem; }
 .chip.on { color: var(--accent); border-color: var(--accent); background: var(--accent-quiet); }
 .chip.on.state-changed { color: var(--changed); border-color: var(--changed); background: var(--changed-bg); }
 .chip.on.state-retired { color: var(--retired); border-color: var(--retired); background: var(--retired-bg); }
+/* chips the current mode ignores: search bypasses every chip, change-history chips the status group */
+.chips.bypass-all .chip, .chips.bypass-status .chip[data-st] { opacity: 0.45; }
 
 .table-wrap { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--surface); }
 .table-scroll { max-height: 580px; overflow-y: auto; }
@@ -218,6 +230,9 @@ td .model-cell { font-weight: 560; letter-spacing: -0.01em; }
 td .model-cell:hover { color: var(--accent); }
 td .org-cell { color: var(--text-dim); font-size: 0.74rem; }
 td .prov-cell { color: var(--text-muted); font-family: var(--mono); font-size: 0.79rem; }
+/* untracked directory rows: the one-line reason sits where the sparkline would */
+td.reason-cell { max-width: 340px; }
+td.reason-cell .reason { display: block; max-width: 340px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-dim); font-size: 0.78rem; }
 td .cc { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 td .cc.zero { color: var(--text-dim); }
 td .cc.some { color: var(--changed); font-weight: 600; }
@@ -249,6 +264,18 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 .compare .t span { color: var(--text-muted); }
 .compare a.go { font-family: var(--mono); font-size: 0.82rem; color: var(--accent); white-space: nowrap; }
 .compare a.go:hover { text-decoration: underline; }
+
+/* endpoint page: per-method tracking status */
+.status-methods { padding: 0.95rem 1.4rem; display: grid; gap: 0.55rem; }
+.status-methods .ms { display: flex; align-items: baseline; gap: 0.6rem; font-size: 0.86rem; color: var(--text-muted); }
+.status-methods .ms .badge { flex: none; }
+.status-methods .st-name { color: var(--text); font-weight: 600; }
+.status-methods .ms-detail { color: var(--text-dim); }
+
+/* untracked endpoint page: catalog metadata in place of a chart */
+.meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1.2rem; padding: 1rem 1.4rem; }
+.meta-grid .k { font-size: 0.68rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.25rem; }
+.meta-grid .v { font-family: var(--mono); font-size: 0.95rem; font-weight: 600; }
 
 .sec-desc { color: var(--text-muted); font-size: 0.86rem; margin: -0.6rem 0 1.1rem; max-width: 82ch; }
 .sec-desc b { color: var(--text); font-weight: 600; }
@@ -289,6 +316,8 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 .cmp .allrow + .grp-h, .cmp .allrow + .row { border-top: none; }
 .cmp .grp-h a:hover { color: var(--accent); }
 .cmp .grp-h span { color: var(--text-dim); font-size: 0.7rem; }
+/* the unlinked banner of an all-untracked group keeps the linked banner's weight */
+.cmp .grp-h span.base { color: inherit; font-size: inherit; }
 .cmp .row { display: grid; grid-template-columns: 176px 1fr 108px; align-items: center; gap: 0.7rem; padding: 0.35rem 1rem; border-top: 1px solid var(--border-soft); }
 .cmp .row:hover { background: var(--surface-2); }
 .cmp .pv a { font-family: var(--mono); font-size: 0.84rem; font-weight: 550; }
@@ -306,6 +335,11 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 .cmp .allrow .k { font-size: 0.78rem; font-weight: 600; }
 .cmp .allrow .k small { display: block; color: var(--text-dim); font-weight: 400; font-size: 0.7rem; font-family: var(--mono); }
 .cmp .allrow svg { width: 100%; height: 34px; display: block; }
+/* model page: untracked endpoint rows carry a reason instead of a strip */
+.cmp .row.untracked { padding: 0.5rem 1rem; }
+.cmp .row .reason { color: var(--text-dim); font-size: 0.78rem; }
+.cmp .row.untracked .meta a { color: var(--text-dim); font-size: 0.7rem; font-family: var(--mono); }
+.cmp .row.untracked .meta a:hover { color: var(--accent); }
 @media (max-width: 680px) { .cmp .row, .cmp .axis, .cmp .allrow { grid-template-columns: 112px 1fr 66px; } }
 
 /* spend page */

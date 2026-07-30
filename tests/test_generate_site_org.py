@@ -11,11 +11,15 @@ def _model_view(model: str, endpoints: list[tuple[str, str]], changes: list[str]
         "date_max": "2026-06-30",
         "n_endpoints": len(endpoints),
         "n_providers": len({base for _, base in endpoints}),
+        "n_endpoints_total": len(endpoints),
         "n_changed": 1 if changes else 0,
         "max_drift": 0.0,
+        "headline": "tracked",
+        "status_summary": f"{len(endpoints)} of {len(endpoints)} endpoints trackable",
         "changes": [{"date": d, "method": "lt", "provider": "p"} for d in changes],
         "endpoints": [
-            {"provider": provider, "base": base} for provider, base in endpoints
+            {"provider": provider, "base": base, "methods": ["lt"]}
+            for provider, base in endpoints
         ],
     }
 
@@ -74,6 +78,26 @@ def test_org_models_sort_most_changed_first():
         "mid",
         "quiet",
     ]
+
+
+def test_org_model_rows_carry_status_badges():
+    view = _model_view("m/untrackable", [("p1", "p1")], [])
+    view["n_endpoints"] = 0
+    view["headline"] = "untrackable"
+    view["status_summary"] = "0 of 1 endpoint trackable"
+    view["endpoints"] = [{"provider": "p1", "base": "p1", "methods": []}]
+    views = build_org_views({slugify("m/untrackable"): view})
+    (row,) = views[slugify("m")]["models"]
+    assert row["headline"] == "untrackable"
+    assert row["status_summary"] == "0 of 1 endpoint trackable"
+    assert row["n_endpoints_total"] == 1
+
+
+def test_org_provider_count_ignores_untracked_endpoints():
+    view = _model_view("m/a", [("p1", "p1")], [])
+    view["endpoints"].append({"provider": "p2", "base": "p2", "methods": []})
+    views = build_org_views({slugify("m/a"): view})
+    assert views[slugify("m")]["n_providers"] == 1
 
 
 def test_org_row_carries_last_change_date():

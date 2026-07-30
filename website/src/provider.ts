@@ -1,8 +1,6 @@
-// `export {}` makes this a module so its top-level names (LANE_W, init, ...)
-// don't collide with the same names in other bundler-entrypoint scripts (endpoint.ts)
-// when type-checked together as one tsc program.
-export {};
-
+// The `init` export both makes this a module (so its top-level names don't collide
+// with other bundler entrypoints when type-checked as one tsc program) and lets the
+// smoke tests re-render a fresh document without busting the module cache.
 import {
   B3IT_CAP,
   LT_CAP,
@@ -16,6 +14,8 @@ import {
   rateBar,
   sparkline,
   statusPill,
+  statusRank,
+  untrackedDirCells,
   volGrid,
 } from "./components";
 
@@ -51,10 +51,12 @@ interface EndpointRow {
   org: string;
   provider: string;
   methods: string[];
-  status: string;
+  status: string | null; // null on rows with no series (untracked)
   stableDays: number | null;
   nChanges: number;
   trace: number[];
+  headline: string;
+  reason: string;
 }
 
 interface ProviderData {
@@ -77,7 +79,7 @@ type SortKey = "model" | "provider" | "status" | "nChanges" | "stableDays";
 
 const LANE_W = 600;
 
-async function init(): Promise<void> {
+export async function init(): Promise<void> {
   const slugEl = document.getElementById("providerData");
   if (!slugEl) return;
   const slug: string = JSON.parse(slugEl.textContent || '""');
@@ -135,7 +137,8 @@ async function init(): Promise<void> {
 
   const summaryEl = document.getElementById("summary");
   if (summaryEl) {
-    const active = D.endpoints.filter((e) => e.status !== "retired").length;
+    // among tracked rows only, like every other number on this card
+    const active = D.endpoints.filter((e) => e.methods.length && e.status !== "retired").length;
     const affected = D.endpoints.filter((e) => e.nChanges > 0).length;
     summaryEl.innerHTML = `
       <div class="s"><div class="v">${D.n_endpoints}</div><div class="k">Endpoints</div></div>
@@ -254,7 +257,6 @@ async function init(): Promise<void> {
   const filters = new Set<string>();
   let sortKey: SortKey = "nChanges";
   let sortDir = -1;
-  const STATUS_ORDER: Record<string, number> = { changed: 0, stable: 1, retired: 2 };
   const qEl = document.getElementById("epq") as HTMLInputElement | null;
   const bodyEl = document.getElementById("epBody");
   const footEl = document.getElementById("epFoot");
@@ -276,7 +278,7 @@ async function init(): Promise<void> {
     });
     list.sort((a, b) => {
       let av: string | number, bv: string | number;
-      if (sortKey === "status") { av = STATUS_ORDER[a.status] ?? 3; bv = STATUS_ORDER[b.status] ?? 3; }
+      if (sortKey === "status") { av = statusRank(a); bv = statusRank(b); }
       else if (sortKey === "stableDays") { av = a.stableDays ?? -1; bv = b.stableDays ?? -1; }
       else if (sortKey === "nChanges") { av = a.nChanges; bv = b.nChanges; }
       else if (sortKey === "provider") { av = variantOf(a.provider); bv = variantOf(b.provider); }
@@ -289,10 +291,12 @@ async function init(): Promise<void> {
       list
         .map((r) => {
           const isLT = r.methods.includes("lt");
-          return `<tr>
+          const head = `<tr>
         <td><a class="model-cell" href="../models/${esc(r.modelSlug)}.html">${esc(r.model)}</a><div class="org-cell">${esc(r.org)}</div></td>
-        <td class="col-hide"><span class="prov-cell">${variantOf(r.provider) ? esc(variantOf(r.provider)) : "—"}</span></td>
-        <td><a href="../endpoints/${esc(r.slug)}.html">${statusPill(r.status)}</a></td>
+        <td class="col-hide"><span class="prov-cell">${variantOf(r.provider) ? esc(variantOf(r.provider)) : "—"}</span></td>`;
+          if (!r.methods.length) return `${head}${untrackedDirCells(r, "../")}</tr>`;
+          return `${head}
+        <td><a href="../endpoints/${esc(r.slug)}.html">${statusPill(r.status!)}</a></td>
         <td class="r"><span class="cc ${r.nChanges ? "some" : "zero"}">${r.nChanges}</span></td>
         <td class="col-hide"><span class="methods">${methodBadges(r.methods)}</span></td>
         <td class="r col-hide">${stableCell(r)}</td>

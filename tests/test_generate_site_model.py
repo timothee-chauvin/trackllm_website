@@ -2,7 +2,12 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-from conftest import write_lt_endpoint
+from conftest import (
+    catalog_entry,
+    empty_status_inputs,
+    site_statuses_for,
+    write_lt_endpoint,
+)
 from trackllm_website.bi.phase_2 import save_results
 from trackllm_website.bi.state import EndpointBIState, Epoch
 from trackllm_website.config import Endpoint
@@ -10,6 +15,7 @@ from trackllm_website.generate_site.b3it import discover_b3it_views
 from trackllm_website.generate_site.changes import merge_changes, to_json
 from trackllm_website.generate_site.lt import discover_lt_endpoints, load_lt_data
 from trackllm_website.generate_site.model import build_model_views
+from trackllm_website.generate_site.status_io import resolve_site_statuses
 from trackllm_website.util import slugify
 
 
@@ -36,13 +42,18 @@ def _write_changes_json(root: Path) -> None:
     (root / "data" / "changes.json").write_text(json.dumps(to_json(events)))
 
 
-def _build_model_views(root: Path) -> dict:
+def _build_model_views_with(root: Path, inputs) -> dict:
     lt_dir = root / "data" / "lt"
     lt_endpoints = list(discover_lt_endpoints(lt_dir)) if lt_dir.exists() else []
     b3it_views = discover_b3it_views(
         root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
     )
-    return build_model_views(root, lt_endpoints, b3it_views)
+    site = site_statuses_for(root, inputs)
+    return build_model_views(root, lt_endpoints, b3it_views, site)
+
+
+def _build_model_views(root: Path) -> dict:
+    return _build_model_views_with(root, empty_status_inputs())
 
 
 def _daily_batch(day: int, token: str):
@@ -258,10 +269,76 @@ def test_endpoint_with_no_lt_scores_file_yields_null_lt(tmp_path):
     # no lt_scores.json written
     _write_changes_json(root)
 
-    views = _build_model_views(root)
+    lt_endpoints = list(discover_lt_endpoints(root / "data" / "lt"))
+    # the site map must cover the seriesless endpoint for it to keep its rec
+    site = resolve_site_statuses(
+        empty_status_inputs(), {e.slug: e for e in lt_endpoints}, set(), {}
+    )
+    views = build_model_views(root, lt_endpoints, {}, site)
     view = views[slugify("m/a")]
     ep = view["endpoints"][0]
     assert ep["methods"] == ["lt"]
     assert ep["lt"] is None
     assert ep["first"] is None and ep["last"] is None
     assert ep["n_changes"] == 0
+
+
+def _gpt5_inputs():
+    """A gpt-5-like model: two catalog endpoints, no temperature, no logprobs."""
+    inputs = empty_status_inputs()
+    inputs.catalog = [
+        catalog_entry(
+            "openai/gpt-5.4",
+            provider,
+            supports_temperature=False,
+            supports_logprobs=False,
+        )
+        for provider in ("openai", "azure")
+    ]
+    for provider in ("openai", "azure"):
+        inputs.bi_cache.add_bad_temperature(
+            Endpoint(
+                api="openrouter", model="openai/gpt-5.4", provider=provider, cost=(1, 2)
+            )
+        )
+    return inputs
+
+
+def test_catalog_only_model_gets_a_view_with_status_summary(tmp_path):
+    root = tmp_path / "website"
+    views = _build_model_views_with(root, _gpt5_inputs())
+    view = views[slugify("openai/gpt-5.4")]
+    assert view["model"] == "openai/gpt-5.4" and view["org"] == "openai"
+    assert view["n_endpoints"] == 0 and view["n_providers"] == 0
+    assert view["n_endpoints_total"] == 2
+    assert view["status_summary"] == "0 of 2 endpoints trackable"
+    assert view["headline"] == "untrackable"
+    assert view["date_min"] is None and view["changes"] == []
+    for ep in view["endpoints"]:
+        assert ep["methods"] == [] and ep["lt"] is None and ep["b3it"] is None
+        assert ep["status"]["headline"] == "untrackable"
+        assert ep["providerSlug"] in {"openai", "azure"}
+
+
+def test_tracked_endpoints_carry_status_and_sort_before_untracked(tmp_path):
+    root = tmp_path / "website"
+    dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 6)]
+    write_lt_endpoint(
+        root, "m2fa23p", "m/a", "p", dates=dates, changes=[], drift=[0.1] * 5
+    )
+    _write_changes_json(root)
+    inputs = empty_status_inputs()
+    inputs.endpoints_lt = [
+        Endpoint(api="openrouter", model="m/a", provider="p", cost=(1, 2))
+    ]
+    inputs.catalog = [
+        catalog_entry("m/a", "p"),
+        catalog_entry("m/a", "q", supports_logprobs=False),
+    ]
+    view = _build_model_views_with(root, inputs)[slugify("m/a")]
+    assert view["n_endpoints"] == 1 and view["n_endpoints_total"] == 2
+    assert view["status_summary"] == "2 of 2 endpoints trackable"
+    assert view["headline"] == "tracked"
+    tracked, untracked = view["endpoints"]
+    assert tracked["slug"] == "m2fa23p" and tracked["status"]["lt"] == "tracked"
+    assert untracked["provider"] == "q" and untracked["methods"] == []

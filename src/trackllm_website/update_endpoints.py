@@ -2,6 +2,7 @@ import asyncio
 from collections.abc import Iterable
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
+from pathlib import Path
 
 import aiohttp
 import requests
@@ -39,6 +40,8 @@ from trackllm_website.util import (
 )
 
 ENDPOINTS_CACHE_BI_PATH = root / "endpoints_cache_bi.yaml"
+ENDPOINTS_CACHE_LT_PATH = root / "endpoints_cache_lt.yaml"
+ENDPOINTS_CATALOG_PATH = root / "endpoints_catalog.yaml"
 
 
 def cache_too_expensive_from_probe(
@@ -82,6 +85,107 @@ def save_endpoints_bi(endpoints: list[Endpoint]) -> None:
     logger.info(
         f"Updated {config.endpoints_yaml_path_bi} with {len(sorted_endpoints)} endpoints"
     )
+
+
+def save_endpoints_catalog(endpoints: list[Endpoint], path: Path) -> None:
+    """Snapshot the FULL OpenRouter catalog (before the free/cost filters drop
+    entries) so the site can show a status for every endpoint."""
+    entries = [
+        {
+            "model": e.model,
+            "provider": e.provider,
+            "cost": list(e.cost),
+            "created": e.created.isoformat() if e.created else None,
+            "supports_temperature": e.supports_temperature,
+            "supports_logprobs": e.supports_logprobs,
+            "free": e.cost == (0, 0),
+        }
+        for e in sorted(endpoints, key=lambda e: (e.model, e.provider))
+    ]
+    atomic_write_bytes(
+        path,
+        yaml.dump(
+            {"endpoints_catalog": entries}, default_flow_style=False, sort_keys=False
+        ).encode(),
+    )
+    logger.info(f"Updated {path} with {len(entries)} endpoints")
+
+
+class LTFailure(BaseModel):
+    model: str
+    provider: str
+    reason: str
+    last_seen: datetime
+
+
+class LTFailureCache(BaseModel):
+    """Why LT logprob probes failed, persisted to endpoints_cache_lt.yaml so the
+    site can display the reason. Passing endpoints are cleared from the cache."""
+
+    failures: list[LTFailure]
+
+    def record(self, endpoint: Endpoint, reason: str, now: datetime) -> None:
+        self.clear(endpoint)
+        self.failures.append(
+            LTFailure(
+                model=endpoint.model,
+                provider=endpoint.provider,
+                reason=reason,
+                last_seen=now,
+            )
+        )
+
+    def clear(self, endpoint: Endpoint) -> None:
+        self.failures = [
+            f
+            for f in self.failures
+            if (f.model, f.provider) != (endpoint.model, endpoint.provider)
+        ]
+
+    def save(self, path: Path) -> None:
+        data = {
+            "failures": [
+                {
+                    "model": f.model,
+                    "provider": f.provider,
+                    "reason": f.reason,
+                    "last_seen": f.last_seen.isoformat(),
+                }
+                for f in sorted(self.failures, key=lambda f: (f.model, f.provider))
+            ]
+        }
+        atomic_write_bytes(
+            path, yaml.dump(data, default_flow_style=False, sort_keys=False).encode()
+        )
+
+    @classmethod
+    def load(cls, path: Path) -> "LTFailureCache":
+        if not path.exists():
+            return cls(failures=[])
+        with open(path) as f:
+            data = yaml.safe_load(f) or {}
+        return cls(failures=data.get("failures") or [])
+
+
+def update_lt_failure_cache(
+    cache: LTFailureCache,
+    valid: list[Endpoint],
+    failures: dict[Endpoint, str],
+    claiming: list[Endpoint],
+    now: datetime,
+) -> None:
+    """Record this run's probe failures (refreshing reason/last_seen) and clear
+    endpoints that now pass. Entries outside the claiming-logprobs-under-cap set
+    are pruned: their status is derivable from the catalog, and a stale failure
+    would outrank that fresher evidence in the resolver."""
+    claiming_keys = {(e.model, e.provider) for e in claiming}
+    cache.failures = [
+        f for f in cache.failures if (f.model, f.provider) in claiming_keys
+    ]
+    for endpoint, reason in failures.items():
+        cache.record(endpoint, reason, now)
+    for endpoint in valid:
+        cache.clear(endpoint)
 
 
 def merge_goods(
@@ -139,10 +243,12 @@ def parse_model_endpoints(
     filtered_endpoints = []
     for endpoint in model_endpoints:
         params = endpoint.get("supported_parameters")
-        if logprob_filter and not (
-            "logprobs" in endpoint["supported_parameters"]
-            and "top_logprobs" in endpoint["supported_parameters"]
-        ):
+        supports_logprobs = (
+            "logprobs" in params and "top_logprobs" in params
+            if params is not None
+            else None
+        )
+        if logprob_filter and not supports_logprobs:
             continue
         endpoint_data = Endpoint(
             api="openrouter",
@@ -160,6 +266,7 @@ def parse_model_endpoints(
                 if params is not None
                 else model_supports_temperature
             ),
+            supports_logprobs=supports_logprobs,
         )
         filtered_endpoints.append(endpoint_data)
     return filtered_endpoints
@@ -200,7 +307,7 @@ async def get_model_endpoints(
 
 
 async def get_endpoints(
-    logprob_filter: bool, max_cost_mtok: float | None
+    logprob_filter: bool, max_cost_mtok: float | None, catalog_path: Path | None
 ) -> list[Endpoint]:
     """Get all endpoints for all models.
 
@@ -208,6 +315,8 @@ async def get_endpoints(
         logprob_filter: If True, only return endpoints that claim to support logprobs
         max_cost_mtok: If not None, only keep endpoints whose combined input+output
             cost is below this cap (in $/Mtok)
+        catalog_path: If not None, snapshot the endpoints fetched BEFORE any
+            filtering there (only meaningful on an unfiltered fetch)
     """
     response = requests.get("https://openrouter.ai/api/v1/models")
     models = response.json()["data"]
@@ -238,6 +347,9 @@ async def get_endpoints(
         ):
             all_endpoints.extend(result)
 
+    if catalog_path is not None:
+        save_endpoints_catalog(all_endpoints, catalog_path)
+
     filtered_endpoints = all_endpoints
     if max_cost_mtok is not None:
         filtered_endpoints = [
@@ -262,34 +374,41 @@ async def get_endpoints(
     return filtered_endpoints
 
 
-async def test_endpoint_logprobs(endpoint: Endpoint) -> Endpoint | None:
-    """Test if an endpoint actually returns logprobs when queried with 'x'"""
+async def test_endpoint_logprobs(endpoint: Endpoint) -> str | None:
+    """Query an endpoint with 'x'; return None if it actually returns logprobs,
+    else the failure reason."""
     async with OpenRouterClient() as client:
         try:
             response = await client.query(endpoint, "x")
-            if response.error or len(
-                response.logprobs.logprobs
-            ) != endpoint.get_max_logprobs(config):
-                log_msg = f"{endpoint} logprob support: ❌"
-                if response.error:
-                    log_msg += f"\n{response.error}"
-                else:
-                    log_msg += f"\n{len(response.logprobs.logprobs)} logprobs, expected {endpoint.get_max_logprobs(config)}"
-                logger.info(log_msg)
+            if response.error:
+                reason = f"error: {response.error.message}"
+            elif (n := len(response.logprobs.logprobs)) != (
+                expected := endpoint.get_max_logprobs(config)
+            ):
+                reason = f"returned {n} logprobs, expected {expected}"
+            else:
+                logger.info(f"{endpoint} logprob support: ✅")
                 return None
-            logger.info(f"{endpoint} logprob support: ✅")
-            return endpoint
-        except Exception:
+            logger.info(f"{endpoint} logprob support: ❌\n{reason}")
+            return reason
+        except Exception as e:
             logger.exception(f"Error testing logprobs for {endpoint}")
-            return None
+            return f"error: {e}"
 
 
-async def test_endpoints_logprobs(endpoints: Iterable[Endpoint]) -> list[Endpoint]:
-    """Return the endpoints that actually return logprobs when queried with 'x'"""
-    tasks = [test_endpoint_logprobs(e) for e in endpoints]
-    return [
-        e for e in await gather_with_concurrency(config.api.max_workers, *tasks) if e
-    ]
+async def test_endpoints_logprobs(
+    endpoints: Iterable[Endpoint],
+) -> tuple[list[Endpoint], dict[Endpoint, str]]:
+    """Split endpoints into (passing, {failing: reason}) by probing each with 'x'."""
+    endpoints = list(endpoints)
+    reasons = await gather_with_concurrency(
+        config.api.max_workers, *(test_endpoint_logprobs(e) for e in endpoints)
+    )
+    valid = [e for e, reason in zip(endpoints, reasons) if reason is None]
+    failures = {
+        e: reason for e, reason in zip(endpoints, reasons) if reason is not None
+    }
+    return valid, failures
 
 
 async def update_endpoints_lt():
@@ -301,7 +420,7 @@ async def update_endpoints_lt():
         f"Keeping {len(endpoints_to_keep)}/{len(current_endpoints)} non-stalled endpoints"
     )
     endpoints_claiming_logprobs = await get_endpoints(
-        logprob_filter=True, max_cost_mtok=config.api.max_cost_mtok
+        logprob_filter=True, max_cost_mtok=config.api.max_cost_mtok, catalog_path=None
     )
 
     # Update costs with latest values
@@ -317,8 +436,15 @@ async def update_endpoints_lt():
                 endpoint.cost = updated_endpoint.cost
 
     endpoints_to_test = set(endpoints_claiming_logprobs) - endpoints_to_keep
-    valid_endpoints = await test_endpoints_logprobs(endpoints_to_test)
+    valid_endpoints, failures = await test_endpoints_logprobs(endpoints_to_test)
     logger.info(f"Found {len(valid_endpoints)} valid new endpoints")
+
+    lt_cache = LTFailureCache.load(ENDPOINTS_CACHE_LT_PATH)
+    now = datetime.now(tz=timezone.utc).replace(microsecond=0)
+    update_lt_failure_cache(
+        lt_cache, valid_endpoints, failures, endpoints_claiming_logprobs, now
+    )
+    lt_cache.save(ENDPOINTS_CACHE_LT_PATH)
     final_endpoints = endpoints_to_keep | set(valid_endpoints)
     # Sort endpoints by total cost, then api, model and provider
     sorted_endpoints = sorted(
@@ -363,7 +489,9 @@ async def update_endpoints_bi() -> list[Endpoint]:
     measured cost_per_request and saves the cache.
     """
     prior_goods = config.endpoints_bi  # prior registry, carries prior cost_per_request
-    all_endpoints = await get_endpoints(logprob_filter=False, max_cost_mtok=None)
+    all_endpoints = await get_endpoints(
+        logprob_filter=False, max_cost_mtok=None, catalog_path=ENDPOINTS_CATALOG_PATH
+    )
     policy = load_policy(root / config.bi.selection_path)
     cache = EndpointCache.load(ENDPOINTS_CACHE_BI_PATH)
     now = datetime.now(tz=timezone.utc).replace(microsecond=0)
