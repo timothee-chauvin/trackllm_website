@@ -23,6 +23,7 @@ from trackllm_website.bi.digest import (
 from trackllm_website.bi.popularity import fetch_popular_models_safe
 from trackllm_website.bi.reinit import reinit
 from trackllm_website.bi.selection import (
+    SelectionPolicy,
     exceeds_ceiling,
     load_policy,
     select_monitoring_targets,
@@ -30,6 +31,7 @@ from trackllm_website.bi.selection import (
 from trackllm_website.bi.state import EndpointBIState, RetiredInfo, load_all_states
 from trackllm_website.bi.vetting import (
     EndpointCache,
+    VetResult,
     clear_recheckable,
     should_recheck,
     vet_endpoint,
@@ -65,16 +67,52 @@ def record_probe_failures(
     probed: list[Endpoint],
     cache: EndpointCache,
     threshold: int,
+    exempt: set[Endpoint],
 ) -> None:
     """Count strategy-resolution failures toward the unprobeable streak, except
-    cost short-circuits (those land in too_expensive, not a flakiness signal)."""
+    cost short-circuits (those land in too_expensive, not a flakiness signal)
+    and `exempt` endpoints (prior goods: merge_goods carries them through flaky
+    days, and a systemic outage must not bucket the whole vetted fleet)."""
     by_key = {str(e): e for e in probed}
     for key, errors in failed.items():
         if errors and errors[0] == TOO_EXPENSIVE:
             continue
-        if key in by_key:
+        if key in by_key and by_key[key] not in exempt:
             error = errors[0] if errors else "strategy resolution failed"
             cache.record_failure(by_key[key], error, threshold=threshold)
+
+
+def route_vet_result(
+    res: VetResult,
+    endpoint: Endpoint,
+    cache: EndpointCache,
+    policy: SelectionPolicy,
+    threshold: int,
+    prior_good: bool,
+) -> Endpoint | None:
+    """Turn one vet verdict into cache state; returns the endpoint iff kept good.
+
+    Transients accrue the unprobeable streak — except for prior goods, which
+    merge_goods already carries through flaky days (see record_probe_failures).
+    """
+    if res.bucket == "transient":
+        if not prior_good:
+            cache.record_failure(
+                endpoint, res.detail or "transient vet failure", threshold=threshold
+            )
+        return None
+    cache.record_success(endpoint)  # any definitive verdict ends the streak
+    if res.bucket == "candidate":
+        endpoint.cost_per_request = res.cost_per_request
+        if exceeds_ceiling(
+            res.cost_per_request, endpoint.model, endpoint.provider, policy
+        ):
+            cache.add_too_expensive(endpoint)
+            return None
+        return endpoint
+    if res.bucket == "liar":
+        cache.add_liar(endpoint)
+    return None  # liar (cached above)
 
 
 def save_endpoints_bi(endpoints: list[Endpoint]) -> None:
@@ -513,8 +551,9 @@ async def update_endpoints_bi() -> list[Endpoint]:
     """Refresh the BI candidate catalog via cost-based vetting.
 
     Pulls the full catalog (no cost cap), skips endpoints already in the bucketed
-    cache (liars / too_expensive / bad_temperature), then vets the rest — known-good
-    endpoints included, to refresh their measured cost_per_request since prices move.
+    cache (liars / too_expensive / bad_temperature / unprobeable), then vets the
+    rest — known-good endpoints included, to refresh their measured
+    cost_per_request since prices move.
     Each vet runs one real query and measures the billed cost; results are routed:
     candidate (kept, with measured cost; or cached too_expensive if over the ceiling),
     liar (cached), transient (skipped, retried next run). Writes endpoints_bi.yaml with
@@ -542,6 +581,12 @@ async def update_endpoints_bi() -> list[Endpoint]:
     # only those already in a reject bucket.
     to_vet = [e for e in all_endpoints if not cache.is_cached(e)]
 
+    # :batch first so a temp:NO batch endpoint gets the batch copy, not temp's.
+    to_vet, batch_skip = partition_batch(to_vet)
+    for endpoint in batch_skip:
+        cache.add_unprobeable(endpoint, reason="batch", detail=None)
+    logger.info(f"Skipping {len(batch_skip)} :batch endpoints (async-only)")
+
     # Pre-filter endpoints whose supported_parameters omit temperature: they
     # provably ignore T=0, so route them straight to bad_temperature without probing.
     to_vet, temp_skip = partition_temperature(to_vet)
@@ -550,11 +595,6 @@ async def update_endpoints_bi() -> list[Endpoint]:
     logger.info(
         f"Skipping {len(temp_skip)} temperature-unsupported endpoints (temp:NO)"
     )
-
-    to_vet, batch_skip = partition_batch(to_vet)
-    for endpoint in batch_skip:
-        cache.add_unprobeable(endpoint, reason="batch", detail=None)
-    logger.info(f"Skipping {len(batch_skip)} :batch endpoints (async-only)")
 
     logger.info(
         f"Vetting {len(to_vet)} of {len(all_endpoints)} endpoints "
@@ -566,9 +606,14 @@ async def update_endpoints_bi() -> list[Endpoint]:
         strategies, failed = await resolve_strategies(
             probe_client, to_vet, policy=policy, probe_spend=probe_spend
         )
+    prior_set = set(prior_goods)
     cache_too_expensive_from_probe(failed, to_vet, cache)
     record_probe_failures(
-        failed, to_vet, cache, threshold=config.bi.reinit.unprobeable_after_failures
+        failed,
+        to_vet,
+        cache,
+        threshold=config.bi.reinit.unprobeable_after_failures,
+        exempt=prior_set,
     )
     logger.info(
         f"Resolved strategies for {len(strategies)} endpoints "
@@ -590,25 +635,14 @@ async def update_endpoints_bi() -> list[Endpoint]:
             spend,
             now,
         )
-        if res.bucket == "transient":
-            cache.record_failure(
-                endpoint,
-                res.detail or "transient vet failure",
-                threshold=config.bi.reinit.unprobeable_after_failures,
-            )
-            return None
-        cache.record_success(endpoint)  # any definitive verdict ends the streak
-        if res.bucket == "candidate":
-            endpoint.cost_per_request = res.cost_per_request
-            if exceeds_ceiling(
-                res.cost_per_request, endpoint.model, endpoint.provider, policy
-            ):
-                cache.add_too_expensive(endpoint)
-                return None
-            return endpoint
-        if res.bucket == "liar":
-            cache.add_liar(endpoint)
-        return None  # liar (cached above)
+        return route_vet_result(
+            res,
+            endpoint,
+            cache,
+            policy,
+            threshold=config.bi.reinit.unprobeable_after_failures,
+            prior_good=endpoint in prior_set,
+        )
 
     client = OpenRouterClient()
     try:

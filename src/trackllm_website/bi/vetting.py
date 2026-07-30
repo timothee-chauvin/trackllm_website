@@ -2,7 +2,8 @@
 
 Buckets: candidate (usable, carries measured cost), liar (billed != advertised),
 too_expensive (set by the catalog refresh against the selection ceiling),
-bad_temperature (set by phase 1 when T=0 is ignored). Only liars are permanent;
+bad_temperature (set by phase 1 when T=0 is ignored), unprobeable (probes
+structurally can't or persistently don't succeed). Only liars are permanent;
 the others are rechecked periodically since prices / providers change.
 """
 
@@ -15,9 +16,11 @@ from pydantic import BaseModel
 
 from trackllm_website.bi.common import QueryStrategy, strategy_to_query_args
 from trackllm_website.config import Endpoint, logger
-from trackllm_website.util import atomic_write_bytes
+from trackllm_website.util import atomic_write_bytes, trim_to_length
 
 PRICE_TOLERANCE = 0.01
+# error text is persisted to the committed cache and shown on the site
+MAX_ERROR_DETAIL = 200
 Bucket = Literal[
     "candidate", "liar", "too_expensive", "bad_temperature", "transient", "unprobeable"
 ]
@@ -30,7 +33,7 @@ UnprobeableReason = Literal["batch", "flaky"]
 class UnprobeableEntry(BaseModel):
     endpoint: Endpoint
     reason: UnprobeableReason
-    detail: str | None = None
+    detail: str | None
 
 
 class FailureStreak(BaseModel):
@@ -106,14 +109,17 @@ class EndpointCache(BaseModel):
         return None
 
     def add_liar(self, endpoint: Endpoint) -> None:
+        self.record_success(endpoint)  # any definitive verdict ends the streak
         if endpoint not in self.liars:
             self.liars.append(endpoint)
 
     def add_too_expensive(self, endpoint: Endpoint) -> None:
+        self.record_success(endpoint)
         if endpoint not in self.too_expensive:
             self.too_expensive.append(endpoint)
 
     def add_bad_temperature(self, endpoint: Endpoint) -> None:
+        self.record_success(endpoint)
         if endpoint not in self.bad_temperature:
             self.bad_temperature.append(endpoint)
 
@@ -122,12 +128,18 @@ class EndpointCache(BaseModel):
     ) -> None:
         if not any(entry.endpoint == endpoint for entry in self.unprobeable):
             self.unprobeable.append(
-                UnprobeableEntry(endpoint=endpoint, reason=reason, detail=detail)
+                UnprobeableEntry(
+                    endpoint=endpoint,
+                    reason=reason,
+                    detail=trim_to_length(detail, MAX_ERROR_DETAIL) if detail else None,
+                )
             )
 
     def record_failure(self, endpoint: Endpoint, error: str, threshold: int) -> None:
-        """One more failed vetting run; at `threshold` consecutive failures the
-        endpoint moves to the unprobeable bucket and stops being probed."""
+        """One more failed vetting run (counts runs, not days; catalog absence
+        does not reset); at `threshold` consecutive failures the endpoint moves
+        to the unprobeable bucket and stops being probed."""
+        error = trim_to_length(error, MAX_ERROR_DETAIL)
         key = str(endpoint)
         prior = self.failure_streaks.get(key)
         streak = FailureStreak(
@@ -230,10 +242,9 @@ def clear_recheckable(cache: EndpointCache) -> int:
 
 
 def should_recheck(cache: EndpointCache, now: datetime, recheck_days: int) -> bool:
-    """Whether the too_expensive / bad_temperature buckets are due for re-vetting.
-
-    Prices drop and providers fix temperature, so these rejects are cleared and
-    re-probed periodically (liars stay permanent).
+    """Whether the recheckable buckets (see clear_recheckable) are due for
+    re-vetting: prices drop and providers fix themselves, so those rejects are
+    cleared and re-probed periodically (liars stay permanent).
     """
     if cache.last_recheck is None:
         return True
