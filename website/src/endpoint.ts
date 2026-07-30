@@ -6,8 +6,6 @@ export {};
 import { readingCaption } from "./caption";
 
 interface ManifestData {
-  model: string;
-  provider: string;
   slug: string;
 }
 
