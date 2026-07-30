@@ -22,9 +22,9 @@ Bucket = Literal[
     "candidate", "liar", "too_expensive", "bad_temperature", "transient", "unprobeable"
 ]
 
-# batch / no_text are structural (derived from the catalog without probing);
-# flaky means the vetting probe itself failed `threshold` runs in a row.
-UnprobeableReason = Literal["batch", "no_text", "flaky"]
+# batch is structural (derived from the model id without probing); flaky means
+# the vetting probe itself failed `threshold` runs in a row.
+UnprobeableReason = Literal["batch", "flaky"]
 
 
 class UnprobeableEntry(BaseModel):
@@ -130,11 +130,15 @@ class EndpointCache(BaseModel):
         endpoint moves to the unprobeable bucket and stops being probed."""
         key = str(endpoint)
         prior = self.failure_streaks.get(key)
-        streak = FailureStreak(count=(prior.count if prior else 0) + 1, last_error=error)
+        streak = FailureStreak(
+            count=(prior.count if prior else 0) + 1, last_error=error
+        )
         if streak.count >= threshold:
             self.failure_streaks.pop(key, None)
             self.add_unprobeable(endpoint, reason="flaky", detail=error)
-            logger.info(f"{endpoint}: unprobeable after {streak.count} failures ({error[:80]})")
+            logger.info(
+                f"{endpoint}: unprobeable after {streak.count} failures ({error[:80]})"
+            )
         else:
             self.failure_streaks[key] = streak
 

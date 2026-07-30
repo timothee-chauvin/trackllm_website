@@ -46,9 +46,13 @@ STATUS_COPY: dict[str, str] = {
     "retired": "We tracked this endpoint, but tracking has since been retired.",
     "untrackable": "This endpoint claims neither temperature control nor logprobs, so no tracking method can work — presumably to prevent distillation.",
     "errors_out": "Our probes of this endpoint error out.",
+    "unprobeable:batch": "Batch endpoints only answer asynchronous batch queries, so our synchronous probes cannot vet them.",
+    "unprobeable:flaky": "Our vetting probes of this endpoint persistently fail.",
 }
 
-ERRORS_OUT = frozenset({"liar", "probe_failed", "retired:unreachable"})
+ERRORS_OUT = frozenset(
+    {"liar", "probe_failed", "retired:unreachable", "unprobeable:flaky"}
+)
 # retired:unreachable is deliberately absent: it reads as "errors out", and the
 # retired headline would otherwise shadow errors_out entirely.
 _RETIRED_HEADLINE = frozenset({"retired:no_bis", "retired:delisted", "retired:stalled"})
@@ -118,6 +122,8 @@ def headline_for(lt: str, bi: str) -> str:
         return "retired"
     if lt == "no_logprobs" and bi == "bad_temperature":
         return "untrackable"
+    if bi == "unprobeable:batch":  # async-only: blocks LT and BI alike
+        return "untrackable"
     if "too_expensive" in (lt, bi):
         return "too_expensive"
     if bi in ("not_selected", "excluded"):
@@ -145,6 +151,8 @@ def _headline_of(status: str) -> str | None:
         return "retired"
     if status == "too_expensive":
         return "too_expensive"
+    if status == "unprobeable:batch":
+        return "untrackable"
     if status in ("not_selected", "excluded"):
         return "not_selected"
     if status in ERRORS_OUT:
@@ -213,7 +221,7 @@ def _bi_status(
     entry: CatalogEntry | None,
     endpoint: Endpoint | None,
     state: EndpointBIState | None,
-    bucket_by_slug: dict[str, str],
+    bucket_by_slug: dict[str, tuple[str, str | None]],
     bi_slugs: set[str],
     policy: SelectionPolicy,
 ) -> tuple[str, str | None]:
@@ -225,7 +233,7 @@ def _bi_status(
             f"since {state.retired.since.date().isoformat()}",
         )
     if slug in bucket_by_slug:
-        return bucket_by_slug[slug], None
+        return bucket_by_slug[slug]
     if endpoint is not None and _matches_any(endpoint, policy.exclude):
         return "excluded", None
     if slug in bi_slugs:
@@ -260,8 +268,15 @@ def resolve_statuses(
         _slug(f.model, f.provider): f.reason for f in lt_failures.failures
     }
     # liars processed last so they win, matching EndpointCache.bucket_of
-    bucket_by_slug = {
-        _slug(e.model, e.provider): bucket
+    bucket_by_slug: dict[str, tuple[str, str | None]] = {
+        _slug(entry.endpoint.model, entry.endpoint.provider): (
+            f"unprobeable:{entry.reason}",
+            entry.detail,
+        )
+        for entry in bi_cache.unprobeable
+    }
+    bucket_by_slug |= {
+        _slug(e.model, e.provider): (bucket, None)
         for bucket, endpoints in (
             ("bad_temperature", bi_cache.bad_temperature),
             ("too_expensive", bi_cache.too_expensive),
