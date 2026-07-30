@@ -70,6 +70,13 @@ cooldown = 10
 instability_window = 14
 instability_threshold = 0.4
 
+[bi.scan]  # early-epoch changepoint scan; thresholds calibrated in scan_sweep.py
+min_batches = 4         # reference + 3 daily batches
+max_batches = 30        # scan window end; the adaptive rule owns the rest
+min_side_samples = 30   # per prompt (average) on each side of a candidate split
+permutations = 999
+alpha = 0.005           # sweep 2026-07-30: ~1-2/129 uncorroborated firings on stable epochs
+
 [bi.reinit]
 reprobe_samples = 10
 reference_samples = 100
