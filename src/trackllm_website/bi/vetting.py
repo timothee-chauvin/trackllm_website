@@ -18,7 +18,24 @@ from trackllm_website.config import Endpoint, logger
 from trackllm_website.util import atomic_write_bytes
 
 PRICE_TOLERANCE = 0.01
-Bucket = Literal["candidate", "liar", "too_expensive", "bad_temperature", "transient"]
+Bucket = Literal[
+    "candidate", "liar", "too_expensive", "bad_temperature", "transient", "unprobeable"
+]
+
+# batch / no_text are structural (derived from the catalog without probing);
+# flaky means the vetting probe itself failed `threshold` runs in a row.
+UnprobeableReason = Literal["batch", "no_text", "flaky"]
+
+
+class UnprobeableEntry(BaseModel):
+    endpoint: Endpoint
+    reason: UnprobeableReason
+    detail: str | None = None
+
+
+class FailureStreak(BaseModel):
+    count: int
+    last_error: str
 
 
 class VetResult(BaseModel):
@@ -67,6 +84,9 @@ class EndpointCache(BaseModel):
     liars: list[Endpoint]
     too_expensive: list[Endpoint]
     bad_temperature: list[Endpoint]
+    # defaults keep pre-unprobeable cache files loadable
+    unprobeable: list[UnprobeableEntry] = []
+    failure_streaks: dict[str, FailureStreak] = {}  # str(endpoint) -> streak
     last_recheck: datetime | None = None
 
     def is_cached(self, endpoint: Endpoint) -> bool:
@@ -79,6 +99,8 @@ class EndpointCache(BaseModel):
             return "too_expensive"
         if endpoint in self.bad_temperature:
             return "bad_temperature"
+        if any(entry.endpoint == endpoint for entry in self.unprobeable):
+            return "unprobeable"
         return None
 
     def add_liar(self, endpoint: Endpoint) -> None:
@@ -92,6 +114,30 @@ class EndpointCache(BaseModel):
     def add_bad_temperature(self, endpoint: Endpoint) -> None:
         if endpoint not in self.bad_temperature:
             self.bad_temperature.append(endpoint)
+
+    def add_unprobeable(
+        self, endpoint: Endpoint, reason: UnprobeableReason, detail: str | None
+    ) -> None:
+        if not any(entry.endpoint == endpoint for entry in self.unprobeable):
+            self.unprobeable.append(
+                UnprobeableEntry(endpoint=endpoint, reason=reason, detail=detail)
+            )
+
+    def record_failure(self, endpoint: Endpoint, error: str, threshold: int) -> None:
+        """One more failed vetting run; at `threshold` consecutive failures the
+        endpoint moves to the unprobeable bucket and stops being probed."""
+        key = str(endpoint)
+        prior = self.failure_streaks.get(key)
+        streak = FailureStreak(count=(prior.count if prior else 0) + 1, last_error=error)
+        if streak.count >= threshold:
+            self.failure_streaks.pop(key, None)
+            self.add_unprobeable(endpoint, reason="flaky", detail=error)
+            logger.info(f"{endpoint}: unprobeable after {streak.count} failures ({error[:80]})")
+        else:
+            self.failure_streaks[key] = streak
+
+    def record_success(self, endpoint: Endpoint) -> None:
+        self.failure_streaks.pop(str(endpoint), None)
 
     def save(self, path: Path) -> None:
         def dump(es: list[Endpoint]) -> list[dict]:
@@ -112,6 +158,18 @@ class EndpointCache(BaseModel):
             "liars": dump(self.liars),
             "too_expensive": dump(self.too_expensive),
             "bad_temperature": dump(self.bad_temperature),
+            "unprobeable": [
+                dump([entry.endpoint])[0]
+                | {"reason": entry.reason, "detail": entry.detail}
+                for entry in sorted(
+                    self.unprobeable,
+                    key=lambda x: (x.endpoint.model, x.endpoint.provider or ""),
+                )
+            ],
+            "failure_streaks": {
+                key: {"count": s.count, "last_error": s.last_error}
+                for key, s in sorted(self.failure_streaks.items())
+            },
         }
         atomic_write_bytes(
             path, yaml.dump(data, default_flow_style=False, sort_keys=False).encode()
@@ -124,22 +182,32 @@ class EndpointCache(BaseModel):
         with open(path) as f:
             data = yaml.safe_load(f) or {}
 
+        def parse_one(e: dict) -> Endpoint:
+            return Endpoint(
+                api=e["api"],
+                model=e["model"],
+                provider=e.get("provider"),
+                cost=tuple(e["cost"]),
+            )
+
         def parse(key: str) -> list[Endpoint]:
-            return [
-                Endpoint(
-                    api=e["api"],
-                    model=e["model"],
-                    provider=e.get("provider"),
-                    cost=tuple(e["cost"]),
-                )
-                for e in data.get(key, [])
-            ]
+            return [parse_one(e) for e in data.get(key, [])]
 
         raw_recheck = data.get("last_recheck")
         return cls(
             liars=parse("liars"),
             too_expensive=parse("too_expensive"),
             bad_temperature=parse("bad_temperature"),
+            unprobeable=[
+                UnprobeableEntry(
+                    endpoint=parse_one(e), reason=e["reason"], detail=e["detail"]
+                )
+                for e in data.get("unprobeable", [])
+            ],
+            failure_streaks={
+                key: FailureStreak(**s)
+                for key, s in (data.get("failure_streaks") or {}).items()
+            },
             last_recheck=datetime.fromisoformat(raw_recheck) if raw_recheck else None,
         )
 
