@@ -60,9 +60,7 @@ def _max_over_splits(
         pre_sizes += n_pre
         with np.errstate(invalid="ignore"):
             diff = prefix / n_pre[:, :, None] - (total - prefix) / n_post[:, :, None]
-        stats += np.where(
-            (n_pre > 0) & (n_post > 0), np.nansum(diff**2, axis=2), 0.0
-        )
+        stats += np.where((n_pre > 0) & (n_post > 0), np.nansum(diff**2, axis=2), 0.0)
     total_all = sum(float(c.sum()) for c in counts)
     admissible = (pre_sizes >= min_side_total) & (
         total_all - pre_sizes >= min_side_total

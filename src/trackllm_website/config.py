@@ -120,6 +120,8 @@ class ScanConfig(BaseModel):
     min_side_samples: int
     permutations: int
     alpha: float
+    backfill_alpha: float
+    backfill_min_separation_days: int
 
 
 class ReinitConfig(BaseModel):

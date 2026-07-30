@@ -17,6 +17,7 @@ SLUGS = {
     "mistralai2fmistral-7b-instruct-v0.323together": "2026-03-12",  # change 2026-01-30 then death
     "tencent2fhy323atlas-cloud2ffp8": None,  # missed early change 2026-07-20 (TV -> 1.0 at batch 3)
     "z-ai2fglm-5.223deepinfra2ffp4": None,  # changed between reference burst and first batch
+    "z-ai2fglm-5.223siliconflow2ffp8": None,  # genuinely unstable (day-to-day dispersion 0.54)
 }
 MAX_PROMPTS = 20
 MAX_SAMPLES = 10
