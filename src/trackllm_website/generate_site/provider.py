@@ -185,9 +185,11 @@ def build_provider_views(
             # Matched on the raw provider string: the item's providerSlug is the
             # slugified base, and `base` is not.
             "changes": [i for i in items if base_provider(i["provider"]) == base],
+            # slug tie-break: same-model serving variants would otherwise keep
+            # the hash-seed-dependent iteration order of the `slugs` set
             "endpoints": sorted(
                 (rows_by_slug[s] for s in slugs if s in rows_by_slug),
-                key=lambda r: (-r["nChanges"], r["model"]),
+                key=lambda r: (-r["nChanges"], r["model"], r["slug"]),
             ),
         }
 

@@ -189,6 +189,27 @@ def test_change_count_equals_the_changes_listed(fake_site):
         assert variant["lt"]["changes"] == len(listed)
 
 
+def test_tied_same_model_variant_rows_order_by_slug(tmp_path):
+    """Serving variants of one model tie on (nChanges, model); their order must
+    come from the slug, not from hash-seed-dependent set iteration order."""
+    root = tmp_path / "website"
+    dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 31)]
+    for variant in ("p", "p/fp8", "p/fp4", "p/bf16", "p/int8"):
+        write_lt_endpoint(
+            root,
+            slugify(f"org/a#{variant}"),
+            "org/a",
+            variant,
+            dates=dates,
+            changes=[],
+            drift=[0.1] * 30,
+        )
+    (root / "data" / "changes.json").write_text(json.dumps([]))
+    (root / "data" / "spend.json").write_text(json.dumps({"cumulative": {}}))
+    slugs = [e["slug"] for e in _views(root)["p"]["endpoints"]]
+    assert slugs == sorted(slugs)
+
+
 def test_untracked_catalog_endpoints_join_their_provider_page(fake_site):
     inputs = empty_status_inputs()
     inputs.catalog = [
