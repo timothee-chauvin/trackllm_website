@@ -64,6 +64,33 @@ def test_save_load_roundtrip(tmp_path):
     assert loaded.failure_streaks[str(ep("b"))].last_error == "boom"
 
 
+def test_recheck_clears_unprobeable_and_streaks():
+    from trackllm_website.bi.vetting import clear_recheckable
+
+    cache = empty_cache()
+    cache.too_expensive.append(ep("a"))
+    cache.bad_temperature.append(ep("b"))
+    cache.add_unprobeable(ep("c"), reason="flaky", detail="boom")
+    cache.record_failure(ep("d"), "boom", threshold=THRESHOLD)
+    assert clear_recheckable(cache) == 3
+    assert cache.too_expensive == []
+    assert cache.bad_temperature == []
+    assert cache.unprobeable == []
+    assert cache.failure_streaks == {}
+
+
+def test_record_probe_failures_skips_too_expensive():
+    from trackllm_website.bi.common import TOO_EXPENSIVE
+    from trackllm_website.update_endpoints import record_probe_failures
+
+    cache = empty_cache()
+    a, b = ep("a"), ep("b")
+    failed = {str(a): [TOO_EXPENSIVE, "other"], str(b): ["no strategy worked"]}
+    record_probe_failures(failed, [a, b], cache, threshold=THRESHOLD)
+    assert str(a) not in cache.failure_streaks  # cost-rejected, not flaky
+    assert cache.failure_streaks[str(b)].last_error == "no strategy worked"
+
+
 def test_load_of_legacy_cache_without_new_keys(tmp_path):
     cache = empty_cache()
     cache.save(tmp_path / "cache.yaml")

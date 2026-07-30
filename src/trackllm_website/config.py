@@ -134,6 +134,7 @@ class ReinitConfig(BaseModel):
     min_bis: int
     stall_days: int
     recheck_days: int
+    unprobeable_after_failures: int
     onboard_concurrency: int
     deselection_grace_days: int
     onboard_timeout_seconds: int
