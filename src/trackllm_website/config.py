@@ -114,6 +114,14 @@ class DetectionConfig(BaseModel):
     instability_threshold: float
 
 
+class ScanConfig(BaseModel):
+    min_batches: int
+    max_batches: int
+    min_side_samples: int
+    permutations: int
+    alpha: float
+
+
 class ReinitConfig(BaseModel):
     reprobe_samples: int
     reference_samples: int
@@ -151,6 +159,7 @@ class BIConfig(BaseModel):
     phase_2: Phase2Config
     prevalence: PrevalenceConfig
     detection: DetectionConfig
+    scan: ScanConfig
     reinit: ReinitConfig
     monitor: MonitorConfig
     temperature_gate: TemperatureGateConfig

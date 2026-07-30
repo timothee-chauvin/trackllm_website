@@ -9,30 +9,34 @@ from trackllm_website.bi.analyze import load_phase2_results
 from trackllm_website.config import config
 
 FIXTURE_DIR = Path("tests/fixtures/phase_2")
-SLUGS = [
-    "deepseek2fdeepseek-chat-v3-032423hyperbolic2ffp8",  # clean change 2026-01-24
-    "qwen2fqwen3-235b-a22b-250723wandb2fbf16",  # unstable (TV~0.47 from day 2)
-    "openai2fgpt-4o-mini23azure",  # stable throughout
-    "mistralai2fmistral-7b-instruct-v0.323together",  # change 2026-01-30 then death
-]
+# slug -> last day to keep (None = everything)
+SLUGS = {
+    "deepseek2fdeepseek-chat-v3-032423hyperbolic2ffp8": "2026-03-12",  # clean change 2026-01-24
+    "qwen2fqwen3-235b-a22b-250723wandb2fbf16": "2026-03-12",  # unstable (TV~0.47 from day 2)
+    "openai2fgpt-4o-mini23azure": "2026-03-12",  # stable throughout
+    "mistralai2fmistral-7b-instruct-v0.323together": "2026-03-12",  # change 2026-01-30 then death
+    "tencent2fhy323atlas-cloud2ffp8": None,  # missed early change 2026-07-20 (TV -> 1.0 at batch 3)
+    "z-ai2fglm-5.223deepinfra2ffp4": None,  # changed between reference burst and first batch
+}
 MAX_PROMPTS = 20
 MAX_SAMPLES = 10
 # 2026-03-12: ends before a subsampling-induced dip in the qwen3-235b trailing
 # window that would otherwise mask its (genuine) instability.
-LAST_DAY = "2026-03-12"
 
 
 def main() -> None:
     rng = random.Random(0)
-    for slug in SLUGS:
+    for slug, last_day in SLUGS.items():
         results = load_phase2_results(config.bi.phase_2_dir / slug)
         prompts = sorted(results)[:MAX_PROMPTS]
         ref_ts = min(ts for p in prompts for ts in results[p])
         out = {}
         for p in prompts:
             out[p] = {}
-            for ts, samples in results[p].items():
-                if ts[:10] > LAST_DAY:
+            # sorted: monthly-file key order is not stable across rewrites, and the
+            # rng stream must not depend on it
+            for ts, samples in sorted(results[p].items()):
+                if last_day is not None and ts[:10] > last_day:
                     continue
                 if ts != ref_ts and len(samples) > MAX_SAMPLES:
                     samples = rng.sample(samples, MAX_SAMPLES)

@@ -33,6 +33,16 @@ def test_change_detected_closes_epoch():
     decision = decide(state, results, datetime(2026, 2, 15, tzinfo=timezone.utc))
     assert decision.action == "reinit"
     assert decision.change_date.date().isoformat() == "2026-01-24"
+    assert decision.detector == "adaptive"
+
+
+def test_early_change_caught_by_scan():
+    # hy3 @ atlas-cloud: model swap at batch 3, invisible to the adaptive rule
+    state, results = open_state_from_fixture("tencent2fhy323atlas-cloud2ffp8")
+    decision = decide(state, results, datetime(2026, 7, 28, tzinfo=timezone.utc))
+    assert decision.action == "reinit"
+    assert decision.detector == "scan"
+    assert decision.change_date.date().isoformat() == "2026-07-20"
 
 
 def test_stable_endpoint_no_action():

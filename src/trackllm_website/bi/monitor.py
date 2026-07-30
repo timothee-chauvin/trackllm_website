@@ -21,6 +21,7 @@ from trackllm_website.bi.phase_2 import (
     save_results,
 )
 from trackllm_website.bi.reinit import reinit
+from trackllm_website.bi.scan import changepoint_scan
 from trackllm_website.bi.sampling import sample_prompts
 from trackllm_website.bi.state import EndpointBIState, RetiredInfo, load_all_states
 from trackllm_website.bi.digest import (
@@ -37,6 +38,7 @@ class Decision(BaseModel):
     action: Literal["none", "reinit", "retire_stalled"]
     change_date: datetime | None = None
     unstable: bool = False
+    detector: Literal["adaptive", "scan"] | None = None
 
 
 def _day_has_samples(results: dict, day: str) -> bool | None:
@@ -76,6 +78,18 @@ def decide(state: EndpointBIState, results: dict, now: datetime) -> Decision:
             action="reinit",
             change_date=datetime.fromisoformat(events[-1]),
             unstable=is_unstable(tv),
+            detector="adaptive",
+        )
+    # Young epochs are invisible to the adaptive rule (it needs ~9 batches of
+    # baseline, then absorbs whatever level it finds); the changepoint scan
+    # covers that window.
+    scan_event = changepoint_scan(epoch_results)
+    if scan_event is not None:
+        return Decision(
+            action="reinit",
+            change_date=datetime.fromisoformat(scan_event.split_ts),
+            unstable=is_unstable(tv),
+            detector="scan",
         )
     return Decision(action="none", unstable=is_unstable(tv))
 
@@ -134,7 +148,10 @@ async def run_endpoint(
         epoch.end = now
         epoch.end_reason = "change_detected"
         epoch.change_date = decision.change_date
-        epoch.params = config.bi.detection.model_dump()
+        detector_cfg = (
+            config.bi.scan if decision.detector == "scan" else config.bi.detection
+        )
+        epoch.params = {"detector": decision.detector, **detector_cfg.model_dump()}
         logger.warning(
             f"{state.endpoint}: change detected (onset {decision.change_date})"
         )
