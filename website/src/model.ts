@@ -9,6 +9,7 @@ import {
   methodBadges,
   plural,
   prettyDate,
+  showLoadError,
 } from "./components";
 
 interface LTChange {
@@ -84,10 +85,18 @@ export async function init(): Promise<void> {
   if (!cmpEl || !slugEl) return;
 
   const slug: string = JSON.parse(slugEl.textContent || '""');
-  const res = await fetch(`../data/models/${slug}.json`).catch(() => null);
-  const D: ModelData | null = res && res.ok ? await res.json() : null;
+  let D: ModelData;
+  try {
+    const res = await fetch(`../data/models/${slug}.json`);
+    if (!res.ok) throw new Error(`models/${slug}.json: HTTP ${res.status}`);
+    D = await res.json();
+  } catch (err) {
+    // a fetch failure must not read as the factual claim "no data yet"
+    showLoadError("cmp", "this model's data");
+    throw err;
+  }
 
-  if (!D || !D.endpoints.length) {
+  if (!D.endpoints.length) {
     cmpEl.innerHTML = `<div style="padding:2rem 1rem;color:var(--text-dim);font-size:0.85rem">No monitoring data available yet for this model.</div>`;
     return;
   }

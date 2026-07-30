@@ -42,6 +42,12 @@ def _scaffold(website: Path):
     _lt_endpoint(website, "m2fa23p", "m/a", "p")
 
 
+def test_render_site_raises_when_data_dir_missing(tmp_path):
+    # a missing data dir must fail the build, not print-and-deploy an empty site
+    with pytest.raises(FileNotFoundError, match="does not exist"):
+        render_site(tmp_path, None, empty_status_inputs())
+
+
 def test_render_site_produces_index_and_endpoint(tmp_path):
     _scaffold(tmp_path)
     render_site(tmp_path, None, empty_status_inputs())

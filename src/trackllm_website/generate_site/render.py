@@ -41,9 +41,9 @@ def render_site(
     endpoints_dir = website_dir / "endpoints"
     templates_dir = website_dir / "templates"
 
+    # fail the build rather than deploy an empty site
     if not data_dir.exists():
-        print(f"Error: Data directory {data_dir} does not exist")
-        return
+        raise FileNotFoundError(f"Data directory {data_dir} does not exist")
 
     website_dir.mkdir(parents=True, exist_ok=True)
     endpoints_dir.mkdir(parents=True, exist_ok=True)

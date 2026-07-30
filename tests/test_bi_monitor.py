@@ -8,7 +8,7 @@ from trackllm_website.api import OpenRouterClient
 from trackllm_website.bi import monitor as monitor_mod
 from trackllm_website.bi.common import PlainStrategy
 from trackllm_website.bi.migrate_state import migrate_endpoint
-from trackllm_website.bi.monitor import Decision, decide, run_endpoint
+from trackllm_website.bi.monitor import Decision, decide, monitor, run_endpoint
 from trackllm_website.config import Endpoint
 
 FIXTURES = Path("tests/fixtures/phase_2")
@@ -116,3 +116,66 @@ def test_run_endpoint_reinit_retires_and_persists(tmp_path, monkeypatch):
     assert written[a_bi][now.isoformat()] == [[now.isoformat(), "tok"]]
     # (d) state file written into the tmp state dir
     assert (state_dir / f"{state.slug}.json").exists()
+
+
+def test_all_errors_batch_lands_in_event_rows(tmp_path, monkeypatch):
+    """A batch where every query errored must reach the run summary, not vanish."""
+    state, results = open_state_from_fixture("openai2fgpt-4o-mini23azure")
+    epoch = state.current_epoch
+    now = datetime(2026, 2, 15, tzinfo=timezone.utc)
+    n_queries = (
+        len(epoch.border_inputs) * monitor_mod.config.bi.phase_2.queries_per_token
+    )
+
+    async def fake_sample_prompts(*args, **kwargs):
+        return {bi: [] for bi in epoch.border_inputs}, n_queries
+
+    monkeypatch.setattr(monitor_mod.config.bi, "data_dir", tmp_path)
+    monkeypatch.setattr(
+        type(monitor_mod.config), "spend_dir", property(lambda self: tmp_path / "spend")
+    )
+    monkeypatch.setattr(monitor_mod, "sample_prompts", fake_sample_prompts)
+    monkeypatch.setattr(
+        monitor_mod, "get_output_path", lambda ep, ym: tmp_path / "monthly.json"
+    )
+    monkeypatch.setattr(monitor_mod, "load_phase2_results", lambda d: results)
+
+    event_rows = []
+
+    async def go():
+        async with OpenRouterClient() as client:
+            await run_endpoint(
+                client, PlainStrategy(), state, now, event_rows=event_rows
+            )
+
+    asyncio.run(go())
+    assert any(r.event == "all_errors" for r in event_rows)
+
+
+def test_unresolved_strategy_is_a_reported_failure(monkeypatch):
+    """An endpoint resolve_strategies drops must not be silently skipped: no batch
+    is written, so the stall detector never advances and it would idle forever."""
+    state, _ = open_state_from_fixture("openai2fgpt-4o-mini23azure")
+
+    class FakeClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def close(self):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *args):
+            pass
+
+    async def fake_resolve(client, endpoints, **kwargs):
+        return {}, {str(state.endpoint): ["plain: 429 rate limited"]}
+
+    monkeypatch.setattr(monitor_mod, "load_all_states", lambda d: {state.slug: state})
+    monkeypatch.setattr(monitor_mod, "resolve_strategies", fake_resolve)
+    monkeypatch.setattr(monitor_mod, "OpenRouterClient", FakeClient)
+
+    report = asyncio.run(monitor())
+    assert report.failures == [str(state.endpoint)]
