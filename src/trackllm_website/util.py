@@ -31,12 +31,21 @@ async def gather_with_concurrency(
     return await asyncio.gather(*(sem_coro(c) for c in coros))
 
 
+class _WorkerError:
+    """Wraps an exception raised by a worker so it can travel through the queue."""
+
+    def __init__(self, exc: BaseException):
+        self.exc = exc
+
+
 async def gather_with_concurrency_streaming(
     n: int, *coros: Coroutine[Any, Any, Any]
 ) -> AsyncIterator[Any]:
     """Run coroutines with limited concurrency, yielding results as they complete.
 
     Tasks are started in order as slots become available, preserving submission order.
+    If a coroutine raises, the exception is re-raised here instead of hanging the
+    consumer on an empty queue.
     """
     queue: asyncio.Queue[Any] = asyncio.Queue()
     coro_iter = iter(coros)
@@ -45,8 +54,12 @@ async def gather_with_concurrency_streaming(
     total = len(coros)
 
     async def worker(coro: Coroutine[Any, Any, Any]) -> None:
-        result = await coro
-        await queue.put(result)
+        try:
+            result = await coro
+        except Exception as e:
+            await queue.put(_WorkerError(e))
+        else:
+            await queue.put(result)
 
     def start_next() -> bool:
         """Start the next coroutine if available. Returns True if one was started."""
@@ -67,6 +80,12 @@ async def gather_with_concurrency_streaming(
     while done_count < total:
         result = await queue.get()
         done_count += 1
+        if isinstance(result, _WorkerError):
+            for task in active_tasks:
+                task.cancel()
+            for coro in coro_iter:
+                coro.close()
+            raise result.exc
         start_next()
         yield result
 
