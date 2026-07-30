@@ -499,6 +499,16 @@ def partition_temperature(
     return probe, skip
 
 
+def partition_batch(
+    endpoints: list[Endpoint],
+) -> tuple[list[Endpoint], list[Endpoint]]:
+    """(to_probe, to_skip): :batch endpoints only answer asynchronous batch
+    queries, so a synchronous probe can never succeed."""
+    probe = [e for e in endpoints if not e.model.endswith(":batch")]
+    skip = [e for e in endpoints if e.model.endswith(":batch")]
+    return probe, skip
+
+
 async def update_endpoints_bi() -> list[Endpoint]:
     """Refresh the BI candidate catalog via cost-based vetting.
 
@@ -540,6 +550,11 @@ async def update_endpoints_bi() -> list[Endpoint]:
     logger.info(
         f"Skipping {len(temp_skip)} temperature-unsupported endpoints (temp:NO)"
     )
+
+    to_vet, batch_skip = partition_batch(to_vet)
+    for endpoint in batch_skip:
+        cache.add_unprobeable(endpoint, reason="batch", detail=None)
+    logger.info(f"Skipping {len(batch_skip)} :batch endpoints (async-only)")
 
     logger.info(
         f"Vetting {len(to_vet)} of {len(all_endpoints)} endpoints "

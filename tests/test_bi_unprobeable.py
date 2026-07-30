@@ -91,6 +91,15 @@ def test_record_probe_failures_skips_too_expensive():
     assert cache.failure_streaks[str(b)].last_error == "no strategy worked"
 
 
+def test_partition_batch_skips_batch_models():
+    from trackllm_website.update_endpoints import partition_batch
+
+    eps = [ep("org/m"), ep("org/m:batch"), ep("org/m2:batch", provider="q")]
+    probe, skip = partition_batch(eps)
+    assert [e.model for e in probe] == ["org/m"]
+    assert [e.model for e in skip] == ["org/m:batch", "org/m2:batch"]
+
+
 def test_load_of_legacy_cache_without_new_keys(tmp_path):
     cache = empty_cache()
     cache.save(tmp_path / "cache.yaml")
