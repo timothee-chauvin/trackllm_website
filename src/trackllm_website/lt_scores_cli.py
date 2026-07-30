@@ -6,9 +6,16 @@ __main__.LTScores a different class from trackllm_website.lt_scores.LTScores and
 tripping beartype's isinstance check in lt_events.update_endpoint_events.
 """
 
+from functools import partial
+
 import fire
 
-from trackllm_website.lt_scores import compute_all, compute_latest
+from trackllm_website.lt_scores import compute_scores
 
 if __name__ == "__main__":
-    fire.Fire({"all": compute_all, "latest": compute_latest})
+    fire.Fire(
+        {
+            "all": partial(compute_scores, skip_current=False),
+            "latest": partial(compute_scores, skip_current=True),
+        }
+    )

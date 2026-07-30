@@ -106,7 +106,7 @@ async def run_endpoint(
     assert epoch is not None
 
     with track() as monitor_spend:
-        samples, _ = await sample_prompts(
+        samples, n_errors = await sample_prompts(
             client,
             state.endpoint,
             strategy,
@@ -123,6 +123,23 @@ async def run_endpoint(
     if probe_spend is not None:
         monitor_spend.merge(probe_spend.get(str(state.endpoint), Spend()))
     append_entry(config.spend_dir, state.slug, "monitor", monitor_spend, now)
+
+    # A batch where every query errored must show up in the digest on day 1, not
+    # only as a "retired (stalled)" surprise stall_days later.
+    n_queries = len(epoch.border_inputs) * config.bi.phase_2.queries_per_token
+    if n_queries and n_errors >= n_queries:
+        logger.warning(f"{state.endpoint}: all {n_queries} monitor queries errored")
+        if event_rows is not None:
+            event_rows.append(
+                MonitorRow(
+                    state.endpoint.model,
+                    state.endpoint.provider,
+                    "all_errors",
+                    None,
+                    None,
+                    0.0,
+                )
+            )
 
     results = load_phase2_results(config.bi.phase_2_dir / state.slug)
     decision = decide(state, results, now)
@@ -198,13 +215,22 @@ async def monitor() -> MonitorReport:
 
     probe_spend: dict[str, Spend] = {}
     async with OpenRouterClient(timeout=60.0) as probe_client:
-        strategies, _failed = await resolve_strategies(
+        strategies, failed = await resolve_strategies(
             probe_client, [s.endpoint for s in monitoring], probe_spend=probe_spend
         )
 
     client = OpenRouterClient()
     event_rows: list[MonitorRow] = []
     failures: list[str] = []
+
+    # An endpoint dropped by resolve_strategies is never sampled: no batch means
+    # the stall detector never advances, so without a failure entry it would sit
+    # in "monitoring" forever with a green check. Report it so main() fails loudly.
+    for state in monitoring:
+        key = str(state.endpoint)
+        if key not in strategies:
+            logger.error(f"{key}: no strategy resolved ({failed.get(key)}); skipped")
+            failures.append(key)
 
     async def run_isolated(state: EndpointBIState) -> None:
         try:

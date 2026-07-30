@@ -1,13 +1,13 @@
-// `export {}` makes this a module so its top-level names (MONTHS, td, init, ...)
+// `export {}` makes this a module so its top-level names (init, ...)
 // don't collide with the same names in other bundler-entrypoint scripts (overview.ts, model.ts)
 // when type-checked together as one tsc program.
 export {};
 
+import { showLoadError } from "./components";
 import { readingCaption } from "./caption";
+import { DAY_MS, MONTH_NAMES, monthTicks, td } from "./components";
 
 interface ManifestData {
-  model: string;
-  provider: string;
   slug: string;
 }
 
@@ -61,8 +61,9 @@ interface FocusB3IT {
 
 type Status = "stable" | "changed" | "retired";
 
-// downsampling/windowing constants mirror generate_site/model.py so the endpoint
-// page and the model page read the same drift level for the same changepoint.
+// downsampling/windowing constants mirror generate_site/model.py and peaks.py so
+// the endpoint page and the model page read the same drift level for the same
+// changepoint.
 const TRACE_LEN = 110;
 const LT_PEAK_WINDOW = 20;
 const B3IT_PEAK_WINDOW = 8;
@@ -70,11 +71,9 @@ const RETIRED_GAP_DAYS = 14;
 const RECENT_CHANGE_DAYS = 60;
 const SIGMA_INF_THRESHOLD = 1e4;
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-const td = (s: string): number => Date.parse(s.slice(0, 10) + "T00:00:00Z");
 const fmtMon = (s: string): string => {
   const d = new Date(td(s));
-  return `${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+  return `${MONTH_NAMES[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
 };
 const round = (v: number, n: number): number => {
   const f = 10 ** n;
@@ -88,12 +87,10 @@ function downsamplePairs(pairs: [string, number][], n: number): [string, number]
 }
 
 // first point on/after `day`, max over the next `window` points -- same rule as
-// generate_site/model.py's _peak_from, so drift levels agree across pages.
+// generate_site/peaks.py's peak_from, so drift levels agree across pages.
 function peakFrom(day: string, pairs: [string, number][], window: number): number | null {
   const onOrAfter = pairs.filter(([d]) => d >= day).slice(0, window);
-  if (onOrAfter.length) return Math.max(...onOrAfter.map(([, v]) => v));
-  const sameDay = pairs.filter(([d]) => d === day);
-  return sameDay.length ? sameDay[sameDay.length - 1][1] : null;
+  return onOrAfter.length ? Math.max(...onOrAfter.map(([, v]) => v)) : null;
 }
 
 function sigmaDisplay(sigma: number | null): string {
@@ -107,13 +104,13 @@ const fmtDrift = (v: number | null): string => (v === null ? "—" : `${v} nats`
 const fmtTV = (v: number | null): string => (v === null ? "TV —" : `TV ${v}`);
 
 async function fetchJSON<T>(url: string): Promise<T | null> {
-  try {
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    return (await res.json()) as T;
-  } catch {
-    return null;
-  }
+  const res = await fetch(url);
+  // 404 is a real state -- the file is absent because that method never ran for
+  // this endpoint. Any other failure must throw rather than masquerade as
+  // "not monitored".
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
+  return (await res.json()) as T;
 }
 
 // Read drift straight from lt_scores.json's own drift/drift_dates -- this is
@@ -160,9 +157,9 @@ function buildB3IT(data: B3ITData | null): FocusB3IT | null {
 
 function computeStatus(lastObserved: string | null, lastChange: string | null): Status {
   if (!lastObserved) return "stable";
-  const gapDays = (Date.now() - td(lastObserved)) / 86400_000;
+  const gapDays = (Date.now() - td(lastObserved)) / DAY_MS;
   if (gapDays > RETIRED_GAP_DAYS) return "retired";
-  if (lastChange && (Date.now() - td(lastChange)) / 86400_000 <= RECENT_CHANGE_DAYS) {
+  if (lastChange && (Date.now() - td(lastChange)) / DAY_MS <= RECENT_CHANGE_DAYS) {
     return "changed";
   }
   return "stable";
@@ -219,17 +216,6 @@ function renderChart(lt: FocusLT | null, b3it: FocusB3IT | null): void {
   const span = Math.max(1, d1 - d0);
   const fx = (s: string): number => PL + ((td(s) - d0) / span) * PW;
 
-  function monthTicks(): Date[] {
-    const out: Date[] = [];
-    const d = new Date(d0);
-    d.setUTCDate(1);
-    while (d.getTime() <= d1) {
-      if (d.getTime() >= d0 - 15 * 86400_000) out.push(new Date(d));
-      d.setUTCMonth(d.getUTCMonth() + 1);
-    }
-    return out;
-  }
-
   function lane(
     series: [string, number][],
     topY: number,
@@ -247,7 +233,7 @@ function renderChart(lt: FocusLT | null, b3it: FocusB3IT | null): void {
       `M${fx(series[0][0]).toFixed(1)} ${(topY + LANE_H).toFixed(1)} ` +
       series.map(([d, v]) => `L${fx(d).toFixed(1)} ${yv(v).toFixed(1)}`).join(" ") +
       ` L${fx(last(series)![0]).toFixed(1)} ${(topY + LANE_H).toFixed(1)} Z`;
-    const grid = monthTicks()
+    const grid = monthTicks(d0, d1)
       .map((d) => {
         const x = fx(d.toISOString().slice(0, 10));
         return `<line x1="${x.toFixed(1)}" y1="${topY}" x2="${x.toFixed(1)}" y2="${topY + LANE_H}" stroke="var(--border-soft)" stroke-width="1"/>`;
@@ -289,10 +275,10 @@ function renderChart(lt: FocusLT | null, b3it: FocusB3IT | null): void {
     })
     .join("");
 
-  const xlabels = monthTicks()
+  const xlabels = monthTicks(d0, d1)
     .map((d) => {
       const x = fx(d.toISOString().slice(0, 10));
-      return `<text x="${x.toFixed(1)}" y="${VH - 14}" fill="var(--text-dim)" font-size="10.5" font-family="var(--mono)" text-anchor="middle">${MONTHS[d.getUTCMonth()]} ${String(d.getUTCFullYear()).slice(2)}</text>`;
+      return `<text x="${x.toFixed(1)}" y="${VH - 14}" fill="var(--text-dim)" font-size="10.5" font-family="var(--mono)" text-anchor="middle">${MONTH_NAMES[d.getUTCMonth()]} ${String(d.getUTCFullYear()).slice(2)}</text>`;
     })
     .join("");
 
@@ -339,10 +325,16 @@ async function init(): Promise<void> {
   }
   const manifest: ManifestData = JSON.parse(manifestEl.textContent || "{}");
 
-  const [scores, b3itData] = await Promise.all([
-    fetchJSON<LTScoresData>(`../data/lt/${manifest.slug}/lt_scores.json`),
-    fetchJSON<B3ITData>(`../data/b3it/${manifest.slug}/b3it.json`),
-  ]);
+  let scores: LTScoresData | null, b3itData: B3ITData | null;
+  try {
+    [scores, b3itData] = await Promise.all([
+      fetchJSON<LTScoresData>(`../data/lt/${manifest.slug}/lt_scores.json`),
+      fetchJSON<B3ITData>(`../data/b3it/${manifest.slug}/b3it.json`),
+    ]);
+  } catch (err) {
+    showLoadError("mainchart", "this endpoint's monitoring data");
+    throw err;
+  }
 
   const lt = buildLT(scores);
   const b3it = buildB3IT(b3itData);

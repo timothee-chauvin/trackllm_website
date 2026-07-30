@@ -41,9 +41,9 @@ def render_site(
     endpoints_dir = website_dir / "endpoints"
     templates_dir = website_dir / "templates"
 
+    # fail the build rather than deploy an empty site
     if not data_dir.exists():
-        print(f"Error: Data directory {data_dir} does not exist")
-        return
+        raise FileNotFoundError(f"Data directory {data_dir} does not exist")
 
     website_dir.mkdir(parents=True, exist_ok=True)
     endpoints_dir.mkdir(parents=True, exist_ok=True)
@@ -236,42 +236,19 @@ def render_site(
             ep = lt_by_slug[slug]
             model = ep.model
             provider = ep.provider
-            manifest = {
-                "model": ep.model,
-                "provider": ep.provider,
-                "slug": ep.slug,
-                "prompts": [
-                    {"slug": p.slug, "prompt": p.prompt, "months": p.months}
-                    for p in ep.prompts
-                ],
-            }
             methods.append("LT")
         elif slug in b3it_views:
             ep = None
             view = b3it_views[slug]
             model = view.model
             provider = view.provider
-            manifest = {
-                "model": view.model,
-                "provider": view.provider,
-                "slug": slug,
-                "prompts": [],
-            }
         else:
             ep = None
             model, provider = site.names[slug]
-            manifest = {
-                "model": model,
-                "provider": provider,
-                "slug": slug,
-                "prompts": [],
-            }
         if slug in b3it_views:
             methods.append("B3IT")
 
         entry = site.entries.get(slug)
-        manifest["status"] = status_json(site.statuses[slug])
-        manifest["meta"] = entry.as_meta() if entry else None
 
         provider_slug = slugify(base_provider(provider))
         endpoint_html = endpoint_template.render(
@@ -282,9 +259,9 @@ def render_site(
             model_name=model.split("/")[-1],
             provider=provider,
             methods=methods,
-            status=manifest["status"],
-            meta=manifest["meta"],
-            manifest_json=json.dumps(manifest),
+            status=status_json(site.statuses[slug]),
+            meta=entry.as_meta() if entry else None,
+            manifest={"slug": slug},
             css_path="../style.css",
             body_class="endpoint",
             nav_prefix="../",
