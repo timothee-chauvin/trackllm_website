@@ -53,8 +53,11 @@ def adaptive_transitions(
     last_event_idx: int | None = None
 
     for i in range(len(vals)):
-        baseline = vals[max(0, i - d.exclusion - d.window) : i - d.exclusion]
+        # clamp the end: for i < exclusion it would go negative and wrap
+        # around, comparing early days against a future-contaminated slice
+        baseline = vals[max(0, i - d.exclusion - d.window) : max(0, i - d.exclusion)]
         if len(baseline) < d.min_baseline:
+            streak = 0
             continue
         mean = statistics.mean(baseline)
         std = statistics.stdev(baseline)

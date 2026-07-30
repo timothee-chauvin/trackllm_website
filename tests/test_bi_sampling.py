@@ -1,6 +1,8 @@
 import asyncio
 from datetime import datetime, timezone
 
+import pytest
+
 from trackllm_website.bi.common import PlainStrategy
 from trackllm_website.bi.sampling import sample_prompts
 from trackllm_website.config import Endpoint
@@ -55,16 +57,17 @@ class RaisingClient:
         return make_response(endpoint, prompt, next(self.answers[prompt]))
 
 
-def test_sample_prompts_survives_per_prompt_exception(monkeypatch):
+def test_sample_prompts_propagates_unexpected_exceptions(monkeypatch):
+    # client.query normalizes API/network errors into response.error, so an
+    # exception here is a programming error and must not become an error count
     from trackllm_website.config import config
 
     monkeypatch.setattr(config.bi.phase_2, "request_delay_seconds", 0.0)
     endpoint = Endpoint(api="openrouter", model="m/x", provider="p", cost=(1, 1))
     client = RaisingClient({"a": iter("xyxyx")}, raising_prompt="b")
-    samples, n_errors = asyncio.run(
-        sample_prompts(
-            client, endpoint, PlainStrategy(), ["a", "b"], 3, temperature=0.0
+    with pytest.raises(RuntimeError, match="boom"):
+        asyncio.run(
+            sample_prompts(
+                client, endpoint, PlainStrategy(), ["a", "b"], 3, temperature=0.0
+            )
         )
-    )
-    assert [tok for _, tok in samples["a"]] == ["x", "y", "x"]
-    assert n_errors > 0

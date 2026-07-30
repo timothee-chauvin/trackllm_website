@@ -1,5 +1,7 @@
 import Plotly from "plotly.js-dist-min";
 
+import { showLoadError } from "./components";
+
 interface SpendData {
   group_order: string[];
   cumulative: Record<string, number>;
@@ -26,9 +28,15 @@ const MUTED_GRID = "rgba(140,150,165,0.25)";
 async function init(): Promise<void> {
   const el = document.getElementById("spend-chart");
   if (!el) return;
-  const res = await fetch("data/spend.json");
-  if (!res.ok) return;
-  const data: SpendData = await res.json();
+  let data: SpendData;
+  try {
+    const res = await fetch("data/spend.json");
+    if (!res.ok) throw new Error(`spend.json: HTTP ${res.status}`);
+    data = await res.json();
+  } catch (err) {
+    showLoadError("spend-chart", "spend data");
+    throw err;
+  }
   if (!data.daily?.length) return;
   const dates = data.daily.map((d) => new Date(d.date));
   const traces = (data.group_order ?? [])

@@ -83,6 +83,6 @@
 {% endblock %}
 
 {% block scripts %}
-    <script type="application/json" id="manifest">{{ manifest_json | safe }}</script>
+    <script type="application/json" id="manifest">{{ manifest | tojson }}</script>
     {% if methods %}<script type="module" src="../js/endpoint.js"></script>{% endif %}
 {% endblock %}

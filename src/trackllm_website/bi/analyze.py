@@ -47,7 +47,9 @@ def load_phase2_results(
 ) -> Results:
     """Load all phase 2 results for an endpoint across all months."""
     combined: Results = {}
-    for json_file in endpoint_dir.glob("*.json"):
+    # sorted: glob order is filesystem order, and it sets the prompt/batch dict
+    # order every downstream mean is summed in
+    for json_file in sorted(endpoint_dir.glob("*.json")):
         data = load_existing_results(json_file)
         for prompt, batches in data.items():
             if prompt not in combined:
@@ -86,7 +88,9 @@ def compute_tv_distance(
     if total_p == 0 or total_q == 0:
         return None
     tv = 0.0
-    for token in all_tokens:
+    # sorted: set order follows PYTHONHASHSEED, and the float summation order
+    # would leak into the last digits, making site builds non-reproducible
+    for token in sorted(all_tokens):
         p_prob = dist_p[token] / total_p
         q_prob = dist_q[token] / total_q
         tv += abs(p_prob - q_prob)
