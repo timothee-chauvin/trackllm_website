@@ -1,6 +1,12 @@
 last_recheck: '2026-07-21T04:06:08+00:00'
 liars:
 - api: openrouter
+  model: deepseek/deepseek-chat
+  provider: streamlake
+  cost:
+  - 0.2002
+  - 0.8001
+- api: openrouter
   model: google/gemini-3.1-flash-image
   provider: google-vertex/global
   cost:
@@ -622,6 +628,12 @@ too_expensive:
 - api: openrouter
   model: moonshotai/kimi-k3
   provider: modal/fp4
+  cost:
+  - 3.0
+  - 15.0
+- api: openrouter
+  model: moonshotai/kimi-k3
+  provider: modal/mxfp4
   cost:
   - 3.0
   - 15.0
@@ -1353,10 +1365,22 @@ too_expensive:
   - 2.2
 - api: openrouter
   model: z-ai/glm-5
+  provider: atlas-cloud/fp8
+  cost:
+  - 0.95
+  - 3.15
+- api: openrouter
+  model: z-ai/glm-5
   provider: novita/fp8
   cost:
   - 1.0
   - 3.2
+- api: openrouter
+  model: z-ai/glm-5
+  provider: streamlake/fp8
+  cost:
+  - 0.6
+  - 1.92
 - api: openrouter
   model: z-ai/glm-5
   provider: z-ai/fp8
