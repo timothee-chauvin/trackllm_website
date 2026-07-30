@@ -13,6 +13,11 @@ from pathlib import Path
 from trackllm_website.generate_site.b3it import B3ITView
 from trackllm_website.generate_site.lt import EndpointInfo, load_lt_data
 from trackllm_website.generate_site.naming import base_provider
+from trackllm_website.generate_site.peaks import (
+    B3IT_PEAK_WINDOW,
+    LT_PEAK_WINDOW,
+    peak_from,
+)
 from trackllm_website.generate_site.status import (
     EndpointStatus,
     dominant_headline,
@@ -22,8 +27,6 @@ from trackllm_website.generate_site.status_io import SiteStatuses
 from trackllm_website.util import slugify
 
 TRACE_LEN = 90
-LT_PEAK_WINDOW = 20
-B3IT_PEAK_WINDOW = 8
 
 
 def _downsample_pairs(pairs: list[tuple], n: int) -> list[tuple]:
@@ -31,15 +34,6 @@ def _downsample_pairs(pairs: list[tuple], n: int) -> list[tuple]:
     if len(pairs) <= n:
         return pairs
     return [pairs[i * len(pairs) // n] for i in range(n)]
-
-
-def _peak_from(day: str, pairs: list[tuple[str, float]], window: int) -> float | None:
-    """Peak value from the first point on/after `day`, over the next `window` points."""
-    on_or_after = [v for d, v in pairs if d >= day][:window]
-    if on_or_after:
-        return max(on_or_after)
-    same_day = [v for d, v in pairs if d == day]
-    return same_day[-1] if same_day else None
 
 
 def _by_method(changes: list[dict], method: str) -> list[dict]:
@@ -54,7 +48,7 @@ def _lt_changes(
     out = []
     for c in canonical:
         day = c["date"][:10]
-        level = _peak_from(day, drift_pairs, LT_PEAK_WINDOW)
+        level = peak_from(day, drift_pairs, LT_PEAK_WINDOW)
         out.append(
             {
                 "date": day,
@@ -71,7 +65,7 @@ def _b3it_changes(
     out = []
     for c in canonical:
         day = c["date"][:10]
-        peak = _peak_from(day, tv_pairs, B3IT_PEAK_WINDOW)
+        peak = peak_from(day, tv_pairs, B3IT_PEAK_WINDOW)
         out.append({"date": day, "peakTV": round(peak or 0.0, 3)})
     return out
 

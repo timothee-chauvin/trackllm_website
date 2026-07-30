@@ -5,6 +5,7 @@ export {};
 
 import {
   FeedItem,
+  bindFilterChips,
   esc,
   eventRow,
   monthLabel,
@@ -192,14 +193,8 @@ async function init(): Promise<void> {
   }
 
   qEl.addEventListener("input", render);
-  document.getElementById("chips")?.addEventListener("click", (e) => {
-    const chip = (e.target as HTMLElement).closest(".chip") as HTMLElement | null;
-    if (!chip) return;
-    const f = chip.dataset.f!;
-    if (filters.has(f)) { filters.delete(f); chip.classList.remove("on"); }
-    else { filters.add(f); chip.classList.add("on"); }
-    render();
-  });
+  const chipsEl = document.getElementById("chips");
+  if (chipsEl) bindFilterChips(chipsEl, filters, render);
   histEl?.addEventListener("click", (e) => {
     const col = (e.target as HTMLElement).closest(".mo") as HTMLElement | null;
     if (!col) return;

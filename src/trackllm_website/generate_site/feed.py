@@ -8,6 +8,11 @@ from datetime import datetime
 
 from trackllm_website.generate_site.b3it import B3ITView
 from trackllm_website.generate_site.naming import base_provider
+from trackllm_website.generate_site.peaks import (
+    B3IT_PEAK_WINDOW,
+    LT_PEAK_WINDOW,
+    peak_from,
+)
 from trackllm_website.util import slugify
 
 TRACE_LEN = 28
@@ -16,8 +21,6 @@ FEED_TRACE_LEN = 40
 FEED_WINDOW_BEFORE = 60
 FEED_WINDOW_AFTER = 20
 FEED_MIN_WINDOW = 6
-FEED_LT_PEAK_WINDOW = 20
-FEED_B3IT_PEAK_WINDOW = 8
 FEED_DEFAULT_CHANGE_FRAC = 0.5
 LT_ALERT_THRESHOLD = 0.8
 B3IT_ALERT_THRESHOLD = 0.6
@@ -81,10 +84,10 @@ def _lt_item(change: dict, drift: list[tuple[datetime, float]], now: datetime) -
     trace: list[float] = []
     frac = FEED_DEFAULT_CHANGE_FRAC
     if drift:
-        k = _nearest_index(drift, cd)
-        peak_hi = min(len(drift), k + FEED_LT_PEAK_WINDOW)
-        magnitude = round(max(v for _, v in drift[k:peak_hi]), 2)
-        trace, frac = _window(drift, k)
+        day_pairs = [(d.date().isoformat(), v) for d, v in drift]
+        level = peak_from(change["date"][:10], day_pairs, LT_PEAK_WINDOW)
+        magnitude = round(level, 2) if level is not None else None
+        trace, frac = _window(drift, _nearest_index(drift, cd))
     display = magnitude if magnitude is not None else "—"
     return {
         "date": change["date"][:10],
@@ -120,10 +123,10 @@ def _b3it_item(change: dict, view: B3ITView | None, now: datetime) -> dict:
         else []
     )
     if pairs:
-        k = _nearest_index(pairs, cd)
-        peak_hi = min(len(pairs), k + FEED_B3IT_PEAK_WINDOW)
-        peak = round(max(v for _, v in pairs[k:peak_hi]), 3)
-        trace, frac = _window(pairs, k)
+        day_pairs = [(d.date().isoformat(), v) for d, v in pairs]
+        level = peak_from(change["date"][:10], day_pairs, B3IT_PEAK_WINDOW)
+        peak = round(level, 3) if level is not None else None
+        trace, frac = _window(pairs, _nearest_index(pairs, cd))
     display = f"{peak:.2f}" if peak is not None else "—"
     return {
         "date": change["date"][:10],
