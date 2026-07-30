@@ -130,12 +130,15 @@ def main(out: str = "scan_sweep_results.json") -> None:
     event = [
         r
         for r in records
-        if r not in known and (r["adaptive_onsets"] or r["end_reason"] == "change_detected")
+        if r not in known
+        and (r["adaptive_onsets"] or r["end_reason"] == "change_detected")
     ]
     null_pool = [r for r in records if r not in known and r not in event]
 
-    print(f"\nepochs: {len(records)} = {len(null_pool)} null pool "
-          f"+ {len(event)} adaptive-event + {len(known)} known early changes")
+    print(
+        f"\nepochs: {len(records)} = {len(null_pool)} null pool "
+        f"+ {len(event)} adaptive-event + {len(known)} known early changes"
+    )
 
     print("\n== false-alarm rate on the null pool (any fire within window W) ==")
     print(f"{'alpha':>7} " + " ".join(f"{'W=' + str(w):>12}" for w in WINDOWS))
@@ -160,14 +163,15 @@ def main(out: str = "scan_sweep_results.json") -> None:
                 fired += 1
                 lat.append(f - KNOWN_EARLY_CHANGES[(r["slug"], r["start"])])
         med = statistics.median(lat) if lat else None
-        print(f"alpha={alpha}: detected {fired}/{len(known)}, "
-              f"median latency {med} batches")
+        print(
+            f"alpha={alpha}: detected {fired}/{len(known)}, "
+            f"median latency {med} batches"
+        )
     print("\nper-epoch detail (alpha=0.005, W=45):")
     for r in sorted(known, key=lambda r: r["slug"]):
         change = KNOWN_EARLY_CHANGES[(r["slug"], r["start"])]
         f = first_fire(r, 0.005, W_MAX)
-        print(f"  {r['slug'][:52]:52s} change@{change:>2} fire@{f} "
-              f"n={r['n']}")
+        print(f"  {r['slug'][:52]:52s} change@{change:>2} fire@{f} n={r['n']}")
 
     print("\n== adaptive-event epochs: scan fire vs rule detection (alpha=0.005) ==")
     for r in event:
