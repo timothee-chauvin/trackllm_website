@@ -3,7 +3,15 @@ import pytest
 import shutil
 from pathlib import Path
 
-from conftest import b3it_slug, write_b3it_series, write_b3it_state, write_lt_endpoint
+from conftest import (
+    b3it_slug,
+    catalog_entry,
+    empty_status_inputs,
+    write_b3it_series,
+    write_b3it_state,
+    write_lt_endpoint,
+)
+from trackllm_website.config import Endpoint
 from trackllm_website.generate_site.render import render_site
 from trackllm_website.util import slugify
 
@@ -36,7 +44,7 @@ def _scaffold(website: Path):
 
 def test_render_site_produces_index_and_endpoint(tmp_path):
     _scaffold(tmp_path)
-    render_site(tmp_path, None)
+    render_site(tmp_path, None, empty_status_inputs())
     index = (tmp_path / "index.html").read_text()
     # index.html is now a static shell; the directory is populated client-side from overview.json
     assert 'id="dirBody"' in index
@@ -65,7 +73,7 @@ def test_render_emits_changes_and_unified_index(tmp_path):
         )
     )
 
-    render_site(tmp_path, None)
+    render_site(tmp_path, None, empty_status_inputs())
     # index.html is a static shell now; the directory + feed are populated client-side
     # from overview.json / changes.json rather than server-rendered into index.html.
     changes = json.loads((tmp_path / "data" / "changes.json").read_text())
@@ -87,7 +95,7 @@ def test_render_emits_b3it_json_and_b3it_only_page(tmp_path):
     )
     assert b3it_slug("b/x", "q") == "b2fx23q"
 
-    render_site(tmp_path, None)
+    render_site(tmp_path, None, empty_status_inputs())
     assert (tmp_path / "data" / "b3it" / "b2fx23q" / "b3it.json").exists()
     assert (tmp_path / "endpoints" / "b2fx23q.html").exists()
 
@@ -127,7 +135,7 @@ def test_render_emits_spend(tmp_path):
     zp.mkdir(parents=True)
     (zp / "2026-06.jsonl").write_text(_spend_line("lt", 0.0) + "\n")
 
-    render_site(tmp_path, None)
+    render_site(tmp_path, None, empty_status_inputs())
     assert (tmp_path / "data" / "spend.json").exists()
     assert (tmp_path / "spend.html").exists()
     assert "spend" in (tmp_path / "index.html").read_text().lower()
@@ -152,7 +160,7 @@ def test_render_endpoint_page_context_for_multi_provider_model(tmp_path):
     # the model is served by 2 providers.
     _lt_endpoint(tmp_path, "m2fa23p2", "m/a", "p2")
 
-    render_site(tmp_path, None)
+    render_site(tmp_path, None, empty_status_inputs())
 
     model_slug = slugify("m/a")
     page = (tmp_path / "endpoints" / "m2fa23p.html").read_text()
@@ -168,7 +176,7 @@ def test_render_endpoint_page_context_for_multi_provider_model(tmp_path):
 
 def test_render_emits_provider_pages_and_data(tmp_path):
     _scaffold(tmp_path)
-    render_site(tmp_path, None)
+    render_site(tmp_path, None, empty_status_inputs())
     view = json.loads((tmp_path / "data" / "providers" / "p.json").read_text())
     assert view["name"] == "p"
     assert view["n_endpoints"] == 1
@@ -178,7 +186,7 @@ def test_render_emits_provider_pages_and_data(tmp_path):
 
 def test_overview_providers_are_base_provider_rows(tmp_path):
     _scaffold(tmp_path)
-    render_site(tmp_path, None)
+    render_site(tmp_path, None, empty_status_inputs())
     overview = json.loads((tmp_path / "data" / "overview.json").read_text())
     (row,) = overview["providers"]
     assert row["name"] == "p"
@@ -188,7 +196,7 @@ def test_overview_providers_are_base_provider_rows(tmp_path):
 
 def test_render_emits_changes_page(tmp_path):
     _scaffold(tmp_path)
-    render_site(tmp_path, None)
+    render_site(tmp_path, None, empty_status_inputs())
     page = json.loads((tmp_path / "data" / "changes_page.json").read_text())
     assert set(page) == {"stats", "items", "months", "top_endpoints"}
     assert (tmp_path / "changes.html").exists()
@@ -197,13 +205,13 @@ def test_render_emits_changes_page(tmp_path):
 
 def test_nav_links_to_changes(tmp_path):
     _scaffold(tmp_path)
-    render_site(tmp_path, None)
+    render_site(tmp_path, None, empty_status_inputs())
     assert 'href="changes.html"' in (tmp_path / "index.html").read_text()
 
 
 def test_render_emits_methodology_page(tmp_path):
     _scaffold(tmp_path)
-    render_site(tmp_path, None)
+    render_site(tmp_path, None, empty_status_inputs())
     page = (tmp_path / "methodology.html").read_text()
     # both papers and the blog post must be reachable from the page
     assert "arxiv.org/abs/2512.03816" in page
@@ -214,7 +222,7 @@ def test_render_emits_methodology_page(tmp_path):
 
 def test_favicon_link_is_relative_to_page_depth(tmp_path):
     _scaffold(tmp_path)
-    render_site(tmp_path, None)
+    render_site(tmp_path, None, empty_status_inputs())
     model_slug = slugify("m/a")
     assert 'href="favicon.svg"' in (tmp_path / "index.html").read_text()
     assert (
@@ -228,7 +236,7 @@ def test_favicon_link_is_relative_to_page_depth(tmp_path):
 
 def test_endpoint_page_links_to_its_provider(tmp_path):
     _scaffold(tmp_path)
-    render_site(tmp_path, None)
+    render_site(tmp_path, None, empty_status_inputs())
     html = (tmp_path / "endpoints" / "m2fa23p.html").read_text()
     assert 'href="../providers/p.html"' in html
 
@@ -242,7 +250,7 @@ def test_endpoint_head_links_model_provider_and_org(tmp_path):
     """The h1 names a model, the @ names a provider, the trailing tag names an org:
     each is a page, so each is a link."""
     _scaffold(tmp_path)
-    render_site(tmp_path, None)
+    render_site(tmp_path, None, empty_status_inputs())
     head = _head((tmp_path / "endpoints" / "m2fa23p.html").read_text())
     assert f'href="../models/{slugify("m/a")}.html"' in head
     assert 'href="../providers/p.html"' in head
@@ -251,7 +259,7 @@ def test_endpoint_head_links_model_provider_and_org(tmp_path):
 
 def test_endpoint_and_model_crumbs_link_the_org(tmp_path):
     _scaffold(tmp_path)
-    render_site(tmp_path, None)
+    render_site(tmp_path, None, empty_status_inputs())
     org_href = f'href="../orgs/{slugify("m")}.html"'
     for path in ("endpoints/m2fa23p.html", f"models/{slugify('m/a')}.html"):
         crumb = (tmp_path / path).read_text().split('<div class="crumb">')[1]
@@ -260,7 +268,7 @@ def test_endpoint_and_model_crumbs_link_the_org(tmp_path):
 
 def test_render_emits_org_pages(tmp_path):
     _scaffold(tmp_path)
-    render_site(tmp_path, None)
+    render_site(tmp_path, None, empty_status_inputs())
     page = (tmp_path / "orgs" / f"{slugify('m')}.html").read_text()
     assert f'href="../models/{slugify("m/a")}.html"' in page
     assert "<h1>m</h1>" in page
@@ -272,16 +280,17 @@ def test_org_pages_are_rewritten_from_scratch(tmp_path):
     orgs = tmp_path / "orgs"
     orgs.mkdir()
     (orgs / "gone.html").write_text("stale")
-    render_site(tmp_path, None)
+    render_site(tmp_path, None, empty_status_inputs())
     assert not (orgs / "gone.html").exists()
 
 
-def test_endpoint_with_nothing_to_show_is_not_rendered_anywhere(tmp_path):
-    """No series, no endpoint: no page, no directory row, no model row, and it
-    is not counted in the stats that describe the fleet."""
+def test_endpoint_with_nothing_to_show_gets_a_status_page_if_ever_tracked(tmp_path):
+    """A never-tracked endpoint that already left the catalog stays absent. One we
+    tracked (a BI state file) keeps an explained page and directory row -- with a
+    status instead of a chart -- but stays out of the tracked-fleet stats."""
     _scaffold(tmp_path)
-    # an LT endpoint whose queries all errored, and a B3IT one retired before its
-    # first post-reference batch -- the two ways to end up with no series
+    # an LT endpoint whose queries all errored (never observed, no catalog entry),
+    # and a B3IT one retired before its first post-reference batch
     dead_lt = tmp_path / "data" / "lt" / "m2fa23dead" / "default"
     dead_lt.mkdir(parents=True)
     (dead_lt / "info.json").write_text(
@@ -293,20 +302,113 @@ def test_endpoint_with_nothing_to_show_is_not_rendered_anywhere(tmp_path):
     )
     write_b3it_state(tmp_path, "m/a", "gone", status="retired")
 
-    render_site(tmp_path, None)
+    render_site(tmp_path, None, empty_status_inputs())
 
     assert not (tmp_path / "endpoints" / "m2fa23dead.html").exists()
-    assert not (tmp_path / "endpoints" / f"{b3it_slug('m/a', 'gone')}.html").exists()
+    gone_slug = b3it_slug("m/a", "gone")
+    assert (tmp_path / "endpoints" / f"{gone_slug}.html").exists()
 
     overview = json.loads((tmp_path / "data" / "overview.json").read_text())
-    assert {e["slug"] for e in overview["endpoints"]} == {"m2fa23p"}
+    assert {e["slug"] for e in overview["endpoints"]} == {"m2fa23p", gone_slug}
+    gone_row = next(e for e in overview["endpoints"] if e["slug"] == gone_slug)
+    assert gone_row["methods"] == [] and gone_row["headline"] == "retired"
     assert overview["stats"]["endpoints"] == 1
 
     model = json.loads(
         (tmp_path / "data" / "models" / f"{slugify('m/a')}.json").read_text()
     )
-    assert [e["provider"] for e in model["endpoints"]] == ["p"]
+    assert [e["provider"] for e in model["endpoints"] if e["methods"]] == ["p"]
     assert model["n_endpoints"] == 1 and model["n_providers"] == 1
+
+
+def _manifest(html: str) -> dict:
+    return json.loads(html.split('id="manifest">')[1].split("</script>")[0])
+
+
+def test_render_emits_status_pages_for_catalog_endpoints(tmp_path):
+    _scaffold(tmp_path)
+    inputs = empty_status_inputs()
+    inputs.endpoints_lt = [
+        Endpoint(api="openrouter", model="m/a", provider="p", cost=(1, 2))
+    ]
+    inputs.catalog = [
+        catalog_entry("m/a", "p"),
+        catalog_entry(
+            "openai/gpt-5.4",
+            "openai",
+            supports_temperature=False,
+            supports_logprobs=False,
+        ),
+    ]
+    inputs.bi_cache.add_bad_temperature(
+        Endpoint(
+            api="openrouter", model="openai/gpt-5.4", provider="openai", cost=(1, 2)
+        )
+    )
+
+    render_site(tmp_path, None, inputs)
+
+    slug = slugify("openai/gpt-5.4#openai")
+    page = (tmp_path / "endpoints" / f"{slug}.html").read_text()
+    manifest = _manifest(page)
+    assert manifest["prompts"] == []
+    assert manifest["status"]["headline"] == "untrackable"
+    assert manifest["status"]["ltCopy"] and manifest["status"]["reason"]
+    assert manifest["meta"]["supports_logprobs"] is False
+    assert manifest["meta"]["cost"] == [1.0, 2.0]
+
+    # the tracked page gains the same status object plus its catalog metadata
+    tracked = _manifest((tmp_path / "endpoints" / "m2fa23p.html").read_text())
+    assert tracked["status"]["lt"] == "tracked"
+    assert tracked["meta"]["free"] is False
+
+    model = json.loads(
+        (tmp_path / "data" / "models" / f"{slugify('openai/gpt-5.4')}.json").read_text()
+    )
+    assert model["status_summary"] == "0 of 1 endpoint trackable"
+
+    overview = json.loads((tmp_path / "data" / "overview.json").read_text())
+    row = next(e for e in overview["endpoints"] if e["slug"] == slug)
+    assert row["headline"] == "untrackable" and row["reason"]
+
+
+def test_untracked_endpoint_page_renders_card_not_chart(tmp_path):
+    """An untracked page is the status card + catalog metadata: no chart mount, no
+    endpoint.js, and no link to a provider page that was never generated."""
+    _scaffold(tmp_path)
+    inputs = empty_status_inputs()
+    inputs.endpoints_lt = [
+        Endpoint(api="openrouter", model="m/a", provider="p", cost=(1, 2))
+    ]
+    inputs.catalog = [
+        catalog_entry("m/a", "p"),
+        catalog_entry(
+            "openai/gpt-5.4",
+            "openai",
+            supports_temperature=False,
+            supports_logprobs=False,
+        ),
+    ]
+    inputs.bi_cache.add_bad_temperature(
+        Endpoint(
+            api="openrouter", model="openai/gpt-5.4", provider="openai", cost=(1, 2)
+        )
+    )
+
+    render_site(tmp_path, None, inputs)
+
+    page = (
+        tmp_path / "endpoints" / f"{slugify('openai/gpt-5.4#openai')}.html"
+    ).read_text()
+    assert "status-methods" in page and "meta-grid" in page
+    assert 'id="mainchart"' not in page and "js/endpoint.js" not in page
+    assert 'class="badge st st-untrackable"' in page
+    # openai has no tracked endpoint, hence no provider page: named, never linked
+    assert 'href="../providers/openai.html"' not in page
+
+    tracked = (tmp_path / "endpoints" / "m2fa23p.html").read_text()
+    assert "status-methods" in tracked and 'id="mainchart"' in tracked
+    assert 'href="../providers/p.html"' in tracked
 
 
 def test_a_dead_lt_series_does_not_hide_a_live_b3it_one(tmp_path):
@@ -330,7 +432,7 @@ def test_a_dead_lt_series_does_not_hide_a_live_b3it_one(tmp_path):
         tokens=["A"] * 10,
     )
 
-    render_site(tmp_path, None)
+    render_site(tmp_path, None, empty_status_inputs())
 
     assert (tmp_path / "endpoints" / f"{slug}.html").exists()
     overview = json.loads((tmp_path / "data" / "overview.json").read_text())
@@ -348,7 +450,7 @@ def test_spend_rows_only_link_endpoints_that_have_a_page(tmp_path):
         d.mkdir(parents=True)
         (d / "2026-06.jsonl").write_text(_spend_line("lt", 0.05) + "\n")
 
-    render_site(tmp_path, None)
+    render_site(tmp_path, None, empty_status_inputs())
 
     html = (tmp_path / "spend.html").read_text()
     assert 'href="endpoints/m2fa23p.html"' in html
@@ -359,7 +461,7 @@ def test_spend_rows_only_link_endpoints_that_have_a_page(tmp_path):
 def test_methodology_links_each_paper_from_its_own_section(tmp_path):
     """The paper belongs beside the method it describes, not only in Read more."""
     _scaffold(tmp_path)
-    render_site(tmp_path, None)
+    render_site(tmp_path, None, empty_status_inputs())
     page = (tmp_path / "methodology.html").read_text()
     lt_section, b3it_section, read_more = (
         page.split("Black-box border input tracking")[0],

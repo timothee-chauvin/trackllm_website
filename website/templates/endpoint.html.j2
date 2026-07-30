@@ -1,4 +1,5 @@
 {% extends "base.html.j2" %}
+{% from "_macros.html.j2" import headline_badge %}
 
 {% block title %}{{ model }} @ {{ provider }} | TrackLLM{% endblock %}
 
@@ -14,22 +15,34 @@
     <div>
       {# every name here is a page: the model, the company serving it, the company that trained it #}
       <h1>{% if model_slug %}<a href="{{ nav_prefix }}models/{{ model_slug }}.html">{{ model_name }}</a>{% else %}{{ model_name }}{% endif %}</h1>
-      <div class="prov">@ <a href="{{ nav_prefix }}providers/{{ provider_slug }}.html">{{ provider }}</a>
+      {# a provider without tracked endpoints has no page, so its name is not a link #}
+      <div class="prov">@ {% if provider_has_page %}<a href="{{ nav_prefix }}providers/{{ provider_slug }}.html">{{ provider }}</a>{% else %}{{ provider }}{% endif %}
         <span style="color:var(--text-dim)">· <a href="{{ nav_prefix }}orgs/{{ org_slug }}.html">{{ org }}</a></span></div>
-      <div class="badges">{% for m in methods %}<span class="badge {{ m|lower }}">{{ m|lower }}</span>{% endfor %}</div>
+      <div class="badges">{% for m in methods %}<span class="badge {{ m|lower }}">{{ m|lower }}</span>{% endfor %}{% if not methods %}{{ headline_badge(status.headline) }}{% endif %}</div>
     </div>
-    <div class="statuscard" id="statuscard"></div>
+    {% if methods %}<div class="statuscard" id="statuscard"></div>{% endif %}
   </div>
   <div class="compare">
-    <div class="t"><b>{{ model_name }}</b> <span>is tracked on {{ n_endpoints }} endpoint{{ "s" if n_endpoints != 1 else "" }} — compare {{ "its" if n_endpoints == 1 else "their" }} drift side by side.</span></div>
+    <div class="t"><b>{{ model_name }}</b>
+      {% if methods %}<span>is tracked on {{ n_endpoints }} endpoint{{ "s" if n_endpoints != 1 else "" }} — compare {{ "its" if n_endpoints == 1 else "their" }} drift side by side.</span>
+      {% else %}<span>— {{ status_summary }}.</span>{% endif %}</div>
     <div style="display:flex;gap:1rem;flex-wrap:wrap">
       {% if model_slug %}<a class="go" href="{{ nav_prefix }}models/{{ model_slug }}.html">View model page →</a>{% endif %}
-      <a class="go" href="{{ nav_prefix }}providers/{{ provider_slug }}.html">All of {{ provider_base }} →</a>
+      {% if provider_has_page %}<a class="go" href="{{ nav_prefix }}providers/{{ provider_slug }}.html">All of {{ provider_base }} →</a>{% endif %}
     </div>
   </div>
 </div>
 
 <main class="wrap">
+  <section class="block">
+    <div class="sec-head"><h2>Tracking status</h2></div>
+    <div class="panel status-methods">
+      <div class="ms"><span class="badge lt">LT</span><span class="ms-body"><b class="st-name">{{ status.lt | replace("_", " ") | replace(":", " · ") }}</b> — {{ status.ltCopy }}{% if status.ltDetail %} <span class="ms-detail">({{ status.ltDetail }})</span>{% endif %}</span></div>
+      <div class="ms"><span class="badge b3it">B3IT</span><span class="ms-body"><b class="st-name">{{ status.bi | replace("_", " ") | replace(":", " · ") }}</b> — {{ status.biCopy }}{% if status.biDetail %} <span class="ms-detail">({{ status.biDetail }})</span>{% endif %}</span></div>
+    </div>
+  </section>
+
+  {% if methods %}
   <section class="block">
     <div class="sec-head"><h2>Drift from baseline</h2></div>
     <p class="sec-desc">Both signals measure how far this endpoint's behaviour has moved from its <b>reference period</b> (its first two weeks). <span class="lt">LT</span> tracks the average change in the returned tokens' log-probabilities (nats); <span class="b3">B3IT</span> tracks the total-variation distance of the border-input votes (0–1). Both read <b>0 when the endpoint matches its baseline</b> and rise — staying elevated — after a real change. Dashed lines mark detected changepoints; <b>σ</b> is the detector's statistical confidence, separate from how far the signal actually moved.</p>
@@ -48,6 +61,17 @@
       </table>
     </div>
   </section>
+  {% elif meta %}
+  <section class="block">
+    <div class="sec-head"><h2>Endpoint details</h2><span class="hint">from the OpenRouter catalog snapshot</span></div>
+    <div class="panel meta-grid">
+      <div><div class="k">Pricing (per Mtok)</div><div class="v">{% if meta.free %}Free{% else %}${{ "%.2f" | format(meta.cost[0]) }} in · ${{ "%.2f" | format(meta.cost[1]) }} out{% endif %}</div></div>
+      <div><div class="k">Listed since</div><div class="v">{{ meta.created[:10] if meta.created else "—" }}</div></div>
+      <div><div class="k">Claims temperature</div><div class="v">{{ "unknown" if meta.supports_temperature is none else ("yes" if meta.supports_temperature else "no") }}</div></div>
+      <div><div class="k">Claims logprobs</div><div class="v">{{ "unknown" if meta.supports_logprobs is none else ("yes" if meta.supports_logprobs else "no") }}</div></div>
+    </div>
+  </section>
+  {% endif %}
 
   <section class="block">
     <div class="method-note">
@@ -60,5 +84,5 @@
 
 {% block scripts %}
     <script type="application/json" id="manifest">{{ manifest_json | safe }}</script>
-    <script type="module" src="../js/endpoint.js"></script>
+    {% if methods %}<script type="module" src="../js/endpoint.js"></script>{% endif %}
 {% endblock %}

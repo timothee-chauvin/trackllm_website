@@ -42,6 +42,20 @@ def test_parse_stamps_cost_and_identity():
     assert e.cost == (1.0, 2.0)
 
 
+def test_parse_stamps_supports_logprobs():
+    raw = [
+        raw_endpoint("both", ["logprobs", "top_logprobs"]),
+        raw_endpoint("partial", ["logprobs"]),
+        raw_endpoint("none", []),
+        raw_endpoint("absent"),
+    ]
+    by_provider = {e.provider: e for e in parse(raw, model_supports_temperature=True)}
+    assert by_provider["both"].supports_logprobs is True
+    assert by_provider["partial"].supports_logprobs is False
+    assert by_provider["none"].supports_logprobs is False
+    assert by_provider["absent"].supports_logprobs is None
+
+
 def test_logprob_filter_uses_endpoint_parameters():
     raw = [
         raw_endpoint("with", ["logprobs", "top_logprobs", "temperature"]),

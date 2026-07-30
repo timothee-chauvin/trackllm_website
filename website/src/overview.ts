@@ -1,8 +1,6 @@
-// `export {}` makes this a module so its top-level names (DATA, fmtInt, init, ...)
-// don't collide with the same names in other bundler-entrypoint scripts (endpoint.ts)
-// when type-checked together as one tsc program.
-export {};
-
+// The `init` export both makes this a module (so its top-level names don't collide
+// with other bundler entrypoints when type-checked as one tsc program) and lets the
+// smoke tests re-render a fresh document without busting the module cache.
 import {
   B3IT_CAP,
   FeedItem,
@@ -10,6 +8,7 @@ import {
   MIN_ENDPOINT_YEARS,
   esc,
   eventRow,
+  highlight,
   magnitudeLabel,
   methodBadges,
   plural,
@@ -18,6 +17,8 @@ import {
   relativeAge,
   sparkline,
   statusPill,
+  statusRank,
+  untrackedDirCells,
   volGrid,
 } from "./components";
 
@@ -74,10 +75,12 @@ interface EndpointRow {
   provider: string;
   providerSlug: string;
   methods: string[];
-  status: EndpointStatus;
+  status: EndpointStatus | null; // null on rows with no series (untracked)
   stableDays: number | null;
   nChanges: number;
   trace: number[];
+  headline: string;
+  reason: string;
 }
 
 /** The one real change event the hero draws, chosen at build time (hero.py). */
@@ -116,7 +119,7 @@ const HERO_HIT_WIDTH = 18; // invisible fat stroke: the curve is 1.6 units thin
 const HERO_TIP_DX = 16;
 const HERO_TIP_DY = 18;
 
-(async function (): Promise<void> {
+export async function init(): Promise<void> {
   const DATA: {
     stats: Stats;
     hero: Hero | null;
@@ -339,29 +342,45 @@ const HERO_TIP_DY = 18;
 
   // ---- endpoint directory ----
   const rows = DATA.endpoints;
+  // provider pages only exist for providers with tracked endpoints; a row whose
+  // provider has none must name it without linking it
+  const providerPages = new Set(provs.map(p => p.slug));
   const active = new Set<string>();
+  // headline chips are OR within the group; an empty set means no status constraint
+  const statusFilters = new Set<string>(["tracked"]);
   let sortKey: SortKey = "nChanges";
   let sortDir = -1;
-  const STATUS_ORDER: Record<EndpointStatus, number> = { changed: 0, stable: 1, retired: 2 };
   function stableCell(r: EndpointRow): string {
     if (r.status === "retired" || r.stableDays === null) return `<span class="org-cell">—</span>`;
     const d = r.stableDays;
     return `<span class="cc">${d >= 365 ? (d / 365).toFixed(1) + "y" : d + "d"}</span>`;
   }
   function render(): void {
-    const q = (document.getElementById("q") as HTMLInputElement).value.trim().toLowerCase();
+    const q = (document.getElementById("q") as HTMLInputElement).value.trim();
+    const ql = q.toLowerCase();
     const mf = [...active].filter(f => f === "lt" || f === "b3it");
-    const list = rows.filter(r => {
-      if (q && !(`${r.model} ${r.provider} ${r.org}`.toLowerCase().includes(q))) return false;
-      if (mf.length && !mf.every(m => r.methods.includes(m))) return false;
-      if (active.has("everchanged") && r.nChanges === 0) return false;
-      if (active.has("recent") && r.status !== "changed") return false;
-      if (active.has("retired") && r.status !== "retired") return false;
-      return true;
-    });
+    // a change-history chip bypasses the status group: its result set is defined
+    // by the change criterion alone (only observed endpoints can have changes),
+    // exactly as before the status chips existed
+    const changeChip = active.has("everchanged") || active.has("recent");
+    // grey out whatever the current mode ignores, so chips never look
+    // toggleable while having no effect
+    const chipsEl = document.getElementById("chips")!;
+    chipsEl.classList.toggle("bypass-all", !!q);
+    chipsEl.classList.toggle("bypass-status", changeChip);
+    // a search spans every row: chips must never hide a hit
+    const list = q
+      ? rows.filter(r => `${r.model} ${r.provider} ${r.org}`.toLowerCase().includes(ql))
+      : rows.filter(r => {
+          if (!changeChip && statusFilters.size && !statusFilters.has(r.headline)) return false;
+          if (mf.length && !mf.every(m => r.methods.includes(m))) return false;
+          if (active.has("everchanged") && r.nChanges === 0) return false;
+          if (active.has("recent") && r.status !== "changed") return false;
+          return true;
+        });
     list.sort((a, b) => {
       let av: string | number, bv: string | number;
-      if (sortKey === "status") { av = STATUS_ORDER[a.status]; bv = STATUS_ORDER[b.status]; }
+      if (sortKey === "status") { av = statusRank(a); bv = statusRank(b); }
       else if (sortKey === "stableDays") { av = a.stableDays ?? -1; bv = b.stableDays ?? -1; }
       else if (sortKey === "nChanges") { av = a.nChanges; bv = b.nChanges; }
       else { av = String(a[sortKey]).toLowerCase(); bv = String(b[sortKey]).toLowerCase(); }
@@ -369,11 +388,16 @@ const HERO_TIP_DY = 18;
     });
     document.getElementById("dirBody")!.innerHTML = list.map(r => {
       const isLT = r.methods.includes("lt");
-      return `
+      const provCell = providerPages.has(r.providerSlug)
+        ? `<a class="prov-cell" href="providers/${esc(r.providerSlug)}.html">${highlight(r.provider, q)}</a>`
+        : `<span class="prov-cell">${highlight(r.provider, q)}</span>`;
+      const head = `
       <tr>
-        <td><a class="model-cell" href="models/${esc(r.modelSlug)}.html">${esc(r.model)}</a><div class="org-cell">${esc(r.org)}</div></td>
-        <td class="col-hide"><a class="prov-cell" href="providers/${esc(r.providerSlug)}.html">${esc(r.provider)}</a></td>
-        <td><a href="endpoints/${esc(r.slug)}.html">${statusPill(r.status)}</a></td>
+        <td><a class="model-cell" href="models/${esc(r.modelSlug)}.html">${highlight(r.model, q)}</a><div class="org-cell">${highlight(r.org, q)}</div></td>
+        <td class="col-hide">${provCell}</td>`;
+      if (!r.methods.length) return `${head}${untrackedDirCells(r, "")}</tr>`;
+      return `${head}
+        <td><a href="endpoints/${esc(r.slug)}.html">${statusPill(r.status!)}</a></td>
         <td class="r"><span class="cc ${r.nChanges ? "some" : "zero"}">${r.nChanges}</span></td>
         <td class="col-hide"><span class="methods">${methodBadges(r.methods)}</span></td>
         <td class="r col-hide">${stableCell(r)}</td>
@@ -388,13 +412,17 @@ const HERO_TIP_DY = 18;
   document.getElementById("q")!.addEventListener("input", render);
   document.getElementById("chips")!.addEventListener("click", e => {
     const chip = (e.target as HTMLElement).closest(".chip") as HTMLElement | null; if (!chip) return;
-    const f = chip.dataset.f!;
-    if (active.has(f)) { active.delete(f); chip.classList.remove("on"); }
-    else { active.add(f); chip.classList.add("on"); }
+    const st = chip.dataset.st;
+    const set = st ? statusFilters : active;
+    const f = st ?? chip.dataset.f!;
+    if (set.has(f)) { set.delete(f); chip.classList.remove("on"); }
+    else { set.add(f); chip.classList.add("on"); }
     render();
   });
   document.querySelectorAll<HTMLElement>("thead th[data-sort]").forEach(th => th.addEventListener("click", () => {
     const k = th.dataset.sort as SortKey; if (sortKey === k) sortDir *= -1; else { sortKey = k; sortDir = (k === "stableDays" || k === "nChanges") ? -1 : 1; } render();
   }));
   render();
-})();
+}
+
+init();

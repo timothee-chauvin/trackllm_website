@@ -4,25 +4,38 @@ from pathlib import Path
 
 import pytest
 
-from conftest import write_b3it_series, write_b3it_state, write_lt_endpoint
+from conftest import (
+    catalog_entry,
+    empty_status_inputs,
+    site_statuses_for,
+    write_b3it_series,
+    write_b3it_state,
+    write_lt_endpoint,
+)
 from trackllm_website.bi.state import RetiredInfo
-from trackllm_website.config import HeroConfig
+from trackllm_website.config import Endpoint, HeroConfig
 from trackllm_website.generate_site.b3it import discover_b3it_views
 from trackllm_website.generate_site.changes import merge_changes, to_json
 from trackllm_website.generate_site.lt import discover_lt_endpoints, load_all_lt_data
 from trackllm_website.generate_site.feed import downsample_trace
 from trackllm_website.generate_site.overview import build_overview
+from trackllm_website.generate_site.status import STATUS_COPY
 from trackllm_website.util import slugify
 
 
-def _build_overview(root: Path) -> dict:
+def _build_overview_with(root: Path, inputs) -> dict:
     lt_dir = root / "data" / "lt"
     lt_endpoints = list(discover_lt_endpoints(lt_dir)) if lt_dir.exists() else []
     lt_data = load_all_lt_data(lt_dir, [e.slug for e in lt_endpoints])
     b3it_views = discover_b3it_views(
         root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
     )
-    return build_overview(root, lt_data, lt_endpoints, b3it_views, None)
+    site = site_statuses_for(root, inputs)
+    return build_overview(root, lt_data, lt_endpoints, b3it_views, None, site)
+
+
+def _build_overview(root: Path) -> dict:
+    return _build_overview_with(root, empty_status_inputs())
 
 
 def test_downsample_trace_caps_length():
@@ -292,6 +305,47 @@ def test_stats_counts_match_endpoint_and_changes_lists(fake_site):
     assert ov["stats"]["spend_cumulative"] == 1.23
 
 
+def test_untracked_catalog_endpoint_gets_a_row_with_reason(fake_site):
+    inputs = empty_status_inputs()
+    inputs.catalog = [
+        catalog_entry(
+            "openai/gpt-5.4",
+            "openai",
+            supports_temperature=False,
+            supports_logprobs=False,
+        )
+    ]
+    inputs.bi_cache.add_bad_temperature(
+        Endpoint(
+            api="openrouter", model="openai/gpt-5.4", provider="openai", cost=(1, 2)
+        )
+    )
+    ov = _build_overview_with(fake_site, inputs)
+    row = next(
+        r for r in ov["endpoints"] if r["slug"] == slugify("openai/gpt-5.4#openai")
+    )
+    assert row["methods"] == [] and row["trace"] == []
+    assert row["model"] == "gpt-5.4" and row["org"] == "openai"
+    assert row["providerSlug"] == "openai"
+    assert row["headline"] == "untrackable"
+    assert (row["ltStatus"], row["biStatus"]) == ("no_logprobs", "bad_temperature")
+    assert row["reason"] == STATUS_COPY["untrackable"]
+    # untracked rows do not join the tracked-fleet stats
+    assert ov["stats"]["endpoints"] == 1
+
+
+def test_tracked_rows_carry_status_fields(fake_site):
+    inputs = empty_status_inputs()
+    inputs.endpoints_lt = [
+        Endpoint(api="openrouter", model="m/a", provider="p", cost=(1, 2))
+    ]
+    ov = _build_overview_with(fake_site, inputs)
+    row = next(r for r in ov["endpoints"] if r["slug"] == "m2fa23p")
+    assert row["headline"] == "tracked"
+    assert (row["ltStatus"], row["biStatus"]) == ("tracked", "monitoring")
+    assert row["reason"] == STATUS_COPY["tracked"]
+
+
 def test_pinned_hero_reaches_overview_json(tmp_path):
     """End-to-end: the configured pin, not a per-build scoring pass, decides the
     hero -- and it arrives at full daily resolution."""
@@ -325,7 +379,14 @@ def test_pinned_hero_reaches_overview_json(tmp_path):
     pin = HeroConfig(
         slug="m2fa23p", method="lt", start=date(2026, 6, 1), end=date(2026, 6, 30)
     )
-    ov = build_overview(root, lt_data, lt_endpoints, {}, pin)
+    ov = build_overview(
+        root,
+        lt_data,
+        lt_endpoints,
+        {},
+        pin,
+        site_statuses_for(root, empty_status_inputs()),
+    )
 
     hero = ov["hero"]
     assert hero["slug"] == "m2fa23p"
@@ -352,4 +413,11 @@ def test_stale_hero_pin_fails_the_build(tmp_path):
         slug="gone2fmissing", method="lt", start=date(2026, 6, 1), end=date(2026, 6, 30)
     )
     with pytest.raises(ValueError, match="hero pin"):
-        build_overview(root, lt_data, lt_endpoints, {}, pin)
+        build_overview(
+            root,
+            lt_data,
+            lt_endpoints,
+            {},
+            pin,
+            site_statuses_for(root, empty_status_inputs()),
+        )
