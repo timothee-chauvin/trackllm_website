@@ -6,7 +6,14 @@ import orjson
 from pydantic import BaseModel
 
 from trackllm_website.config import Endpoint, config
-from trackllm_website.util import slugify
+from trackllm_website.util import atomic_write_bytes, slugify
+
+
+class PartialMonthlyDataError(RuntimeError):
+    """A month directory holds an incomplete/inconsistent file set (crashed write).
+
+    Loading must fail loudly: returning empty data would make the next
+    store_response rewrite the month and silently discard it."""
 
 
 class ResponseLogprobs(BaseModel, arbitrary_types_allowed=True):
@@ -90,8 +97,15 @@ class MonthlyData:
         queries_path = path / cls.queries_filename
         errors_path = path / cls.errors_filename
 
-        if not logprobs_path.exists() or not queries_path.exists():
+        all_paths = (logprobs_path, queries_path, errors_path)
+        if not any(p.exists() for p in all_paths):
+            # Genuinely absent (e.g. first response of a new month)
             return cls(year=year, month=month, logprob_responses=[], error_responses=[])
+        missing = [p.name for p in (logprobs_path, queries_path) if not p.exists()]
+        if missing:
+            raise PartialMonthlyDataError(
+                f"{path} is missing {', '.join(missing)} but other data files exist"
+            )
 
         # Load the condensed data
         with open(logprobs_path, "rb") as f:
@@ -143,6 +157,12 @@ class MonthlyData:
             else:
                 # "e" followed by the index of an error
                 err_idx = int(idx[1:])
+                if err_idx >= len(seen_errors):
+                    raise PartialMonthlyDataError(
+                        f"{queries_path} references error index {err_idx} but "
+                        f"{cls.errors_filename} in {path} only has "
+                        f"{len(seen_errors)} errors"
+                    )
                 error_responses.append((full_date, seen_errors[err_idx]))
 
         return cls(
@@ -250,24 +270,20 @@ class MonthlyData:
         all_queries: list[tuple[str, int | str]] = logprob_queries + error_queries
         all_queries.sort(key=lambda x: x[0])
 
-        # Write logprobs.json
-        with open(path / self.logprob_filename, "wb") as f:
-            json_dict = {
-                "seen_tokens": seen_tokens,
-                "seen_logprobs": [lp.model_dump(mode="python") for lp in idx_logprobs],
-            }
-            f.write(orjson.dumps(json_dict, option=orjson.OPT_SERIALIZE_NUMPY))
-
-        # Write queries.json
-        with open(path / self.queries_filename, "wb") as f:
-            f.write(orjson.dumps(all_queries))
-
-        # Write errors.json
-        with open(path / self.errors_filename, "wb") as f:
-            json_dict = {
-                "seen_errors": [e.model_dump() for e in seen_errors],
-            }
-            f.write(orjson.dumps(json_dict))
+        # Atomic writes, with queries.json last since it references the other two:
+        # a crash mid-serialize then leaves consistent files (at worst unreferenced
+        # entries), never dangling references.
+        logprobs_dict = {
+            "seen_tokens": seen_tokens,
+            "seen_logprobs": [lp.model_dump(mode="python") for lp in idx_logprobs],
+        }
+        atomic_write_bytes(
+            path / self.logprob_filename,
+            orjson.dumps(logprobs_dict, option=orjson.OPT_SERIALIZE_NUMPY),
+        )
+        errors_dict = {"seen_errors": [e.model_dump() for e in seen_errors]}
+        atomic_write_bytes(path / self.errors_filename, orjson.dumps(errors_dict))
+        atomic_write_bytes(path / self.queries_filename, orjson.dumps(all_queries))
 
 
 class ResultsStorage:

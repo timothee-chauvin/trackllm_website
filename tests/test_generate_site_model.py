@@ -7,6 +7,7 @@ from conftest import (
     empty_status_inputs,
     site_statuses_for,
     write_lt_endpoint,
+    write_month_dir,
 )
 from trackllm_website.bi.phase_2 import save_results
 from trackllm_website.bi.state import EndpointBIState, Epoch
@@ -263,9 +264,7 @@ def test_endpoint_with_no_lt_scores_file_yields_null_lt(tmp_path):
     (d / "info.json").write_text(
         json.dumps({"prompt": "hi", "endpoint": {"model": "m/a", "provider": "p1"}})
     )
-    md = d / "2026-06"
-    md.mkdir()
-    (md / "queries.json").write_text(json.dumps([["24 10:00:00", 0]]))
+    write_month_dir(d, "2026-06", [["24 10:00:00", 0]])
     # no lt_scores.json written
     _write_changes_json(root)
 
