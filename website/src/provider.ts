@@ -13,12 +13,9 @@ import {
   plural,
   prettyDate,
   rateBar,
-  sparkline,
-  statusPill,
-  statusRank,
-  untrackedDirCells,
   volGrid,
 } from "./components";
+import { EndpointRow, initDirectory } from "./directory";
 
 interface MethodBlock {
   endpoints: number;
@@ -45,21 +42,6 @@ interface ProviderChange {
   slug: string;
 }
 
-interface EndpointRow {
-  slug: string;
-  model: string;
-  modelSlug: string;
-  org: string;
-  provider: string;
-  methods: string[];
-  status: string | null; // null on rows with no series (untracked)
-  stableDays: number | null;
-  nChanges: number;
-  trace: number[];
-  headline: string;
-  reason: string;
-}
-
 interface ProviderData {
   name: string;
   slug: string;
@@ -75,8 +57,6 @@ interface ProviderData {
   changes: ProviderChange[];
   endpoints: EndpointRow[];
 }
-
-type SortKey = "model" | "provider" | "status" | "nChanges" | "stableDays";
 
 const LANE_W = 600;
 
@@ -256,78 +236,40 @@ export async function init(): Promise<void> {
   // endpoint directory
   const rows = D.endpoints;
   const filters = new Set<string>();
-  let sortKey: SortKey = "nChanges";
-  let sortDir = -1;
   const qEl = document.getElementById("epq") as HTMLInputElement | null;
   const bodyEl = document.getElementById("epBody");
   const footEl = document.getElementById("epFoot");
   if (!qEl || !bodyEl || !footEl) return;
 
-  function stableCell(r: EndpointRow): string {
-    if (r.status === "retired" || r.stableDays === null) return `<span class="org-cell">—</span>`;
-    return `<span class="cc">${r.stableDays >= 365 ? (r.stableDays / 365).toFixed(1) + "y" : r.stableDays + "d"}</span>`;
-  }
-
-  function render(): void {
-    const q = qEl!.value.trim().toLowerCase();
-    const list = rows.filter((r) => {
-      if (q && !`${r.model} ${r.org} ${r.provider}`.toLowerCase().includes(q)) return false;
-      if (filters.has("changed") && r.nChanges === 0) return false;
-      if (filters.has("retired") && r.status !== "retired") return false;
-      if (filters.has("b3it") && !r.methods.includes("b3it")) return false;
-      return true;
-    });
-    list.sort((a, b) => {
-      let av: string | number, bv: string | number;
-      if (sortKey === "status") { av = statusRank(a); bv = statusRank(b); }
-      else if (sortKey === "stableDays") { av = a.stableDays ?? -1; bv = b.stableDays ?? -1; }
-      else if (sortKey === "nChanges") { av = a.nChanges; bv = b.nChanges; }
-      else if (sortKey === "provider") { av = variantOf(a.provider); bv = variantOf(b.provider); }
-      else { av = a.model.toLowerCase(); bv = b.model.toLowerCase(); }
-      if (av < bv) return -sortDir;
-      if (av > bv) return sortDir;
-      return a.model.localeCompare(b.model);
-    });
-    bodyEl!.innerHTML =
-      list
-        .map((r) => {
-          const isLT = r.methods.includes("lt");
-          const head = `<tr>
+  const render = initDirectory({
+    rows,
+    root: "../",
+    q: qEl,
+    body: bodyEl,
+    foot: footEl,
+    descending: ["status", "nChanges", "stableDays"],
+    providerValue: (r) => variantOf(r.provider),
+    list: (q) => {
+      const ql = q.toLowerCase();
+      return rows.filter((r) => {
+        if (ql && !`${r.model} ${r.org} ${r.provider}`.toLowerCase().includes(ql)) return false;
+        if (filters.has("changed") && r.nChanges === 0) return false;
+        if (filters.has("retired") && r.status !== "retired") return false;
+        if (filters.has("b3it") && !r.methods.includes("b3it")) return false;
+        return true;
+      });
+    },
+    leadCells: (r) => `
         <td><a class="model-cell" href="../models/${esc(r.modelSlug)}.html">${esc(r.model)}</a><div class="org-cell">${esc(r.org)}</div></td>
-        <td class="col-hide"><span class="prov-cell">${variantOf(r.provider) ? esc(variantOf(r.provider)) : "—"}</span></td>`;
-          if (!r.methods.length) return `${head}${untrackedDirCells(r, "../")}</tr>`;
-          return `${head}
-        <td><a href="../endpoints/${esc(r.slug)}.html">${statusPill(r.status!)}</a></td>
-        <td class="r"><span class="cc ${r.nChanges ? "some" : "zero"}">${r.nChanges}</span></td>
-        <td class="col-hide"><span class="methods">${methodBadges(r.methods)}</span></td>
-        <td class="r col-hide">${stableCell(r)}</td>
-        <td class="col-hide spark-cell">${sparkline(r.trace, isLT ? LT_CAP : B3IT_CAP, isLT ? "var(--accent)" : "var(--b3it)", null)}</td>
-      </tr>`;
-        })
-        .join("") || '<tr><td colspan="7"><div class="empty">No endpoints match.</div></td></tr>';
-    footEl!.textContent = `${list.length} of ${rows.length} endpoints`;
-    document.querySelectorAll<HTMLElement>("th[data-sort]").forEach((th) => {
-      const arr = th.querySelector(".arr");
-      if (arr) arr.textContent = th.dataset.sort === sortKey ? (sortDir < 0 ? "▼" : "▲") : "";
-    });
-  }
+        <td class="col-hide"><span class="prov-cell">${variantOf(r.provider) ? esc(variantOf(r.provider)) : "—"}</span></td>`,
+  });
 
   const countEl = document.getElementById("epCount");
   if (countEl) {
     countEl.textContent = `${rows.length} endpoints from ${NAME} · model names link to the model page, the status pill to the endpoint page`;
   }
-  qEl.addEventListener("input", render);
   const chipsEl = document.getElementById("epChips");
   if (chipsEl) bindFilterChips(chipsEl, filters, render);
-  document.querySelectorAll<HTMLElement>("th[data-sort]").forEach((th) =>
-    th.addEventListener("click", () => {
-      const k = th.dataset.sort as SortKey;
-      if (sortKey === k) sortDir *= -1;
-      else { sortKey = k; sortDir = k === "model" || k === "provider" ? 1 : -1; }
-      render();
-    })
-  );
-  render();
 }
 
 init();
