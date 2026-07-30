@@ -1,0 +1,2 @@
+{# Headline status badge; must stay in sync with components.ts::headlineBadge. #}
+{% macro headline_badge(h) %}<span class="badge st st-{{ h | replace("_", "-") }}">{{ h | replace("_", " ") }}</span>{% endmacro %}

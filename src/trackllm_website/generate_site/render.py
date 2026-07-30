@@ -201,11 +201,13 @@ def render_site(
     # page with an endpoint count consistent with that model's own page (Task 7).
     slug_to_model_slug: dict[str, str] = {}
     slug_to_n_endpoints: dict[str, int] = {}
+    slug_to_status_summary: dict[str, str] = {}
     for mslug, view in model_views.items():
         n_endpoints = view["n_endpoints"]
         for e in view["endpoints"]:
             slug_to_model_slug[e["slug"]] = mslug
             slug_to_n_endpoints[e["slug"]] = n_endpoints
+            slug_to_status_summary[e["slug"]] = view["status_summary"]
 
     index_html = index_template.render(
         css_path="style.css",
@@ -271,6 +273,7 @@ def render_site(
         manifest["status"] = status_json(site.statuses[slug])
         manifest["meta"] = entry.as_meta() if entry else None
 
+        provider_slug = slugify(base_provider(provider))
         endpoint_html = endpoint_template.render(
             endpoint=ep,
             model=model,
@@ -279,14 +282,19 @@ def render_site(
             model_name=model.split("/")[-1],
             provider=provider,
             methods=methods,
+            status=manifest["status"],
+            meta=manifest["meta"],
             manifest_json=json.dumps(manifest),
             css_path="../style.css",
             body_class="endpoint",
             nav_prefix="../",
             provider_base=base_provider(provider),
-            provider_slug=slugify(base_provider(provider)),
+            provider_slug=provider_slug,
+            # only providers with tracked endpoints get a page; never link a 404
+            provider_has_page=provider_slug in provider_views,
             model_slug=slug_to_model_slug.get(slug, ""),
             n_endpoints=slug_to_n_endpoints.get(slug, 1),
+            status_summary=slug_to_status_summary.get(slug, ""),
         )
         (endpoints_dir / f"{slug}.html").write_text(endpoint_html)
 

@@ -372,6 +372,45 @@ def test_render_emits_status_pages_for_catalog_endpoints(tmp_path):
     assert row["headline"] == "untrackable" and row["reason"]
 
 
+def test_untracked_endpoint_page_renders_card_not_chart(tmp_path):
+    """An untracked page is the status card + catalog metadata: no chart mount, no
+    endpoint.js, and no link to a provider page that was never generated."""
+    _scaffold(tmp_path)
+    inputs = empty_status_inputs()
+    inputs.endpoints_lt = [
+        Endpoint(api="openrouter", model="m/a", provider="p", cost=(1, 2))
+    ]
+    inputs.catalog = [
+        catalog_entry("m/a", "p"),
+        catalog_entry(
+            "openai/gpt-5.4",
+            "openai",
+            supports_temperature=False,
+            supports_logprobs=False,
+        ),
+    ]
+    inputs.bi_cache.add_bad_temperature(
+        Endpoint(
+            api="openrouter", model="openai/gpt-5.4", provider="openai", cost=(1, 2)
+        )
+    )
+
+    render_site(tmp_path, None, inputs)
+
+    page = (
+        tmp_path / "endpoints" / f"{slugify('openai/gpt-5.4#openai')}.html"
+    ).read_text()
+    assert "status-methods" in page and "meta-grid" in page
+    assert 'id="mainchart"' not in page and "js/endpoint.js" not in page
+    assert 'class="badge st st-untrackable"' in page
+    # openai has no tracked endpoint, hence no provider page: named, never linked
+    assert 'href="../providers/openai.html"' not in page
+
+    tracked = (tmp_path / "endpoints" / "m2fa23p.html").read_text()
+    assert "status-methods" in tracked and 'id="mainchart"' in tracked
+    assert 'href="../providers/p.html"' in tracked
+
+
 def test_a_dead_lt_series_does_not_hide_a_live_b3it_one(tmp_path):
     """The endpoint survives on its B3IT series; only the empty lt badge goes."""
     _scaffold(tmp_path)
