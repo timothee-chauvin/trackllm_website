@@ -32,7 +32,7 @@ def test_retired_no_reference_yields_empty_tv_but_full_timeline():
             )
         ],
     )
-    view = derive_b3it(state, {})
+    view = derive_b3it(state, {}, [])
     assert view.status == "retired"
     assert view.retired_reason == "no_bis"
     assert view.tv_series == {"dates": [], "values": []}
@@ -108,7 +108,7 @@ def test_closed_epoch_with_results_yields_tv_and_changes():
             )
         ],
     )
-    view = derive_b3it(state, results)
+    view = derive_b3it(state, results, [])
     assert view.tv_series["values"], "closed epoch must produce a TV series"
     assert view.changes, "a change onset must be detected in the closed epoch"
     assert view.changes[0]["kind"] == "onset"
@@ -148,7 +148,7 @@ def test_derivation_restricts_to_top_k_ranked_bis(monkeypatch):
         "trackllm_website.generate_site.b3it.select_top_bis",
         lambda reference, k: ["signal"],
     )
-    view = derive_b3it(state, results)
+    view = derive_b3it(state, results, [])
     # Full set would average to 0.5; top-k (signal only) is 1.0.
     assert view.tv_series["values"] == [pytest.approx(1.0)]
 
@@ -173,8 +173,26 @@ def test_monitoring_with_reference_yields_tv_series():
             )
         ],
     )
-    view = derive_b3it(state, results)
+    view = derive_b3it(state, results, [])
     assert view.status == "monitoring"
     assert view.n_bis == 1
     assert view.tv_series["values"]  # non-empty
     assert view.tv_series["values"][0] == pytest.approx(1.0)
+
+
+def test_backfill_events_surface_as_scan_changes():
+    state = EndpointBIState(
+        endpoint=_ep(),
+        status="monitoring",
+        retired=None,
+        epochs=[
+            Epoch(
+                start=datetime(2026, 1, 1, tzinfo=timezone.utc),
+                border_inputs=["p1"],
+                reference={"p1": [("2026-01-01T00:00:00Z", "A")] * 10},
+            )
+        ],
+    )
+    backfill = [{"date": "2026-01-05T00:00:00+00:00", "p_value": 0.001}]
+    view = derive_b3it(state, {}, backfill)
+    assert {"date": "2026-01-05T00:00:00+00:00", "kind": "scan"} in view.changes

@@ -71,13 +71,36 @@ def adaptive_transitions(
     return events
 
 
-def is_unstable(tv_over_time: list[tuple[Timestamp, float]]) -> bool:
-    """Median TV over the trailing window exceeds the instability threshold."""
+def is_unstable(results: dict) -> bool:
+    """Median day-vs-other-days distance over the trailing window.
+
+    Internal dispersion, not distance to the epoch reference: an endpoint
+    whose days agree with each other but sit far from a stale reference is
+    changed, not unstable (hy3/glm-5.2 July 2026 were misfiled this way).
+    """
     d = config.bi.detection
-    if not tv_over_time:
-        return False
-    tail = [v for _, v in tv_over_time[-d.instability_window :]]
-    return statistics.median(tail) >= d.instability_threshold
+    # [1:]: the earliest batch is the epoch's merged reference burst; its ~100
+    # samples would dominate every pooled comparison
+    window = sorted({ts for b in results.values() for ts in b})[1:][
+        -d.instability_window :
+    ]
+    day_vals = []
+    for ts in window:
+        tvs = []
+        for batches in results.values():
+            samples = batches.get(ts)
+            if not samples:
+                continue
+            others: Counter = Counter()
+            for ts2 in window:
+                if ts2 != ts and batches.get(ts2):
+                    others += get_distribution(batches[ts2])
+            tv = compute_tv_distance(others, get_distribution(samples))
+            if tv is not None:
+                tvs.append(tv)
+        if tvs:
+            day_vals.append(statistics.mean(tvs))
+    return bool(day_vals) and statistics.median(day_vals) >= d.instability_threshold
 
 
 def balance_score(dist: Counter) -> float:

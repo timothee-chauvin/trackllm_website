@@ -77,7 +77,7 @@ def decide(state: EndpointBIState, results: dict, now: datetime) -> Decision:
         return Decision(
             action="reinit",
             change_date=datetime.fromisoformat(events[-1]),
-            unstable=is_unstable(tv),
+            unstable=is_unstable(epoch_results),
             detector="adaptive",
         )
     # Young epochs are invisible to the adaptive rule (it needs ~9 batches of
@@ -88,10 +88,10 @@ def decide(state: EndpointBIState, results: dict, now: datetime) -> Decision:
         return Decision(
             action="reinit",
             change_date=datetime.fromisoformat(scan_event.split_ts),
-            unstable=is_unstable(tv),
+            unstable=is_unstable(epoch_results),
             detector="scan",
         )
-    return Decision(action="none", unstable=is_unstable(tv))
+    return Decision(action="none", unstable=is_unstable(epoch_results))
 
 
 async def run_endpoint(
