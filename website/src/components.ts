@@ -160,7 +160,7 @@ export function relDays(n: number): string {
 
 const MINUTE_MS = 60_000;
 const HOUR_MS = 60 * MINUTE_MS;
-const DAY_MS = 24 * HOUR_MS;
+export const DAY_MS = 24 * HOUR_MS;
 const COARSE_DAYS = 30; // past a month, the hour is noise
 
 /** Age of an absolute instant: "14m ago", "3h07m ago", "2d 4h ago", "45d ago".
@@ -182,6 +182,39 @@ export function relativeAge(iso: string, now: number): string {
 export const MONTH_NAMES = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
+
+/** Day of a date/datetime string as ms at UTC midnight. */
+export const td = (s: string): number => Date.parse(s.slice(0, 10) + "T00:00:00Z");
+
+/** First-of-month tick instants for a [d0, d1] ms range; the month start just
+ *  before d0 is kept only when it is within 15 days, so the first label never
+ *  sits far outside the plotted span. */
+export function monthTicks(d0: number, d1: number): Date[] {
+  const out: Date[] = [];
+  const d = new Date(d0);
+  d.setUTCDate(1);
+  while (d.getTime() <= d1) {
+    if (d.getTime() >= d0 - 15 * DAY_MS) out.push(new Date(d));
+    d.setUTCMonth(d.getUTCMonth() + 1);
+  }
+  return out;
+}
+
+/** Toggle `f` in `set`, mirroring membership in the chip's .on class. */
+export function toggleChip(chip: HTMLElement, set: Set<string>, f: string): void {
+  if (set.has(f)) { set.delete(f); chip.classList.remove("on"); }
+  else { set.add(f); chip.classList.add("on"); }
+}
+
+/** The standard filter toolbar: each .chip toggles its data-f flag, then re-renders. */
+export function bindFilterChips(el: Element, filters: Set<string>, render: () => void): void {
+  el.addEventListener("click", (e) => {
+    const chip = (e.target as HTMLElement).closest(".chip") as HTMLElement | null;
+    if (!chip) return;
+    toggleChip(chip, filters, chip.dataset.f!);
+    render();
+  });
+}
 
 /** "2026-07" -> "Jul '26" — axis ticks and month headers. */
 export function monthLabel(month: string): string {

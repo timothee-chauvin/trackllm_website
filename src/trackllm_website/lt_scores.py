@@ -236,40 +236,9 @@ def _is_scores_current(endpoint_dir: Path) -> bool:
     return True
 
 
-def compute_all():
-    """Compute LT scores for all endpoints from scratch."""
-    from trackllm_website.lt_events import (
-        EVENTS_FILENAME,
-        load_events,
-        save_events,
-        update_endpoint_events,
-    )
-
-    data_dir = config.lt_dir
-    now = datetime.now(tz=timezone.utc)
-    events_path = data_dir / EVENTS_FILENAME
-    all_events = load_events(events_path)
-    n_computed = 0
-    for endpoint_dir in sorted(data_dir.iterdir()):
-        if not endpoint_dir.is_dir():
-            continue
-        scores = compute_endpoint_scores(endpoint_dir)
-        if scores is None:
-            logger.info(f"{endpoint_dir.name}: not enough data")
-            continue
-        _save_scores(endpoint_dir / SCORES_FILENAME, scores)
-        update_endpoint_events(all_events, endpoint_dir.name, scores, now)
-        n_computed += 1
-        logger.info(
-            f"{endpoint_dir.name}: {len(scores.scores)} scores, "
-            f"{len(scores.changes)} changes"
-        )
-    save_events(events_path, all_events)
-    logger.info(f"Computed scores for {n_computed} endpoints")
-
-
-def compute_latest():
-    """Recompute LT scores only for endpoints with new data since last run."""
+def compute_scores(skip_current: bool):
+    """Compute LT scores for all endpoints; with skip_current, only recompute
+    endpoints whose data changed since their scores file was written."""
     from trackllm_website.lt_events import (
         EVENTS_FILENAME,
         load_events,
@@ -286,11 +255,12 @@ def compute_latest():
     for endpoint_dir in sorted(data_dir.iterdir()):
         if not endpoint_dir.is_dir():
             continue
-        if _is_scores_current(endpoint_dir):
+        if skip_current and _is_scores_current(endpoint_dir):
             n_skipped += 1
             continue
         scores = compute_endpoint_scores(endpoint_dir)
         if scores is None:
+            logger.info(f"{endpoint_dir.name}: not enough data")
             continue
         _save_scores(endpoint_dir / SCORES_FILENAME, scores)
         update_endpoint_events(all_events, endpoint_dir.name, scores, now)

@@ -1,4 +1,10 @@
-:root {
+/* Dark is the default; the JS toggle (base.html.j2) forces a theme by setting
+   data-theme, whose [attr] specificity beats the OS-preference rules below in
+   both directions. The light palette appears twice because one copy sits inside
+   a media query and CSS cannot share a rule across that boundary without
+   light-dark(), which needs color-scheme and would restyle UA scrollbars and
+   form controls. Keep both light copies identical. */
+:root, :root[data-theme="dark"] {
   --bg: #0B0F14; --surface: #12181F; --surface-2: #171F28; --surface-3: #1E2731;
   --border: #232C38; --border-soft: #1A222C; --text: #E6EDF3; --text-muted: #91A0B2;
   --text-dim: #5E6C7E; --accent: #37C2E0; --accent-quiet: rgba(55,194,224,0.12);
@@ -22,16 +28,6 @@
     --stable-bg: rgba(31,157,95,0.11); --changed-bg: rgba(176,121,26,0.12);
     --alert-bg: rgba(192,82,30,0.11); --retired-bg: rgba(120,130,143,0.12);
   }
-}
-:root[data-theme="dark"] {
-  --bg: #0B0F14; --surface: #12181F; --surface-2: #171F28; --surface-3: #1E2731;
-  --border: #232C38; --border-soft: #1A222C; --text: #E6EDF3; --text-muted: #91A0B2;
-  --text-dim: #5E6C7E; --accent: #37C2E0; --accent-quiet: rgba(55,194,224,0.12);
-  --accent-line: rgba(55,194,224,0.35); --accent-fill: rgba(55,194,224,0.14);
-  --b3it: #B98BE8; --b3it-quiet: rgba(160,110,224,0.14); --b3it-fill: rgba(160,110,224,0.13);
-  --stable: #3FB77E; --changed: #E0A94A; --alert: #E5713B; --retired: #6B7686;
-  --stable-bg: rgba(63,183,126,0.13); --changed-bg: rgba(224,169,74,0.14);
-  --alert-bg: rgba(229,113,59,0.14); --retired-bg: rgba(107,118,134,0.14);
 }
 :root[data-theme="light"] {
   --bg: #FAFCFD; --surface: #F1F5F8; --surface-2: #FFFFFF; --surface-3: #FFFFFF;
