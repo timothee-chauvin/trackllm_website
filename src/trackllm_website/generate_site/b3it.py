@@ -113,11 +113,14 @@ def to_json(view: B3ITView) -> dict:
     }
 
 
-def discover_b3it_views(state_dir: Path, phase_2_dir: Path) -> dict[str, B3ITView]:
+def discover_b3it_views(
+    state_dir: Path, phase_2_dir: Path, backfill_path: Path
+) -> dict[str, B3ITView]:
+    """Every input is injected, never read from config: a synthetic site (tests,
+    fixtures) must not mix in production's state, phase-2 data or scan events."""
     views: dict[str, B3ITView] = {}
     if not state_dir.exists():
         return views
-    backfill_path = config.bi.data_dir / "scan_backfill.json"
     backfill: dict[str, list[dict]] = (
         orjson.loads(backfill_path.read_bytes()) if backfill_path.exists() else {}
     )

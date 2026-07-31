@@ -1,9 +1,10 @@
+import json
 from datetime import datetime, timezone
 
 import pytest
 
 from trackllm_website.bi.state import EndpointBIState, Epoch, RetiredInfo
-from trackllm_website.config import Endpoint
+from trackllm_website.config import Endpoint, config
 from trackllm_website.generate_site.b3it import derive_b3it, discover_b3it_views
 
 
@@ -70,9 +71,33 @@ def test_discover_loads_phase2_for_closed_epochs(tmp_path, monkeypatch):
         return {}
 
     monkeypatch.setattr("trackllm_website.generate_site.b3it.load_phase2_results", _spy)
-    views = discover_b3it_views(tmp_path / "state", tmp_path / "phase_2")
+    views = discover_b3it_views(
+        tmp_path / "state", tmp_path / "phase_2", tmp_path / "scan_backfill.json"
+    )
     assert loaded, "phase_2 must be loaded for closed-epoch endpoints"
     assert views[state.slug].status == "retired"
+
+
+def test_discover_reads_the_backfill_it_is_given_not_the_configured_one(
+    tmp_path, monkeypatch
+):
+    """The scan backfill belongs to the site being built: a synthetic one must not
+    inherit production's events through config.bi.data_dir."""
+    state = EndpointBIState(
+        endpoint=_ep(), status="monitoring", retired=None, epochs=[]
+    )
+    state.save(tmp_path / "state")
+    production = tmp_path / "production"
+    production.mkdir()
+    (production / "scan_backfill.json").write_text(
+        json.dumps({state.slug: [{"date": "2026-03-01T00:00:00Z"}]})
+    )
+    monkeypatch.setattr(config.bi, "data_dir", production)
+
+    views = discover_b3it_views(
+        tmp_path / "state", tmp_path / "phase_2", tmp_path / "scan_backfill.json"
+    )
+    assert views[state.slug].changes == []
 
 
 def _daily_batch(day: int, token: str):
