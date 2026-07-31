@@ -8,11 +8,7 @@ from typing import Literal
 import orjson
 import plotly.graph_objects as go
 
-from trackllm_website.bi.phase_2 import (
-    Results,
-    Timestamp,
-    load_border_inputs,
-)
+from trackllm_website.bi.phase_2 import Prompt, Results, Timestamp
 from trackllm_website.bi.results import (
     compute_tv_distance,
     get_distribution,
@@ -20,6 +16,21 @@ from trackllm_website.bi.results import (
 )
 from trackllm_website.config import config, logger
 from trackllm_website.util import endpoint_from_slug, slugify
+
+
+def load_border_inputs(temperature: float) -> dict[str, list[Prompt]]:
+    """Load border inputs from the legacy phase_1b output.
+
+    The file this reads is a leftover of the retired phase_1b/phase_2 pipeline;
+    nothing writes it any more, and only the cost estimates below still read it.
+    """
+    phase_1_dir = config.bi.get_phase_1_dir(temperature)
+    border_inputs_path = phase_1_dir / "border_inputs.json"
+    if not border_inputs_path.exists():
+        raise FileNotFoundError(f"Border inputs file not found: {border_inputs_path}")
+    with open(border_inputs_path, "rb") as f:
+        return orjson.loads(f.read())
+
 
 # Paul Tol's muted color scheme
 TOL_MUTED = [
