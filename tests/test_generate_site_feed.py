@@ -137,6 +137,27 @@ def test_b3it_item_without_a_view_reports_no_magnitude():
     assert item["trace"] == []
 
 
+def test_change_without_a_fleet_entry_gets_no_page_slugs():
+    """merge_changes falls back to model=slug, provider="" for an endpoint that
+    has left the fleet. No model or provider page is generated for it, so the
+    item carries no slugs to link -- the UI renders the names as plain text."""
+    changes = [
+        {
+            "date": "2026-06-15T00:00:00Z",
+            "slug": "gone2fslug",
+            "model": "gone2fslug",
+            "provider": "",
+            "method": "LT",
+            "magnitude": 5.0,
+            "magnitude_display": "5σ",
+        }
+    ]
+    (item,) = build_feed_items(changes, {}, {}, NOW)
+    assert item["modelSlug"] == ""
+    assert item["providerSlug"] == ""
+    assert item["slug"] == "gone2fslug"
+
+
 def test_unrecognised_method_raises():
     changes = [
         {

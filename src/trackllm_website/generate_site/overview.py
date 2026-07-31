@@ -7,12 +7,13 @@ views, changes.json, spend.json) -- never raw logprobs.
 """
 
 import json
-from collections import Counter
+from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 
 from trackllm_website.config import HeroConfig
 from trackllm_website.generate_site.b3it import B3ITView
+from trackllm_website.generate_site.clock import site_now
 from trackllm_website.generate_site.feed import (
     TRACE_LEN,
     build_feed_items,
@@ -20,7 +21,7 @@ from trackllm_website.generate_site.feed import (
 )
 from trackllm_website.generate_site.freshness import latest
 from trackllm_website.generate_site.hero import build_hero
-from trackllm_website.generate_site.lt import EndpointInfo, LTData, latest_date
+from trackllm_website.generate_site.lt import EndpointInfo, LTData
 from trackllm_website.generate_site.naming import base_provider
 from trackllm_website.generate_site.status import EndpointStatus, one_line_reason
 from trackllm_website.generate_site.status_io import SiteStatuses
@@ -33,40 +34,56 @@ FEED_LT_SIZE = 6
 FEED_B3IT_SIZE = 4
 
 
-def _b3it_status_trace(
-    view: B3ITView, now: datetime
+def _row_state(
+    now: datetime,
+    obs_dates: list[datetime],
+    change_dates: list[datetime],
+    values: list[float],
+    retired: bool,
 ) -> tuple[str, list[float], int | None]:
-    """Directory row (status/trace/stableDays) for a B3IT-only endpoint.
+    """Directory row (status/trace/stableDays) for one endpoint.
 
-    Mirrors endpoint.ts::computeStatus (date-gap based), plus the view's own
-    retired status -- a B3IT endpoint the pipeline has explicitly retired
-    (e.g. delisted, no border inputs) must show as retired even if its last
-    tv_series point happens to fall inside RETIRED_GAP_DAYS.
+    Mirrors endpoint.ts::computeStatus (date-gap based). `change_dates` is the
+    endpoint's slice of the canonical merged list -- the same one the row's
+    nChanges counts, so the row can never read "stable for N days" beside a
+    nonzero count. `retired` is the pipeline's own verdict, independent of the
+    observation gap.
     """
-    tv_dates = [datetime.fromisoformat(s) for s in view.tv_series["dates"]]
-    tv_values = view.tv_series["values"]
-    change_dates = sorted(datetime.fromisoformat(c["date"]) for c in view.changes)
-
-    last_tv_date = tv_dates[-1] if tv_dates else None
-    gap_retired = (
-        last_tv_date is not None and (now - last_tv_date).days > RETIRED_GAP_DAYS
-    )
-    if view.status == "retired" or gap_retired:
+    last_obs = obs_dates[-1] if obs_dates else None
+    gap_retired = last_obs is not None and (now - last_obs).days > RETIRED_GAP_DAYS
+    if retired or gap_retired:
         status = "retired"
     else:
-        last_change_date = change_dates[-1] if change_dates else None
+        last_change = change_dates[-1] if change_dates else None
         recent = (
-            last_change_date is not None
-            and (now - last_change_date).days <= RECENT_CHANGE_DAYS
+            last_change is not None and (now - last_change).days <= RECENT_CHANGE_DAYS
         )
         status = "changed" if recent else "stable"
 
     stable_since = (
-        change_dates[-1] if change_dates else (tv_dates[0] if tv_dates else None)
+        change_dates[-1] if change_dates else (obs_dates[0] if obs_dates else None)
     )
     stable_days = (now - stable_since).days if stable_since is not None else None
-    trace = downsample_trace(tv_values, TRACE_LEN)
-    return status, trace, stable_days
+    return status, downsample_trace(values, TRACE_LEN), stable_days
+
+
+def _b3it_row_state(
+    view: B3ITView, now: datetime, change_dates: list[datetime]
+) -> tuple[str, list[float], int | None]:
+    """Directory row for a B3IT-only endpoint: its tv_series is the trace.
+
+    The view's own retired status is load-bearing -- a B3IT endpoint the pipeline
+    has explicitly retired (e.g. delisted, no border inputs) must show as retired
+    even if its last tv_series point happens to fall inside RETIRED_GAP_DAYS.
+    """
+    tv_dates = [datetime.fromisoformat(s) for s in view.tv_series["dates"]]
+    return _row_state(
+        now,
+        tv_dates,
+        change_dates,
+        view.tv_series["values"],
+        view.status == "retired",
+    )
 
 
 def _status_fields(st: EndpointStatus) -> dict:
@@ -109,16 +126,21 @@ def build_overview(
 
     lt_by_slug = {e.slug: e for e in lt_endpoints}
 
-    now = latest_date(lt_data)
+    now = site_now(lt_data, b3it_views)
 
     changes_path = data_dir / "changes.json"
     changes = json.loads(changes_path.read_text()) if changes_path.exists() else []
     lt_changes = [c for c in changes if c["method"] == "LT"]
-    # Canonical per-endpoint counts. Never the changes recomputed into
-    # lt_scores.json: that recompute double-detects some changes on adjacent
-    # days, and the directory row sits on the same pages as the merged change
-    # list (the Overview feed, the provider tables, the Changes board).
-    changes_by_slug = Counter(c["slug"] for c in changes)
+    # Canonical per-endpoint changes -- both the count and the status/stableDays
+    # each row publishes. Never the changes recomputed into lt_scores.json: that
+    # recompute double-detects some changes on adjacent days, and the directory
+    # row sits on the same pages as the merged change list (the Overview feed,
+    # the provider tables, the Changes board).
+    change_dates: dict[str, list[datetime]] = defaultdict(list)
+    for c in changes:
+        change_dates[c["slug"]].append(datetime.fromisoformat(c["date"]))
+    for dates in change_dates.values():
+        dates.sort()
 
     all_slugs = sorted(set(lt_by_slug) | set(b3it_views))
     endpoint_recs = []
@@ -144,23 +166,15 @@ def build_overview(
 
         info = lt_data.get(slug)
         if info is not None and now is not None:
-            active = (now - info.dates[-1]).days <= RETIRED_GAP_DAYS
-            last_change_date = (
-                info.dates[info.changes[-1]["index"]] if info.changes else None
+            status, trace, stable_days = _row_state(
+                now,
+                info.dates,
+                change_dates[slug],
+                [v for _, v in info.drift],
+                retired=False,
             )
-            recent = (
-                last_change_date is not None
-                and (now - last_change_date).days <= RECENT_CHANGE_DAYS
-            )
-            status = "retired" if not active else ("changed" if recent else "stable")
-            stable_days = (
-                (now - last_change_date).days
-                if last_change_date
-                else (now - info.dates[0]).days
-            )
-            trace = downsample_trace([v for _, v in info.drift], TRACE_LEN)
         elif view is not None and now is not None:
-            status, trace, stable_days = _b3it_status_trace(view, now)
+            status, trace, stable_days = _b3it_row_state(view, now, change_dates[slug])
 
         endpoint_recs.append(
             {
@@ -174,7 +188,7 @@ def build_overview(
                 "methods": methods,
                 "status": status,
                 "stableDays": stable_days,
-                "nChanges": changes_by_slug[slug],
+                "nChanges": len(change_dates[slug]),
                 "trace": trace,
                 **_status_fields(site.statuses[slug]),
             }

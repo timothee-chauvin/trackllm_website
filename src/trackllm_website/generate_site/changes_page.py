@@ -10,8 +10,9 @@ from datetime import datetime
 from pathlib import Path
 
 from trackllm_website.generate_site.b3it import B3ITView
+from trackllm_website.generate_site.clock import site_now
 from trackllm_website.generate_site.feed import build_feed_items
-from trackllm_website.generate_site.lt import LTData, latest_date
+from trackllm_website.generate_site.lt import LTData
 from trackllm_website.generate_site.months import month_range
 
 TOP_ENDPOINTS = 5
@@ -40,7 +41,7 @@ def build_changes_page(
     changes_path = data_dir / "changes.json"
     changes = json.loads(changes_path.read_text()) if changes_path.exists() else []
 
-    now = latest_date(lt_data)
+    now = site_now(lt_data, b3it_views)
     drift_by_slug = {slug: d.drift for slug, d in lt_data.items()}
     items = build_feed_items(changes, drift_by_slug, b3it_views, now) if now else []
 
@@ -77,7 +78,11 @@ def build_changes_page(
             "lt": sum(1 for i in items if i["method"] == "lt"),
             "b3it": sum(1 for i in items if i["method"] == "b3it"),
             "endpoints_affected": len(per_endpoint),
-            "providers_involved": len({i["providerSlug"] for i in items}),
+            # An endpoint that has left the fleet carries no provider (feed.py
+            # leaves its slugs empty); the empty string is not a provider.
+            "providers_involved": len(
+                {i["providerSlug"] for i in items if i["providerSlug"]}
+            ),
             "changes_30d": sum(1 for i in items if i["daysAgo"] < RECENT_DAYS),
             "largest_lt_drift": max(lt_drifts, default=None),
             "since": min(all_dates) if all_dates else None,
