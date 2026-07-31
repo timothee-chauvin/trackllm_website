@@ -119,13 +119,17 @@ async function init(): Promise<void> {
   if (topEl) {
     const most = D.top_endpoints[0]?.n || 1;
     topEl.innerHTML = D.top_endpoints
-      .map(
-        (e, i) => `<a class="brow" href="models/${esc(e.modelSlug)}.html">
-        <span class="rk">${i + 1}</span>
+      .map((e, i) => {
+        const cells = `<span class="rk">${i + 1}</span>
         <span class="pv">${esc(e.model)}<small>@ ${esc(e.provider)}</small></span>
         <span class="rbar"><span style="width:${((e.n / most) * 100).toFixed(0)}%"></span><b>${e.n}</b></span>
-        <span class="meta">last<br><b>${esc(e.last)}</b></span></a>`
-      )
+        <span class="meta">last<br><b>${esc(e.last)}</b></span>`;
+        // no modelSlug: the endpoint has left the fleet and has no model page
+        // (feed.py leaves its slugs empty), so the row is text, not a link to a 404
+        return e.modelSlug
+          ? `<a class="brow" href="models/${esc(e.modelSlug)}.html">${cells}</a>`
+          : `<div class="brow">${cells}</div>`;
+      })
       .join("");
   }
 

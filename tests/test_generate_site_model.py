@@ -254,6 +254,63 @@ def test_change_count_follows_changes_json_not_the_recomputed_scores(tmp_path):
     assert len(view["changes"]) == 1
 
 
+def test_lt_change_after_the_last_series_point_has_no_level(tmp_path):
+    """The level a change reached is unknown when the series has no point on or
+    after it: published as null, never 0.00 -- which would read as a change that
+    moved nothing (feed.py already does this)."""
+    root = tmp_path / "website"
+    dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 11)]
+    write_lt_endpoint(
+        root, "m2fa23p1", "m/a", "p1", dates=dates, changes=[], drift=[0.1] * 10
+    )
+    (root / "data" / "changes.json").write_text(
+        json.dumps(
+            [
+                {
+                    "date": "2026-06-20T00:00:00Z",
+                    "slug": "m2fa23p1",
+                    "model": "m/a",
+                    "provider": "p1",
+                    "method": "LT",
+                    "magnitude": 12.0,
+                    "magnitude_display": "12σ",
+                }
+            ]
+        )
+    )
+
+    view = _build_model_views(root)[slugify("m/a")]
+    ep = view["endpoints"][0]
+    assert ep["lt"]["changes"][0]["drift"] is None
+    assert ep["n_changes"] == 1
+    # the unknown level joins neither the model's peak nor its scale
+    assert view["max_drift"] == 0.1
+
+
+def test_b3it_change_after_the_last_series_point_has_no_peak(tmp_path):
+    root = tmp_path / "website"
+    _write_b3it_with_transition(root, "m2fa23p2", "m/a", "p2")
+    (root / "data" / "changes.json").write_text(
+        json.dumps(
+            [
+                {
+                    "date": "2026-02-10T00:00:00+00:00",
+                    "slug": "m2fa23p2",
+                    "model": "m/a",
+                    "provider": "p2",
+                    "method": "B3IT",
+                    "magnitude": None,
+                    "magnitude_display": "",
+                }
+            ]
+        )
+    )
+
+    view = _build_model_views(root)[slugify("m/a")]
+    ep = view["endpoints"][0]
+    assert ep["b3it"]["changes"][0]["peakTV"] is None
+
+
 def test_endpoint_with_no_lt_scores_file_yields_null_lt(tmp_path):
     """The shape build_model_views produces for a seriesless endpoint. render.py
     never hands it one -- tracked.with_observations drops them from the fleet
