@@ -232,6 +232,40 @@ export function toggleChip(chip: HTMLElement, set: Set<string>, f: string): void
   chip.setAttribute("aria-pressed", String(set.has(f)));
 }
 
+/** How many marks a strip spells out before it summarises the rest. */
+const TIP_MAX = 6;
+
+/** An SVG <title> only ever appears on hover, so a touch device never sees it --
+ *  and inside a `preserveAspectRatio="none"` strip a change mark is squeezed to
+ *  about a pixel wide on a phone, far too small to aim at anyway. So the strip as
+ *  a whole carries the story: one tab stop, one full-width tap target, the same
+ *  words as its accessible name and as the caption bindTips writes on activation.
+ *  A strip with no marks stays decorative. */
+export function stripTip(lead: string, parts: string[]): string {
+  if (!parts.length) return ' aria-hidden="true"';
+  const shown = parts.slice(0, TIP_MAX);
+  const more = parts.length > TIP_MAX ? ` · +${parts.length - TIP_MAX} more` : "";
+  const text = esc(`${lead}: ${shown.join(" · ")}${more}`);
+  return ` tabindex="0" role="img" aria-label="${text}" data-tip="${text}"`;
+}
+
+/** The line a tapped strip writes into. aria-hidden because a screen reader has
+ *  already read the same words off the strip that put them there. Empty until
+ *  something is tapped, and styled to take no space until then. */
+export const TIP_LINE = '<div class="tipline" aria-hidden="true"></div>';
+
+/** Tapping or focusing a strip shows its text in the chart's caption line. */
+export function bindTips(root: Element): void {
+  const line = root.querySelector(".tipline");
+  if (!line) return;
+  const show = (e: Event): void => {
+    const el = (e.target as Element).closest?.("[data-tip]");
+    if (el) line.textContent = el.getAttribute("data-tip");
+  };
+  root.addEventListener("click", show);
+  root.addEventListener("focusin", show);
+}
+
 /** The standard filter toolbar: each .chip toggles its data-f flag, then re-renders. */
 export function bindFilterChips(el: Element, filters: Set<string>, render: () => void): void {
   bindActivation(el, ".chip", (chip) => {
