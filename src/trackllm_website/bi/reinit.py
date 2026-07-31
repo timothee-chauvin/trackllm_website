@@ -126,13 +126,14 @@ async def _reinit(
     if len(candidates) < r.top_k_bis:
         discovered, prevalence = await discover_candidates(endpoint, exclude=candidates)
         # The gate only makes sense on discovery (old_bis empty): if T=0 doesn't
-        # pin the output, the discovered "border inputs" are fake.
-        if (
-            not old_bis
-            and prevalence > config.bi.temperature_gate.prevalence_trigger
-            and await check_temperature(client, endpoint, strategy, discovered)
-        ):
-            return ReinitResult(epoch=None, reason="bad_temperature")
+        # pin the output, the discovered "border inputs" are fake. An inconclusive
+        # verdict (too many errored gate queries) is not a pass mark: we simply keep
+        # going and let the next run judge, rather than caching bad_temperature on
+        # what may be a transient outage.
+        if not old_bis and prevalence > config.bi.temperature_gate.prevalence_trigger:
+            verdict = await check_temperature(client, endpoint, strategy, discovered)
+            if verdict == "ignored":
+                return ReinitResult(epoch=None, reason="bad_temperature")
         candidates = candidates + discovered
     # Rank the top-k among at most target_border_inputs candidates; collecting
     # references for more would roughly double onboarding cost for nothing.

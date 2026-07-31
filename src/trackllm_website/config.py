@@ -152,6 +152,7 @@ class TemperatureGateConfig(BaseModel):
     prevalence_trigger: float
     check_prompts: int
     check_samples: int
+    min_success_fraction: float
 
 
 class BIConfig(BaseModel):

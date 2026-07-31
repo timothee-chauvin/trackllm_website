@@ -89,7 +89,7 @@ def test_reinit_bad_temperature_on_high_prevalence(monkeypatch):
         return ["p1", "p2", "p3"], 0.9  # above the 0.30 trigger
 
     async def fake_check(client, endpoint, strategy, prompts):
-        return True
+        return "ignored"
 
     monkeypatch.setattr(reinit_mod, "discover_candidates", fake_discover)
     monkeypatch.setattr(reinit_mod, "check_temperature", fake_check)
@@ -97,6 +97,31 @@ def test_reinit_bad_temperature_on_high_prevalence(monkeypatch):
     result = asyncio.run(reinit_mod.reinit(None, None, ENDPOINT, [], NOW))
     assert result.epoch is None
     assert result.reason == "bad_temperature"
+
+
+def test_reinit_inconclusive_gate_does_not_cache_bad_temperature(
+    monkeypatch, tmp_path
+):
+    # The gate couldn't get enough data (transient outage): onboarding proceeds and
+    # the gate retries next run, instead of excluding the endpoint for 14 days.
+    monkeypatch.setattr(reinit_mod, "sample_prompts", fake_sampler({"p1": ["a", "b"]}))
+    monkeypatch.setattr(
+        reinit_mod, "get_output_path", lambda ep, ym: tmp_path / "phase2.json"
+    )
+
+    async def fake_discover(endpoint, exclude):
+        return ["p1"], 0.9  # above the 0.30 trigger
+
+    async def fake_check(client, endpoint, strategy, prompts):
+        return "inconclusive"
+
+    monkeypatch.setattr(reinit_mod, "discover_candidates", fake_discover)
+    monkeypatch.setattr(reinit_mod, "check_temperature", fake_check)
+    monkeypatch.setattr(reinit_mod.config.bi.reinit, "top_k_bis", 1)
+    monkeypatch.setattr(reinit_mod.config.bi.reinit, "min_bis", 1)
+
+    result = asyncio.run(reinit_mod.reinit(None, None, ENDPOINT, [], NOW))
+    assert result.reason == "ok"
 
 
 def test_reinit_no_gate_when_prevalence_low(monkeypatch, tmp_path):
