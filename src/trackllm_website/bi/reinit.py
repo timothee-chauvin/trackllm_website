@@ -32,10 +32,15 @@ class ReinitResult(BaseModel):
     reason distinguishes a normal failure to find enough BIs (no_bis) from an
     endpoint that ignores temperature (bad_temperature), so the caller can cache
     the latter instead of retiring it as a normal no_bis.
+
+    gate_inconclusive is neither: the temperature gate could not gather enough data
+    to judge, so no verdict was reached. The caller must record nothing at all (no
+    cache entry, no state file), leaving the endpoint unknown so the next run
+    onboards it again — the only lifecycle path that re-runs the gate.
     """
 
     epoch: Epoch | None
-    reason: Literal["ok", "no_bis", "bad_temperature"]
+    reason: Literal["ok", "no_bis", "bad_temperature", "gate_inconclusive"]
 
 
 def parse_phase_1_results(
@@ -127,13 +132,15 @@ async def _reinit(
         discovered, prevalence = await discover_candidates(endpoint, exclude=candidates)
         # The gate only makes sense on discovery (old_bis empty): if T=0 doesn't
         # pin the output, the discovered "border inputs" are fake. An inconclusive
-        # verdict (too many errored gate queries) is not a pass mark: we simply keep
-        # going and let the next run judge, rather than caching bad_temperature on
-        # what may be a transient outage.
+        # verdict is not a pass mark either — onboarding on ungated border inputs
+        # would monitor and bill them forever, since nothing re-gates a monitoring
+        # endpoint — so we abort and let the next run try the gate again.
         if not old_bis and prevalence > config.bi.temperature_gate.prevalence_trigger:
             verdict = await check_temperature(client, endpoint, strategy, discovered)
             if verdict == "ignored":
                 return ReinitResult(epoch=None, reason="bad_temperature")
+            if verdict == "inconclusive":
+                return ReinitResult(epoch=None, reason="gate_inconclusive")
         candidates = candidates + discovered
     # Rank the top-k among at most target_border_inputs candidates; collecting
     # references for more would roughly double onboarding cost for nothing.
@@ -174,10 +181,13 @@ async def reinit(
 
     Onboarding scratch is removed only on a normal (terminal) return; if the
     caller's deadline cancels us mid-run, CancelledError propagates past the
-    cleanup so the next run resumes from disk.
+    cleanup so the next run resumes from disk. gate_inconclusive is not terminal
+    either — discovery succeeded and only the verdict is missing — so its scratch
+    is kept too, and the retry costs one gate probe instead of ~15k queries.
     """
     result = await _reinit(client, strategy, endpoint, old_bis, now)
-    _cleanup_onboarding_progress(endpoint)
+    if result.reason != "gate_inconclusive":
+        _cleanup_onboarding_progress(endpoint)
     return result
 
 

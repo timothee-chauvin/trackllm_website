@@ -830,6 +830,16 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]) -> Onboardin
                     logger.warning(f"{endpoint}: cached bad_temperature (T=0 ignored)")
                     outcome = "bad_temperature"
                     return
+                if result.reason == "gate_inconclusive":
+                    # No verdict on whether T=0 pins the output. Record nothing at
+                    # all: a saved state would monitor possibly-fake border inputs
+                    # forever (nothing re-gates a monitoring endpoint) and a no_bis
+                    # retirement is never re-onboarded. Unknown is the only status
+                    # this run can retry, and a recheck keeps its old last_recheck
+                    # so it stays due.
+                    logger.warning(f"{endpoint}: temperature gate inconclusive, retry")
+                    outcome = "gate_inconclusive"
+                    return
                 if state is None:
                     state = EndpointBIState(
                         endpoint=endpoint, status="monitoring", epochs=[]

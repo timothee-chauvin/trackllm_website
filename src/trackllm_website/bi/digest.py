@@ -16,6 +16,7 @@ OUTCOME = {
     "recheck_still_no_bis": ("recheck → still no BIs", "#cf222e"),
     "timeout": ("timed out (resumes tomorrow)", "#bf8700"),
     "bad_temperature": ("ignores temperature (cached)", "#6e7781"),
+    "gate_inconclusive": ("temperature gate inconclusive (retries)", "#bf8700"),
     "no_strategy": ("skipped: no strategy", "#6e7781"),
     "error": ("error (see logs)", "#cf222e"),
     "change_detected": ("change detected", "#0969da"),
@@ -60,9 +61,10 @@ class MonitorReport:
     date: str
     rows: list[MonitorRow]
     n_endpoints: int
-    # endpoints where an exception escaped run_endpoint (never expected:
-    # API errors are handled inside; this means e.g. a failure to save),
-    # plus endpoints skipped because no query strategy could be resolved
+    # endpoints where an exception escaped run_endpoint: a re-init that hit its
+    # deadline, or something genuinely unexpected (API errors are handled inside,
+    # so that would be e.g. a failure to save), plus endpoints skipped because no
+    # query strategy could be resolved
     failures: list[str] = field(default_factory=list)
 
     def notable(self) -> bool:

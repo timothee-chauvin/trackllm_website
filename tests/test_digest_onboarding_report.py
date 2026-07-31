@@ -88,6 +88,24 @@ def test_no_bis_outcome(monkeypatch, tmp_path):
     assert row.n_bis is None
 
 
+def test_gate_inconclusive_outcome(monkeypatch, tmp_path):
+    async def fake_reinit(client, strategy, endpoint, old_bis, now):
+        return ReinitResult(epoch=None, reason="gate_inconclusive")
+
+    _patch_deps(monkeypatch, tmp_path, reinit=fake_reinit)
+    report = asyncio.run(ue.update_endpoints_bi_lifecycle([ep("m/flakygate")]))
+
+    row = report.rows[0]
+    assert row.outcome == "gate_inconclusive"
+    assert row.n_bis is None
+    # the digest must show a human label, not the raw key
+    from trackllm_website.bi.digest import build_onboarding_email
+
+    _subject, plain, html = build_onboarding_email(report, config.spend_dir)
+    assert "gate_inconclusive" not in plain and "gate_inconclusive" not in html
+    assert "temperature gate inconclusive" in plain
+
+
 def test_recheck_resurrected_outcome(monkeypatch, tmp_path):
     endpoint = ep("m/old")
     state = EndpointBIState(
