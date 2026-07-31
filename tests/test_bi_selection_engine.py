@@ -233,6 +233,50 @@ def test_providers_branch_covers_and_skips_pricey():
     assert [e.provider for e in selected] == ["provA"]
 
 
+def _providers_policy(patterns):
+    return SelectionPolicy(
+        budget_per_month=100.0,
+        max_endpoint_cost=100.0,
+        exclude=[],
+        rules=[
+            Rule(
+                name="providers",
+                kind="providers",
+                patterns=patterns,
+                endpoints_per_provider=1,
+            )
+        ],
+    )
+
+
+def test_providers_rule_honors_patterns():
+    # a narrowed providers rule must not silently select from every provider
+    cands = [
+        ep("m/a", "deepinfra", 0.00002),
+        ep("m/b", "deepinfra-turbo", 0.00002),
+        ep("m/c", "together", 0.00002),
+        ep("m/d", "novita", 0.00002),
+    ]
+    selected, _ = select_monitoring_targets(
+        cands, _providers_policy(["deepinfra*"]), []
+    )
+    assert sorted(e.provider for e in selected) == ["deepinfra", "deepinfra-turbo"]
+
+
+def test_providers_rule_wildcard_covers_everyone():
+    cands = [ep("m/a", "deepinfra", 0.00002), ep("m/c", "together", 0.00002)]
+    selected, _ = select_monitoring_targets(cands, _providers_policy(["*"]), [])
+    assert sorted(e.provider for e in selected) == ["deepinfra", "together"]
+
+
+def test_providers_rule_matches_the_suffix_free_provider_name():
+    # by_provider is keyed by provider_without_suffix, so an exact name matches
+    # every variant of that provider
+    cands = [ep("m/a", "deepinfra/fp8", 0.00002), ep("m/c", "together", 0.00002)]
+    selected, _ = select_monitoring_targets(cands, _providers_policy(["deepinfra"]), [])
+    assert [e.provider for e in selected] == ["deepinfra/fp8"]
+
+
 def test_selection_is_deterministic():
     policy = SelectionPolicy(
         budget_per_month=100.0,

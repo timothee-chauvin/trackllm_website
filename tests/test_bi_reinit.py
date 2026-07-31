@@ -89,7 +89,7 @@ def test_reinit_bad_temperature_on_high_prevalence(monkeypatch):
         return ["p1", "p2", "p3"], 0.9  # above the 0.30 trigger
 
     async def fake_check(client, endpoint, strategy, prompts):
-        return True
+        return "ignored"
 
     monkeypatch.setattr(reinit_mod, "discover_candidates", fake_discover)
     monkeypatch.setattr(reinit_mod, "check_temperature", fake_check)
@@ -97,6 +97,52 @@ def test_reinit_bad_temperature_on_high_prevalence(monkeypatch):
     result = asyncio.run(reinit_mod.reinit(None, None, ENDPOINT, [], NOW))
     assert result.epoch is None
     assert result.reason == "bad_temperature"
+
+
+def test_reinit_inconclusive_gate_aborts_without_a_verdict(monkeypatch, tmp_path):
+    # The gate couldn't get enough data (transient outage). Onboarding must NOT
+    # proceed on unvetted border inputs: it aborts with gate_inconclusive, which the
+    # caller turns into "still unknown" so the whole thing is retried next run.
+    monkeypatch.setattr(reinit_mod, "sample_prompts", fake_sampler({"p1": ["a", "b"]}))
+    monkeypatch.setattr(
+        reinit_mod, "get_output_path", lambda ep, ym: tmp_path / "phase2.json"
+    )
+
+    async def fake_discover(endpoint, exclude):
+        return ["p1"], 0.9  # above the 0.30 trigger
+
+    async def fake_check(client, endpoint, strategy, prompts):
+        return "inconclusive"
+
+    monkeypatch.setattr(reinit_mod, "discover_candidates", fake_discover)
+    monkeypatch.setattr(reinit_mod, "check_temperature", fake_check)
+    monkeypatch.setattr(reinit_mod.config.bi.reinit, "top_k_bis", 1)
+    monkeypatch.setattr(reinit_mod.config.bi.reinit, "min_bis", 1)
+
+    result = asyncio.run(reinit_mod.reinit(None, None, ENDPOINT, [], NOW))
+    assert result.epoch is None
+    assert result.reason == "gate_inconclusive"
+
+
+def test_reinit_inconclusive_gate_keeps_phase_1_progress(monkeypatch, tmp_path):
+    # Discovery already succeeded and only the verdict is missing, so the ~15k-query
+    # phase-1 scratch must survive for the next run to resume from.
+    monkeypatch.setattr(reinit_mod.config.bi, "data_dir", tmp_path)
+    progress = reinit_mod.onboarding_progress_dir(ENDPOINT)
+    progress.mkdir(parents=True)
+    (progress / "partial.json").write_bytes(b"{}")
+
+    async def fake_discover(endpoint, exclude):
+        return ["p1"], 0.9
+
+    async def fake_check(client, endpoint, strategy, prompts):
+        return "inconclusive"
+
+    monkeypatch.setattr(reinit_mod, "discover_candidates", fake_discover)
+    monkeypatch.setattr(reinit_mod, "check_temperature", fake_check)
+
+    asyncio.run(reinit_mod.reinit(None, None, ENDPOINT, [], NOW))
+    assert (progress / "partial.json").exists()
 
 
 def test_reinit_no_gate_when_prevalence_low(monkeypatch, tmp_path):

@@ -17,6 +17,31 @@ def test_onboarding_safety_knobs_present():
     assert config.bi.reinit.onboard_concurrency == 40
 
 
+def test_monitor_reinit_deadline_fits_the_workflow_budget():
+    """bi-monitor.yml allows 300 minutes; a re-init storm must stay inside it.
+
+    Re-inits run at monitor concurrency, so the worst case is
+    ceil(firing / max_concurrent_endpoints) waves of the deadline.
+    """
+    deadline_s = config.bi.monitor.reinit_timeout_seconds
+    p1, p2 = config.bi.phase_1, config.bi.phase_2
+    discovery_s = (
+        p1.tokens_per_endpoint
+        * p1.queries_per_token
+        / p1.requests_per_second_per_endpoint
+    )
+    reference_s = (
+        p1.target_border_inputs
+        * config.bi.reinit.reference_samples
+        / p2.requests_per_second_per_endpoint
+    )
+    assert (
+        deadline_s > (discovery_s + reference_s) * 1.2
+    )  # full re-init fits, with margin
+    waves_in_budget = 5 * 3600 / deadline_s  # 300-minute job limit
+    assert waves_in_budget * config.bi.monitor.max_concurrent_endpoints >= 60
+
+
 def test_no_backoff_on_timeout_when_disabled():
     calls = {"n": 0}
 

@@ -68,17 +68,23 @@ def write_cost_summary() -> None:
     path.write_bytes(orjson.dumps(summary, option=orjson.OPT_INDENT_2))
 
 
-async def ensure_costs(candidates: list[Endpoint], *, save: bool) -> list[Endpoint]:
+async def ensure_costs(
+    candidates: list[Endpoint], policy: SelectionPolicy, *, save: bool
+) -> list[Endpoint]:
     """Return candidates with cost_per_request filled, probing only those missing it.
 
     Probed costs are written back to endpoints_bi.yaml when save=True so repeated
     previews don't re-probe. Endpoints that fail vetting (liar/transient) are dropped.
+
+    The policy is what arms discover_strategy's too-expensive short-circuit: without
+    it, budget escalation runs unguarded (up to config.bi.probe.max_budget reasoning
+    tokens per probe) on arbitrary un-priced catalog endpoints.
     """
     missing = [e for e in candidates if e.cost_per_request is None]
     if missing:
         logger.info(f"cost-preview: measuring {len(missing)} endpoints missing a cost")
         async with OpenRouterClient(timeout=60.0) as probe:
-            strategies, _ = await resolve_strategies(probe, missing)
+            strategies, _ = await resolve_strategies(probe, missing, policy=policy)
 
         async def measure(client: OpenRouterClient, e: Endpoint) -> None:
             strat = strategies.get(str(e))
@@ -128,7 +134,7 @@ async def preview(policy_path: str | None = None) -> None:
 
     path = root / (policy_path or config.bi.selection_path)
     policy = load_policy(path)
-    candidates = await ensure_costs(list(config.endpoints_bi), save=True)
+    candidates = await ensure_costs(list(config.endpoints_bi), policy, save=True)
     summary = build_cost_summary(
         candidates, policy, fetch_popular_models_safe(config.bi.popularity.top_n)
     )

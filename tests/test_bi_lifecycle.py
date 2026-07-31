@@ -208,6 +208,40 @@ def test_bad_temperature_is_cached_not_monitored(monkeypatch, tmp_path):
     assert not (config.bi.state_dir / f"{slugify_eq(bad_temp)}.json").exists()
 
 
+def test_gate_inconclusive_leaves_the_endpoint_unknown(monkeypatch, tmp_path):
+    """An inconclusive temperature gate must neither cache nor onboard the endpoint.
+
+    Onboarding it would monitor (and bill) possibly-fake border inputs forever —
+    nothing re-runs the gate on a monitoring endpoint. Retiring it no_bis would be
+    worse still: those are never re-onboarded. Staying unknown is the only state
+    the lifecycle actually retries.
+    """
+    flaky_gate = ep("m/flakygate")
+
+    def select_all(candidates, policy, popular_models):
+        return list(candidates), {e: "test" for e in candidates}
+
+    async def fake_reinit(client, strategy, endpoint, old_bis, now):
+        return ReinitResult(epoch=None, reason="gate_inconclusive")
+
+    _patch_lifecycle_deps(monkeypatch, tmp_path, select=select_all, reinit=fake_reinit)
+
+    report = asyncio.run(update_endpoints_bi_lifecycle([flaky_gate]))
+
+    from trackllm_website.bi.state import load_all_states
+    from trackllm_website.bi.vetting import EndpointCache
+    from trackllm_website.update_endpoints import ENDPOINTS_CACHE_BI_PATH
+
+    assert EndpointCache.load(ENDPOINTS_CACHE_BI_PATH).bucket_of(flaky_gate) is None
+    assert not (config.bi.state_dir / f"{slugify_eq(flaky_gate)}.json").exists()
+    # ...so the very next run onboards it again, gate included
+    actions = select_lifecycle_actions(
+        [flaky_gate], load_all_states(config.bi.state_dir), NOW
+    )
+    assert actions.onboard == [flaky_gate]
+    assert [r.outcome for r in report.rows] == ["gate_inconclusive"]
+
+
 def test_only_selected_candidates_are_onboarded(monkeypatch, tmp_path):
     chosen_a, chosen_b = ep("m/a"), ep("m/b")
     rejected = ep("m/c")

@@ -3,6 +3,7 @@
 import asyncio
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Literal
 
 import orjson
 from aiolimiter import AsyncLimiter
@@ -154,6 +155,11 @@ async def phase_1b(temperature: float, base_dir: Path | None = None) -> None:
         f.write(orjson.dumps(results))
 
 
+# "inconclusive" means the gate could not gather enough successful queries to
+# decide; the caller must treat it as neither a pass nor a rejection.
+TemperatureVerdict = Literal["ignored", "honored", "inconclusive"]
+
+
 def temperature_is_ignored(
     t0_distinct: dict[str, int], t1_distinct: dict[str, int]
 ) -> bool:
@@ -170,12 +176,23 @@ async def check_temperature(
     endpoint: Endpoint,
     strategy: QueryStrategy | None,
     border_prompts: list[str],
-) -> bool:
-    """Re-sample border prompts at T=0 and T=1; True if temperature is ignored.
+) -> TemperatureVerdict:
+    """Re-sample border prompts at T=0 and T=1 and judge whether temperature is ignored.
 
     A high border-input prevalence is only meaningful if T=0 actually pins the
     output. Endpoints that ignore temperature (e.g. some reasoning models) produce
     fake border inputs with no detection power, so this gate excludes them.
+
+    Returns "inconclusive" when too few gate queries came back with a token: an
+    outage (or an endpoint answering nothing but empty strings) drives the distinct
+    counts to all zeros at both temperatures, which the comparison cannot tell apart
+    from "T=1 never broadens". Caching that as bad_temperature would drop a healthy
+    endpoint from monitoring until the next cache recheck, so a verdict without data
+    is no verdict — consistent with how vetting treats transient errors.
+
+    Usable samples, not the error count, are what's measured: sample_prompts counts
+    an empty (non-error) response as a success, and an empty response carries exactly
+    as much evidence about temperature as a failed one — none.
     """
     # Worst case config.bi.temperature_gate.check_prompts * check_samples * 2 queries
     # (T=0 and T=1). For reasoning endpoints each query bills the full reasoning
@@ -183,21 +200,37 @@ async def check_temperature(
     # for exactly the endpoints it targets (reasoning models that ignore temperature).
     gate = config.bi.temperature_gate
     prompts = border_prompts[: gate.check_prompts]
+    if not prompts:
+        return "inconclusive"
+    n_queries = len(prompts) * gate.check_samples
 
-    async def distinct_at(temperature: float) -> dict[str, int]:
-        samples, _ = await sample_prompts(
+    async def distinct_at(temperature: float) -> tuple[dict[str, int], int, int]:
+        """(distinct tokens per prompt, total tokens collected, errored queries)."""
+        samples, n_errors = await sample_prompts(
             client, endpoint, strategy, prompts, gate.check_samples, temperature
         )
-        return {p: len({tok for _, tok in samples[p]}) for p in samples}
+        distinct = {p: len({tok for _, tok in samples[p]}) for p in samples}
+        return distinct, sum(len(s) for s in samples.values()), n_errors
 
-    t0_distinct = await distinct_at(0.0)
-    t1_distinct = await distinct_at(1.0)
-    ignored = temperature_is_ignored(t0_distinct, t1_distinct)
-    if ignored:
-        logger.warning(
-            f"{endpoint}: temperature ignored (T=0 {t0_distinct} >= T=1 {t1_distinct})"
-        )
-    return ignored
+    t0_distinct, t0_tokens, t0_errors = await distinct_at(0.0)
+    t1_distinct, t1_tokens, t1_errors = await distinct_at(1.0)
+    for temperature, n_tokens, n_errors in (
+        (0.0, t0_tokens, t0_errors),
+        (1.0, t1_tokens, t1_errors),
+    ):
+        if n_tokens < gate.min_success_fraction * n_queries:
+            logger.warning(
+                f"{endpoint}: temperature gate inconclusive at T={temperature:g} — "
+                f"only {n_tokens}/{n_queries} queries returned a token "
+                f"({n_errors} errored)"
+            )
+            return "inconclusive"
+    if not temperature_is_ignored(t0_distinct, t1_distinct):
+        return "honored"
+    logger.warning(
+        f"{endpoint}: temperature ignored (T=0 {t0_distinct} >= T=1 {t1_distinct})"
+    )
+    return "ignored"
 
 
 if __name__ == "__main__":

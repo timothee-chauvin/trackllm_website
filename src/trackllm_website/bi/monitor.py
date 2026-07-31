@@ -172,11 +172,46 @@ async def run_endpoint(
         logger.warning(
             f"{state.endpoint}: change detected (onset {decision.change_date})"
         )
+        timed_out = False
         with track() as reinit_spend:
-            result = await reinit(
-                client, strategy, state.endpoint, epoch.border_inputs, now
-            )
+            try:
+                result = await asyncio.wait_for(
+                    reinit(client, strategy, state.endpoint, epoch.border_inputs, now),
+                    # A re-init is a full discovery run (~15k queries) and it happens
+                    # inside the daily monitor job, so one hanging endpoint would stall
+                    # the whole workflow. Its own deadline, not the onboarding one:
+                    # this job's budget is 300 minutes (see config.toml).
+                    # TODO: an endpoint that times out here every day re-detects the
+                    # same change and burns the deadline again forever. It needs a
+                    # give-up path (retire after N consecutive re-init timeouts, or
+                    # back off), which needs a counter in EndpointBIState.
+                    timeout=config.bi.monitor.reinit_timeout_seconds,
+                )
+            except asyncio.TimeoutError:
+                timed_out = True
         append_entry(config.spend_dir, state.slug, "reinit", reinit_spend, now)
+        if timed_out:
+            if event_rows is not None:
+                event_rows.append(
+                    MonitorRow(
+                        state.endpoint.model,
+                        state.endpoint.provider,
+                        "reinit_timeout",
+                        (
+                            decision.change_date.date().isoformat()
+                            if decision.change_date
+                            else None
+                        ),
+                        None,
+                        reinit_spend.cost,
+                    )
+                )
+            # Raise so run_isolated reports it in report.failures: nothing was saved,
+            # so the next daily run re-detects the change and retries.
+            raise TimeoutError(
+                f"{state.endpoint}: re-init exceeded "
+                f"{config.bi.monitor.reinit_timeout_seconds}s"
+            )
         if event_rows is not None:
             event_rows.append(
                 MonitorRow(

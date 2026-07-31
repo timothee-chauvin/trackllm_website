@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import orjson
+import pytest
 
 from trackllm_website.api import OpenRouterClient
 from trackllm_website.bi import monitor as monitor_mod
@@ -150,6 +151,53 @@ def test_all_errors_batch_lands_in_event_rows(tmp_path, monkeypatch):
 
     asyncio.run(go())
     assert any(r.event == "all_errors" for r in event_rows)
+
+
+def test_reinit_timeout_is_a_reported_failure(tmp_path, monkeypatch):
+    """A hanging change-triggered re-init (full discovery is ~15k queries) must not
+    stall the daily monitor job: it is bounded, reported, and persists nothing."""
+    state, results = open_state_from_fixture(
+        "deepseek2fdeepseek-chat-v3-032423hyperbolic2ffp8"
+    )
+    epoch = state.current_epoch
+    now = datetime(2026, 2, 15, tzinfo=timezone.utc)
+
+    async def fake_sample_prompts(*args, **kwargs):
+        return {bi: [(now.isoformat(), "tok")] for bi in epoch.border_inputs}, 0
+
+    async def slow_reinit(*args, **kwargs):
+        await asyncio.sleep(10)
+        raise AssertionError("re-init should have been cancelled by the timeout")
+
+    monkeypatch.setattr(monitor_mod.config.bi, "data_dir", tmp_path)
+    monkeypatch.setattr(
+        type(monitor_mod.config), "spend_dir", property(lambda self: tmp_path / "spend")
+    )
+    state_dir = monitor_mod.config.bi.state_dir
+    monkeypatch.setattr(monitor_mod, "sample_prompts", fake_sample_prompts)
+    monkeypatch.setattr(monitor_mod, "reinit", slow_reinit)
+    monkeypatch.setattr(
+        monitor_mod, "get_output_path", lambda ep, ym: tmp_path / "monthly.json"
+    )
+    monkeypatch.setattr(monitor_mod, "load_phase2_results", lambda d: results)
+    monkeypatch.setattr(monitor_mod.config.bi.monitor, "reinit_timeout_seconds", 0.05)
+
+    event_rows = []
+
+    async def go():
+        async with OpenRouterClient() as client:
+            await run_endpoint(
+                client, PlainStrategy(), state, now, event_rows=event_rows
+            )
+
+    with pytest.raises(TimeoutError):  # run_isolated turns this into a report failure
+        asyncio.run(go())
+
+    assert any(r.event == "reinit_timeout" for r in event_rows)
+    # nothing persisted: the next daily run re-detects the change and retries
+    assert not (state_dir / f"{state.slug}.json").exists()
+    # the spend of the abandoned re-init is still recorded
+    assert (tmp_path / "spend").exists()
 
 
 def test_unresolved_strategy_is_a_reported_failure(monkeypatch):
