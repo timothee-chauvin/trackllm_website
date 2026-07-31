@@ -837,6 +837,10 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]) -> Onboardin
                     # retirement is never re-onboarded. Unknown is the only status
                     # this run can retry, and a recheck keeps its old last_recheck
                     # so it stays due.
+                    # TODO: a persistently inconclusive endpoint (e.g. one now
+                    # answering only empty strings) re-onboards daily forever;
+                    # like the re-init timeout, a give-up needs a counter in
+                    # EndpointBIState.
                     logger.warning(f"{endpoint}: temperature gate inconclusive, retry")
                     outcome = "gate_inconclusive"
                     return
