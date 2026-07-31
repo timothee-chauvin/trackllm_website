@@ -205,6 +205,49 @@ def test_monitoring_with_reference_yields_tv_series():
     assert view.tv_series["values"][0] == pytest.approx(1.0)
 
 
+def test_consecutive_epochs_do_not_measure_the_same_day_twice():
+    """Each day belongs to exactly one epoch, so the series stays sorted and unique.
+
+    When a re-initialised epoch keeps some of the previous epoch's border inputs,
+    those keep being sampled; a closed epoch that ignored its own end would score
+    every later day a second time against its stale reference.
+    """
+    ref_a = {"p1": [("2026-01-01T00:00:00+00:00", "A")] * 10}
+    ref_b = {"p1": [("2026-01-10T00:00:00+00:00", "B")] * 10}
+    results = {
+        "p1": dict(
+            [_daily_batch(d, "A") for d in range(1, 10)]
+            + [_daily_batch(d, "B") for d in range(10, 13)]
+        )
+    }
+    state = EndpointBIState(
+        endpoint=_ep(),
+        status="monitoring",
+        retired=None,
+        epochs=[
+            Epoch(
+                start=datetime(2026, 1, 1, tzinfo=timezone.utc),
+                border_inputs=["p1"],
+                reference=ref_a,
+                end=datetime(2026, 1, 10, tzinfo=timezone.utc),
+                end_reason="change_detected",
+                change_date=datetime(2026, 1, 10, tzinfo=timezone.utc),
+            ),
+            Epoch(
+                start=datetime(2026, 1, 10, tzinfo=timezone.utc),
+                border_inputs=["p1"],
+                reference=ref_b,
+            ),
+        ],
+    )
+    dates = derive_b3it(state, results, []).tv_series["dates"]
+    assert len(dates) == len(set(dates))
+    assert dates == sorted(dates)
+    # the closing day is the last evidence of the old epoch, and the new epoch's
+    # reference batch -- scored once, against the reference it ended.
+    assert dates[-1] == "2026-01-12T00:00:00+00:00"
+
+
 def test_backfill_events_surface_as_scan_changes():
     state = EndpointBIState(
         endpoint=_ep(),

@@ -36,6 +36,43 @@ def test_current_epoch_open_and_closed():
     assert state.current_epoch is None
 
 
+def test_filter_results_stops_at_the_epoch_end():
+    """A closed epoch owns no sample past its end: the next epoch does.
+
+    Without the upper bound, every day after a closure is measured a second
+    time against the stale pre-change reference (z-ai/glm-5.2 @ cloudflare).
+    """
+    epoch = Epoch(
+        start=datetime(2026, 1, 14, tzinfo=timezone.utc),
+        border_inputs=["a"],
+        reference={},
+        end=datetime(2026, 1, 16, tzinfo=timezone.utc),
+        end_reason="change_detected",
+    )
+    results = {
+        "a": {
+            "2026-01-13T00:00:00+00:00": ["before"],
+            "2026-01-15T00:00:00+00:00": ["inside"],
+            "2026-01-16T00:00:00+00:00": ["at the end"],
+            "2026-01-17T00:00:00+00:00": ["after"],
+        }
+    }
+    assert sorted(epoch.filter_results(results)["a"]) == [
+        "2026-01-15T00:00:00+00:00",
+        "2026-01-16T00:00:00+00:00",
+    ]
+
+
+def test_filter_results_of_an_open_epoch_has_no_upper_bound():
+    epoch = Epoch(
+        start=datetime(2026, 1, 14, tzinfo=timezone.utc),
+        border_inputs=["a"],
+        reference={},
+    )
+    results = {"a": {"2026-09-01T00:00:00+00:00": ["much later"]}}
+    assert list(epoch.filter_results(results)["a"]) == ["2026-09-01T00:00:00+00:00"]
+
+
 def test_retired_requires_info():
     state = make_state()
     state.status = "retired"
