@@ -156,12 +156,12 @@ function renderStatusCard(lt: FocusLT | null, b3it: FocusB3IT | null, state: Sta
 // letting `.chart svg { width: 100% }` scale it down is what made the axis and
 // sigma labels render at ~2.6px in a 264px phone column.
 const DESIGN_VW = 1000; // width to draw at when nothing can be measured (no layout engine)
-const NARROW_VW = 560; // below this the side margins are trimmed and month labels thinned
+const NARROW_VW = 560; // below this the side margins are trimmed and lane titles shortened
 const MIN_VW = 160; // floor: below it the margins would eat the whole plot area
 const LANE_H = 108, GAP = 34, TOP1 = 34;
 const TOP2 = TOP1 + LANE_H + GAP;
 const VH = TOP2 + LANE_H + 40;
-// "Jul 26" in var(--mono) at font-size 10.5 measures ~41px; the rest is the gap
+// "Jul '26" in var(--mono) at font-size 10.5 measures ~41px; the rest is the gap
 // that keeps two neighbouring labels from touching.
 const MONTH_LABEL_W = 52;
 const RESIZE_DEBOUNCE_MS = 150;
@@ -207,6 +207,97 @@ function onWidthChange(el: HTMLElement, draw: () => void): void {
       draw();
     }, RESIZE_DEBOUNCE_MS);
   });
+}
+
+// ---- change marks -------------------------------------------------------------
+// measured with getBBox in Chromium and rounded up: reserving a little too much
+// only ever moves a label that would have just fitted
+const CHAR_W = 6.4; // var(--mono) at font-size 10.5
+const TITLE_CHAR_W = 7.2; // ... and at the 11.5 the lane titles use
+// 14, not the 12 the two font sizes suggest: at 12 a moved label's box still
+// shared a pixel row with the lane title's
+const ROW_H = 14;
+const LABEL_DY = 10; // an anchored label clears its own dot by this much
+const CEIL_DOT_DY = 4; // a mark with nothing to anchor to sits this far above the lane
+const CEIL_LABEL_DY = 8; // ... and its label on the lane title's baseline
+const BELOW_DY = 12; // the one place left to try once everything above is taken
+const MAX_LIFT = 2; // rows a label may climb before it is put below its dot instead
+
+interface CpLane {
+  series: [string, number][];
+  topY: number;
+  maxV: number;
+  col: string;
+  title: string; // "" when the lane draws a placeholder instead of a trace
+  changes: { date: string; lab: string }[];
+}
+
+interface Mark {
+  x: number;
+  y: number;
+  labelX: number;
+  labelY: number | null; // null: nowhere free, so only the rule and dot are drawn
+  col: string;
+  lab: string;
+}
+
+interface Box {
+  x0: number;
+  x1: number;
+  y: number;
+}
+
+const boxesCollide = (a: Box, b: Box): boolean =>
+  a.x0 < b.x1 && b.x0 < a.x1 && Math.abs(a.y - b.y) < ROW_H;
+
+/** The value the curve shows on `date`, or null when the date is outside the
+ *  sampled span — the series is downsampled, so the nearest sample is the answer,
+ *  but extrapolating past either end would invent a level. */
+function sampleAt(series: [string, number][], date: string): number | null {
+  if (!series.length) return null;
+  const t = td(date);
+  if (t < td(series[0][0]) || t > td(last(series)![0])) return null;
+  let best = series[0];
+  for (const p of series) {
+    if (Math.abs(td(p[0]) - t) < Math.abs(td(best[0]) - t)) best = p;
+  }
+  return best[1];
+}
+
+/** Place one lane's change marks: dot on the curve, label above it, moved out of
+ *  the way of the lane title and of labels already placed. A label with nowhere
+ *  free is dropped — its dashed rule and dot still mark the day, and the changes
+ *  table below the chart lists every change with its magnitude. */
+export function packMarks(
+  lane: CpLane,
+  fx: (s: string) => number,
+  vw: number,
+  pl: number
+): Mark[] {
+  const yv = (v: number): number => lane.topY + LANE_H * (1 - v / lane.maxV);
+  const ceiling = lane.topY - CEIL_LABEL_DY - ROW_H; // one clear row above the title
+  const floor = lane.topY + LANE_H;
+  const placed: Box[] = lane.title
+    ? [{ x0: pl, x1: pl + lane.title.length * TITLE_CHAR_W, y: lane.topY - CEIL_LABEL_DY }]
+    : [];
+  return lane.changes
+    .map((c) => ({ c, x: fx(c.date) }))
+    .sort((a, b) => a.x - b.x)
+    .map(({ c, x }) => {
+      const v = sampleAt(lane.series, c.date);
+      const y = v === null ? lane.topY - CEIL_DOT_DY : yv(v);
+      const half = (c.lab.length * CHAR_W) / 2;
+      const labelX = Math.min(Math.max(x, half), vw - half);
+      const box = (ly: number): Box => ({ x0: labelX - half, x1: labelX + half, y: ly });
+      const start = v === null ? lane.topY - CEIL_LABEL_DY : y - LABEL_DY;
+      const rows = Array.from({ length: MAX_LIFT + 1 }, (_, k) => start - k * ROW_H)
+        .filter((ly) => ly >= ceiling)
+        .concat(y + BELOW_DY);
+      const labelY =
+        rows.find((ly) => ly <= floor && !placed.some((p) => boxesCollide(box(ly), p))) ?? null;
+      if (labelY !== null) placed.push(box(labelY));
+      return { x, y, labelX, labelY, col: lane.col, lab: c.lab };
+    });
 }
 
 /** The whole chart as one SVG, a pure function of the data and the width to fill.
@@ -286,49 +377,38 @@ export function chartSvg(lt: FocusLT | null, b3it: FocusB3IT | null, vw: number)
       ? lane(b3it.tv, TOP2, 1, "var(--b3it)", "var(--b3it-fill)", b3Title, (v) => v.toFixed(1))
       : placeholder(TOP2, b3it ? say("B3IT · no reference data in this window", "B3IT · no reference data") : say("B3IT · not monitored for this endpoint", "B3IT · not monitored"));
 
-  const cps = [
-    ...(lt?.changes ?? []).map((c) => ({ x: fx(c.date), col: "var(--accent)", lab: c.sigma, baseY: TOP1 - 8 })),
-    ...(b3it?.changes ?? []).map((c) => ({ x: fx(c.date), col: "var(--b3it)", lab: fmtTV(c.peakTV), baseY: TOP2 - 8 })),
+  // A change mark's dot sits on its lane's curve at the change date, so the reader
+  // can see the level the label is quoting. Only when the curve cannot answer -- an
+  // empty lane, or a change recorded outside the sampled span -- does the mark fall
+  // back to the lane ceiling, where every mark used to be drawn.
+  const cpLanes: CpLane[] = [
+    {
+      series: lt?.drift ?? [],
+      topY: TOP1,
+      maxV: ltMax,
+      col: "var(--accent)",
+      title: lt?.drift.length ? ltTitle : "",
+      changes: (lt?.changes ?? []).map((c) => ({ date: c.date, lab: c.sigma })),
+    },
+    {
+      series: b3it?.tv ?? [],
+      topY: TOP2,
+      maxV: 1,
+      col: "var(--b3it)",
+      title: b3it?.tv.length ? b3Title : "",
+      changes: (b3it?.changes ?? []).map((c) => ({ date: c.date, lab: fmtTV(c.peakTV) })),
+    },
   ];
-  // A changepoint label is centred on its dot and shares a baseline with the lane
-  // title, so on a plot this narrow they overprint each other and the title. Three
-  // corrections, all no-ops while everything still fits: pull a label at either
-  // end of the span back inside the SVG (which clips), lift one that would land
-  // on an already-occupied stretch of the baseline into the row above, and drop the
-  // one that finds every row taken -- its dashed rule and dot still mark the day,
-  // and the changes table below the chart lists every change with its magnitude.
-  // measured with getBBox in Chromium and rounded up: reserving a little too much
-  // only ever lifts a label that would have just fitted
-  const CHAR_W = 6.4; // var(--mono) at font-size 10.5
-  const TITLE_CHAR_W = 7.2; // ... and at the 11.5 the lane titles use
-  // 14, not the 12 the two font sizes suggest: at 12 a lifted label's box still
-  // shared a pixel row with the lane title's
-  const ROW_H = 14;
-  // one row up is all the clear space there is above either baseline: row 2 would
-  // leave the SVG over the LT lane and cut into the drift plot over the B3IT one
-  const MAX_ROW = 1;
-  // per baseline, the right edge already occupied in each row -- row 0 starts at
-  // the end of the lane title
-  const rowEnd = new Map<number, number[]>([
-    [TOP1 - 8, [PL + (lt?.drift.length ? ltTitle.length * TITLE_CHAR_W : 0)]],
-    [TOP2 - 8, [PL + (b3it?.tv.length ? b3Title.length * TITLE_CHAR_W : 0)]],
-  ]);
-  const cpSvg = cps
-    .sort((a, b) => a.x - b.x)
-    .map((c) => {
-      const half = (c.lab.length * CHAR_W) / 2;
-      const labX = Math.min(Math.max(c.x, half), VW - half);
-      const ends = rowEnd.get(c.baseY)!;
-      let row = 0;
-      while (row <= MAX_ROW && labX - half < (ends[row] ?? 0) + 4) row++;
-      if (row <= MAX_ROW) ends[row] = labX + half;
-      const label =
-        row <= MAX_ROW
-          ? `<text x="${labX.toFixed(1)}" y="${c.baseY - row * ROW_H}" fill="${c.col}" font-size="10.5" font-family="var(--mono)" font-weight="600" text-anchor="middle">${esc(c.lab)}</text>`
-          : "";
-      return `<line x1="${c.x.toFixed(1)}" y1="${TOP1 - 4}" x2="${c.x.toFixed(1)}" y2="${TOP2 + LANE_H}" stroke="${c.col}" stroke-width="1" stroke-dasharray="3 3" opacity="0.55"/>
-        <circle cx="${c.x.toFixed(1)}" cy="${(c.baseY + 4).toFixed(1)}" r="2.6" fill="${c.col}"/>${label}`;
-    })
+  const cpSvg = cpLanes
+    .flatMap((l) => packMarks(l, fx, VW, PL))
+    .map(
+      (m) => `<line x1="${m.x.toFixed(1)}" y1="${TOP1 - 4}" x2="${m.x.toFixed(1)}" y2="${TOP2 + LANE_H}" stroke="${m.col}" stroke-width="1" stroke-dasharray="3 3" opacity="0.55"/>
+        <circle cx="${m.x.toFixed(1)}" cy="${m.y.toFixed(1)}" r="2.6" fill="${m.col}"/>${
+          m.labelY === null
+            ? ""
+            : `<text x="${m.labelX.toFixed(1)}" y="${m.labelY.toFixed(1)}" fill="${m.col}" font-size="10.5" font-family="var(--mono)" font-weight="600" text-anchor="middle">${esc(m.lab)}</text>`
+        }`
+    )
     .join("");
 
   const xlabels = ticks
