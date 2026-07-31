@@ -9,6 +9,14 @@ on:
 permissions:
   contents: write  # Allow pushing commits
 
+# Shared with update-endpoints.yml and bi-monitor.yml: all three commit to main and
+# touch overlapping files (website/data/spend, monthly state). Queue instead of
+# cancelling, so an overlapping manual dispatch can't race a cron run into a
+# last-write-wins loss.
+concurrency:
+  group: repo-write
+  cancel-in-progress: false
+
 jobs:
   run-main:
     runs-on: ubuntu-latest
@@ -46,6 +54,9 @@ jobs:
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-        git add .
+        # Scoped to what this job writes: main.py stores responses under
+        # website/data/lt and appends the LT spend ledger under website/data/spend;
+        # lt_scores_cli rewrites lt_scores.json / lt_changes.json under website/data/lt.
+        git add website/data/lt website/data/spend
         git diff --staged --quiet || git commit -m "[bot] add new responses"
         bash .github/scripts/push-with-rebase.sh

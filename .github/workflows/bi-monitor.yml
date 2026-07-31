@@ -9,6 +9,11 @@ on:
 permissions:
   contents: write  # Allow pushing commits
 
+# See run-main.yml for why all three repo-writing workflows share this group.
+concurrency:
+  group: repo-write
+  cancel-in-progress: false
+
 jobs:
   bi-monitor:
     runs-on: ubuntu-latest

@@ -9,6 +9,11 @@ on:
 permissions:
   contents: write  # Allow pushing commits
 
+# See run-main.yml for why all three repo-writing workflows share this group.
+concurrency:
+  group: repo-write
+  cancel-in-progress: false
+
 jobs:
   update-endpoints:
     runs-on: ubuntu-latest
@@ -45,6 +50,18 @@ jobs:
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-        git add .
+        # Scoped to what update_endpoints.py writes. Keep in sync when a new writer
+        # is added: a missing pathspec silently drops that run's data.
+        git add \
+          endpoints_lt.yaml \
+          endpoints_cache_lt.yaml \
+          endpoints_catalog.yaml \
+          endpoints_bi.yaml \
+          endpoints_cache_bi.yaml \
+          strategies_test_reasoning.json \
+          website/data/spend \
+          website/data/b3it/state \
+          website/data/b3it/phase_2 \
+          website/data/b3it/onboarding_progress
         git diff --staged --quiet || git commit -m "[bot] Daily update of target endpoints"
         bash .github/scripts/push-with-rebase.sh
