@@ -121,7 +121,8 @@ def _strategy_to_raw(strategy: QueryStrategy) -> dict | None:
     elif isinstance(strategy, ReasoningDisabledStrategy):
         return {"effort": "none"}
     elif isinstance(strategy, ReasoningBudgetStrategy):
-        # Store the original discovered budget (not doubled) for cache compat with test_reasoning.py
+        # Store the original discovered budget (not doubled) for cache compat with
+        # analysis/probe_reasoning.py
         return {"max_tokens": strategy.budget // 2}
 
 
