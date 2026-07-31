@@ -42,6 +42,10 @@ def _by_method(changes: list[dict], method: str) -> list[dict]:
     )
 
 
+# Both helpers below publish None, never 0.0, for a change the series has no point
+# on or after (one dated after the last observation): the level it reached is
+# unknown, and a published 0.00 would read as a change that moved nothing. feed.py
+# publishes the same null; model.ts and endpoint.ts render it as an em dash.
 def _lt_changes(
     canonical: list[dict], drift_pairs: list[tuple[str, float]]
 ) -> list[dict]:
@@ -53,7 +57,7 @@ def _lt_changes(
             {
                 "date": day,
                 "sigma": c["magnitude_display"],
-                "drift": round(level or 0.0, 2),
+                "drift": round(level, 2) if level is not None else None,
             }
         )
     return out
@@ -66,7 +70,9 @@ def _b3it_changes(
     for c in canonical:
         day = c["date"][:10]
         peak = peak_from(day, tv_pairs, B3IT_PEAK_WINDOW)
-        out.append({"date": day, "peakTV": round(peak or 0.0, 3)})
+        out.append(
+            {"date": day, "peakTV": round(peak, 3) if peak is not None else None}
+        )
     return out
 
 
@@ -214,7 +220,13 @@ def build_model_views(
 
         drift_values = [
             v for e in endpoints if e["lt"] for _, v in e["lt"]["drift"]
-        ] + [c["drift"] for e in endpoints if e["lt"] for c in e["lt"]["changes"]]
+        ] + [
+            c["drift"]
+            for e in endpoints
+            if e["lt"]
+            for c in e["lt"]["changes"]
+            if c["drift"] is not None
+        ]
         max_drift = round(max(drift_values, default=0.0), 2)
 
         headlines = [site.statuses[s].headline for s in slugs]

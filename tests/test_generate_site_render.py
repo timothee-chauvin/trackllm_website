@@ -218,6 +218,18 @@ def test_nav_links_to_changes(tmp_path):
     assert 'href="changes.html"' in (tmp_path / "index.html").read_text()
 
 
+def test_nav_marks_only_the_current_page(tmp_path):
+    """body_class names the page, so it is what marks the nav link -- and a page
+    with no nav entry of its own (the Overview) marks none."""
+    _scaffold(tmp_path)
+    render_site(tmp_path, None, empty_status_inputs())
+    for page in ("changes", "spend", "methodology"):
+        html = (tmp_path / f"{page}.html").read_text()
+        assert f'<a href="{page}.html" class="active" aria-current="page">' in html
+        assert html.count("aria-current") == 1
+    assert "aria-current" not in (tmp_path / "index.html").read_text()
+
+
 def test_render_emits_methodology_page(tmp_path):
     _scaffold(tmp_path)
     render_site(tmp_path, None, empty_status_inputs())

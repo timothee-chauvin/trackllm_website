@@ -229,6 +229,72 @@ def test_monitoring_email_plain_has_event(tmp_path):
 
 
 # ---------------------------------------------------------------------------
+# HTML escaping — model/provider come from the OpenRouter catalog, not from us
+# ---------------------------------------------------------------------------
+
+
+def test_link_html_escapes_model_and_provider():
+    from trackllm_website.bi.digest import _link_html
+
+    html = _link_html("<script>alert(1)</script>", 'a"b&c')
+    assert "<script>" not in html
+    assert "&lt;script&gt;alert(1)&lt;/script&gt;" in html
+    assert "&quot;" in html and "&amp;" in html
+
+
+def test_onboarding_email_html_escapes_row_names(tmp_path):
+    from trackllm_website.bi.digest import (
+        OnboardRow,
+        OnboardingReport,
+        build_onboarding_email,
+    )
+
+    report = OnboardingReport(
+        date="2026-06-23",
+        rows=[
+            OnboardRow(
+                model="<img src=x onerror=alert(1)>",
+                provider="prov</a>",
+                outcome="onboarded",
+                n_bis=1,
+                spent=0.0,
+            )
+        ],
+    )
+    _make_ledger(tmp_path)
+    _, _, html = build_onboarding_email(report, tmp_path)
+    assert "<img src=x" not in html
+    assert "prov</a>" not in html
+
+
+def test_monitoring_email_html_escapes_row_names(tmp_path):
+    from trackllm_website.bi.digest import (
+        MonitorRow,
+        MonitorReport,
+        build_monitoring_email,
+    )
+
+    report = MonitorReport(
+        date="2026-06-23",
+        rows=[
+            MonitorRow(
+                model="<img src=x onerror=alert(1)>",
+                provider="prov</a>",
+                event="change_detected",
+                change_date="2026-06-20",
+                n_bis_after=1,
+                spent=0.0,
+            )
+        ],
+        n_endpoints=1,
+    )
+    _make_ledger(tmp_path)
+    _, _, html = build_monitoring_email(report, tmp_path)
+    assert "<img src=x" not in html
+    assert "prov</a>" not in html
+
+
+# ---------------------------------------------------------------------------
 # notable() gating — send_*_digest must NOT call send_email on empty reports
 # ---------------------------------------------------------------------------
 

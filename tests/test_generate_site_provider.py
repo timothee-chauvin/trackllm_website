@@ -239,6 +239,33 @@ def test_change_count_follows_changes_json_not_the_recomputed_scores(fake_site):
     assert view["lt"]["changes"] == len(view["changes"])
 
 
+def test_change_from_a_departed_endpoint_mints_no_phantom_variant(fake_site):
+    """A change whose endpoint has left the fleet has no exposure behind it and
+    no row to sit in: attributing it would publish a variant with 0 endpoints,
+    0 endpoint-years and N changes -- an infinite drift rate."""
+    changes_path = fake_site / "data" / "changes.json"
+    changes = json.loads(changes_path.read_text())
+    changes.append(
+        {
+            "date": "2026-06-10T00:00:00Z",
+            "slug": "org2fc23p2ffp4",
+            "model": "org/c",
+            "provider": "p/fp4",
+            "method": "LT",
+            "magnitude": 20.0,
+            "magnitude_display": "20σ",
+        }
+    )
+    changes_path.write_text(json.dumps(changes))
+
+    view = _views(fake_site)["p"]
+    assert {v["name"] for v in view["variants"]} == {"", "fp8"}
+    assert all(v["n_endpoints"] > 0 for v in view["variants"])
+    # what the page counts is what the page lists, still
+    lt_items = [c for c in view["changes"] if c["method"] == "lt"]
+    assert view["lt"]["changes"] == len(lt_items)
+
+
 def test_change_links_use_the_slug_the_provider_view_is_keyed_by(tmp_path):
     """A provider whose name does not slugify to itself must still resolve: the
     feed item's providerSlug is what the page links to, and provider pages are

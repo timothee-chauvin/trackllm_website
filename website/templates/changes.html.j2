@@ -1,4 +1,5 @@
 {% extends "base.html.j2" %}
+{% from "_macros.html.j2" import chip, search_box %}
 
 {% block title %}Changes | TrackLLM{% endblock %}
 
@@ -43,15 +44,12 @@
   <section class="block">
     <div class="sec-head"><h2>Log</h2><span class="hint" id="logCount"></span></div>
     <div class="toolbar">
-      <label class="search">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
-        <input id="q" type="text" placeholder="Search model, provider, or org…" autocomplete="off">
-      </label>
+      {{ search_box("q", "Search model, provider, or org…", "Search changes by model, provider, or org") }}
       <div class="chips" id="chips">
-        <span class="chip" data-f="lt">LT</span>
-        <span class="chip" data-f="b3it">B3IT</span>
-        <span class="chip state-changed" data-f="recent">Last 90 days</span>
-        <span class="chip state-changed" data-f="big">Large drift</span>
+        {{ chip("LT", "f", "lt") }}
+        {{ chip("B3IT", "f", "b3it") }}
+        {{ chip("Last 90 days", "f", "recent", state="state-changed") }}
+        {{ chip("Large drift", "f", "big", state="state-changed") }}
       </div>
     </div>
     <div class="feed" id="log"></div>

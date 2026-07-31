@@ -200,17 +200,41 @@ export function monthTicks(d0: number, d1: number): Date[] {
   return out;
 }
 
-/** Toggle `f` in `set`, mirroring membership in the chip's .on class. */
+/** Delegated activation for the widgets that are not native buttons: a pointer
+ *  click, plus the Enter/Space contract a role="button" element owes a keyboard.
+ *  Space is prevented so activating a control never scrolls the page instead. */
+export function bindActivation(
+  el: Element,
+  selector: string,
+  handler: (target: HTMLElement) => void
+): void {
+  const target = (e: Event): HTMLElement | null =>
+    (e.target as HTMLElement).closest(selector);
+  el.addEventListener("click", (e) => {
+    const t = target(e);
+    if (t) handler(t);
+  });
+  el.addEventListener("keydown", (e) => {
+    const ev = e as KeyboardEvent;
+    if (ev.key !== "Enter" && ev.key !== " ") return;
+    const t = target(ev);
+    if (!t) return;
+    ev.preventDefault();
+    handler(t);
+  });
+}
+
+/** Toggle `f` in `set`, mirroring membership in the chip's .on class and, for
+ *  assistive tech, in its aria-pressed state. */
 export function toggleChip(chip: HTMLElement, set: Set<string>, f: string): void {
   if (set.has(f)) { set.delete(f); chip.classList.remove("on"); }
   else { set.add(f); chip.classList.add("on"); }
+  chip.setAttribute("aria-pressed", String(set.has(f)));
 }
 
 /** The standard filter toolbar: each .chip toggles its data-f flag, then re-renders. */
 export function bindFilterChips(el: Element, filters: Set<string>, render: () => void): void {
-  el.addEventListener("click", (e) => {
-    const chip = (e.target as HTMLElement).closest(".chip") as HTMLElement | null;
-    if (!chip) return;
+  bindActivation(el, ".chip", (chip) => {
     toggleChip(chip, filters, chip.dataset.f!);
     render();
   });

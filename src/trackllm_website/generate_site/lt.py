@@ -43,72 +43,72 @@ class EndpointInfo:
         return self.last_query_date.strftime("%Y-%m-%d")
 
 
-def get_last_query_date(endpoint_dir: Path) -> datetime | None:
-    """Get the date of the last successful query for an endpoint."""
-    latest_date: datetime | None = None
+def get_prompt_last_query_date(prompt_dir: Path) -> datetime | None:
+    """Get the date of the last successful query for a single prompt."""
+    # Get month directories sorted in reverse (newest first)
+    month_dirs = sorted(
+        [d for d in prompt_dir.iterdir() if d.is_dir() and "-" in d.name],
+        reverse=True,
+    )
 
-    for prompt_dir in endpoint_dir.iterdir():
-        if not prompt_dir.is_dir():
+    for month_dir in month_dirs:
+        queries_file = month_dir / "queries.json"
+        if not queries_file.exists():
             continue
 
-        # Get month directories sorted in reverse (newest first)
-        month_dirs = sorted(
-            [d for d in prompt_dir.iterdir() if d.is_dir() and "-" in d.name],
-            reverse=True,
-        )
+        try:
+            with open(queries_file, "r") as f:
+                queries = json.load(f)
+        except (json.JSONDecodeError, IOError):
+            continue
 
-        for month_dir in month_dirs:
-            queries_file = month_dir / "queries.json"
-            if not queries_file.exists():
+        if not queries:
+            continue
+
+        # Parse year-month from directory name
+        try:
+            year, month = map(int, month_dir.name.split("-"))
+        except ValueError:
+            continue
+
+        # Find the last successful query (not an error)
+        for date_str, idx in reversed(queries):
+            # Skip errors (e.g., "e0", "e1")
+            if isinstance(idx, str) and idx.startswith("e"):
                 continue
 
+            # Parse date "DD HH:MM:SS"
             try:
-                with open(queries_file, "r") as f:
-                    queries = json.load(f)
-            except (json.JSONDecodeError, IOError):
-                continue
-
-            if not queries:
-                continue
-
-            # Parse year-month from directory name
-            try:
-                year, month = map(int, month_dir.name.split("-"))
+                day_time = datetime.strptime(date_str, "%d %H:%M:%S")
+                return datetime(
+                    year,
+                    month,
+                    day_time.day,
+                    day_time.hour,
+                    day_time.minute,
+                    day_time.second,
+                    tzinfo=timezone.utc,
+                )
             except ValueError:
                 continue
 
-            # Find the last successful query (not an error)
-            for date_str, idx in reversed(queries):
-                # Skip errors (e.g., "e0", "e1")
-                if isinstance(idx, str) and idx.startswith("e"):
-                    continue
+        # This month held only errors (or unparsable dates): try the older ones
 
-                # Parse date "DD HH:MM:SS"
-                try:
-                    day_time = datetime.strptime(date_str, "%d %H:%M:%S")
-                    query_date = datetime(
-                        year,
-                        month,
-                        day_time.day,
-                        day_time.hour,
-                        day_time.minute,
-                        day_time.second,
-                        tzinfo=timezone.utc,
-                    )
+    return None
 
-                    if latest_date is None or query_date > latest_date:
-                        latest_date = query_date
 
-                    # Found latest in this month, move to next prompt
-                    break
-                except ValueError:
-                    continue
+def get_last_query_date(endpoint_dir: Path) -> datetime | None:
+    """Get the date of the last successful query for an endpoint.
 
-            # If we found a date in the latest month, no need to check older months
-            if latest_date is not None:
-                break
-
-    return latest_date
+    Each prompt is scanned on its own: a date found for one prompt must not cut
+    short the month scan of another, whose newest month may hold only errors.
+    """
+    dates = (
+        get_prompt_last_query_date(prompt_dir)
+        for prompt_dir in sorted(endpoint_dir.iterdir())
+        if prompt_dir.is_dir()
+    )
+    return max((d for d in dates if d is not None), default=None)
 
 
 def get_endpoint_info(endpoint_dir: Path) -> EndpointInfo | None:

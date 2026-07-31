@@ -1,4 +1,5 @@
 {% extends "base.html.j2" %}
+{% from "_macros.html.j2" import chip, search_box %}
 
 {% block title %}{{ provider }} | TrackLLM{% endblock %}
 
@@ -45,37 +46,34 @@
       <h2>Serving variants</h2>
       <span class="hint">a provider's quantizations are separate serving stacks and drift separately</span>
     </div>
-    <div class="table-wrap"><table class="dir">
+    <div class="table-wrap"><div class="table-scroll"><table class="dir">
       <thead><tr>
-        <th>Variant</th><th class="r">Endpoints</th><th>LT drift rate</th>
-        <th class="col-hide">Monitoring</th><th class="r col-hide">Changes</th><th class="r col-hide">B3IT</th>
+        <th scope="col">Variant</th><th scope="col" class="r">Endpoints</th><th scope="col">LT drift rate</th>
+        <th scope="col" class="col-hide">Monitoring</th><th scope="col" class="r col-hide">Changes</th><th scope="col" class="r col-hide">B3IT</th>
       </tr></thead>
       <tbody id="variantBody"></tbody>
-    </table></div>
+    </table></div></div>
   </section>
 
   <section class="block">
     <div class="sec-head"><h2>Endpoints</h2><span class="hint" id="epCount"></span></div>
     <div class="toolbar">
-      <label class="search">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
-        <input id="epq" type="text" placeholder="Search model or org…" autocomplete="off">
-      </label>
+      {{ search_box("epq", "Search model or org…", "Search this provider's endpoints by model or org") }}
       <div class="chips" id="epChips">
-        <span class="chip state-changed" data-f="changed">Ever changed</span>
-        <span class="chip state-retired" data-f="retired">Retired</span>
-        <span class="chip" data-f="b3it">B3IT</span>
+        {{ chip("Ever changed", "f", "changed", state="state-changed") }}
+        {{ chip("Retired", "f", "retired", state="state-retired") }}
+        {{ chip("B3IT", "f", "b3it") }}
       </div>
     </div>
     <div class="table-wrap"><div class="table-scroll"><table class="dir">
       <thead><tr>
-        <th data-sort="model">Model <span class="arr"></span></th>
-        <th data-sort="provider" class="col-hide">Variant <span class="arr"></span></th>
-        <th data-sort="status">Status <span class="arr"></span></th>
-        <th data-sort="nChanges" class="r">Changes <span class="arr"></span></th>
-        <th class="col-hide">Methods</th>
-        <th data-sort="stableDays" class="r col-hide">Stable for <span class="arr"></span></th>
-        <th class="col-hide">Drift from baseline</th>
+        <th scope="col" data-sort="model">Model <span class="arr"></span></th>
+        <th scope="col" data-sort="provider" class="col-hide">Variant <span class="arr"></span></th>
+        <th scope="col" data-sort="status">Status <span class="arr"></span></th>
+        <th scope="col" data-sort="nChanges" class="r">Changes <span class="arr"></span></th>
+        <th scope="col" class="col-hide">Methods</th>
+        <th scope="col" data-sort="stableDays" class="r col-hide">Stable for <span class="arr"></span></th>
+        <th scope="col" class="col-hide">Drift from baseline</th>
       </tr></thead>
       <tbody id="epBody"></tbody>
     </table></div><div class="dir-foot" id="epFoot"></div></div>

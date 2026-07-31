@@ -133,6 +133,62 @@ def test_stats_report_affected_endpoints_and_providers(fake_site):
     assert stats["largest_lt_drift"] == pytest.approx(2.0)
 
 
+def test_providers_involved_ignores_changes_with_no_provider(fake_site):
+    """A change whose endpoint has left the fleet carries no provider (the
+    merge_changes fallback); an empty providerSlug is not a provider."""
+    changes_path = fake_site / "data" / "changes.json"
+    changes = json.loads(changes_path.read_text())
+    changes.append(
+        {
+            "date": "2026-06-05T00:00:00Z",
+            "slug": "gone2fslug",
+            "model": "gone2fslug",
+            "provider": "",
+            "method": "LT",
+            "magnitude": 5.0,
+            "magnitude_display": "5σ",
+        }
+    )
+    changes_path.write_text(json.dumps(changes))
+
+    stats = _build(fake_site)["stats"]
+    assert stats["total"] == 4
+    assert stats["providers_involved"] == 2
+
+
+def test_changes_30d_spans_b3it_observations_newer_than_the_last_lt_one(fake_site):
+    """The window is measured against the newest observation of either method, so
+    a B3IT change after the last logprob observation is not dated in the future."""
+    write_b3it_series(
+        fake_site,
+        "org/c",
+        "r",
+        status="monitoring",
+        retired=None,
+        month="2026-07",
+        tokens=["A"] * 12 + ["B"] * 12,
+    )
+    changes_path = fake_site / "data" / "changes.json"
+    changes = json.loads(changes_path.read_text())
+    changes.append(
+        {
+            "date": "2026-07-13T00:00:00+00:00",
+            "slug": b3it_slug("org/c", "r"),
+            "model": "org/c",
+            "provider": "r",
+            "method": "B3IT",
+            "magnitude": None,
+            "magnitude_display": "",
+        }
+    )
+    changes_path.write_text(json.dumps(changes))
+
+    page = _build(fake_site)
+    assert page["stats"]["now"] == "2026-07-24"
+    assert min(i["daysAgo"] for i in page["items"]) >= 0
+    assert page["stats"]["changes_30d"] == 1
+
+
 def test_b3it_changes_are_counted_alongside_lt(fake_site_with_b3it):
     page = _build(fake_site_with_b3it)
     assert page["stats"]["total"] == 4

@@ -14,15 +14,17 @@ import {
   td,
 } from "./components";
 
+// drift/peakTV are null when the level the change reached is unknown: the series
+// has no point on or after it (model.py, mirroring feed.py and endpoint.ts).
 interface LTChange {
   date: string;
   sigma: string;
-  drift: number;
+  drift: number | null;
 }
 
 interface B3ITChange {
   date: string;
-  peakTV: number;
+  peakTV: number | null;
 }
 
 interface EndpointLT {
@@ -157,12 +159,17 @@ export async function init(): Promise<void> {
     0.5,
     ...D.endpoints
       .filter((e) => e.lt)
-      .flatMap((e) => e.lt!.drift.map((p) => p[1]).concat(e.lt!.changes.map((c) => c.drift)))
+      .flatMap((e) =>
+        e.lt!.drift
+          .map((p) => p[1])
+          .concat(e.lt!.changes.map((c) => c.drift).filter((d) => d !== null))
+      )
   );
 
+  /** `y` is null when the level is unknown: the dot has nowhere honest to sit. */
   interface Mark {
     date: string;
-    y: number;
+    y: number | null;
     color: string;
     title: string;
   }
@@ -190,9 +197,9 @@ export async function init(): Promise<void> {
         ? ep.lt.changes.map(
             (c): Mark => ({
               date: c.date,
-              y: y(c.drift, LT_MAX),
+              y: c.drift === null ? null : y(c.drift, LT_MAX),
               color: "var(--accent)",
-              title: `LT ${c.date} · ${c.sigma}, drift ${c.drift} nats`,
+              title: `LT ${c.date} · ${c.sigma}, drift ${c.drift === null ? "—" : `${c.drift} nats`}`,
             })
           )
         : []),
@@ -200,9 +207,9 @@ export async function init(): Promise<void> {
         ? ep.b3it.changes.map(
             (c): Mark => ({
               date: c.date,
-              y: y(c.peakTV, B3IT_CAP),
+              y: c.peakTV === null ? null : y(c.peakTV, B3IT_CAP),
               color: "var(--b3it)",
-              title: `B3IT ${c.date} · peak TV ${c.peakTV}`,
+              title: `B3IT ${c.date} · peak TV ${c.peakTV === null ? "—" : c.peakTV}`,
             })
           )
         : []),
@@ -210,6 +217,11 @@ export async function init(): Promise<void> {
     const dots = marks
       .map((m) => {
         const x = xpos(m.date).toFixed(1);
+        // Unknown level: a dashed rule the full height of the strip, never a dot —
+        // a dot sits at a level, and this change was never measured at one.
+        if (m.y === null) {
+          return `<line x1="${x}" y1="3" x2="${x}" y2="${H - 3}" stroke="${m.color}" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"><title>${esc(m.title)}</title></line>`;
+        }
         return `<line x1="${x}" y1="${H - 3}" x2="${x}" y2="${m.y.toFixed(1)}" stroke="${m.color}" stroke-width="1" opacity="0.35"/>
       <circle cx="${x}" cy="${m.y.toFixed(1)}" r="3.4" fill="${m.color}"><title>${esc(m.title)}</title></circle>`;
       })

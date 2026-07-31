@@ -241,6 +241,110 @@ def test_change_count_follows_changes_json_not_the_recomputed_scores(fake_site):
     assert sum(e["nChanges"] for e in ov["endpoints"]) == ov["stats"]["changes_total"]
 
 
+def test_directory_status_ignores_a_recompute_change_absent_from_changes_json(
+    fake_site,
+):
+    """status/stableDays read the same canonical list as nChanges. Reading them
+    from lt_scores.json instead put "stable for N days" next to a nonzero change
+    count -- or "changed" next to a zero one -- on the very same row."""
+    (fake_site / "data" / "changes.json").write_text(json.dumps([]))
+
+    ov = _build_overview(fake_site)
+    ep = next(e for e in ov["endpoints"] if e["slug"] == "m2fa23p")
+    assert ep["nChanges"] == 0
+    assert ep["status"] == "stable"
+    # stable since the first observation (2026-06-01), not since the recompute's change
+    assert ep["stableDays"] == 29
+
+
+def test_directory_status_follows_a_canonical_change_absent_from_the_recompute(
+    fake_site,
+):
+    scores_path = fake_site / "data" / "lt" / "m2fa23p" / "lt_scores.json"
+    scores = json.loads(scores_path.read_text())
+    scores["changes"] = []
+    scores_path.write_text(json.dumps(scores))
+
+    ov = _build_overview(fake_site)
+    ep = next(e for e in ov["endpoints"] if e["slug"] == "m2fa23p")
+    assert ep["nChanges"] == 1
+    assert ep["status"] == "changed"
+    assert ep["stableDays"] == 5  # 2026-06-25 -> 2026-06-30
+
+
+def test_b3it_row_status_counts_an_epoch_closure_change(tmp_path):
+    """A closure-only change (`change_detected`, no derived onset in the view)
+    reaches changes.json through merge_changes, so the row must not read stable."""
+    root = tmp_path / "website"
+    dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 31)]
+    write_lt_endpoint(
+        root, "m2fa23p", "m/a", "p", dates=dates, changes=[], drift=[0.1] * 30
+    )
+    write_b3it_series(
+        root,
+        "m/b",
+        "q",
+        status="monitoring",
+        retired=None,
+        month="2026-06",
+        tokens=["A"] * 24,  # a flat series: the view derives no onset of its own
+    )
+    slug = slugify("m/b#q")
+    (root / "data" / "changes.json").write_text(
+        json.dumps(
+            [
+                {
+                    "date": "2026-06-20T00:00:00+00:00",
+                    "slug": slug,
+                    "model": "m/b",
+                    "provider": "q",
+                    "method": "B3IT",
+                    "magnitude": None,
+                    "magnitude_display": "",
+                }
+            ]
+        )
+    )
+
+    ov = _build_overview(root)
+    ep = next(e for e in ov["endpoints"] if e["slug"] == slug)
+    assert ep["nChanges"] == 1
+    assert ep["status"] == "changed"
+    assert ep["stableDays"] == 10  # 2026-06-20 -> 2026-06-30
+
+
+def test_now_spans_b3it_observations_newer_than_the_last_lt_one(tmp_path):
+    """The site clock is the newest observation of either method. Taking LT alone
+    dated a newer B3IT change in the future: a negative age on the feed, and a
+    change missing from the 30-day count."""
+    root = tmp_path / "website"
+    dates = [f"2026-05-{d:02d}T00:00:00Z" for d in range(1, 11)]
+    write_lt_endpoint(
+        root, "m2fa23p", "m/a", "p", dates=dates, changes=[], drift=[0.1] * 10
+    )
+    write_b3it_series(
+        root,
+        "m/b",
+        "q",
+        status="monitoring",
+        retired=None,
+        month="2026-06",
+        tokens=["A"] * 12 + ["B"] * 12,
+    )
+    views = discover_b3it_views(
+        root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
+    )
+    (root / "data" / "changes.json").write_text(
+        json.dumps(to_json(merge_changes({}, {}, views)))
+    )
+
+    ov = _build_overview(root)
+    assert ov["stats"]["now"] == "2026-06-24"
+    (item,) = [f for f in ov["feed"] if f["method"] == "b3it"]
+    assert item["daysAgo"] >= 0
+    assert ov["stats"]["changes_30d"] == 1
+
+
 def test_endpoint_rows_carry_model_slug(fake_site):
     ov = _build_overview(fake_site)
     ep = next(e for e in ov["endpoints"] if e["slug"] == "m2fa23p")
