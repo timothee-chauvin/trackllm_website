@@ -118,6 +118,12 @@ def _build_endpoint(
         date_range += [lt_out["drift"][0][0], lt_out["drift"][-1][0]]
     if b3it_out and b3it_out["tv"]:
         date_range += [b3it_out["tv"][0][0], b3it_out["tv"][-1][0]]
+    # The changes are on the axis too, and a change can fall outside the observed
+    # span (one recorded after the endpoint's last sampled point). model.ts maps
+    # dates onto date_min..date_max, so leaving it out puts its mark -- the dashed
+    # "level unknown" rule -- outside the viewBox, where it is simply invisible.
+    for lane in (lt_out, b3it_out):
+        date_range += [c["date"] for c in lane["changes"]] if lane else []
 
     n_changes = (len(lt_out["changes"]) if lt_out else 0) + (
         len(b3it_out["changes"]) if b3it_out else 0
