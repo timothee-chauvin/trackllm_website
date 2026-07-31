@@ -10,11 +10,7 @@ from pydantic import BaseModel
 from trackllm_website.api import OpenRouterClient
 from trackllm_website.bi.results import load_phase2_results
 from trackllm_website.bi.common import QueryStrategy, resolve_strategies
-from trackllm_website.bi.detection import (
-    adaptive_transitions,
-    epoch_tv_series,
-    is_unstable,
-)
+from trackllm_website.bi.detection import adaptive_transitions, epoch_tv_series
 from trackllm_website.bi.phase_2 import (
     get_output_path,
     load_existing_results,
@@ -37,7 +33,6 @@ from trackllm_website.util import gather_with_concurrency
 class Decision(BaseModel):
     action: Literal["none", "reinit", "retire_stalled"]
     change_date: datetime | None = None
-    unstable: bool = False
     detector: Literal["adaptive", "scan"] | None = None
 
 
@@ -77,7 +72,6 @@ def decide(state: EndpointBIState, results: dict, now: datetime) -> Decision:
         return Decision(
             action="reinit",
             change_date=datetime.fromisoformat(events[-1]),
-            unstable=is_unstable(epoch_results),
             detector="adaptive",
         )
     # Young epochs are invisible to the adaptive rule (it needs ~9 batches of
@@ -88,10 +82,9 @@ def decide(state: EndpointBIState, results: dict, now: datetime) -> Decision:
         return Decision(
             action="reinit",
             change_date=datetime.fromisoformat(scan_event.split_ts),
-            unstable=is_unstable(epoch_results),
             detector="scan",
         )
-    return Decision(action="none", unstable=is_unstable(epoch_results))
+    return Decision(action="none")
 
 
 async def run_endpoint(

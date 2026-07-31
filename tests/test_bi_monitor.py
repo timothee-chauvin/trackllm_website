@@ -50,7 +50,6 @@ def test_stable_endpoint_no_action():
     state, results = open_state_from_fixture("openai2fgpt-4o-mini23azure")
     decision = decide(state, results, datetime(2026, 2, 15, tzinfo=timezone.utc))
     assert decision.action == "none"
-    assert decision.unstable is False
 
 
 def test_stalled_endpoint_retired():

@@ -297,8 +297,6 @@ async def resolve_strategies(
 
     return result, failed
 
-    return result
-
 
 _file_semaphore: asyncio.Semaphore | None = None
 
