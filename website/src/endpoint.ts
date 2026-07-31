@@ -5,7 +5,7 @@ export {};
 
 import { showLoadError } from "./components";
 import { readingCaption } from "./caption";
-import { MONTH_NAMES, monthTicks, td } from "./components";
+import { MONTH_NAMES, esc, monthTicks, td } from "./components";
 
 interface ManifestData {
   slug: string;
@@ -142,7 +142,7 @@ function renderStatusCard(lt: FocusLT | null, b3it: FocusB3IT | null, state: Sta
   const monitored = first && lastObserved ? `${fmtMon(first)} – ${fmtMon(lastObserved)}` : "—";
 
   el.innerHTML = `
-    ${state ? `<div><div class="k">Status</div><div class="v"><span class="pill ${state}"><span class="led"></span>${LABEL[state]}</span></div></div>` : ""}
+    ${state ? `<div><div class="k">Status</div><div class="v"><span class="pill ${esc(state)}"><span class="led"></span>${LABEL[state]}</span></div></div>` : ""}
     <div><div class="k">Monitored</div><div class="v">${monitored}</div></div>
     <div><div class="k">Changes</div><div class="v">${nLT + nB3} <small>(${nLT} LT · ${nB3} B3IT)</small></div></div>`;
 }
@@ -163,6 +163,11 @@ function renderChart(lt: FocusLT | null, b3it: FocusB3IT | null): void {
   const anchors = [
     lt?.drift[0]?.[0], last(lt?.drift ?? [])?.[0],
     b3it?.tv[0]?.[0], last(b3it?.tv ?? [])?.[0],
+    // the changepoint rules are on this axis too, and a change can fall outside the
+    // observed span (one recorded after the last sampled point) -- same reason
+    // model.py folds them into its date_range
+    ...(lt?.changes ?? []).map((c) => c.date),
+    ...(b3it?.changes ?? []).map((c) => c.date),
   ].filter((d): d is string => !!d);
   if (!anchors.length) {
     chartEl.innerHTML = `<div style="padding:2rem 1rem;color:var(--text-dim);font-size:0.85rem">No monitoring data available yet for this endpoint.</div>`;
@@ -229,7 +234,7 @@ function renderChart(lt: FocusLT | null, b3it: FocusB3IT | null): void {
       const labY = c.lane === "lt" ? TOP1 - 8 : TOP2 - 8;
       return `<line x1="${c.x.toFixed(1)}" y1="${TOP1 - 4}" x2="${c.x.toFixed(1)}" y2="${TOP2 + LANE_H}" stroke="${c.col}" stroke-width="1" stroke-dasharray="3 3" opacity="0.55"/>
         <circle cx="${c.x.toFixed(1)}" cy="${(labY + 4).toFixed(1)}" r="2.6" fill="${c.col}"/>
-        <text x="${c.x.toFixed(1)}" y="${labY}" fill="${c.col}" font-size="10.5" font-family="var(--mono)" font-weight="600" text-anchor="middle">${c.lab}</text>`;
+        <text x="${c.x.toFixed(1)}" y="${labY}" fill="${c.col}" font-size="10.5" font-family="var(--mono)" font-weight="600" text-anchor="middle">${esc(c.lab)}</text>`;
     })
     .join("");
 
@@ -267,10 +272,10 @@ function renderChangesTable(lt: FocusLT | null, b3it: FocusB3IT | null): void {
   el.innerHTML = rows
     .map(
       (r) => `<tr>
-    <td class="date">${r.date}</td>
+    <td class="date">${esc(r.date)}</td>
     <td><span class="badge ${r.method}">${r.method}</span></td>
     <td class="r mag" style="color:${r.method === "lt" ? "var(--accent)" : "var(--b3it)"}">${r.mag}</td>
-    <td class="r num" style="color:var(--text-muted)">${r.conf}</td></tr>`
+    <td class="r num" style="color:var(--text-muted)">${esc(r.conf)}</td></tr>`
     )
     .join("");
 }

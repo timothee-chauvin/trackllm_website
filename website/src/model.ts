@@ -178,7 +178,10 @@ export async function init(): Promise<void> {
    *  An LT dot and a B3IT dot never share a scale: nats go through the model-wide LT
    *  scale, total variation through its own 0..B3IT_CAP one. */
   function strip(ep: ModelEndpoint): string {
-    const sig = ep.lt ? ep.lt.drift : ep.b3it ? ep.b3it.tv : [];
+    // an lt lane can carry changes and no points at all (model.py), so which lane
+    // draws the line is decided on the points, not on which lanes exist
+    const onLT = !!ep.lt?.drift.length;
+    const sig = onLT ? ep.lt!.drift : ep.b3it ? ep.b3it.tv : [];
     const H = 40, pad = 5;
     const y = (v: number, dmax: number): number =>
       H - pad - (Math.min(v, dmax) / dmax) * (H - 2 * pad);
@@ -187,11 +190,11 @@ export async function init(): Promise<void> {
         ? sig
             .map(
               (p, i) =>
-                `${i ? "L" : "M"}${xpos(p[0]).toFixed(1)} ${y(p[1], ep.lt ? LT_MAX : B3IT_CAP).toFixed(1)}`
+                `${i ? "L" : "M"}${xpos(p[0]).toFixed(1)} ${y(p[1], onLT ? LT_MAX : B3IT_CAP).toFixed(1)}`
             )
             .join(" ")
         : "";
-    const col = ep.lt ? "var(--accent)" : "var(--b3it)";
+    const col = onLT || !ep.b3it ? "var(--accent)" : "var(--b3it)";
     const marks: Mark[] = [
       ...(ep.lt
         ? ep.lt.changes.map(
@@ -258,9 +261,10 @@ export async function init(): Promise<void> {
 
   function row(ep: ModelEndpoint): string {
     if (!ep.methods.length) return untrackedRow(ep);
-    const peak = ep.lt
+    // on the points, not on the lane: Math.max of an empty lane is -Infinity
+    const peak = ep.lt?.drift.length
       ? `${Math.max(...ep.lt.drift.map((p) => p[1])).toFixed(2)} nats`
-      : ep.b3it
+      : ep.b3it?.tv.length
         ? `TV ${Math.max(...ep.b3it.tv.map((p) => p[1])).toFixed(2)}`
         : "—";
     const last = [

@@ -95,12 +95,16 @@ def _build_endpoint(
     lt_out = None
     lt = load_lt_data(lt_dir, slug) if ep is not None else None
     if lt is not None:
+        # The changes are published whether or not the drift lane has points to
+        # level them against: an empty lane (lt_drift.py yields none under three
+        # distinct observation days) makes each level unknown, not each change
+        # nonexistent. Dropping them would leave the endpoint page and the
+        # directory row disagreeing about how many changes this endpoint has.
         drift_pairs = [(d.date().isoformat(), v) for d, v in lt.drift]
-        if drift_pairs:
-            lt_out = {
-                "drift": [list(p) for p in _downsample_pairs(drift_pairs, TRACE_LEN)],
-                "changes": _lt_changes(_by_method(canonical, "LT"), drift_pairs),
-            }
+        lt_out = {
+            "drift": [list(p) for p in _downsample_pairs(drift_pairs, TRACE_LEN)],
+            "changes": _lt_changes(_by_method(canonical, "LT"), drift_pairs),
+        }
 
     b3it_out = None
     if view is not None and view.tv_series["dates"]:

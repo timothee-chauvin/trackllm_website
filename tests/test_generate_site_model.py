@@ -286,6 +286,39 @@ def test_lt_change_after_the_last_series_point_has_no_level(tmp_path):
     assert view["date_max"] >= "2026-06-20"
 
 
+def test_lt_changes_survive_an_empty_drift_lane(tmp_path):
+    """An LT series whose drift lane is empty (lt_drift returns nothing under three
+    distinct observation days) must still publish its canonical changes: the level
+    each one reached is unknown, the change itself is not. Dropping them leaves the
+    endpoint page saying "Changed" beside a count of zero."""
+    root = tmp_path / "website"
+    dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 11)]
+    write_lt_endpoint(root, "m2fa23p1", "m/a", "p1", dates=dates, changes=[], drift=[])
+    (root / "data" / "changes.json").write_text(
+        json.dumps(
+            [
+                {
+                    "date": dates[5],
+                    "slug": "m2fa23p1",
+                    "model": "m/a",
+                    "provider": "p1",
+                    "method": "LT",
+                    "magnitude": 12.0,
+                    "magnitude_display": "12σ",
+                }
+            ]
+        )
+    )
+
+    view = _build_model_views(root)[slugify("m/a")]
+    ep = view["endpoints"][0]
+    assert ep["lt"]["drift"] == []
+    assert [c["date"] for c in ep["lt"]["changes"]] == [dates[5][:10]]
+    assert ep["lt"]["changes"][0]["drift"] is None
+    assert ep["n_changes"] == 1
+    assert len(view["changes"]) == 1
+
+
 def test_b3it_change_after_the_last_series_point_has_no_peak(tmp_path):
     root = tmp_path / "website"
     _write_b3it_with_transition(root, "m2fa23p2", "m/a", "p2")

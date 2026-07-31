@@ -443,6 +443,44 @@ def test_endpoint_manifest_carries_the_canonical_status_and_changes(tmp_path):
     assert len(manifest["changes"]["lt"]) == row["nChanges"]
 
 
+def test_endpoint_manifest_count_matches_the_row_without_a_drift_lane(tmp_path):
+    """The count the page prints is the row's, whatever the series can level: an
+    endpoint whose drift lane is empty must not read "Changed · 0 changes"."""
+    _scaffold(tmp_path)
+    write_lt_endpoint(
+        tmp_path, "m2fb23p", "m/b", "p", dates=DATES, changes=[], drift=[]
+    )
+    (tmp_path / "data" / "lt" / "lt_changes.json").write_text(
+        json.dumps(
+            {
+                "m2fb23p": [
+                    {
+                        "endpoint": "m2fb23p",
+                        "index": 3,
+                        "date": DATES[3],
+                        "sigma": 9.0,
+                        "first_detected": DATES[4],
+                    }
+                ]
+            }
+        )
+    )
+
+    render_site(tmp_path, None, empty_status_inputs())
+
+    manifest = _manifest((tmp_path / "endpoints" / "m2fb23p.html").read_text())
+    row = next(
+        e
+        for e in json.loads((tmp_path / "data" / "overview.json").read_text())[
+            "endpoints"
+        ]
+        if e["slug"] == "m2fb23p"
+    )
+    assert manifest["state"] == row["status"] == "changed"
+    assert len(manifest["changes"]["lt"]) == row["nChanges"] == 1
+    assert manifest["changes"]["lt"][0]["drift"] is None
+
+
 def test_render_emits_status_pages_for_catalog_endpoints(tmp_path):
     _scaffold(tmp_path)
     inputs = empty_status_inputs()
