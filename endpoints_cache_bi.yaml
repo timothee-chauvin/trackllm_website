@@ -603,6 +603,12 @@ too_expensive:
   - 3.6
 - api: openrouter
   model: moonshotai/kimi-k2.7-code
+  provider: alibaba/fp8
+  cost:
+  - 0.95
+  - 4.0
+- api: openrouter
+  model: moonshotai/kimi-k2.7-code
   provider: atlas-cloud/int4
   cost:
   - 0.95
@@ -655,6 +661,18 @@ too_expensive:
   cost:
   - 3.0
   - 15.0
+- api: openrouter
+  model: moonshotai/kimi-k3
+  provider: wafer
+  cost:
+  - 3.0
+  - 15.0
+- api: openrouter
+  model: moonshotai/kimi-k3
+  provider: wafer/fast
+  cost:
+  - 4.5
+  - 22.5
 - api: openrouter
   model: morph/morph-v3-fast
   provider: morph
@@ -1389,6 +1407,12 @@ too_expensive:
   - 3.2
 - api: openrouter
   model: z-ai/glm-5.1
+  provider: alibaba/fp8
+  cost:
+  - 1.33
+  - 4.18
+- api: openrouter
+  model: z-ai/glm-5.1
   provider: gmicloud/fp8
   cost:
   - 0.98
@@ -1599,11 +1623,53 @@ bad_temperature:
   - 1.0
   - 5.0
 - api: openrouter
+  model: google/gemini-3.1-pro-preview
+  provider: google-ai-studio/flex
+  cost:
+  - 1.0
+  - 6.0
+- api: openrouter
+  model: google/gemini-3.5-flash-lite
+  provider: google-vertex/global
+  cost:
+  - 0.3
+  - 2.5
+- api: openrouter
+  model: google/gemini-3.5-flash-lite
+  provider: google-vertex/global/flex
+  cost:
+  - 0.15
+  - 1.25
+- api: openrouter
+  model: google/gemini-3.5-flash-lite
+  provider: google-vertex/global/priority
+  cost:
+  - 0.54
+  - 4.5
+- api: openrouter
   model: google/gemini-3.5-flash-lite:batch
   provider: google-vertex/global
   cost:
   - 0.15
   - 1.25
+- api: openrouter
+  model: google/gemini-3.6-flash
+  provider: google-vertex/global
+  cost:
+  - 1.5
+  - 7.5
+- api: openrouter
+  model: google/gemini-3.6-flash
+  provider: google-vertex/global/flex
+  cost:
+  - 0.75
+  - 3.75
+- api: openrouter
+  model: google/gemini-3.6-flash
+  provider: google-vertex/global/priority
+  cost:
+  - 2.7
+  - 13.5
 - api: openrouter
   model: google/gemini-3.6-flash:batch
   provider: google-vertex/global
@@ -1616,6 +1682,30 @@ bad_temperature:
   cost:
   - 0.3
   - 1.2
+- api: openrouter
+  model: moonshotai/kimi-k2.5
+  provider: moonshotai/int4
+  cost:
+  - 0.6
+  - 3.0
+- api: openrouter
+  model: moonshotai/kimi-k2.6
+  provider: moonshotai/int4
+  cost:
+  - 0.95
+  - 4.0
+- api: openrouter
+  model: moonshotai/kimi-k2.7-code
+  provider: moonshotai/highspeed
+  cost:
+  - 1.9
+  - 8.0
+- api: openrouter
+  model: moonshotai/kimi-k2.7-code
+  provider: moonshotai/int4
+  cost:
+  - 0.95
+  - 4.0
 - api: openrouter
   model: moonshotai/kimi-k3
   provider: moonshotai/int4
@@ -1954,6 +2044,12 @@ bad_temperature:
   - 28.0
 - api: openrouter
   model: openai/gpt-5.4
+  provider: amazon-bedrock/us-east-1
+  cost:
+  - 2.7500000000000004
+  - 16.5
+- api: openrouter
+  model: openai/gpt-5.4
   provider: azure
   cost:
   - 2.5
@@ -2098,6 +2194,12 @@ bad_temperature:
   - 15.0
 - api: openrouter
   model: openai/gpt-5.5
+  provider: amazon-bedrock/us-east-1
+  cost:
+  - 5.500000000000001
+  - 33.0
+- api: openrouter
+  model: openai/gpt-5.5
   provider: azure
   cost:
   - 5.0
@@ -2158,6 +2260,12 @@ bad_temperature:
   - 37.5
 - api: openrouter
   model: openai/gpt-5.6-luna
+  provider: amazon-bedrock/us-east-1
+  cost:
+  - 0.22
+  - 1.3200000000000003
+- api: openrouter
+  model: openai/gpt-5.6-luna
   provider: azure
   cost:
   - 1.0
@@ -2218,6 +2326,12 @@ bad_temperature:
   - 12.0
 - api: openrouter
   model: openai/gpt-5.6-sol
+  provider: amazon-bedrock/us-east-1
+  cost:
+  - 5.500000000000001
+  - 33.0
+- api: openrouter
+  model: openai/gpt-5.6-sol
   provider: azure
   cost:
   - 5.0
@@ -2276,6 +2390,12 @@ bad_temperature:
   cost:
   - 10.0
   - 60.0
+- api: openrouter
+  model: openai/gpt-5.6-terra
+  provider: amazon-bedrock/us-east-1
+  cost:
+  - 2.2000000000000006
+  - 13.2
 - api: openrouter
   model: openai/gpt-5.6-terra
   provider: azure
@@ -2414,3 +2534,329 @@ bad_temperature:
   cost:
   - 0.112
   - 0.224
+unprobeable:
+- api: openrouter
+  model: anthropic/claude-haiku-4.5:batch
+  provider: anthropic
+  cost:
+  - 0.5
+  - 2.5
+  reason: batch
+  detail: null
+- api: openrouter
+  model: anthropic/claude-opus-4.1:batch
+  provider: anthropic
+  cost:
+  - 7.5
+  - 37.5
+  reason: batch
+  detail: null
+- api: openrouter
+  model: anthropic/claude-opus-4.5:batch
+  provider: anthropic
+  cost:
+  - 2.5
+  - 12.5
+  reason: batch
+  detail: null
+- api: openrouter
+  model: anthropic/claude-opus-4.6:batch
+  provider: anthropic
+  cost:
+  - 2.5
+  - 12.5
+  reason: batch
+  detail: null
+- api: openrouter
+  model: anthropic/claude-sonnet-4.5:batch
+  provider: anthropic
+  cost:
+  - 1.5
+  - 7.5
+  reason: batch
+  detail: null
+- api: openrouter
+  model: google/gemini-2.5-flash-lite:batch
+  provider: google-vertex/eu
+  cost:
+  - 0.05
+  - 0.2
+  reason: batch
+  detail: null
+- api: openrouter
+  model: google/gemini-2.5-flash:batch
+  provider: google-vertex/global
+  cost:
+  - 0.15
+  - 1.25
+  reason: batch
+  detail: null
+- api: openrouter
+  model: google/gemini-2.5-pro:batch
+  provider: google-vertex/global
+  cost:
+  - 0.625
+  - 5.0
+  reason: batch
+  detail: null
+- api: openrouter
+  model: google/gemini-3-flash-preview:batch
+  provider: google-vertex/global
+  cost:
+  - 0.25
+  - 1.5
+  reason: batch
+  detail: null
+- api: openrouter
+  model: google/gemini-3.1-flash-lite:batch
+  provider: google-vertex/global
+  cost:
+  - 0.125
+  - 0.75
+  reason: batch
+  detail: null
+- api: openrouter
+  model: google/gemini-3.1-pro-preview:batch
+  provider: google-vertex/global
+  cost:
+  - 1.0
+  - 6.0
+  reason: batch
+  detail: null
+- api: openrouter
+  model: google/gemini-3.5-flash:batch
+  provider: google-vertex/global
+  cost:
+  - 0.75
+  - 4.5
+  reason: batch
+  detail: null
+- api: openrouter
+  model: minimax/minimax-m3:batch
+  provider: together
+  cost:
+  - 0.15
+  - 0.6
+  reason: batch
+  detail: null
+failure_streaks:
+  openrouter#anthropic/claude-sonnet-4.6#google-vertex/us-east5:
+    count: 1
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"anthropic/claude-sonnet-4.6
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate ...'
+  openrouter#arcee-ai/virtuoso-large#together:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"id\":
+      \"ouH1dq4-2kFHot-a239cec65a30da16\",\n  \"error\": {\n    \"message\": \"Unable
+      to access non-serverless mode...'
+  openrouter#cohere/command-r7b-12-2024#cohere:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471596-4vL1WFMInv670aSl67Gq","object":"chat.completion","created":1785471596,"model":"cohere/command-r7b-12-2024","provider":"Cohere","system_fing...'
+  openrouter#deepseek/deepseek-r1#azure:
+    count: 1
+    last_error: 'plain: empty response'
+  openrouter#deepseek/deepseek-r1-0528#novita/fp8:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"code\":400,
+      \"reason\":\"INVALID_REQUEST_BODY\", \"message\":\"model: deepseek/deepseek-r1-0528
+      does not support endpoi...'
+  openrouter#google/gemini-2.5-flash-image#google-vertex/global/flex:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
+      {\n    \"code\": 400,\n    \"message\": \"Flex API is not supported for model:
+      gemini-2.5-flash-image.\",\...'
+  openrouter#google/gemini-2.5-pro#google-vertex/eu:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471595-mJe209W8kNKT2QPXlgrr","object":"chat.completion","created":1785471595,"model":"google/gemini-2.5-pro","provider":"Google","system_fingerpri...'
+  openrouter#google/gemini-2.5-pro#google-vertex/global:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471595-6csbwTacytFj5Fq70MYJ","object":"chat.completion","created":1785471595,"model":"google/gemini-2.5-pro","provider":"Google","system_fingerpri...'
+  openrouter#google/gemini-2.5-pro#google-vertex/global/flex:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
+      {\n    \"code\": 400,\n    \"message\": \"Flex API is not supported for model:
+      gemini-2.5-pro.\",\n    \"s...'
+  openrouter#google/gemini-2.5-pro#google-vertex/us:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471596-SRQYFw3m6F9gLw7JbRdt","object":"chat.completion","created":1785471596,"model":"google/gemini-2.5-pro","provider":"Google","system_fingerpri...'
+  openrouter#google/gemini-2.5-pro-preview#google-vertex/eu:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471595-Nr85fF47humCdoVuFYTJ","object":"chat.completion","created":1785471595,"model":"google/gemini-2.5-pro","provider":"Google","system_fingerpri...'
+  openrouter#google/gemini-2.5-pro-preview#google-vertex/global:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471595-DdGUCkOcs2sKDd4KLjGF","object":"chat.completion","created":1785471595,"model":"google/gemini-2.5-pro","provider":"Google","system_fingerpri...'
+  openrouter#google/gemini-2.5-pro-preview#google-vertex/global/flex:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
+      {\n    \"code\": 400,\n    \"message\": \"Flex API is not supported for model:
+      gemini-2.5-pro.\",\n    \"s...'
+  openrouter#google/gemini-2.5-pro-preview#google-vertex/global/priority:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471596-HzMGfBdQJZqKhZEo3cmA","object":"chat.completion","created":1785471596,"model":"google/gemini-2.5-pro","provider":"Google","system_fingerpri...'
+  openrouter#google/gemini-2.5-pro-preview-05-06#google-vertex/eu:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471596-6Mn5XeGPW8fzm5g18cnG","object":"chat.completion","created":1785471596,"model":"google/gemini-2.5-pro","provider":"Google","system_fingerpri...'
+  openrouter#google/gemini-2.5-pro-preview-05-06#google-vertex/global/flex:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
+      {\n    \"code\": 400,\n    \"message\": \"Flex API is not supported for model:
+      gemini-2.5-pro.\",\n    \"s...'
+  openrouter#google/gemini-2.5-pro-preview-05-06#google-vertex/us:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471595-CsbH66RD6pgNyHxJZStH","object":"chat.completion","created":1785471595,"model":"google/gemini-2.5-pro","provider":"Google","system_fingerpri...'
+  openrouter#google/gemini-3-flash-preview#google-ai-studio:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471595-fJZBMyyJZz7pGRpfksQN","object":"chat.completion","created":1785471595,"model":"google/gemini-3-flash-preview","provider":"Google
+      AI Studio"...'
+  openrouter#google/gemini-3-flash-preview#google-ai-studio/flex:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471595-HEFLT0LNJnqI0P6OLicJ","object":"chat.completion","created":1785471595,"model":"google/gemini-3-flash-preview","provider":"Google
+      AI Studio"...'
+  openrouter#google/gemini-3-flash-preview#google-ai-studio/priority:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471596-35dXd7fc1bNX2xOKu1z1","object":"chat.completion","created":1785471596,"model":"google/gemini-3-flash-preview","provider":"Google
+      AI Studio"...'
+  openrouter#google/gemini-3-flash-preview#google-vertex/global:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471596-DOR6VXH0GsMVmtdb3r2Q","object":"chat.completion","created":1785471596,"model":"google/gemini-3-flash-preview","provider":"Google","system_f...'
+  openrouter#google/gemini-3-flash-preview#google-vertex/global/flex:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"error":{"message":"Provider
+      returned error","code":429}}'
+  openrouter#google/gemini-3-flash-preview#google-vertex/global/priority:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471596-5Z432vSrd3Ebr2L4Ro1B","object":"chat.completion","created":1785471596,"model":"google/gemini-3-flash-preview","provider":"Google","system_f...'
+  openrouter#google/gemini-3.1-pro-preview#google-vertex/global/flex:
+    count: 1
+    last_error: 'plain: 0 Timeout after 15.0s'
+  openrouter#google/gemini-3.5-flash#google-ai-studio:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471595-ns9rN7nN71F2lL6ckBEV","object":"chat.completion","created":1785471595,"model":"google/gemini-3.5-flash","provider":"Google
+      AI Studio","syst...'
+  openrouter#google/gemini-3.5-flash#google-ai-studio/flex:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471596-K1KImVwOKzCG1pUTfiGT","object":"chat.completion","created":1785471596,"model":"google/gemini-3.5-flash","provider":"Google
+      AI Studio","syst...'
+  openrouter#google/gemini-3.5-flash#google-ai-studio/priority:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471595-fvlxEVnExd6OcgawAMTS","object":"chat.completion","created":1785471595,"model":"google/gemini-3.5-flash","provider":"Google
+      AI Studio","syst...'
+  openrouter#google/gemini-3.5-flash#google-vertex/global:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471596-ebz6do0Miya1HXd3jCh9","object":"chat.completion","created":1785471596,"model":"google/gemini-3.5-flash","provider":"Google","system_fingerp...'
+  openrouter#google/gemini-3.5-flash#google-vertex/global/flex:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471596-JgBhTs90SZuHoacM4Zh1","object":"chat.completion","created":1785471596,"model":"google/gemini-3.5-flash","provider":"Google","system_fingerp...'
+  openrouter#google/gemini-3.5-flash#google-vertex/global/priority:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471595-q24HM98untSPlvHkGX0a","object":"chat.completion","created":1785471595,"model":"google/gemini-3.5-flash","provider":"Google","system_fingerp...'
+  openrouter#google/gemini-3.5-flash-lite#google-ai-studio:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471595-sQ10V48Z8leb7txqdkiI","object":"chat.completion","created":1785471595,"model":"google/gemini-3.5-flash-lite","provider":"Google
+      AI Studio",...'
+  openrouter#google/gemini-3.5-flash-lite#google-ai-studio/flex:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471596-G6rRoqaY24mf4xvNvXco","object":"chat.completion","created":1785471596,"model":"google/gemini-3.5-flash-lite","provider":"Google
+      AI Studio",...'
+  openrouter#google/gemini-3.5-flash-lite#google-ai-studio/priority:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471595-BiYW2o4O38Wae5UVFoOV","object":"chat.completion","created":1785471595,"model":"google/gemini-3.5-flash-lite","provider":"Google
+      AI Studio",...'
+  openrouter#google/gemini-3.6-flash#google-ai-studio:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471595-UAby4DGiR2L1Z7X2KU0v","object":"chat.completion","created":1785471595,"model":"google/gemini-3.6-flash","provider":"Google
+      AI Studio","syst...'
+  openrouter#google/gemini-3.6-flash#google-ai-studio/flex:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471596-eBBHUlOuAGOGB7WSLSvs","object":"chat.completion","created":1785471596,"model":"google/gemini-3.6-flash","provider":"Google
+      AI Studio","syst...'
+  openrouter#google/gemini-3.6-flash#google-ai-studio/priority:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471595-drIF9E4y7iheoC5GqX9g","object":"chat.completion","created":1785471595,"model":"google/gemini-3.6-flash","provider":"Google
+      AI Studio","syst...'
+  openrouter#google/gemma-2-27b-it#nextbit/int4:
+    count: 1
+    last_error: 'plain: empty response'
+  openrouter#google/gemma-3-27b-it#phala:
+    count: 1
+    last_error: 'plain: empty response'
+  openrouter#meta-llama/llama-3.1-70b-instruct#amazon-bedrock:
+    count: 1
+    last_error: 'plain: empty response'
+  openrouter#meta-llama/llama-4-scout#google-vertex/us-east5:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1785471596-dIA470GB33Mrjt8UsBi4","object":"chat.completion","created":1785471596,"model":"meta-llama/llama-4-scout","provider":"Google","system_finger...'
+  openrouter#meta-llama/llama-guard-4-12b#deepinfra/bf16:
+    count: 1
+    last_error: 'plain: empty response'
+  openrouter#moonshotai/kimi-k2.6#baseten/fp4:
+    count: 1
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"moonshotai/kimi-k2.6
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your ra...'
+  openrouter#moonshotai/kimi-k2.6#fireworks:
+    count: 1
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"moonshotai/kimi-k2.6
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your ra...'
+  openrouter#moonshotai/kimi-k2.7-code#siliconflow/fp8:
+    count: 1
+    last_error: 'plain: empty response'
+  openrouter#moonshotai/kimi-k3#baseten/fp8:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"Cannot
+      override enforced sampling params: {''top_p'': 1.0}. Required values: {''top_p'':
+      0.95}\",\"type\":\"Bad...'
+  openrouter#moonshotai/kimi-k3#together:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"id\":
+      \"ouH1dmz-6z2FuN-a239cec69f70c6f0\",\n  \"error\": {\n    \"message\": \"Invalid
+      value for ''top_p'': 1. This e...'
+  openrouter#openai/gpt-4-turbo-preview#openai:
+    count: 1
+    last_error: 'plain: 404 {"message":"Provider returned error","code":404,"metadata":{"raw":"{\n    \"error\":
+      {\n        \"message\": \"The model `gpt-4-turbo-preview` does not exist or
+      you do not have access to it...'
+  openrouter#openai/gpt-audio#openai:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
+      {\n    \"message\": \"This model requires that either input content or output
+      modality contain audio.\",\n...'
+  openrouter#openai/gpt-audio-mini#openai:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
+      {\n    \"message\": \"This model requires that either input content or output
+      modality contain audio.\",\n...'
+  openrouter#openai/gpt-oss-20b#parasail/fp4:
+    count: 1
+    last_error: 'plain: empty response'
+  openrouter#openai/gpt-oss-20b#together:
+    count: 1
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"openai/gpt-oss-20b
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rate...'
+  openrouter#perplexity/sonar#perplexity:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"max_tokens
+      must be at least 16\",\"type\":\"invalid_request\",\"code\":400,\"param\":\"max_token...'
+  openrouter#qwen/qwen-2.5-72b-instruct#novita/bf16:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"code\":400,
+      \"reason\":\"INVALID_REQUEST_BODY\", \"message\":\"model: qwen/qwen-2.5-72b-instruct
+      does not support endpo...'
+  openrouter#qwen/qwen3-32b#alibaba/fp8:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"error":{"message":"JSON
+      error injected into SSE stream","code":502}}'
+  openrouter#qwen/qwen3-coder-30b-a3b-instruct#amazon-bedrock:
+    count: 1
+    last_error: 'plain: 500 {"message":"Internal Server Error","code":500}'
+  openrouter#qwen/qwen3.5-397b-a17b#gmicloud/fp8:
+    count: 1
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"qwen/qwen3.5-397b-a17b
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your ...'
+  openrouter#upstage/solar-pro-3#upstage:
+    count: 1
+    last_error: 'plain: empty response'
