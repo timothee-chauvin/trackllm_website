@@ -9,13 +9,15 @@ on:
 permissions:
   contents: write  # Allow pushing commits
 
-# Shared with update-endpoints.yml and bi-monitor.yml: all three commit to main and
-# touch overlapping files (website/data/spend, monthly state). Queue instead of
-# cancelling, so an overlapping manual dispatch can't race a cron run into a
-# last-write-wins loss.
-concurrency:
-  group: repo-write
-  cancel-in-progress: false
+# Deliberately NOT in the repo-write concurrency group that update-endpoints.yml and
+# bi-monitor.yml share. This workflow is hourly and update-endpoints runs for 3-5h, so
+# sharing the group would leave a run-main run pending for most of that window — and a
+# group holds only ONE pending run, so each new hourly cron would cancel the previous
+# pending one. That silently drops ~3 LT collections a day (a cancelled run is not a
+# failure, so notify-on-failure stays quiet). It is safe to run unserialized: its
+# writes (website/data/lt, website/data/spend) are disjoint from the other two except
+# for the spend ledgers, which .gitattributes union-merges, and push-with-rebase.sh
+# retries on a racing push.
 
 jobs:
   run-main:
