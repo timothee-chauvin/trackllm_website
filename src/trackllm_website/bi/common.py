@@ -97,9 +97,11 @@ def load_strategies() -> dict[str, dict | None]:
 
 
 def save_strategies(strategies: dict[str, dict | None]) -> None:
+    # Indented: this file is committed by CI, so it must produce a reviewable diff
+    # rather than one 45KB line.
     atomic_write_bytes(
         root / config.bi.probe.strategies_path,
-        orjson.dumps(strategies, option=orjson.OPT_SORT_KEYS),
+        orjson.dumps(strategies, option=orjson.OPT_SORT_KEYS | orjson.OPT_INDENT_2),
     )
 
 
