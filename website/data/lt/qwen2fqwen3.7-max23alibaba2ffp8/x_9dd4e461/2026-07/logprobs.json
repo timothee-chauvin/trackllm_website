@@ -1,1 +1,1 @@
-{"seen_tokens":["Hello","It"," Hello",">Hello","hello"],"seen_logprobs":[{"tokens":[0,1,2,3,4],"logprobs":[-8.344647e-7,-14.250001,-15.500001,-17.625,-19.75]}]}
+{"seen_tokens":["Hello","It"," Hello",">Hello","hello","<"],"seen_logprobs":[{"tokens":[0,1,2,3,4],"logprobs":[-8.344647e-7,-14.250001,-15.500001,-17.625,-19.75]},{"tokens":[0,1,2,3,5],"logprobs":[-0.000002264974,-13.125002,-15.375002,-17.250002,-20.000002]}]}
