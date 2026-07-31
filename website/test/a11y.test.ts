@@ -291,3 +291,17 @@ describe("navigation", () => {
     }
   });
 });
+
+/** .table-wrap clips (overflow: hidden), so a table wide enough to overflow it
+ *  disappears at the edge unless it sits in the .table-scroll port. */
+test("every directory table sits in a scroll port", () => {
+  for (const path of ["index.html", "providers/chutes.html", "orgs/deepseek.html"]) {
+    document.documentElement.innerHTML = readFileSync(requireBuilt(path), "utf8");
+    const tables = document.querySelectorAll("table.dir");
+    expect(tables.length, `${path} has no directory table`).toBeGreaterThan(0);
+    for (const t of tables) {
+      expect(t.closest(".table-scroll"), `${path}: a table.dir is not in .table-scroll`)
+        .not.toBeNull();
+    }
+  }
+});
