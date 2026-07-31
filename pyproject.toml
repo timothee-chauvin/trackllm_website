@@ -27,9 +27,6 @@ dependencies = [
     "transformers>=4.57.3",
 ]
 
-[project.scripts]
-trackllm-website = "trackllm_website:main"
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

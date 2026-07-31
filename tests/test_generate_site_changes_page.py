@@ -2,8 +2,12 @@ import json
 
 import pytest
 
-from conftest import b3it_slug, write_b3it_series, write_lt_endpoint
-from trackllm_website.generate_site.b3it import discover_b3it_views
+from conftest import (
+    b3it_slug,
+    b3it_views_for,
+    write_b3it_series,
+    write_lt_endpoint,
+)
 from trackllm_website.generate_site.changes_page import build_changes_page
 from trackllm_website.generate_site.lt import discover_lt_endpoints, load_all_lt_data
 
@@ -87,9 +91,7 @@ def _build(root):
     return build_changes_page(
         root,
         lt_data,
-        discover_b3it_views(
-            root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
-        ),
+        b3it_views_for(root),
     )
 
 
@@ -187,6 +189,30 @@ def test_changes_30d_spans_b3it_observations_newer_than_the_last_lt_one(fake_sit
     assert page["stats"]["now"] == "2026-07-24"
     assert min(i["daysAgo"] for i in page["items"]) >= 0
     assert page["stats"]["changes_30d"] == 1
+
+
+def test_changes_30d_excludes_changes_dated_after_the_last_observation(fake_site):
+    """An epoch closure can be recorded after the endpoint's last sampled point, so
+    its age is negative. The Overview counts `0 <= days < 30`; this board must agree
+    rather than fold the future into "last 30 days"."""
+    changes_path = fake_site / "data" / "changes.json"
+    changes = json.loads(changes_path.read_text())
+    changes.append(
+        {
+            "date": "2026-08-01T00:00:00Z",
+            "slug": "a23p",
+            "model": "org/a",
+            "provider": "p",
+            "method": "LT",
+            "magnitude": 5.0,
+            "magnitude_display": "5σ",
+        }
+    )
+    changes_path.write_text(json.dumps(changes))
+
+    page = _build(fake_site)
+    assert min(i["daysAgo"] for i in page["items"]) < 0
+    assert page["stats"]["changes_30d"] == 1  # the 2026-06-23 one, not the future one
 
 
 def test_b3it_changes_are_counted_alongside_lt(fake_site_with_b3it):

@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from conftest import (
+    b3it_views_for,
     catalog_entry,
     empty_status_inputs,
     site_statuses_for,
@@ -12,7 +13,6 @@ from conftest import (
 from trackllm_website.bi.phase_2 import save_results
 from trackllm_website.bi.state import EndpointBIState, Epoch
 from trackllm_website.config import Endpoint
-from trackllm_website.generate_site.b3it import discover_b3it_views
 from trackllm_website.generate_site.changes import merge_changes, to_json
 from trackllm_website.generate_site.lt import discover_lt_endpoints, load_lt_data
 from trackllm_website.generate_site.model import build_model_views
@@ -36,9 +36,7 @@ def _write_changes_json(root: Path) -> None:
             {"date": data.dates[c["index"]].isoformat(), "sigma": c["sigma"]}
             for c in data.changes
         ]
-    b3it_views = discover_b3it_views(
-        root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
-    )
+    b3it_views = b3it_views_for(root)
     events = merge_changes(lt_changes, lt_by_slug, b3it_views)
     (root / "data" / "changes.json").write_text(json.dumps(to_json(events)))
 
@@ -46,9 +44,7 @@ def _write_changes_json(root: Path) -> None:
 def _build_model_views_with(root: Path, inputs) -> dict:
     lt_dir = root / "data" / "lt"
     lt_endpoints = list(discover_lt_endpoints(lt_dir)) if lt_dir.exists() else []
-    b3it_views = discover_b3it_views(
-        root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
-    )
+    b3it_views = b3it_views_for(root)
     site = site_statuses_for(root, inputs)
     return build_model_views(root, lt_endpoints, b3it_views, site)
 
@@ -285,6 +281,42 @@ def test_lt_change_after_the_last_series_point_has_no_level(tmp_path):
     assert ep["n_changes"] == 1
     # the unknown level joins neither the model's peak nor its scale
     assert view["max_drift"] == 0.1
+    # ... but it does join the axis: model.ts maps dates onto date_min..date_max,
+    # so a change outside that span is drawn outside the viewBox and never seen.
+    assert view["date_max"] >= "2026-06-20"
+
+
+def test_lt_changes_survive_an_empty_drift_lane(tmp_path):
+    """An LT series whose drift lane is empty (lt_drift returns nothing under three
+    distinct observation days) must still publish its canonical changes: the level
+    each one reached is unknown, the change itself is not. Dropping them leaves the
+    endpoint page saying "Changed" beside a count of zero."""
+    root = tmp_path / "website"
+    dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 11)]
+    write_lt_endpoint(root, "m2fa23p1", "m/a", "p1", dates=dates, changes=[], drift=[])
+    (root / "data" / "changes.json").write_text(
+        json.dumps(
+            [
+                {
+                    "date": dates[5],
+                    "slug": "m2fa23p1",
+                    "model": "m/a",
+                    "provider": "p1",
+                    "method": "LT",
+                    "magnitude": 12.0,
+                    "magnitude_display": "12σ",
+                }
+            ]
+        )
+    )
+
+    view = _build_model_views(root)[slugify("m/a")]
+    ep = view["endpoints"][0]
+    assert ep["lt"]["drift"] == []
+    assert [c["date"] for c in ep["lt"]["changes"]] == [dates[5][:10]]
+    assert ep["lt"]["changes"][0]["drift"] is None
+    assert ep["n_changes"] == 1
+    assert len(view["changes"]) == 1
 
 
 def test_b3it_change_after_the_last_series_point_has_no_peak(tmp_path):
@@ -309,6 +341,7 @@ def test_b3it_change_after_the_last_series_point_has_no_peak(tmp_path):
     view = _build_model_views(root)[slugify("m/a")]
     ep = view["endpoints"][0]
     assert ep["b3it"]["changes"][0]["peakTV"] is None
+    assert view["date_max"] >= "2026-02-10"
 
 
 def test_endpoint_with_no_lt_scores_file_yields_null_lt(tmp_path):

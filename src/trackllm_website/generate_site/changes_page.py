@@ -83,7 +83,9 @@ def build_changes_page(
             "providers_involved": len(
                 {i["providerSlug"] for i in items if i["providerSlug"]}
             ),
-            "changes_30d": sum(1 for i in items if i["daysAgo"] < RECENT_DAYS),
+            # The floor matters: a change dated after the last observation has a
+            # negative age, and the Overview's own window is 0 <= days < 30.
+            "changes_30d": sum(1 for i in items if 0 <= i["daysAgo"] < RECENT_DAYS),
             "largest_lt_drift": max(lt_drifts, default=None),
             "since": min(all_dates) if all_dates else None,
             "now": now.strftime("%Y-%m-%d") if now else None,

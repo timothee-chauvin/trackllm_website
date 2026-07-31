@@ -3,12 +3,12 @@ from pathlib import Path
 
 from conftest import (
     b3it_slug,
+    b3it_views_for,
     write_b3it_series,
     write_b3it_state,
     write_lt_endpoint,
     write_month_dir,
 )
-from trackllm_website.generate_site.b3it import discover_b3it_views
 from trackllm_website.generate_site.lt import discover_lt_endpoints, load_all_lt_data
 from trackllm_website.generate_site.tracked import with_observations
 
@@ -33,9 +33,7 @@ def _fleets(root: Path):
     return with_observations(
         lt_by_slug,
         load_all_lt_data(lt_dir, lt_by_slug),
-        discover_b3it_views(
-            root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
-        ),
+        b3it_views_for(root),
     )
 
 
