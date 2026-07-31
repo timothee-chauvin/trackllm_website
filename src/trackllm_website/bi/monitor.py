@@ -172,11 +172,41 @@ async def run_endpoint(
         logger.warning(
             f"{state.endpoint}: change detected (onset {decision.change_date})"
         )
+        timed_out = False
         with track() as reinit_spend:
-            result = await reinit(
-                client, strategy, state.endpoint, epoch.border_inputs, now
-            )
+            try:
+                result = await asyncio.wait_for(
+                    reinit(client, strategy, state.endpoint, epoch.border_inputs, now),
+                    # Same deadline as onboarding: a re-init is a full discovery run
+                    # (~15k queries), and it is serialized into the daily monitor job,
+                    # so one hanging endpoint would stall the whole workflow.
+                    timeout=config.bi.reinit.onboard_timeout_seconds,
+                )
+            except asyncio.TimeoutError:
+                timed_out = True
         append_entry(config.spend_dir, state.slug, "reinit", reinit_spend, now)
+        if timed_out:
+            if event_rows is not None:
+                event_rows.append(
+                    MonitorRow(
+                        state.endpoint.model,
+                        state.endpoint.provider,
+                        "reinit_timeout",
+                        (
+                            decision.change_date.date().isoformat()
+                            if decision.change_date
+                            else None
+                        ),
+                        None,
+                        reinit_spend.cost,
+                    )
+                )
+            # Raise so run_isolated reports it in report.failures: nothing was saved,
+            # so the next daily run re-detects the change and retries.
+            raise TimeoutError(
+                f"{state.endpoint}: re-init exceeded "
+                f"{config.bi.reinit.onboard_timeout_seconds}s"
+            )
         if event_rows is not None:
             event_rows.append(
                 MonitorRow(

@@ -21,6 +21,7 @@ OUTCOME = {
     "change_detected": ("change detected", "#0969da"),
     "reonboarded": ("re-onboarded", "#1a7f37"),
     "reonboard_no_bis": ("re-onboard → no BIs", "#cf222e"),
+    "reinit_timeout": ("re-init timed out (retries tomorrow)", "#cf222e"),
     "retired_stalled": ("retired (stalled)", "#6e7781"),
     "all_errors": ("all queries errored", "#cf222e"),
 }
