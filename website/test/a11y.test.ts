@@ -225,3 +225,45 @@ describe("accessible names", () => {
     }
   });
 });
+
+/** No layout engine here either (see smoke.test.ts): guard the token instead.
+ *  --text-dim carries 0.6-0.82rem body text, so it owes 4.5:1 against the
+ *  surfaces it is drawn on -- the lightest one in dark mode, the darkest in light. */
+describe("--text-dim contrast", () => {
+  const css = readFileSync(join(SITE, "style.css"), "utf8");
+
+  function luminance(hex: string): number {
+    const lin = (c: number): number => {
+      const s = c / 255;
+      return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+    };
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+    return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+  }
+  function ratio(a: string, b: string): number {
+    const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+    return (hi + 0.05) / (lo + 0.05);
+  }
+  /** The `n`th palette block's value for `token` (dark first, then both light copies). */
+  function tokenValues(token: string): string[] {
+    return [...css.matchAll(new RegExp(`--${token}: (#[0-9A-Fa-f]{6});`, "g"))].map(
+      (m) => m[1],
+    );
+  }
+
+  test("clears AA on the worst background of each theme", () => {
+    const dims = tokenValues("text-dim");
+    expect(dims.length, "expected one dark and two light palette copies").toBe(3);
+    const [dark, light1, light2] = dims;
+    expect(light1, "the two light palette copies have drifted apart").toBe(light2);
+
+    // dark theme: the lightest surface a dim label sits on is --surface-3
+    for (const bg of ["#0B0F14", "#12181F", "#171F28", "#1E2731"]) {
+      expect(ratio(dark, bg), `dark --text-dim on ${bg}`).toBeGreaterThanOrEqual(4.5);
+    }
+    // light theme: the darkest is --surface
+    for (const bg of ["#FAFCFD", "#F1F5F8", "#FFFFFF"]) {
+      expect(ratio(light1, bg), `light --text-dim on ${bg}`).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+});

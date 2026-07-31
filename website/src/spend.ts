@@ -22,8 +22,28 @@ const GROUP_COLOR: Record<string, string> = {
   vetting: "#E0A94A", // --changed
 };
 const DEFAULT_GROUP_COLOR = "#8A97A8";
-const MUTED_TEXT = "#8A97A8";
 const MUTED_GRID = "rgba(140,150,165,0.25)";
+// --text-dim, dark theme; only reached if the stylesheet has not applied yet.
+const MUTED_TEXT_FALLBACK = "#7F8EA0";
+
+/** The chart's text cannot be a fixed hex: no single color clears AA against both
+ *  the dark and the light page background, so it follows the --text-dim token and
+ *  is repainted when the theme toggle (base.html.j2) flips data-theme. */
+function mutedText(): string {
+  const v = getComputedStyle(document.documentElement).getPropertyValue("--text-dim");
+  return v.trim() || MUTED_TEXT_FALLBACK;
+}
+
+/** Every layout field carrying that color, as relayout attribute paths. */
+function textColors(c: string): Record<string, string> {
+  return {
+    "font.color": c,
+    "title.font.color": c,
+    "xaxis.color": c,
+    "yaxis.color": c,
+    "legend.font.color": c,
+  };
+}
 
 async function init(): Promise<void> {
   const el = document.getElementById("spend-chart");
@@ -48,23 +68,29 @@ async function init(): Promise<void> {
       name: g,
       marker: { color: GROUP_COLOR[g] ?? DEFAULT_GROUP_COLOR },
     }));
-  Plotly.newPlot(
+  await Plotly.newPlot(
     el,
     traces,
     {
       barmode: "stack",
-      title: { text: "Daily spend by category", font: { color: MUTED_TEXT, size: 14 } },
-      xaxis: { title: { text: "Date" }, gridcolor: MUTED_GRID, color: MUTED_TEXT },
-      yaxis: { title: { text: "USD" }, gridcolor: MUTED_GRID, color: MUTED_TEXT, rangemode: "tozero" },
+      title: { text: "Daily spend by category", font: { size: 14 } },
+      xaxis: { title: { text: "Date" }, gridcolor: MUTED_GRID },
+      yaxis: { title: { text: "USD" }, gridcolor: MUTED_GRID, rangemode: "tozero" },
       paper_bgcolor: "rgba(0,0,0,0)",
       plot_bgcolor: "rgba(0,0,0,0)",
-      font: { color: MUTED_TEXT },
-      legend: { bgcolor: "rgba(0,0,0,0)", font: { color: MUTED_TEXT } },
+      legend: { bgcolor: "rgba(0,0,0,0)" },
       height: 400,
       margin: { t: 40, r: 20, b: 50, l: 60 },
     },
     { responsive: true, displayModeBar: false }
   );
+  const paint = (): void => {
+    Plotly.relayout(el, textColors(mutedText()) as Partial<Plotly.Layout>);
+  };
+  paint();
+  new MutationObserver(paint).observe(document.documentElement, {
+    attributeFilter: ["data-theme"],
+  });
 }
 
 init();
