@@ -122,6 +122,14 @@ def slugify(s: str, max_length: int = 1000, hash_length: int = 0) -> str:
 
     slug = slug[:max_length]
 
+    # Single-name slugs are used directly as path components (slugify(org),
+    # slugify(model)), so the result must never be "." or "..". Every other
+    # character class is already hex-encoded above — including "/" — so an all-dot
+    # slug is the only way to produce one. Applied after truncation, which can
+    # itself turn e.g. "..foo" into "..".
+    if slug and set(slug) == {"."}:
+        slug = "".join(f"{ord(char):02x}" for char in slug)
+
     if hash_length > 0:
         string_hash = hashlib.md5(s.encode("utf-8")).hexdigest()[:hash_length]
         slug += "_" + string_hash

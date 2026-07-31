@@ -9,21 +9,31 @@ on:
 permissions:
   contents: write  # Allow pushing commits
 
+# Deliberately NOT in the repo-write concurrency group that update-endpoints.yml and
+# bi-monitor.yml share. This workflow is hourly and update-endpoints runs for 3-5h, so
+# sharing the group would leave a run-main run pending for most of that window — and a
+# group holds only ONE pending run, so each new hourly cron would cancel the previous
+# pending one. That silently drops ~3 LT collections a day (a cancelled run is not a
+# failure, so notify-on-failure stays quiet). It is safe to run unserialized: its
+# writes (website/data/lt, website/data/spend) are disjoint from the other two except
+# for the spend ledgers, which .gitattributes union-merges, and push-with-rebase.sh
+# retries on a racing push.
+
 jobs:
   run-main:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
       with:
         python-version: '3.13'
 
     - name: Install uv
-      uses: astral-sh/setup-uv@v4
+      uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
 
     - name: Install dependencies
       run: uv sync
@@ -46,6 +56,9 @@ jobs:
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-        git add .
+        # Scoped to what this job writes: main.py stores responses under
+        # website/data/lt and appends the LT spend ledger under website/data/spend;
+        # lt_scores_cli rewrites lt_scores.json / lt_changes.json under website/data/lt.
+        git add website/data/lt website/data/spend
         git diff --staged --quiet || git commit -m "[bot] add new responses"
         bash .github/scripts/push-with-rebase.sh

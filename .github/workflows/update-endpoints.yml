@@ -9,21 +9,29 @@ on:
 permissions:
   contents: write  # Allow pushing commits
 
+# Shared with bi-monitor.yml: both write website/data/b3it/state and phase_2, which are
+# plain JSON with no merge driver, so an overlap is a last-write-wins silent loss.
+# cancel-in-progress: false to queue rather than drop. run-main.yml is deliberately
+# excluded — see the comment there.
+concurrency:
+  group: repo-write
+  cancel-in-progress: false
+
 jobs:
   update-endpoints:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
       with:
         python-version: '3.13'
 
     - name: Install uv
-      uses: astral-sh/setup-uv@v4
+      uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4
 
     - name: Install dependencies
       run: uv sync
@@ -45,6 +53,25 @@ jobs:
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-        git add .
+        # Scoped to what update_endpoints.py writes. Keep in sync when a new writer
+        # is added: a missing pathspec silently drops that run's data.
+        # website/data/b3it rather than its state/phase_2/onboarding_progress subdirs:
+        # onboarding_progress is rmtree'd on every normal onboarding return, and
+        # `git add` on a path that is in neither the worktree nor the index exits 128,
+        # which under `bash -e` would abort this step before the commit — turning an
+        # empty scratch dir into a daily failure that also drops the partial work this
+        # step exists to save. The parent dir always exists (state and phase_2 have
+        # hundreds of tracked files) and the other subdirs under it (tokenizers,
+        # logprob_stats, phase_1, bi_prevalence) are written only by manual CLI
+        # modules, never by update_endpoints.py, so nothing extra can land from CI.
+        git add \
+          endpoints_lt.yaml \
+          endpoints_cache_lt.yaml \
+          endpoints_catalog.yaml \
+          endpoints_bi.yaml \
+          endpoints_cache_bi.yaml \
+          strategies_test_reasoning.json \
+          website/data/spend \
+          website/data/b3it
         git diff --staged --quiet || git commit -m "[bot] Daily update of target endpoints"
         bash .github/scripts/push-with-rebase.sh
