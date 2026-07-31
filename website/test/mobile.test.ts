@@ -326,3 +326,45 @@ describe("sticky month headers clear the nav", () => {
     expect(rule(".mohead")).toContain("top: var(--nav-h)");
   });
 });
+
+/** The changes table's four columns have a min-content width of ~374px, wider than
+ *  the panel a 375px phone gives them, so the page itself used to scroll sideways
+ *  (body scrollWidth 413 at a 375 viewport). Same reason as above: no layout engine
+ *  here, so the structure is checked on the built pages and the rule in the CSS. */
+describe("the changes table never widens the page", () => {
+  const css = readFileSync(join(SITE, "style.css"), "utf8");
+
+  test("every changes table can scroll on its own", () => {
+    for (const page of [EP_PAGE, "spend.html"]) {
+      document.documentElement.innerHTML = readFileSync(requireBuilt(page), "utf8");
+      const tables = [...document.querySelectorAll("table.changes-tbl")];
+      expect(tables.length, `no changes table on ${page}`).toBeGreaterThan(0);
+      for (const t of tables) {
+        expect(t.closest(".tblwrap"), `a changes table on ${page} can only push the page`)
+          .not.toBeNull();
+      }
+    }
+  });
+
+  test("the wrapper is the thing that scrolls", () => {
+    const m = css.match(/^\.tblwrap \{[^}]*\}/m);
+    expect(m, ".tblwrap rule not found in style.css").not.toBeNull();
+    expect(m![0]).toContain("overflow-x: auto");
+    // a scroll container that is itself unshrinkable just moves the overflow up a level
+    expect(m![0]).toContain("max-width: 100%");
+  });
+
+  test("a phone trims the padding so the table need not scroll at 375px", () => {
+    // Measured in Chromium: at 1.1rem cell padding inside a 1.4rem panel, the four
+    // columns want 374px and the panel offers 296. Both trims are needed -- the
+    // table's own got it to 320, still 8 short.
+    // the last such block: an earlier one's segment runs to the end of the file
+    const block = css
+      .split(/@media \(max-width: 560px\) \{/)
+      .filter((b) => b.includes(".changes-tbl th"))
+      .pop();
+    expect(block, "no narrow-viewport block styles the changes table").toBeDefined();
+    expect(block, "the panel's own padding is the larger of the two costs").toContain(".panel");
+    expect(block).toMatch(/\.changes-tbl th, \.changes-tbl td \{[^}]*padding-left/);
+  });
+});
