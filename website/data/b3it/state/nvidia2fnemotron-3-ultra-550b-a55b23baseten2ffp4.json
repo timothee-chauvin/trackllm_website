@@ -1,0 +1,25 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "nvidia/nemotron-3-ultra-550b-a55b",
+    "provider": "baseten/fp4",
+    "cost": [
+      0.6,
+      2.4
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 0.0000132,
+    "created": "2026-06-04T05:33:28Z",
+    "last_seen": "2026-07-31T04:19:53Z",
+    "supports_temperature": true,
+    "supports_logprobs": false
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "no_bis",
+    "since": "2026-07-31T04:30:35Z",
+    "last_recheck": "2026-07-31T04:30:35Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}
