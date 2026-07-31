@@ -16,14 +16,16 @@
     <div class="sec-head"><h2>Cumulative by group</h2></div>
     <div class="panel">
       {% if spend.cumulative %}
-      <table class="changes-tbl">
-        <thead><tr><th scope="col">Group</th><th scope="col" class="r">Cost (USD)</th></tr></thead>
-        <tbody>
-        {% for group, cost in spend.cumulative.items() %}
-          <tr><td>{{ group }}</td><td class="r num">${{ "%.4f"|format(cost) }}</td></tr>
-        {% endfor %}
-        </tbody>
-      </table>
+      <div class="tblwrap">
+        <table class="changes-tbl">
+          <thead><tr><th scope="col">Group</th><th scope="col" class="r">Cost (USD)</th></tr></thead>
+          <tbody>
+          {% for group, cost in spend.cumulative.items() %}
+            <tr><td>{{ group }}</td><td class="r num">${{ "%.4f"|format(cost) }}</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
       {% else %}<p class="no-data">No spend data yet.</p>{% endif %}
     </div>
   </section>
@@ -39,6 +41,7 @@
     <div class="sec-head"><h2>By endpoint</h2></div>
     <div class="panel">
       {% if spend.by_endpoint %}
+      <div class="tblwrap">
       <table class="changes-tbl">
         <thead>
           <tr>
@@ -62,6 +65,7 @@
         {% endfor %}
         </tbody>
       </table>
+      </div>
       {% else %}<p class="no-data">No spend data yet.</p>{% endif %}
     </div>
   </section>

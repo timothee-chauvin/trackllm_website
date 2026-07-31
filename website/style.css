@@ -305,13 +305,31 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 .chart-tip .d { color: var(--text-muted); }
 .chart-tip .v { font-weight: 600; }
 
+/* A table's min-content width is a floor: the changes table's four columns will not
+   go below ~374px, so on a 375px phone `width: 100%` loses and the table pushed the
+   whole page sideways (body scrollWidth 413). The wrapper takes the overflow instead
+   -- max-width, or an unshrinkable scroll container just moves the problem up a level. */
+.tblwrap { max-width: 100%; overflow-x: auto; }
 .changes-tbl { width: 100%; border-collapse: collapse; }
 .changes-tbl th { text-align: left; font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-dim); font-weight: 600; padding: 0.6rem 1.1rem; border-bottom: 1px solid var(--border); }
 .changes-tbl th.r, .changes-tbl td.r { text-align: right; }
 .changes-tbl td { padding: 0.6rem 1.1rem; border-bottom: 1px solid var(--border-soft); font-size: 0.88rem; }
 .changes-tbl tr:last-child td { border-bottom: none; }
-.changes-tbl .date { font-family: var(--mono); color: var(--text-muted); }
-.changes-tbl .mag { font-family: var(--mono); font-weight: 600; }
+/* the values are single tokens: a date broken across two lines as "2026-" / "07-26"
+   costs more than the column width it saves */
+.changes-tbl .date { font-family: var(--mono); color: var(--text-muted); white-space: nowrap; }
+.changes-tbl .mag { font-family: var(--mono); font-weight: 600; white-space: nowrap; }
+/* A phone loses 16px each side to .wrap and another 22.4 to the panel: nearly a
+   fifth of a 375px screen before any content. Measured in Chromium, the four columns
+   want 374px and the panel offers 296; the table's own trims got it to 320, and
+   trimming the panel too is what turns "scrolls" into "fits". */
+@media (max-width: 560px) {
+  .panel { padding-left: 0.9rem; padding-right: 0.9rem; }
+  .changes-tbl th, .changes-tbl td { padding-left: 0.4rem; padding-right: 0.4rem; }
+  /* the tracking is what pushes "Confidence" past the width there is for it */
+  .changes-tbl th { font-size: 0.66rem; letter-spacing: normal; }
+  .changes-tbl td { font-size: 0.82rem; }
+}
 
 .method-note { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 .method-note .card { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: 1rem 1.2rem; }

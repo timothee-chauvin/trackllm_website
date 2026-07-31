@@ -59,10 +59,12 @@
   <section class="block">
     <div class="sec-head"><h2>Detected changes</h2></div>
     <div class="panel">
-      <table class="changes-tbl">
-        <thead><tr><th scope="col">Date</th><th scope="col">Method</th><th scope="col" class="r">Drift reached</th><th scope="col" class="r">Confidence</th></tr></thead>
-        <tbody id="changerows"></tbody>
-      </table>
+      <div class="tblwrap">
+        <table class="changes-tbl">
+          <thead><tr><th scope="col">Date</th><th scope="col">Method</th><th scope="col" class="r">Drift reached</th><th scope="col" class="r">Confidence</th></tr></thead>
+          <tbody id="changerows"></tbody>
+        </table>
+      </div>
     </div>
   </section>
   {% elif meta %}
