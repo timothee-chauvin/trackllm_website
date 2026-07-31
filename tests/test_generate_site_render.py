@@ -305,6 +305,42 @@ def test_org_pages_are_rewritten_from_scratch(tmp_path):
     assert not (orgs / "gone.html").exists()
 
 
+def test_generated_json_is_rewritten_from_scratch_but_data_survives(tmp_path):
+    """An endpoint that leaves the fleet must not leave orphan JSON behind at a
+    URL the site still serves. Only generated files go: b3it/<slug>/b3it.json is
+    generated, b3it/state and b3it/phase_2 under the same directory are data."""
+    _scaffold(tmp_path)
+    write_b3it_series(
+        tmp_path,
+        "b/x",
+        "q",
+        status="monitoring",
+        retired=None,
+        month="2026-06",
+        tokens=["A"] * 10,
+    )
+    slug = b3it_slug("b/x", "q")
+
+    stale = [
+        tmp_path / "data" / "providers" / "gone.json",
+        tmp_path / "data" / "models" / "gone.json",
+        tmp_path / "data" / "b3it" / "gone2fslug" / "b3it.json",
+    ]
+    for f in stale:
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_text("{}")
+
+    render_site(tmp_path, None, empty_status_inputs())
+
+    assert [f for f in stale if f.exists()] == []
+    assert (tmp_path / "data" / "b3it" / slug / "b3it.json").exists()
+    assert (tmp_path / "data" / "providers" / "p.json").exists()
+    assert (tmp_path / "data" / "models" / f"{slugify('m/a')}.json").exists()
+    # the collected inputs the views are derived from
+    assert (tmp_path / "data" / "b3it" / "state" / f"{slug}.json").exists()
+    assert (tmp_path / "data" / "b3it" / "phase_2" / slug / "p1.json").exists()
+
+
 def test_endpoint_with_nothing_to_show_gets_a_status_page_if_ever_tracked(tmp_path):
     """A never-tracked endpoint that already left the catalog stays absent. One we
     tracked (a BI state file) keeps an explained page and directory row -- with a
@@ -370,6 +406,43 @@ def test_manifest_escapes_hostile_names_and_error_details(tmp_path):
     assert "<script>alert(1)</script>" not in page
 
 
+def test_endpoint_manifest_carries_the_canonical_status_and_changes(tmp_path):
+    """endpoint.js must not re-derive either in the browser: the verdict would be
+    aged against the reader's clock, and the change list would come from the
+    per-method series rather than the merged one the rest of the site counts."""
+    _scaffold(tmp_path)
+    (tmp_path / "data" / "lt" / "lt_changes.json").write_text(
+        json.dumps(
+            {
+                "m2fa23p": [
+                    {
+                        "endpoint": "m2fa23p",
+                        "index": 3,
+                        "date": DATES[3],
+                        "sigma": 9.0,
+                        "first_detected": DATES[4],
+                    }
+                ]
+            }
+        )
+    )
+
+    render_site(tmp_path, None, empty_status_inputs())
+
+    manifest = _manifest((tmp_path / "endpoints" / "m2fa23p.html").read_text())
+    row = next(
+        e
+        for e in json.loads((tmp_path / "data" / "overview.json").read_text())[
+            "endpoints"
+        ]
+        if e["slug"] == "m2fa23p"
+    )
+    assert manifest["state"] == row["status"] == "changed"
+    assert [c["date"] for c in manifest["changes"]["lt"]] == [DATES[3][:10]]
+    assert manifest["changes"]["lt"][0]["sigma"] == "9σ"
+    assert len(manifest["changes"]["lt"]) == row["nChanges"]
+
+
 def test_render_emits_status_pages_for_catalog_endpoints(tmp_path):
     _scaffold(tmp_path)
     inputs = empty_status_inputs()
@@ -397,13 +470,21 @@ def test_render_emits_status_pages_for_catalog_endpoints(tmp_path):
     page = (tmp_path / "endpoints" / f"{slug}.html").read_text()
     # the manifest carries only what endpoint.js reads; status + metadata are
     # rendered server-side
-    assert _manifest(page) == {"slug": slug}
+    assert _manifest(page) == {
+        "slug": slug,
+        "state": None,
+        "changes": {"lt": [], "b3it": []},
+    }
     assert 'class="badge st st-untrackable"' in page
     assert '<b class="st-name">no logprobs</b>' in page
     assert "$1.00 in · $2.00 out" in page
 
     tracked_page = (tmp_path / "endpoints" / "m2fa23p.html").read_text()
-    assert _manifest(tracked_page) == {"slug": "m2fa23p"}
+    assert _manifest(tracked_page) == {
+        "slug": "m2fa23p",
+        "state": "stable",
+        "changes": {"lt": [], "b3it": []},
+    }
     assert '<b class="st-name">tracked</b>' in tracked_page
 
     model = json.loads(
