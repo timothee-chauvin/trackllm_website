@@ -1,6 +1,7 @@
 """Render and send the two daily B3IT digest emails (onboarding, monitoring)."""
 
 from dataclasses import dataclass, field
+from html import escape
 
 from trackllm_website import notify
 from trackllm_website.config import logger
@@ -89,9 +90,13 @@ def _label(key):
 
 
 def _link_html(model, provider):
+    # model/provider are OpenRouter catalog strings, i.e. attacker-influenced input
+    # rendered into our inbox. The href is safe by construction (slugify hex-encodes
+    # everything outside its allowlist), but the link text must be escaped.
     return (
         f'<a href="{_url(model, provider)}" style="color:#0969da;text-decoration:none">'
-        f'<b>{model}</b> <span style="color:#6e7781">@ {provider}</span></a>'
+        f"<b>{escape(model)}</b> "
+        f'<span style="color:#6e7781">@ {escape(provider)}</span></a>'
     )
 
 
