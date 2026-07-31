@@ -4,6 +4,7 @@
 import {
   B3IT_CAP,
   MONTH_NAMES,
+  bindTips,
   esc,
   headlineBadge,
   methodBadges,
@@ -11,6 +12,7 @@ import {
   plural,
   prettyDate,
   showLoadError,
+  stripTip,
   td,
 } from "./components";
 
@@ -229,7 +231,7 @@ export async function init(): Promise<void> {
       <circle cx="${x}" cy="${m.y.toFixed(1)}" r="3.4" fill="${m.color}"><title>${esc(m.title)}</title></circle>`;
       })
       .join("");
-    return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${gridLines(H)}
+    return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"${stripTip(ep.provider, marks.map((m) => m.title))}>${gridLines(H)}
       ${path ? `<path d="${path} L${W} ${H} L0 ${H} Z" fill="${col}" opacity="0.10"/>
       <path d="${path}" fill="none" stroke="${col}" stroke-width="1.3" opacity="0.65" vector-effect="non-scaling-stroke"/>` : ""}
       ${dots}</svg>`;
@@ -238,14 +240,16 @@ export async function init(): Promise<void> {
   /** Every change for the model on the shared axis: when did this model move at all. */
   function allStrip(): string {
     const H = 34;
+    const title = (c: ModelChange): string =>
+      `${c.date} · ${c.provider} · ${c.method.toUpperCase()}`;
     const marks = changes
       .map((c) => {
         const x = xpos(c.date).toFixed(1);
         const col = c.method === "lt" ? "var(--accent)" : "var(--b3it)";
-        return `<line x1="${x}" y1="6" x2="${x}" y2="${H - 6}" stroke="${col}" stroke-width="2" opacity="0.85"><title>${esc(`${c.date} · ${c.provider} · ${c.method.toUpperCase()}`)}</title></line>`;
+        return `<line x1="${x}" y1="6" x2="${x}" y2="${H - 6}" stroke="${col}" stroke-width="2" opacity="0.85"><title>${esc(title(c))}</title></line>`;
       })
       .join("");
-    return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${gridLines(H)}${marks}</svg>`;
+    return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"${stripTip("All endpoints", changes.map(title))}>${gridLines(H)}${marks}</svg>`;
   }
 
   /** A catalog endpoint with no series: headline badge + reason where the strip would be. */
@@ -320,6 +324,7 @@ export async function init(): Promise<void> {
       })
       .join("") +
     (hasTimeline ? `<div class="axis"><div class="ticks" id="ticks"></div></div>` : "");
+  bindTips(cmpEl);
 
   const ticksEl = document.getElementById("ticks");
   if (ticksEl) {
