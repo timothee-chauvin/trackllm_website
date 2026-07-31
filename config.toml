@@ -94,6 +94,14 @@ onboard_timeout_seconds = 10800
 
 [bi.monitor]
 max_concurrent_endpoints = 20
+# Deadline for a change-triggered re-init, separate from the 3h onboarding budget:
+# these run inside the daily monitor job, whose workflow limit is 300 minutes
+# (bi-monitor.yml). Hung endpoints burn one deadline per wave of
+# max_concurrent_endpoints, so 1h absorbs ~100 of them (5 waves) inside the job,
+# where the 3h onboarding budget blows it at 21 (2 waves = 6h). A real re-init is
+# ~15k queries (~50 min at 5 rps) and resumes from its persisted phase-1 progress
+# next run, so cutting one off costs a day, not the work.
+reinit_timeout_seconds = 3600
 
 [bi.popularity]
 top_n = 5

@@ -146,6 +146,7 @@ class PopularityConfig(BaseModel):
 
 class MonitorConfig(BaseModel):
     max_concurrent_endpoints: int
+    reinit_timeout_seconds: int
 
 
 class TemperatureGateConfig(BaseModel):

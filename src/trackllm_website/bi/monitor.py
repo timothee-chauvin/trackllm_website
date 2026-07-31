@@ -177,10 +177,15 @@ async def run_endpoint(
             try:
                 result = await asyncio.wait_for(
                     reinit(client, strategy, state.endpoint, epoch.border_inputs, now),
-                    # Same deadline as onboarding: a re-init is a full discovery run
-                    # (~15k queries), and it is serialized into the daily monitor job,
-                    # so one hanging endpoint would stall the whole workflow.
-                    timeout=config.bi.reinit.onboard_timeout_seconds,
+                    # A re-init is a full discovery run (~15k queries) and it happens
+                    # inside the daily monitor job, so one hanging endpoint would stall
+                    # the whole workflow. Its own deadline, not the onboarding one:
+                    # this job's budget is 300 minutes (see config.toml).
+                    # TODO: an endpoint that times out here every day re-detects the
+                    # same change and burns the deadline again forever. It needs a
+                    # give-up path (retire after N consecutive re-init timeouts, or
+                    # back off), which needs a counter in EndpointBIState.
+                    timeout=config.bi.monitor.reinit_timeout_seconds,
                 )
             except asyncio.TimeoutError:
                 timed_out = True
@@ -205,7 +210,7 @@ async def run_endpoint(
             # so the next daily run re-detects the change and retries.
             raise TimeoutError(
                 f"{state.endpoint}: re-init exceeded "
-                f"{config.bi.reinit.onboard_timeout_seconds}s"
+                f"{config.bi.monitor.reinit_timeout_seconds}s"
             )
         if event_rows is not None:
             event_rows.append(
