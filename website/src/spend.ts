@@ -23,15 +23,16 @@ const GROUP_COLOR: Record<string, string> = {
 };
 const DEFAULT_GROUP_COLOR = "#8A97A8";
 const MUTED_GRID = "rgba(140,150,165,0.25)";
-// --text-dim, dark theme; only reached if the stylesheet has not applied yet.
-const MUTED_TEXT_FALLBACK = "#7F8EA0";
 
 /** The chart's text cannot be a fixed hex: no single color clears AA against both
- *  the dark and the light page background, so it follows the --text-dim token and
- *  is repainted when the theme toggle (base.html.j2) flips data-theme. */
-function mutedText(): string {
-  const v = getComputedStyle(document.documentElement).getPropertyValue("--text-dim");
-  return v.trim() || MUTED_TEXT_FALLBACK;
+ *  the dark and the light page background, so it follows the --text-dim token —
+ *  undefined (Plotly's own default) only in the moment before the stylesheet
+ *  applies. Both ways the theme can move it are watched in `init`. */
+function mutedText(): string | undefined {
+  return (
+    getComputedStyle(document.documentElement).getPropertyValue("--text-dim").trim() ||
+    undefined
+  );
 }
 
 /** Every layout field carrying that color, as relayout attribute paths. */
@@ -68,14 +69,23 @@ async function init(): Promise<void> {
       name: g,
       marker: { color: GROUP_COLOR[g] ?? DEFAULT_GROUP_COLOR },
     }));
+  // The color goes into the first paint, not into a relayout after it: Plotly
+  // would otherwise draw the whole chart in its own #444 first.
+  const muted = mutedText();
   await Plotly.newPlot(
     el,
     traces,
     {
       barmode: "stack",
       title: { text: "Daily spend by category", font: { size: 14 } },
-      xaxis: { title: { text: "Date" }, gridcolor: MUTED_GRID },
-      yaxis: { title: { text: "USD" }, gridcolor: MUTED_GRID, rangemode: "tozero" },
+      font: { color: muted },
+      xaxis: { title: { text: "Date" }, gridcolor: MUTED_GRID, color: muted },
+      yaxis: {
+        title: { text: "USD" },
+        gridcolor: MUTED_GRID,
+        rangemode: "tozero",
+        color: muted,
+      },
       paper_bgcolor: "rgba(0,0,0,0)",
       plot_bgcolor: "rgba(0,0,0,0)",
       legend: { bgcolor: "rgba(0,0,0,0)" },
@@ -84,13 +94,16 @@ async function init(): Promise<void> {
     },
     { responsive: true, displayModeBar: false }
   );
-  const paint = (): void => {
-    Plotly.relayout(el, textColors(mutedText()) as Partial<Plotly.Layout>);
+  const repaint = (): void => {
+    const c = mutedText();
+    if (c) Plotly.relayout(el, textColors(c) as Partial<Plotly.Layout>);
   };
-  paint();
-  new MutationObserver(paint).observe(document.documentElement, {
+  // The token moves two ways: the toggle in base.html.j2 stamps data-theme, and
+  // the OS setting changes what the unstamped default resolves to.
+  new MutationObserver(repaint).observe(document.documentElement, {
     attributeFilter: ["data-theme"],
   });
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", repaint);
 }
 
 init();

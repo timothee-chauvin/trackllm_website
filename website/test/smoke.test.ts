@@ -64,7 +64,28 @@ const PAGES: Page[] = [
     ready: "#cmp .row",
     mounts: ["lede", "summary", "cmp"],
   },
+  {
+    // Discovered, not hardcoded: which endpoints exist churns daily. It needs a
+    // change of its own, or the changes table below the chart has no rows.
+    name: "endpoint",
+    html: `endpoints/${changedEndpointSlug()}.html`,
+    entry: "../src/endpoint.ts",
+    ready: "#changerows tr",
+    mounts: ["statuscard", "mainchart", "changerows"],
+  },
 ];
+
+/** The slug of one tracked endpoint with at least one detected change. */
+function changedEndpointSlug(): string {
+  const rows = JSON.parse(
+    readFileSync(requireBuilt("data/overview.json"), "utf8"),
+  ).endpoints;
+  const row = rows.find(
+    (r: { methods: string[]; nChanges: number }) => r.methods.length && r.nChanges > 0,
+  );
+  if (!row) throw new Error("no tracked endpoint with a change in overview.json");
+  return row.slug;
+}
 
 function requireBuilt(path: string): string {
   const full = join(SITE, path);
