@@ -118,7 +118,7 @@ async function fetchJSON<T>(url: string): Promise<T | null> {
 // `changes` (sigma-based changepoints) come from a different part of the LT pipeline than
 // the drift trace, so a still-empty drift/drift_dates backfill (see brief) must not hide them --
 // only the per-change drift *level* lookup is unavailable until the backfill lands.
-function buildLT(scores: LTScoresData | null): FocusLT | null {
+export function buildLT(scores: LTScoresData | null): FocusLT | null {
   if (!scores || !scores.dates.length) return null;
   const driftDates = scores.drift_dates ?? [];
   const drift = scores.drift ?? [];
@@ -136,7 +136,7 @@ function buildLT(scores: LTScoresData | null): FocusLT | null {
   };
 }
 
-function buildB3IT(data: B3ITData | null): FocusB3IT | null {
+export function buildB3IT(data: B3ITData | null): FocusB3IT | null {
   if (!data) return null;
   const pairs: [string, number][] = data.tv_series.dates.map((d, i) => [
     d.slice(0, 10),
@@ -191,26 +191,76 @@ function renderStatusCard(lt: FocusLT | null, b3it: FocusB3IT | null): void {
 
 // ---- stacked-lane drift chart: LT drift (nats) and B3IT total variation (0-1)
 // share one time axis so a real change reads as an aligned step in both lanes.
-const VW = 1000, PL = 50, PR = 20;
+//
+// The SVG is laid out in CSS pixels of the container it is about to fill: the
+// viewBox width is the measured content width, so a `font-size="10"` label is 10px
+// on a phone exactly as on a desktop. Drawing at a fixed 1000-unit width and
+// letting `.chart svg { width: 100% }` scale it down is what made the axis and
+// sigma labels render at ~2.6px in a 264px phone column.
+const DESIGN_VW = 1000; // width to draw at when nothing can be measured (no layout engine)
+const NARROW_VW = 560; // below this the side margins are trimmed and month labels thinned
+const MIN_VW = 160; // floor: below it the margins would eat the whole plot area
 const LANE_H = 108, GAP = 34, TOP1 = 34;
 const TOP2 = TOP1 + LANE_H + GAP;
 const VH = TOP2 + LANE_H + 40;
-const PW = VW - PL - PR;
+// "Jul 26" in var(--mono) at font-size 10.5 measures ~41px; the rest is the gap
+// that keeps two neighbouring labels from touching.
+const MONTH_LABEL_W = 52;
+const RESIZE_DEBOUNCE_MS = 150;
 
-function renderChart(lt: FocusLT | null, b3it: FocusB3IT | null): void {
-  const chartEl = document.getElementById("mainchart");
-  const footEl = document.getElementById("footnote");
-  if (!chartEl) return;
+interface Dims {
+  vw: number;
+  pl: number;
+  pr: number;
+  pw: number;
+  narrow: boolean;
+}
 
+/** Plot margins for a given container width. At DESIGN_VW these are the values the
+ *  chart has always used, so a desktop-width render is unchanged. */
+function dims(vw: number): Dims {
+  const w = Math.max(MIN_VW, vw);
+  const narrow = w < NARROW_VW;
+  const pl = narrow ? 30 : 50;
+  const pr = narrow ? 10 : 20;
+  return { vw: w, pl, pr, pw: w - pl - pr, narrow };
+}
+
+/** Content width of the chart's own box, in CSS pixels. */
+function chartWidth(el: HTMLElement): number {
+  const cs = getComputedStyle(el);
+  const w = Math.round(
+    el.clientWidth - parseFloat(cs.paddingLeft || "0") - parseFloat(cs.paddingRight || "0")
+  );
+  return w > 0 ? w : DESIGN_VW;
+}
+
+/** Redraw when the container's width actually changed. A phone fires `resize` for
+ *  every scroll-driven browser-chrome collapse, where only the height moves. */
+function onWidthChange(el: HTMLElement, draw: () => void): void {
+  let width = chartWidth(el);
+  let timer: ReturnType<typeof setTimeout>;
+  window.addEventListener("resize", () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      const w = chartWidth(el);
+      if (w === width) return;
+      width = w;
+      draw();
+    }, RESIZE_DEBOUNCE_MS);
+  });
+}
+
+/** The whole chart as one SVG, a pure function of the data and the width to fill.
+ *  Returns "" when there is nothing to plot. */
+export function chartSvg(lt: FocusLT | null, b3it: FocusB3IT | null, vw: number): string {
   const anchors = [
     lt?.drift[0]?.[0], last(lt?.drift ?? [])?.[0],
     b3it?.tv[0]?.[0], last(b3it?.tv ?? [])?.[0],
   ].filter((d): d is string => !!d);
-  if (!anchors.length) {
-    chartEl.innerHTML = `<div style="padding:2rem 1rem;color:var(--text-dim);font-size:0.85rem">No monitoring data available yet for this endpoint.</div>`;
-    if (footEl) footEl.innerHTML = "";
-    return;
-  }
+  if (!anchors.length) return "";
+
+  const { pl: PL, pr: PR, pw: PW, vw: VW, narrow } = dims(vw);
   const d0 = td(anchors.sort()[0]);
   const d1 = td(last(anchors.sort())!);
   const span = Math.max(1, d1 - d0);
@@ -253,38 +303,90 @@ function renderChart(lt: FocusLT | null, b3it: FocusB3IT | null): void {
     return `<text x="${PL}" y="${topY + LANE_H / 2}" fill="var(--text-dim)" font-size="11" font-family="var(--mono)">${text}</text>`;
   }
 
+  // SVG text does not wrap, so every string here has to fit the plot it is drawn
+  // in: at ~30 px of margin and ~7 px per character, a phone column has room for
+  // roughly 30 of them. The lane's meaning is spelled out in .sec-desc above.
+  const say = (full: string, short: string): string => (narrow ? short : full);
+  const ltTitle = say("LT · drift from baseline (nats)", "LT · drift (nats)");
+  const b3Title = say("B3IT · total variation from baseline (0–1)", "B3IT · TV (0–1)");
   const ltMax = lt && lt.drift.length ? Math.max(1, ...lt.drift.map(([, v]) => v)) * 1.08 : 1;
   const ltSvg =
     lt && lt.drift.length
-      ? lane(lt.drift, TOP1, ltMax, "var(--accent)", "var(--accent-fill)", "LT · drift from baseline (nats)", (v) => v.toFixed(1))
-      : placeholder(TOP1, lt ? "LT · drift trace not available for this endpoint yet" : "LT · not monitored for this endpoint");
+      ? lane(lt.drift, TOP1, ltMax, "var(--accent)", "var(--accent-fill)", ltTitle, (v) => v.toFixed(1))
+      : placeholder(TOP1, lt ? say("LT · drift trace not available for this endpoint yet", "LT · no drift trace yet") : say("LT · not monitored for this endpoint", "LT · not monitored"));
   const b3Svg =
     b3it && b3it.tv.length
-      ? lane(b3it.tv, TOP2, 1, "var(--b3it)", "var(--b3it-fill)", "B3IT · total variation from baseline (0–1)", (v) => v.toFixed(1))
-      : placeholder(TOP2, b3it ? "B3IT · no reference data in this window" : "B3IT · not monitored for this endpoint");
+      ? lane(b3it.tv, TOP2, 1, "var(--b3it)", "var(--b3it-fill)", b3Title, (v) => v.toFixed(1))
+      : placeholder(TOP2, b3it ? say("B3IT · no reference data in this window", "B3IT · no reference data") : say("B3IT · not monitored for this endpoint", "B3IT · not monitored"));
 
-  const cps: { x: number; col: string; lab: string; lane: "lt" | "b3" }[] = [];
-  (lt?.changes ?? []).forEach((c) => cps.push({ x: fx(c.date), col: "var(--accent)", lab: c.sigma, lane: "lt" }));
-  (b3it?.changes ?? []).forEach((c) => cps.push({ x: fx(c.date), col: "var(--b3it)", lab: fmtTV(c.peakTV), lane: "b3" }));
+  const cps = [
+    ...(lt?.changes ?? []).map((c) => ({ x: fx(c.date), col: "var(--accent)", lab: c.sigma, baseY: TOP1 - 8 })),
+    ...(b3it?.changes ?? []).map((c) => ({ x: fx(c.date), col: "var(--b3it)", lab: fmtTV(c.peakTV), baseY: TOP2 - 8 })),
+  ];
+  // A changepoint label is centred on its dot and shares a baseline with the lane
+  // title, so on a plot this narrow they overprint each other and the title. Two
+  // corrections, both no-ops while everything still fits: pull a label at either
+  // end of the span back inside the SVG (which clips), and lift one that would land
+  // on an already-occupied stretch of the baseline into the row above.
+  const CHAR_W = 6.3; // var(--mono) at font-size 10.5
+  const TITLE_CHAR_W = 6.9; // ... and at the 11.5 the lane titles use
+  const ROW_H = 12;
+  // one row up is all the clear space there is above either baseline
+  const MAX_ROW = 1;
+  // per baseline, the right edge already occupied in each row -- row 0 starts at
+  // the end of the lane title
+  const rowEnd = new Map<number, number[]>([
+    [TOP1 - 8, [PL + (lt?.drift.length ? ltTitle.length * TITLE_CHAR_W : 0)]],
+    [TOP2 - 8, [PL + (b3it?.tv.length ? b3Title.length * TITLE_CHAR_W : 0)]],
+  ]);
   const cpSvg = cps
+    .sort((a, b) => a.x - b.x)
     .map((c) => {
-      const labY = c.lane === "lt" ? TOP1 - 8 : TOP2 - 8;
+      const half = (c.lab.length * CHAR_W) / 2;
+      const labX = Math.min(Math.max(c.x, half), VW - half);
+      const ends = rowEnd.get(c.baseY)!;
+      let row = 0;
+      while (row < ends.length && row < MAX_ROW && labX - half < ends[row] + 4) row++;
+      if (row === ends.length) ends.push(0);
+      ends[row] = labX + half;
       return `<line x1="${c.x.toFixed(1)}" y1="${TOP1 - 4}" x2="${c.x.toFixed(1)}" y2="${TOP2 + LANE_H}" stroke="${c.col}" stroke-width="1" stroke-dasharray="3 3" opacity="0.55"/>
-        <circle cx="${c.x.toFixed(1)}" cy="${(labY + 4).toFixed(1)}" r="2.6" fill="${c.col}"/>
-        <text x="${c.x.toFixed(1)}" y="${labY}" fill="${c.col}" font-size="10.5" font-family="var(--mono)" font-weight="600" text-anchor="middle">${c.lab}</text>`;
+        <circle cx="${c.x.toFixed(1)}" cy="${(c.baseY + 4).toFixed(1)}" r="2.6" fill="${c.col}"/>
+        <text x="${labX.toFixed(1)}" y="${c.baseY - row * ROW_H}" fill="${c.col}" font-size="10.5" font-family="var(--mono)" font-weight="600" text-anchor="middle">${c.lab}</text>`;
     })
     .join("");
 
-  const xlabels = monthTicks(d0, d1)
+  // Every month keeps its gridline; only the labels thin out, and only once they
+  // would no longer fit side by side -- which on a phone is from the second one.
+  const ticks = monthTicks(d0, d1);
+  const step = Math.max(1, Math.ceil((ticks.length * MONTH_LABEL_W) / PW));
+  const xlabels = ticks
+    .filter((_, i) => i % step === 0)
     .map((d) => {
       const x = fx(d.toISOString().slice(0, 10));
       return `<text x="${x.toFixed(1)}" y="${VH - 14}" fill="var(--text-dim)" font-size="10.5" font-family="var(--mono)" text-anchor="middle">${MONTH_NAMES[d.getUTCMonth()]} ${String(d.getUTCFullYear()).slice(2)}</text>`;
     })
     .join("");
 
-  chartEl.innerHTML = `<svg viewBox="0 0 ${VW} ${VH}" preserveAspectRatio="xMidYMid meet">
+  return `<svg viewBox="0 0 ${VW} ${VH}" preserveAspectRatio="xMidYMid meet">
     ${ltSvg}${b3Svg}${cpSvg}${xlabels}
     <line x1="${PL}" y1="${TOP2 + LANE_H}" x2="${VW - PR}" y2="${TOP2 + LANE_H}" stroke="var(--border)" stroke-width="1"/></svg>`;
+}
+
+function renderChart(lt: FocusLT | null, b3it: FocusB3IT | null): void {
+  const chartEl = document.getElementById("mainchart");
+  const footEl = document.getElementById("footnote");
+  if (!chartEl) return;
+
+  const svg = chartSvg(lt, b3it, chartWidth(chartEl));
+  if (!svg) {
+    chartEl.innerHTML = `<div style="padding:2rem 1rem;color:var(--text-dim);font-size:0.85rem">No monitoring data available yet for this endpoint.</div>`;
+    if (footEl) footEl.innerHTML = "";
+    return;
+  }
+  chartEl.innerHTML = svg;
+  onWidthChange(chartEl, () => {
+    chartEl.innerHTML = chartSvg(lt, b3it, chartWidth(chartEl));
+  });
 
   if (footEl) {
     let note = readingCaption(!!lt, !!b3it);
@@ -317,7 +419,7 @@ function renderChangesTable(lt: FocusLT | null, b3it: FocusB3IT | null): void {
     .join("");
 }
 
-async function init(): Promise<void> {
+export async function init(): Promise<void> {
   const manifestEl = document.getElementById("manifest");
   if (!manifestEl) {
     console.error("Manifest element not found");
