@@ -5,7 +5,7 @@ export {};
 
 import { showLoadError } from "./components";
 import { readingCaption } from "./caption";
-import { MONTH_NAMES, esc, monthTicks, td } from "./components";
+import { MONTH_NAMES, esc, td, timeTicks } from "./components";
 
 interface ManifestData {
   slug: string;
@@ -228,6 +228,10 @@ export function chartSvg(lt: FocusLT | null, b3it: FocusB3IT | null, vw: number)
   const d1 = td(last(anchors.sort())!);
   const span = Math.max(1, d1 - d0);
   const fx = (s: string): number => PL + ((td(s) - d0) / span) * PW;
+  // One tick list for the gridlines and the labels both, at whatever granularity
+  // this many pixels can spell out -- days on a fortnight-old endpoint, months on
+  // a two-year one.
+  const ticks = timeTicks(d0, d1, Math.max(1, Math.floor(PW / MONTH_LABEL_W)));
 
   function lane(
     series: [string, number][],
@@ -246,19 +250,19 @@ export function chartSvg(lt: FocusLT | null, b3it: FocusB3IT | null, vw: number)
       `M${fx(series[0][0]).toFixed(1)} ${(topY + LANE_H).toFixed(1)} ` +
       series.map(([d, v]) => `L${fx(d).toFixed(1)} ${yv(v).toFixed(1)}`).join(" ") +
       ` L${fx(last(series)![0]).toFixed(1)} ${(topY + LANE_H).toFixed(1)} Z`;
-    const grid = monthTicks(d0, d1)
-      .map((d) => {
-        const x = fx(d.toISOString().slice(0, 10));
+    const grid = ticks
+      .map(({ t }) => {
+        const x = fx(new Date(t).toISOString().slice(0, 10));
         return `<line x1="${x.toFixed(1)}" y1="${topY}" x2="${x.toFixed(1)}" y2="${topY + LANE_H}" stroke="var(--border-soft)" stroke-width="1"/>`;
       })
       .join("");
-    const ticks = [0, maxV / 2, maxV]
+    const yticks = [0, maxV / 2, maxV]
       .map(
         (v) =>
           `<line x1="${PL}" y1="${yv(v).toFixed(1)}" x2="${VW - PR}" y2="${yv(v).toFixed(1)}" stroke="var(--border-soft)" stroke-width="0.7" opacity="0.6"/><text x="${PL - 8}" y="${(yv(v) + 3).toFixed(1)}" fill="${color}" font-size="10" font-family="var(--mono)" text-anchor="end">${axisFmt(v)}</text>`
       )
       .join("");
-    return `${grid}${ticks}<path d="${area}" fill="${fill}" stroke="none"/><path d="${pts}" fill="none" stroke="${color}" stroke-width="1.7" vector-effect="non-scaling-stroke"/>
+    return `${grid}${yticks}<path d="${area}" fill="${fill}" stroke="none"/><path d="${pts}" fill="none" stroke="${color}" stroke-width="1.7" vector-effect="non-scaling-stroke"/>
       <text x="${PL}" y="${topY - 8}" fill="${color}" font-size="11.5" font-family="var(--mono)" font-weight="600">${label}</text>`;
   }
 
@@ -327,15 +331,10 @@ export function chartSvg(lt: FocusLT | null, b3it: FocusB3IT | null, vw: number)
     })
     .join("");
 
-  // Every month keeps its gridline; only the labels thin out, and only once they
-  // would no longer fit side by side -- which on a phone is from the second one.
-  const ticks = monthTicks(d0, d1);
-  const step = Math.max(1, Math.ceil((ticks.length * MONTH_LABEL_W) / PW));
   const xlabels = ticks
-    .filter((_, i) => i % step === 0)
-    .map((d) => {
-      const x = fx(d.toISOString().slice(0, 10));
-      return `<text x="${x.toFixed(1)}" y="${VH - 14}" fill="var(--text-dim)" font-size="10.5" font-family="var(--mono)" text-anchor="middle">${MONTH_NAMES[d.getUTCMonth()]} ${String(d.getUTCFullYear()).slice(2)}</text>`;
+    .map(({ t, label }) => {
+      const x = fx(new Date(t).toISOString().slice(0, 10));
+      return `<text x="${x.toFixed(1)}" y="${VH - 14}" fill="var(--text-dim)" font-size="10.5" font-family="var(--mono)" text-anchor="middle">${label}</text>`;
     })
     .join("");
 

@@ -200,6 +200,71 @@ export function monthTicks(d0: number, d1: number): Date[] {
   return out;
 }
 
+export interface Tick {
+  t: number;
+  label: string;
+}
+
+// Coarsest first is what the caller wants and finest first is what reads well, so
+// the ladder is climbed, not descended: the first rung whose ticks all fit is used.
+const DAY_STEPS = [1, 2, 3, 7, 14];
+const MONTH_STEPS = [1, 2, 3, 6, 12];
+
+const dayLabel = (t: number): string => {
+  const d = new Date(t);
+  return `${MONTH_NAMES[d.getUTCMonth()]} ${d.getUTCDate()}`;
+};
+// monthLabel's apostrophe is load-bearing here: without it "Jul 26" is a day on one
+// chart and a year on the next.
+const tickMonthLabel = (t: number): string => monthLabel(new Date(t).toISOString().slice(0, 7));
+
+/** Ticks every `step` days, aligned to the epoch so the same days are chosen
+ *  whatever `d0` happens to be. */
+function dayRungTicks(d0: number, d1: number, step: number): number[] {
+  const ms = step * DAY_MS;
+  const out: number[] = [];
+  for (let t = Math.ceil(d0 / ms) * ms; t <= d1; t += ms) out.push(t);
+  return out;
+}
+
+/** First-of-month ticks every `step` months, aligned to January for the same reason. */
+function monthRungTicks(d0: number, d1: number, step: number): number[] {
+  const out: number[] = [];
+  const d = new Date(d0);
+  d.setUTCDate(1);
+  d.setUTCHours(0, 0, 0, 0);
+  d.setUTCMonth(d.getUTCMonth() - (d.getUTCMonth() % step));
+  while (d.getTime() < d0) d.setUTCMonth(d.getUTCMonth() + step);
+  while (d.getTime() <= d1) {
+    out.push(d.getTime());
+    d.setUTCMonth(d.getUTCMonth() + step);
+  }
+  return out;
+}
+
+/** Dated x-axis ticks for a [d0, d1] ms range, at the finest granularity whose
+ *  labels still fit in `maxLabels` slots.
+ *
+ *  monthTicks, which this replaces on the endpoint chart, could return nothing at
+ *  all: an endpoint observed for under a month need contain no first-of-month, and
+ *  its chart came out with no gridlines and a blank axis. Here the 1-day rung always
+ *  yields at least one tick, and the coarsest rung is thinned rather than abandoned,
+ *  so the result is never empty and never over budget. */
+export function timeTicks(d0: number, d1: number, maxLabels: number): Tick[] {
+  for (const step of DAY_STEPS) {
+    const ts = dayRungTicks(d0, d1, step);
+    if (ts.length <= maxLabels) return ts.map((t) => ({ t, label: dayLabel(t) }));
+  }
+  let coarsest: number[] = [];
+  for (const step of MONTH_STEPS) {
+    coarsest = monthRungTicks(d0, d1, step);
+    if (coarsest.length <= maxLabels) break;
+  }
+  // Past a decade even yearly ticks can outrun a phone's budget.
+  const keep = Math.ceil(coarsest.length / Math.max(1, maxLabels));
+  return coarsest.filter((_, i) => i % keep === 0).map((t) => ({ t, label: tickMonthLabel(t) }));
+}
+
 /** The Enter/Space contract a role="button"/role="img" widget owes a keyboard.
  *  Space is prevented so activating a control never scrolls the page instead. */
 export function bindKeyActivation(
