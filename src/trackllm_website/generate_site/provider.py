@@ -15,8 +15,9 @@ from datetime import datetime
 from pathlib import Path
 
 from trackllm_website.generate_site.b3it import B3ITView
+from trackllm_website.generate_site.clock import site_now
 from trackllm_website.generate_site.feed import build_feed_items
-from trackllm_website.generate_site.lt import EndpointInfo, LTData, latest_date
+from trackllm_website.generate_site.lt import EndpointInfo, LTData
 from trackllm_website.generate_site.months import month_range
 from trackllm_website.generate_site.naming import base_provider, variant_name
 from trackllm_website.generate_site.rates import drift_rate, poisson_interval
@@ -110,9 +111,15 @@ def build_provider_views(
         if dates:
             b3it_span[slug] = (dates[0][:10], dates[-1][:10])
 
-    now = latest_date(lt_data)
+    now = site_now(lt_data, b3it_views)
     drift_by_slug = {slug: d.drift for slug, d in lt_data.items()}
     items = build_feed_items(changes, drift_by_slug, b3it_views, now) if now else []
+    # Only changes from endpoints still in the fleet. A departed endpoint brings
+    # no exposure to divide its changes by, and its serving variant may have no
+    # row at all: counting it there would mint a variant with 0 endpoints and 0
+    # endpoint-years -- a phantom row with an infinite drift rate.
+    fleet = set(lt_by_slug) | set(b3it_views)
+    items = [i for i in items if i["slug"] in fleet]
 
     by_provider: dict[str, dict[str, _Span]] = defaultdict(lambda: defaultdict(_Span))
     models: dict[str, set[str]] = defaultdict(set)
@@ -139,11 +146,11 @@ def build_provider_views(
     # build-time recompute double-detects some changes on adjacent days, which the
     # canonical merged list does not carry.
     for item in items:
-        base = base_provider(item["provider"])
-        if base in by_provider:
-            by_provider[base][variant_name(item["provider"])].changes[
-                item["method"]
-            ] += 1
+        # never by defaultdict: a variant absent from the fleet must not be minted
+        variants = by_provider.get(base_provider(item["provider"]), {})
+        acc = variants.get(variant_name(item["provider"]))
+        if acc is not None:
+            acc.changes[item["method"]] += 1
 
     views: dict[str, dict] = {}
     for base, variants in sorted(by_provider.items()):
