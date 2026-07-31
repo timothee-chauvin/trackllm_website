@@ -20,10 +20,12 @@
             <span class="glyph"><svg viewBox="0 0 24 24" fill="none" stroke="#0B0F14" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l2-7 4 14 2-7h8"/></svg></span>
             <span class="name">Track<b>LLM</b></span>
         </a>
+        {# body_class already names the page every template is rendered as, so it is
+           what says which nav link is the current one. #}
         <div class="nav-links">
-            <a href="{{ nav_prefix }}changes.html">Changes</a>
-            <a href="{{ nav_prefix }}spend.html">Spend</a>
-            <a href="{{ nav_prefix }}methodology.html">Methodology</a>
+            {% for page, label in [('changes', 'Changes'), ('spend', 'Spend'), ('methodology', 'Methodology')] %}
+            <a href="{{ nav_prefix }}{{ page }}.html"{% if body_class == page %} class="active" aria-current="page"{% endif %}>{{ label }}</a>
+            {% endfor %}
             <a href="https://github.com/timothee-chauvin/trackllm_website" target="_blank" rel="noopener">GitHub</a>
         </div>
         <div class="nav-right">

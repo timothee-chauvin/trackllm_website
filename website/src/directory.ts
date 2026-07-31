@@ -5,6 +5,7 @@
 import {
   B3IT_CAP,
   LT_CAP,
+  bindActivation,
   esc,
   methodBadges,
   sparkline,
@@ -32,37 +33,44 @@ export interface EndpointRow {
 export type DirSortKey = "model" | "provider" | "status" | "nChanges" | "stableDays";
 
 /** Sortable column headers for one table: holds (key, dir), flips them on header
- *  clicks, and paints the ▼/▲ arrows. `attr` is the th dataset key ("sort",
- *  "psort"), so two tables on one page keep independent state. A first click on
- *  a key listed in `descending` sorts high-to-low. */
+ *  clicks or Enter/Space, and paints the ▼/▲ arrows plus the aria-sort a screen
+ *  reader announces. `attr` is the th dataset key ("sort", "psort"), so two
+ *  tables on one page keep independent state. A first click on a key listed in
+ *  `descending` sorts high-to-low. The headers become focusable here rather than
+ *  in the template: without this script they sort nothing, so they are no more
+ *  tabbable than the plain headers beside them. */
 export function initSortHeaders<K extends string>(
   attr: string,
   initial: K,
   initialDir: number,
   descending: readonly K[],
   render: () => void
-): { key: K; dir: number; paintArrows: () => void } {
+): { key: K; dir: number; paintSort: () => void } {
   const headers = document.querySelectorAll<HTMLElement>(`th[data-${attr}]`);
   const state = {
     key: initial,
     dir: initialDir,
-    paintArrows(): void {
+    paintSort(): void {
       headers.forEach((th) => {
+        const active = th.dataset[attr] === state.key;
         const arr = th.querySelector(".arr");
-        if (arr) {
-          arr.textContent = th.dataset[attr] === state.key ? (state.dir < 0 ? "▼" : "▲") : "";
-        }
+        if (arr) arr.textContent = active ? (state.dir < 0 ? "▼" : "▲") : "";
+        th.setAttribute(
+          "aria-sort",
+          active ? (state.dir < 0 ? "descending" : "ascending") : "none"
+        );
       });
     },
   };
-  headers.forEach((th) =>
-    th.addEventListener("click", () => {
+  headers.forEach((th) => {
+    th.tabIndex = 0;
+    bindActivation(th, `th[data-${attr}]`, () => {
       const k = th.dataset[attr] as K;
       if (state.key === k) state.dir *= -1;
       else { state.key = k; state.dir = descending.includes(k) ? -1 : 1; }
       render();
-    })
-  );
+    });
+  });
   return state;
 }
 
@@ -134,7 +142,7 @@ export function initDirectory(cfg: DirectoryConfig): () => void {
       return `${head}${cells}</tr>`;
     }).join("") || '<tr><td colspan="7"><div class="empty">No endpoints match.</div></td></tr>';
     cfg.foot.textContent = `${list.length} of ${cfg.rows.length} endpoints`;
-    sort.paintArrows();
+    sort.paintSort();
   }
   cfg.q.addEventListener("input", render);
   render();
