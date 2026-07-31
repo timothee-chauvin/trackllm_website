@@ -1,1 +1,1 @@
-{"seen_tokens":["</think>","<","\"",","," and"],"seen_logprobs":[{"tokens":[0,1,2,3,4],"logprobs":[-0.000048159392,-12.312548,-12.937548,-13.687548,-14.000048]}]}
+{"seen_tokens":["</think>","<","\"",","," and"," helpful"," encouraging"," supportive"," encourage"," inviting"],"seen_logprobs":[{"tokens":[0,1,2,3,4],"logprobs":[-0.000048159392,-12.312548,-12.937548,-13.687548,-14.000048]},{"tokens":[5,6,7,8,9],"logprobs":[-0.00016068121,-9.25016,-10.00016,-11.25016,-12.75016]}]}
