@@ -267,3 +267,27 @@ describe("--text-dim contrast", () => {
     }
   });
 });
+
+describe("navigation", () => {
+  test("the current page's nav link is marked, and only it", () => {
+    const cases: [string, string][] = [
+      ["changes.html", "changes.html"],
+      ["spend.html", "spend.html"],
+      ["methodology.html", "methodology.html"],
+    ];
+    for (const [page, href] of cases) {
+      document.documentElement.innerHTML = readFileSync(requireBuilt(page), "utf8");
+      const current = document.querySelectorAll(".nav-links a[aria-current]");
+      expect(current.length, `${page} marks ${current.length} nav links`).toBe(1);
+      expect(current[0].getAttribute("href")).toBe(href);
+      expect(current[0].classList.contains("active")).toBe(true);
+    }
+  });
+
+  test("a page with no nav entry of its own marks none", () => {
+    for (const page of ["index.html", "orgs/deepseek.html"]) {
+      document.documentElement.innerHTML = readFileSync(requireBuilt(page), "utf8");
+      expect(document.querySelectorAll(".nav-links a[aria-current]").length, page).toBe(0);
+    }
+  });
+});
