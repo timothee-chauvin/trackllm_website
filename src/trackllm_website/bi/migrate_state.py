@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 
 import fire
 
-from trackllm_website.bi.analyze import load_phase2_results
+from trackllm_website.bi.results import load_phase2_results
 from trackllm_website.bi.state import EndpointBIState, Epoch, RetiredInfo
 from trackllm_website.config import Endpoint, config, logger
 from trackllm_website.util import endpoint_from_slug

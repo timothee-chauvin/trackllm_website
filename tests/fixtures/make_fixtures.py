@@ -5,7 +5,7 @@ from pathlib import Path
 
 import orjson
 
-from trackllm_website.bi.analyze import load_phase2_results
+from trackllm_website.bi.results import load_phase2_results
 from trackllm_website.config import config
 
 FIXTURE_DIR = Path("tests/fixtures/phase_2")

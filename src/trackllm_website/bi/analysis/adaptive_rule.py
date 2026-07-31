@@ -11,19 +11,19 @@ from pathlib import Path
 import fire
 from plotly.subplots import make_subplots
 
-from trackllm_website.bi.analyze import (
+from trackllm_website.bi.analysis.analyze import (
     compute_endpoint_tv_over_time,
     find_transitions,
     get_endpoint_legend_name,
 )
-from trackllm_website.bi.bi_quality import (
+from trackllm_website.bi.analysis.bi_quality import (
     ref_distributions,
     select_prompts,
     subsample,
 )
 from trackllm_website.bi.detection import adaptive_transitions
 from trackllm_website.bi.phase_2 import Timestamp
-from trackllm_website.bi.sampling_sweep import (
+from trackllm_website.bi.analysis.sampling_sweep import (
     DAYS_AFTER,
     DAYS_BEFORE,
     THRESHOLD,

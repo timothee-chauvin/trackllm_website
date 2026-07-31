@@ -644,10 +644,13 @@ class TestBIPrevalenceIntegration:
         )
 
         with (
-            patch("trackllm_website.bi.bi_prevalence.config", mock_config),
-            patch("trackllm_website.bi.bi_prevalence.load_tokenizers") as mock_load_tok,
+            patch("trackllm_website.bi.analysis.bi_prevalence.config", mock_config),
             patch(
-                "trackllm_website.bi.bi_prevalence.resolve_strategies", mock_strategies
+                "trackllm_website.bi.analysis.bi_prevalence.load_tokenizers"
+            ) as mock_load_tok,
+            patch(
+                "trackllm_website.bi.analysis.bi_prevalence.resolve_strategies",
+                mock_strategies,
             ),
             patch("trackllm_website.bi.common.OpenRouterClient") as MockClient,
         ):
@@ -659,7 +662,7 @@ class TestBIPrevalenceIntegration:
             client_instance.query.return_value = mock_response(content="result")
             MockClient.return_value = client_instance
 
-            from trackllm_website.bi.bi_prevalence import run_bi_prevalence
+            from trackllm_website.bi.analysis.bi_prevalence import run_bi_prevalence
 
             await run_bi_prevalence(temperatures=[0.0, 1.0])
 

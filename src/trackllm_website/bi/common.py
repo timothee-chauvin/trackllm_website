@@ -121,7 +121,8 @@ def _strategy_to_raw(strategy: QueryStrategy) -> dict | None:
     elif isinstance(strategy, ReasoningDisabledStrategy):
         return {"effort": "none"}
     elif isinstance(strategy, ReasoningBudgetStrategy):
-        # Store the original discovered budget (not doubled) for cache compat with test_reasoning.py
+        # Store the original discovered budget (not doubled) for cache compat with
+        # analysis/probe_reasoning.py
         return {"max_tokens": strategy.budget // 2}
 
 
@@ -295,8 +296,6 @@ async def resolve_strategies(
         logger.info(f"Updated strategy cache ({len(cached_raw)} entries)")
 
     return result, failed
-
-    return result
 
 
 _file_semaphore: asyncio.Semaphore | None = None
