@@ -21,7 +21,7 @@ from trackllm_website.bi.common import (
     run_queries,
     save_strategies,
 )
-from trackllm_website.bi.generate_bi_prevalence_endpoints import (
+from trackllm_website.bi.analysis.generate_bi_prevalence_endpoints import (
     PREVALENCE_MAX_AVG_COST,
     PREVALENCE_N,
     get_cheap_endpoints,

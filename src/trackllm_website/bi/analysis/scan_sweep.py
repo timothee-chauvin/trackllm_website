@@ -6,7 +6,7 @@ up to a window W — over all historical epochs, and reports:
 - detection rate and latency on the known missed early changes
 - head-to-head vs the adaptive rule on the epochs where it fired
 
-Run from the repo root: `uv run python -m trackllm_website.bi.scan_sweep`
+Run from the repo root: `uv run python -m trackllm_website.bi.analysis.scan_sweep`
 """
 
 import statistics
@@ -16,7 +16,7 @@ from datetime import datetime
 import fire
 import orjson
 
-from trackllm_website.bi.analyze import load_phase2_results
+from trackllm_website.bi.results import load_phase2_results
 from trackllm_website.bi.detection import (
     adaptive_transitions,
     epoch_tv_series,

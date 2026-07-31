@@ -8,7 +8,10 @@ from pathlib import Path
 from aiolimiter import AsyncLimiter
 
 from trackllm_website.api import OpenRouterClient
-from trackllm_website.bi.bi_prevalence import TARGET_BORDER_INPUTS, _build_states
+from trackllm_website.bi.analysis.bi_prevalence import (
+    TARGET_BORDER_INPUTS,
+    _build_states,
+)
 from trackllm_website.bi.common import (
     EndpointState,
     QueryStrategy,

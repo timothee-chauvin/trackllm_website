@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
-import orjson
 from aiolimiter import AsyncLimiter
 
 from trackllm_website.api import OpenRouterClient
@@ -107,54 +106,6 @@ async def phase_1a(
     logger.info("Phase 1a complete")
 
 
-async def phase_1b(temperature: float, base_dir: Path | None = None) -> None:
-    """Phase 1b: Perform additional sampling of the candidate border inputs and select the best ones."""
-    if base_dir is None:
-        base_dir = config.bi.data_dir / "phase_1"
-    logger.info(f"Running phase 1b with temperature={temperature:g}")
-    tokenizer_index, fallback_tokens = load_tokenizers()
-
-    endpoints = config.endpoints_bi
-    logger.info(f"Running phase 1b for {len(endpoints)} endpoints")
-
-    requests_per_second = config.bi.phase_1.requests_per_second_per_endpoint
-    max_concurrent_requests = config.bi.phase_1.max_concurrent_requests_per_endpoint
-    max_concurrent_tokens = config.bi.phase_1.max_concurrent_tokens_per_endpoint
-
-    states = [
-        Phase1EndpointState(
-            endpoint=ep,
-            input_tokens=get_input_tokens(
-                ep,
-                tokenizer_index,
-                fallback_tokens,
-                config.bi.phase_1.tokens_per_endpoint,
-            ),
-            temperatures=[temperature],
-            base_dir=base_dir,
-            rate_limiter=AsyncLimiter(requests_per_second, 1),
-            concurrency_semaphore=asyncio.Semaphore(max_concurrent_requests),
-            pending_before_new_semaphore=asyncio.Semaphore(max_concurrent_tokens),
-            queries_per_token=config.bi.phase_1.queries_per_token,
-            max_retries=config.bi.phase_1.max_retries,
-            backoff_on_timeout=False,
-            abandon_after_timeouts=config.bi.phase_1.abandon_after_timeouts,
-        )
-        for ep in endpoints
-    ]
-
-    results = {}
-    for state in states:
-        # TODO do the additional sampling, this is just a mock
-        border_inputs = state.get_border_tokens()
-        results[str(state.endpoint)] = border_inputs
-
-    output_path = config.bi.get_phase_1_dir(temperature, base_dir)
-    output_path.mkdir(parents=True, exist_ok=True)
-    with open(output_path / "border_inputs.json", "wb") as f:
-        f.write(orjson.dumps(results))
-
-
 # "inconclusive" means the gate could not gather enough successful queries to
 # decide; the caller must treat it as neither a pass nor a rejection.
 TemperatureVerdict = Literal["ignored", "honored", "inconclusive"]
@@ -231,8 +182,3 @@ async def check_temperature(
         f"{endpoint}: temperature ignored (T=0 {t0_distinct} >= T=1 {t1_distinct})"
     )
     return "ignored"
-
-
-if __name__ == "__main__":
-    TEMPERATURE = 0.0
-    asyncio.run(phase_1a(config.endpoints_bi, TEMPERATURE, None))

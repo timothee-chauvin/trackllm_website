@@ -1,7 +1,12 @@
-"""Test which endpoints return content with limited output tokens.
+"""Probe which endpoints return content with limited output tokens.
 
 Reasoning models need extra tokens for chain-of-thought before producing visible output,
 so requesting only 1 output token may result in empty content.
+
+Named `probe_reasoning` rather than `test_reasoning` so pytest's `test_*.py`
+glob does not collect it: it is a manual, network-hitting CLI script.
+The data files it reads and writes keep their historical `test_reasoning`
+names (`strategies_test_reasoning.json` is the production strategy cache).
 """
 
 import asyncio
@@ -13,7 +18,7 @@ import yaml
 from tqdm import tqdm
 
 from trackllm_website.api import OpenRouterClient
-from trackllm_website.bi.generate_bi_prevalence_endpoints import (
+from trackllm_website.bi.analysis.generate_bi_prevalence_endpoints import (
     main as regenerate_endpoints,
 )
 from trackllm_website.config import Endpoint, config, logger, root

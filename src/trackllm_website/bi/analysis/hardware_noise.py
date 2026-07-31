@@ -21,7 +21,7 @@ from trackllm_website.bi.download_tokenizers import (
     get_best_single_token_strings,
     load_existing_index,
 )
-from trackllm_website.bi.logprob_stats import FILTER_ENDPOINTS
+from trackllm_website.bi.analysis.logprob_stats import FILTER_ENDPOINTS
 from trackllm_website.bi.phase_1 import get_input_tokens
 from trackllm_website.config import Endpoint, config, logger
 from trackllm_website.util import slugify

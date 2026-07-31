@@ -6,7 +6,7 @@ import sys
 
 _SCRIPT = """
 from collections import Counter
-from trackllm_website.bi.analyze import compute_tv_distance
+from trackllm_website.bi.results import compute_tv_distance
 
 p = Counter({f"tok{i}": 1 for i in range(60)})
 q = Counter({f"tok{i}": i + 1 for i in range(60)})
