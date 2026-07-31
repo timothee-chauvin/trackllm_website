@@ -17,6 +17,9 @@ concurrency:
 jobs:
   bi-monitor:
     runs-on: ubuntu-latest
+    # Backstop only: hitting it is reported as "cancelled", which skips the commit
+    # step below and discards the whole run. The monitor stops itself 30 minutes
+    # earlier — see job_deadline_seconds in config.toml, and keep the two in sync.
     timeout-minutes: 300
 
     steps:
