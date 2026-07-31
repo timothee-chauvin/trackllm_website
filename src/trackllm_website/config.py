@@ -146,12 +146,14 @@ class PopularityConfig(BaseModel):
 
 class MonitorConfig(BaseModel):
     max_concurrent_endpoints: int
+    reinit_timeout_seconds: int
 
 
 class TemperatureGateConfig(BaseModel):
     prevalence_trigger: float
     check_prompts: int
     check_samples: int
+    min_success_fraction: float
 
 
 class BIConfig(BaseModel):
