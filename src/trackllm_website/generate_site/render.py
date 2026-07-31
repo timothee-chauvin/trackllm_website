@@ -9,6 +9,7 @@ from trackllm_website.config import HeroConfig
 from trackllm_website.generate_site import b3it as b3it_mod
 from trackllm_website.generate_site import changes as changes_mod
 from trackllm_website.generate_site import changes_page as changes_page_mod
+from trackllm_website.generate_site import manifest as manifest_mod
 from trackllm_website.generate_site import model as model_mod
 from trackllm_website.generate_site import org as org_mod
 from trackllm_website.generate_site import overview as overview_mod
@@ -25,6 +26,20 @@ from trackllm_website.generate_site.tracked import with_observations
 from trackllm_website.util import slugify
 
 from .lt import EndpointInfo, discover_lt_endpoints, load_all_lt_data
+
+
+def write_json_dir(directory: Path, views: dict[str, dict]) -> None:
+    """Rewrite a generated `<slug>.json` directory from scratch.
+
+    Pruning first is what the page directories already do: an entity that has left
+    the site keeps serving its last JSON otherwise, at a URL the site itself no
+    longer links but anything else may still fetch.
+    """
+    directory.mkdir(parents=True, exist_ok=True)
+    for f in directory.glob("*.json"):
+        f.unlink()
+    for slug, view in views.items():
+        (directory / f"{slug}.json").write_text(json.dumps(view))
 
 
 def render_site(
@@ -64,9 +79,11 @@ def render_site(
         status = "active" if ep.is_active else f"inactive ({ep.last_query_str})"
         print(f"  {ep.model} @ {ep.provider}: {status}")
 
+    b3it_dir = website_dir / "data" / "b3it"
     b3it_views = b3it_mod.discover_b3it_views(
-        website_dir / "data" / "b3it" / "state",
-        website_dir / "data" / "b3it" / "phase_2",
+        b3it_dir / "state",
+        b3it_dir / "phase_2",
+        b3it_dir / "scan_backfill.json",
     )
 
     # Parsed once for the overview, provider and changes-page builders (~400
@@ -89,8 +106,14 @@ def render_site(
     lt_stalled = lt_stalled_slugs(data_dir, status_inputs.endpoints_lt, set(lt_by_slug))
     site = resolve_site_statuses(status_inputs, lt_by_slug, lt_stalled, bi_states)
 
+    # Only the generated b3it.json is pruned (and the directory it leaves empty):
+    # state/ and phase_2/ sit under the same parent and are collected data.
+    for f in b3it_dir.glob("*/b3it.json"):
+        f.unlink()
+        if not any(f.parent.iterdir()):
+            f.parent.rmdir()
     for slug, view in b3it_views.items():
-        out_dir = website_dir / "data" / "b3it" / slug
+        out_dir = b3it_dir / slug
         out_dir.mkdir(parents=True, exist_ok=True)
         (out_dir / "b3it.json").write_text(json.dumps(b3it_mod.to_json(view)))
 
@@ -121,10 +144,7 @@ def render_site(
     overview["providers"] = provider_mod.overview_rows(provider_views)
     (website_dir / "data" / "overview.json").write_text(json.dumps(overview))
 
-    providers_data_dir = website_dir / "data" / "providers"
-    providers_data_dir.mkdir(parents=True, exist_ok=True)
-    for pslug, view in provider_views.items():
-        (providers_data_dir / f"{pslug}.json").write_text(json.dumps(view))
+    write_json_dir(website_dir / "data" / "providers", provider_views)
 
     provider_pages_dir = website_dir / "providers"
     provider_pages_dir.mkdir(parents=True, exist_ok=True)
@@ -155,11 +175,8 @@ def render_site(
     )
     print("Generated methodology.html")
 
-    models_dir = website_dir / "data" / "models"
-    models_dir.mkdir(parents=True, exist_ok=True)
     model_views = model_mod.build_model_views(website_dir, endpoints, b3it_views, site)
-    for mslug, view in model_views.items():
-        (models_dir / f"{mslug}.json").write_text(json.dumps(view))
+    write_json_dir(website_dir / "data" / "models", model_views)
 
     model_pages_dir = website_dir / "models"
     model_pages_dir.mkdir(parents=True, exist_ok=True)
@@ -196,6 +213,8 @@ def render_site(
             )
         )
     print(f"Generated {len(org_views)} org pages in orgs/")
+
+    manifests = manifest_mod.build_manifests(overview["endpoints"], model_views)
 
     # slug -> (model_slug, n_endpoints) so endpoint pages can link to their model
     # page with an endpoint count consistent with that model's own page (Task 7).
@@ -261,7 +280,7 @@ def render_site(
             methods=methods,
             status=status_json(site.statuses[slug]),
             meta=entry.as_meta() if entry else None,
-            manifest={"slug": slug},
+            manifest=manifests[slug],
             css_path="../style.css",
             body_class="endpoint",
             nav_prefix="../",

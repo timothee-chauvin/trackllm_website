@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from trackllm_website.lt_scores import SCORES_FILENAME
+from trackllm_website.storage import parse_query_date
 
 # Endpoints with last query older than this are considered inactive
 INACTIVE_THRESHOLD_DAYS = 3
@@ -77,18 +78,9 @@ def get_prompt_last_query_date(prompt_dir: Path) -> datetime | None:
             if isinstance(idx, str) and idx.startswith("e"):
                 continue
 
-            # Parse date "DD HH:MM:SS"
+            # Parse date "DD HH:MM:SS" against the month dir it was found in
             try:
-                day_time = datetime.strptime(date_str, "%d %H:%M:%S")
-                return datetime(
-                    year,
-                    month,
-                    day_time.day,
-                    day_time.hour,
-                    day_time.minute,
-                    day_time.second,
-                    tzinfo=timezone.utc,
-                )
+                return parse_query_date(year, month, date_str)
             except ValueError:
                 continue
 
