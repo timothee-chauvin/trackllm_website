@@ -8,7 +8,7 @@ import fire
 from pydantic import BaseModel
 
 from trackllm_website.api import OpenRouterClient
-from trackllm_website.bi.analyze import load_phase2_results
+from trackllm_website.bi.results import load_phase2_results
 from trackllm_website.bi.common import QueryStrategy, resolve_strategies
 from trackllm_website.bi.detection import (
     adaptive_transitions,

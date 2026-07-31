@@ -15,14 +15,13 @@ from plotly.subplots import make_subplots
 
 from trackllm_website.bi.analyze import (
     TOL_MUTED,
-    Results,
     compute_endpoint_tv_over_time,
     find_transitions,
     get_endpoint_legend_name,
     load_phase1_token_counts,
-    load_phase2_results,
 )
-from trackllm_website.bi.phase_2 import Timestamp
+from trackllm_website.bi.phase_2 import Results, Timestamp
+from trackllm_website.bi.results import load_phase2_results
 from trackllm_website.config import config, logger
 from trackllm_website.util import slugify
 

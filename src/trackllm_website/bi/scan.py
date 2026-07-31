@@ -14,7 +14,7 @@ exist.
 import numpy as np
 from pydantic import BaseModel
 
-from trackllm_website.bi.analyze import get_distribution
+from trackllm_website.bi.results import get_distribution
 from trackllm_website.bi.phase_2 import Timestamp
 from trackllm_website.config import config
 

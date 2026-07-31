@@ -3,7 +3,7 @@
 import statistics
 from collections import Counter
 
-from trackllm_website.bi.analyze import compute_tv_distance, get_distribution
+from trackllm_website.bi.results import compute_tv_distance, get_distribution
 from trackllm_website.bi.phase_2 import Timestamp
 from trackllm_website.config import config
 
