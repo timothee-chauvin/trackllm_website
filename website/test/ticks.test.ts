@@ -50,6 +50,16 @@ describe("timeTicks", () => {
     expect(ticks.length).toBeGreaterThanOrEqual(3);
   });
 
+  test("a span of months labels as months even when days would fit", () => {
+    // 14-day ticks fit a 930px plot seven times over, but "Jul 3 .. Jan 15" spends
+    // sixteen labels saying less than seven monthly ones -- and drops the year at
+    // exactly the point the reader needs it.
+    const d0 = at("2025-07-03"), d1 = at("2026-02-01");
+    const ticks = timeTicks(d0, d1, 18);
+    expectWellFormed(ticks, d0, d1, 18);
+    for (const { label } of ticks) expect(label).toMatch(MONTH_LABEL);
+  });
+
   test("two years label as months, never as bare days", () => {
     const d0 = at("2024-07-17"), d1 = at("2026-07-29");
     const ticks = timeTicks(d0, d1, 18);

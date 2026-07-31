@@ -209,6 +209,10 @@ export interface Tick {
 // the ladder is climbed, not descended: the first rung whose ticks all fit is used.
 const DAY_STEPS = [1, 2, 3, 7, 14];
 const MONTH_STEPS = [1, 2, 3, 6, 12];
+// Past this the day rungs are skipped even where they would fit: on a seven-month
+// chart "Jul 3 · Jul 17 · Jul 31 · ..." spends sixteen labels saying less than
+// seven monthly ones, and drops the year at the January the reader needs it at.
+const DAY_TICK_MAX_SPAN = 70 * DAY_MS;
 
 const dayLabel = (t: number): string => {
   const d = new Date(t);
@@ -251,9 +255,11 @@ function monthRungTicks(d0: number, d1: number, step: number): number[] {
  *  yields at least one tick, and the coarsest rung is thinned rather than abandoned,
  *  so the result is never empty and never over budget. */
 export function timeTicks(d0: number, d1: number, maxLabels: number): Tick[] {
-  for (const step of DAY_STEPS) {
-    const ts = dayRungTicks(d0, d1, step);
-    if (ts.length <= maxLabels) return ts.map((t) => ({ t, label: dayLabel(t) }));
+  if (d1 - d0 <= DAY_TICK_MAX_SPAN) {
+    for (const step of DAY_STEPS) {
+      const ts = dayRungTicks(d0, d1, step);
+      if (ts.length <= maxLabels) return ts.map((t) => ({ t, label: dayLabel(t) }));
+    }
   }
   let coarsest: number[] = [];
   for (const step of MONTH_STEPS) {
