@@ -36,14 +36,14 @@
       <h2>Models</h2>
       <span class="hint">most-changed first &mdash; a model is one page, where every provider serving it is compared on one timeline</span>
     </div>
-    <div class="table-wrap"><table class="dir">
+    <div class="table-wrap"><div class="table-scroll"><table class="dir">
       <thead><tr>
-        <th>Model</th>
-        <th class="r">Endpoints</th>
-        <th class="r col-hide">Providers</th>
-        <th class="r">Changes</th>
-        <th class="r col-hide">Endpoints changed</th>
-        <th class="r col-hide">Last change</th>
+        <th scope="col">Model</th>
+        <th scope="col" class="r">Endpoints</th>
+        <th scope="col" class="r col-hide">Providers</th>
+        <th scope="col" class="r">Changes</th>
+        <th scope="col" class="r col-hide">Endpoints changed</th>
+        <th scope="col" class="r col-hide">Last change</th>
       </tr></thead>
       <tbody id="modelBody">
       {% for m in view.models %}
@@ -58,7 +58,7 @@
         </tr>
       {% endfor %}
       </tbody>
-    </table><div class="dir-foot">{{ view.n_models }} model{{ s(view.n_models) }}{% if view.first %} · monitored since {{ view.first }}{% endif %}</div></div>
+    </table></div><div class="dir-foot">{{ view.n_models }} model{{ s(view.n_models) }}{% if view.first %} · monitored since {{ view.first }}{% endif %}</div></div>
   </section>
 </main>
 {% endblock %}

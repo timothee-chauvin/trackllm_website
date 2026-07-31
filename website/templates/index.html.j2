@@ -1,4 +1,5 @@
 {% extends "base.html.j2" %}
+{% from "_macros.html.j2" import chip, search_box %}
 {% block title %}TrackLLM{% endblock %}
 {% block content %}
 <header class="hero">
@@ -32,14 +33,11 @@
     </div>
     <div class="boards" id="provBoards"></div>
     <div class="toolbar">
-      <label class="search">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
-        <input id="provQ" type="text" placeholder="Search provider…" autocomplete="off">
-      </label>
+      {{ search_box("provQ", "Search provider…", "Search providers") }}
       <div class="chips" id="provChips">
-        <span class="chip state-changed" data-f="changed">Has changes</span>
-        <span class="chip" data-f="rateable">Rateable</span>
-        <span class="chip" data-f="b3it">Runs B3IT</span>
+        {{ chip("Has changes", "f", "changed", state="state-changed") }}
+        {{ chip("Rateable", "f", "rateable") }}
+        {{ chip("Runs B3IT", "f", "b3it") }}
       </div>
     </div>
     <div class="table-wrap">
@@ -47,12 +45,12 @@
         <table class="dir">
           <thead>
             <tr>
-              <th data-psort="name">Provider <span class="arr"></span></th>
-              <th data-psort="n_endpoints" class="r">Endpoints <span class="arr"></span></th>
-              <th data-psort="lt_rate">LT drift rate (changes / endpoint-year) <span class="arr"></span></th>
-              <th class="col-hide">Monitoring (1 sq = endpoint-month)</th>
-              <th class="col-hide">B3IT</th>
-              <th data-psort="last_change" class="r col-hide">Last change <span class="arr"></span></th>
+              <th scope="col" data-psort="name">Provider <span class="arr"></span></th>
+              <th scope="col" data-psort="n_endpoints" class="r">Endpoints <span class="arr"></span></th>
+              <th scope="col" data-psort="lt_rate">LT drift rate (changes / endpoint-year) <span class="arr"></span></th>
+              <th scope="col" class="col-hide">Monitoring (1 sq = endpoint-month)</th>
+              <th scope="col" class="col-hide">B3IT</th>
+              <th scope="col" data-psort="last_change" class="r col-hide">Last change <span class="arr"></span></th>
             </tr>
           </thead>
           <tbody id="provBody"></tbody>
@@ -68,23 +66,20 @@
       <span class="hint" id="dirCount"></span>
     </div>
     <div class="toolbar">
-      <label class="search">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
-        <input id="q" type="text" placeholder="Search model, provider, or org…" autocomplete="off">
-      </label>
+      {{ search_box("q", "Search model, provider, or org…", "Search endpoints by model, provider, or org") }}
       <div class="chips" id="chips">
-        <span class="chip on" data-st="tracked">Tracked</span>
-        <span class="chip state-retired" data-st="retired">Retired</span>
-        <span class="chip" data-st="untrackable">Untrackable</span>
-        <span class="chip" data-st="too_expensive">Too expensive</span>
-        <span class="chip" data-st="not_selected">Not selected</span>
-        <span class="chip" data-st="errors_out">Errors</span>
-        <span class="chip" data-st="pending">Pending</span>
-        <span class="chip" data-st="free_excluded">Free</span>
-        <span class="chip" data-f="lt">LT</span>
-        <span class="chip" data-f="b3it">B3IT</span>
-        <span class="chip state-changed" data-f="everchanged">Ever changed</span>
-        <span class="chip state-changed" data-f="recent">Recent (60d)</span>
+        {{ chip("Tracked", "st", "tracked", on=true) }}
+        {{ chip("Retired", "st", "retired", state="state-retired") }}
+        {{ chip("Untrackable", "st", "untrackable") }}
+        {{ chip("Too expensive", "st", "too_expensive") }}
+        {{ chip("Not selected", "st", "not_selected") }}
+        {{ chip("Errors", "st", "errors_out") }}
+        {{ chip("Pending", "st", "pending") }}
+        {{ chip("Free", "st", "free_excluded") }}
+        {{ chip("LT", "f", "lt") }}
+        {{ chip("B3IT", "f", "b3it") }}
+        {{ chip("Ever changed", "f", "everchanged", state="state-changed") }}
+        {{ chip("Recent (60d)", "f", "recent", state="state-changed") }}
       </div>
     </div>
     <div class="table-wrap">
@@ -92,13 +87,13 @@
         <table class="dir">
           <thead>
             <tr>
-              <th data-sort="model">Model <span class="arr"></span></th>
-              <th data-sort="provider" class="col-hide">Provider <span class="arr"></span></th>
-              <th data-sort="status">Status <span class="arr"></span></th>
-              <th data-sort="nChanges" class="r">Changes <span class="arr"></span></th>
-              <th class="col-hide">Methods</th>
-              <th data-sort="stableDays" class="r col-hide">Stable for <span class="arr"></span></th>
-              <th class="col-hide">Drift from baseline</th>
+              <th scope="col" data-sort="model">Model <span class="arr"></span></th>
+              <th scope="col" data-sort="provider" class="col-hide">Provider <span class="arr"></span></th>
+              <th scope="col" data-sort="status">Status <span class="arr"></span></th>
+              <th scope="col" data-sort="nChanges" class="r">Changes <span class="arr"></span></th>
+              <th scope="col" class="col-hide">Methods</th>
+              <th scope="col" data-sort="stableDays" class="r col-hide">Stable for <span class="arr"></span></th>
+              <th scope="col" class="col-hide">Drift from baseline</th>
             </tr>
           </thead>
           <tbody id="dirBody"></tbody>

@@ -1,8 +1,7 @@
-// `export {}` makes this a module so its top-level names (DATA, init, ...) don't
-// collide with the same names in other bundler-entrypoint scripts (endpoint.ts)
-// when type-checked together as one tsc program.
-export {};
-
+// The `init` export both makes this a module (so its top-level names don't collide
+// with the same names in other bundler entrypoints when type-checked as one tsc
+// program) and lets the tests re-render a fresh document without busting the
+// module cache -- exactly as overview.ts does.
 import {
   FeedItem,
   bindFilterChips,
@@ -54,7 +53,7 @@ interface ChangesData {
 const BARS_H = 131;
 const RECENT_DAYS = 90;
 
-async function init(): Promise<void> {
+export async function init(): Promise<void> {
   let D: ChangesData;
   try {
     const res = await fetch("data/changes_page.json");
@@ -94,15 +93,19 @@ async function init(): Promise<void> {
   const maxMonth = Math.max(1, ...D.months.map((m) => m.lt + m.b3it));
   const histEl = document.getElementById("hist");
   if (histEl) {
+    // Each column filters the log, so each is a real button: that is what makes it
+    // tabbable and Enter/Space-activatable without a keyboard handler of our own.
     const bars = D.months
       .map((m) => {
         const total = m.lt + m.b3it;
         const h = (n: number): string => ((n / maxMonth) * BARS_H).toFixed(1);
-        return `<div class="mo" data-m="${esc(m.month)}" title="${monthLabel(m.month)}: ${m.lt} LT, ${m.b3it} B3IT">
+        const what = `${monthLabel(m.month)}: ${m.lt} LT, ${m.b3it} B3IT`;
+        return `<button type="button" class="mo" data-m="${esc(m.month)}" title="${esc(what)}"
+          aria-pressed="false" aria-label="${esc(what)} — filter the log to this month">
           ${total ? `<span class="n">${total}</span>` : ""}
           ${m.b3it ? `<div class="b3" style="height:${h(m.b3it)}px"></div>` : ""}
           ${m.lt ? `<div class="lt ${m.b3it ? "" : "bottom"}" style="height:${h(m.lt)}px"></div>` : ""}
-        </div>`;
+        </button>`;
       })
       .join("");
     // Januaries and Julys are the readable anchors on a month-per-column axis
@@ -193,6 +196,7 @@ async function init(): Promise<void> {
     }
     document.querySelectorAll<HTMLElement>("#hist .mo").forEach((el) => {
       el.classList.toggle("dim", month !== null && el.dataset.m !== month);
+      el.setAttribute("aria-pressed", String(el.dataset.m === month));
     });
   }
 

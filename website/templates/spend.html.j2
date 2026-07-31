@@ -17,7 +17,7 @@
     <div class="panel">
       {% if spend.cumulative %}
       <table class="changes-tbl">
-        <thead><tr><th>Group</th><th class="r">Cost (USD)</th></tr></thead>
+        <thead><tr><th scope="col">Group</th><th scope="col" class="r">Cost (USD)</th></tr></thead>
         <tbody>
         {% for group, cost in spend.cumulative.items() %}
           <tr><td>{{ group }}</td><td class="r num">${{ "%.4f"|format(cost) }}</td></tr>
@@ -42,9 +42,9 @@
       <table class="changes-tbl">
         <thead>
           <tr>
-            <th>Endpoint</th>
-            {% for g in spend.group_order %}<th class="r">{{ g }}</th>{% endfor %}
-            <th class="r">Total</th>
+            <th scope="col">Endpoint</th>
+            {% for g in spend.group_order %}<th scope="col" class="r">{{ g }}</th>{% endfor %}
+            <th scope="col" class="r">Total</th>
           </tr>
         </thead>
         <tbody>
