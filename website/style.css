@@ -292,7 +292,18 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 .sec-desc b { color: var(--text); font-weight: 600; }
 .sec-desc .lt { color: var(--accent); font-weight: 600; } .sec-desc .b3 { color: var(--b3it); font-weight: 600; }
 
+.chartbox { position: relative; }
 .chartwrap { padding: 0.8rem 1rem 0.4rem; } .chart svg { width: 100%; height: auto; display: block; }
+/* the lane hit targets swallow no gestures: touch-action keeps a swipe over the
+   chart scrolling the page, and the readout still reads on tap */
+.chart .lane-hit { touch-action: pan-y; cursor: crosshair; }
+.chart-tip { position: absolute; z-index: 2; pointer-events: none; white-space: nowrap;
+  display: flex; gap: 0.5rem; align-items: baseline;
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.28); padding: 0.35rem 0.55rem;
+  font-family: var(--mono); font-size: 0.74rem; }
+.chart-tip .d { color: var(--text-muted); }
+.chart-tip .v { font-weight: 600; }
 
 .changes-tbl { width: 100%; border-collapse: collapse; }
 .changes-tbl th { text-align: left; font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-dim); font-weight: 600; padding: 0.6rem 1.1rem; border-bottom: 1px solid var(--border); }

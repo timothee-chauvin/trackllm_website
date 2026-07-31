@@ -47,7 +47,11 @@
     <div class="sec-head"><h2>Drift from baseline</h2></div>
     <p class="sec-desc">Both signals measure how far this endpoint's behaviour has moved from its <b>reference period</b> (its first two weeks). <span class="lt">LT</span> tracks the average change in the returned tokens' log-probabilities (nats); <span class="b3">B3IT</span> tracks the total-variation distance of the border-input votes (0–1). Both read <b>0 when the endpoint matches its baseline</b> and rise — staying elevated — after a real change. Dashed lines mark detected changepoints; <b>σ</b> is the detector's statistical confidence, separate from how far the signal actually moved.</p>
     <div class="panel">
-      <div class="chartwrap chart" id="mainchart"></div>
+      {# the tip is a sibling of the chart, not a child: every redraw replaces #mainchart's contents #}
+      <div class="chartbox">
+        <div class="chartwrap chart" id="mainchart"></div>
+        <div class="chart-tip" id="charttip" hidden></div>
+      </div>
       <div class="footnote" id="footnote"></div>
     </div>
   </section>
