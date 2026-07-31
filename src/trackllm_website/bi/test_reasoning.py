@@ -13,7 +13,7 @@ import yaml
 from tqdm import tqdm
 
 from trackllm_website.api import OpenRouterClient
-from trackllm_website.bi.generate_bi_prevalence_endpoints import (
+from trackllm_website.bi.analysis.generate_bi_prevalence_endpoints import (
     main as regenerate_endpoints,
 )
 from trackllm_website.config import Endpoint, config, logger, root

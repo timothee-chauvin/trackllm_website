@@ -18,14 +18,14 @@ import fire
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-from trackllm_website.bi.analyze import (
+from trackllm_website.bi.analysis.analyze import (
     compute_endpoint_tv_over_time,
     find_transitions,
     get_endpoint_legend_name,
 )
 from trackllm_website.bi.phase_2 import Prompt, Results, Timestamp
 from trackllm_website.bi.results import compute_tv_distance, get_distribution
-from trackllm_website.bi.sampling_sweep import (
+from trackllm_website.bi.analysis.sampling_sweep import (
     DAYS_AFTER,
     DAYS_BEFORE,
     SEED,

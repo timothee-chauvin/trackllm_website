@@ -13,7 +13,7 @@ import fire
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-from trackllm_website.bi.analyze import (
+from trackllm_website.bi.analysis.analyze import (
     TOL_MUTED,
     compute_endpoint_tv_over_time,
     find_transitions,
