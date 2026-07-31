@@ -75,6 +75,7 @@ def test_lt_item_carries_drift_magnitude_and_link_slugs():
     assert item["providerSlug"] == "chutes"
     assert item["modelSlug"] == "org2fmodel-x"
     assert item["slug"] == "m2fa23p"
+    assert item["endpointSlug"] == "m2fa23p"
     assert item["secondary"] == "40σ conf"
     assert item["trace"]
 
@@ -156,6 +157,8 @@ def test_change_without_a_fleet_entry_gets_no_page_slugs():
     (item,) = build_feed_items(changes, {}, {}, NOW)
     assert item["modelSlug"] == ""
     assert item["providerSlug"] == ""
+    assert item["endpointSlug"] == ""
+    # the identity stays: the log still groups and counts this endpoint's changes
     assert item["slug"] == "gone2fslug"
 
 
