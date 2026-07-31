@@ -25,6 +25,9 @@ budget_per_month = 15.0
 max_endpoint_cost = 0.50
 
 # Never selected anywhere (globs match "model" or "model#provider").
+# Note: a rule's own `patterns` match the same way, EXCEPT for kind = "providers",
+# where they match the provider name with its variant suffix stripped ("deepinfra",
+# not "deepinfra/fp8").
 exclude = [
     "*image*", "*-fast", "*:extended", "*customtools*", "*-beta",
     "switchpoint/router",
