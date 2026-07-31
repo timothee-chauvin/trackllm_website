@@ -409,7 +409,11 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 /* changes page */
 .hist { padding: 1rem 1.2rem 0.3rem; }
 .hist .bars { display: flex; align-items: flex-end; gap: 3px; height: 132px; }
-.hist .mo { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 1px; cursor: pointer; min-width: 0; position: relative; }
+/* each column is a <button> (changes.ts), so the UA button styling is stripped back
+   to the bare bar it was as a div -- only the focus ring is new */
+.hist .mo { flex: 1; display: flex; flex-direction: column; align-items: stretch; justify-content: flex-end; gap: 1px; cursor: pointer; min-width: 0; position: relative;
+  appearance: none; -webkit-appearance: none; border: 0; padding: 0; background: none; font: inherit; color: inherit; text-align: inherit;
+  overflow: visible; /* the count label sits above the bar's own box */ }
 .hist .mo .b3 { background: var(--b3it); border-radius: 2px 2px 0 0; }
 .hist .mo .lt { background: var(--accent); opacity: 0.85; }
 .hist .mo .lt.bottom { border-radius: 0 0 2px 2px; }

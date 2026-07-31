@@ -1,2 +1,21 @@
 {# Headline status badge; must stay in sync with components.ts::headlineBadge. #}
 {% macro headline_badge(h) %}<span class="badge st st-{{ h | replace("_", "-") }}">{{ h | replace("_", " ") }}</span>{% endmacro %}
+
+{# A filter chip. It is a span, not a button, so the button role and the pressed
+   state have to be spelled out here; components.ts::toggleChip keeps aria-pressed
+   in sync from then on, and bindActivation gives it Enter/Space. `attr` is the
+   dataset key the page's handler reads ("f" for the method/change filters, "st"
+   for the status group). #}
+{% macro chip(label, attr, value, state="", on=false) -%}
+<span class="chip{{ " " ~ state if state }}{{ " on" if on }}" data-{{ attr }}="{{ value }}"
+  role="button" tabindex="0" aria-pressed="{{ "true" if on else "false" }}">{{ label }}</span>
+{%- endmacro %}
+
+{# The toolbar search box: the label's only content is a decorative magnifier, so
+   the input carries its own name. #}
+{% macro search_box(id, placeholder, label) -%}
+<label class="search">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+  <input id="{{ id }}" type="text" placeholder="{{ placeholder }}" autocomplete="off" aria-label="{{ label }}">
+</label>
+{%- endmacro %}

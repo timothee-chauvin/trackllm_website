@@ -4,6 +4,7 @@
 import {
   FeedItem,
   MIN_ENDPOINT_YEARS,
+  bindActivation,
   bindFilterChips,
   esc,
   eventRow,
@@ -146,7 +147,10 @@ export async function init(): Promise<void> {
 
     // The hover target has to sit *above* .hero-inner, which covers the whole hero and
     // would otherwise swallow every pointer event before the trace behind it sees one.
-    hitLayer.innerHTML = `<a href="endpoints/${esc(h.slug)}.html" class="hero-hit">
+    // Its only content is an invisible path, so the link needs a name of its own --
+    // the same thing the hover card says, for anyone who never sees the hover card.
+    hitLayer.innerHTML = `<a href="endpoints/${esc(h.slug)}.html" class="hero-hit"
+      aria-label="Open ${esc(h.model)} @ ${esc(h.provider)} — the endpoint this curve is drawn from">
       <path d="${line}" fill="none" stroke="transparent" stroke-width="${HERO_HIT_WIDTH}"/></a>`;
 
     const method = h.method === "lt" ? "LT" : "B3IT";
@@ -308,7 +312,7 @@ export async function init(): Promise<void> {
     const unrated = provs.filter(p => p.lt_rate === null).length;
     document.getElementById("provFoot")!.textContent =
       `${list.length} of ${provs.length} providers · ${unrated} under ${MIN_ENDPOINT_YEARS} endpoint-years, so not yet rateable`;
-    provSort.paintArrows();
+    provSort.paintSort();
   }
   provQ.addEventListener("input", renderProviders);
   bindFilterChips(document.getElementById("provChips")!, provFilters, renderProviders);
@@ -365,8 +369,7 @@ export async function init(): Promise<void> {
   document.getElementById("dirCount")!.innerHTML = `${fmtInt(rows.length)} endpoints · <b style="color:var(--changed)">${S.changes_total} changes</b> across ${S.changed_endpoints} of them`;
   // two chip groups share the toolbar: data-st chips toggle the status set,
   // data-f chips the method/change set
-  document.getElementById("chips")!.addEventListener("click", e => {
-    const chip = (e.target as HTMLElement).closest(".chip") as HTMLElement | null; if (!chip) return;
+  bindActivation(document.getElementById("chips")!, ".chip", chip => {
     const st = chip.dataset.st;
     toggleChip(chip, st ? statusFilters : active, st ?? chip.dataset.f!);
     render();
