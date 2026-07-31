@@ -76,3 +76,12 @@ def test_endpoint_with_all_errors_in_newest_month_is_not_stale(tmp_path):
 def test_last_query_date_none_when_only_errors(tmp_path):
     _make_prompt(tmp_path, "a_1", {"2026-07": [["02 08:00:00", "e0"]]})
     assert get_last_query_date(tmp_path) is None
+
+
+def test_last_query_date_takes_year_and_month_from_the_directory(tmp_path):
+    """The stored timestamp is a bare day of month; parsing it without the
+    directory's year is deprecated on 3.13 and raises from 3.15."""
+    _make_prompt(tmp_path, "a_1", {"2028-02": [["29 10:00:00", 0]]})
+    assert get_last_query_date(tmp_path) == datetime(
+        2028, 2, 29, 10, 0, 0, tzinfo=timezone.utc
+    )
