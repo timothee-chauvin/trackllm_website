@@ -81,9 +81,10 @@ const parse = (markup: string): Element => {
   host.innerHTML = markup;
   return host.firstElementChild!;
 };
-/** The x-axis month labels: the only <text> anchored on the chart's bottom rule. */
-const monthLabels = (svg: Element): Element[] =>
-  [...svg.querySelectorAll("text")].filter((t) => /^\w{3} \d\d$/.test(t.textContent ?? ""));
+/** The x-axis labels: the only <text> anchored on the chart's bottom rule. Either
+ *  granularity timeTicks can pick -- "Jul '26" for a month, "Jul 18" for a day. */
+const axisLabels = (svg: Element): Element[] =>
+  [...svg.querySelectorAll("text")].filter((t) => /^\w{3} ('\d\d|\d{1,2})$/.test(t.textContent ?? ""));
 /** The changepoint labels: bold, and the only bold text drawn at 10.5 (the lane
  *  titles, bold too, sit on the same baselines at 11.5). */
 const cpLabels = (svg: Element): Element[] =>
@@ -123,19 +124,19 @@ describe("endpoint chart at a phone's width", () => {
     // here: the SVG is scaled to the container either way, so relative size is size.
     const [wide, narrow] = [DESIGN_VW, PHONE_VW].map((w) => parse(chartSvg(LT, null, w)));
     const relSize = (svg: Element): number =>
-      +attr(monthLabels(svg)[0], "font-size") / +attr(svg, "viewBox").split(" ")[2];
+      +attr(axisLabels(svg)[0], "font-size") / +attr(svg, "viewBox").split(" ")[2];
     expect(relSize(narrow)).toBeGreaterThan(relSize(wide) * 3);
   });
 
-  test("thins the month labels rather than overprinting them", async () => {
+  test("coarsens the x axis rather than overprinting its labels", async () => {
     const { chartSvg } = await import("../src/endpoint");
-    const wide = monthLabels(parse(chartSvg(LT, null, DESIGN_VW)));
-    const narrow = monthLabels(parse(chartSvg(LT, null, PHONE_VW)));
+    const wide = axisLabels(parse(chartSvg(LT, null, DESIGN_VW)));
+    const narrow = axisLabels(parse(chartSvg(LT, null, PHONE_VW)));
     expect(wide.length, "the design width should still label every month").toBe(14);
     expect(narrow.length).toBeLessThan(wide.length);
     expect(narrow.length, "a phone still needs some sense of the time axis").toBeGreaterThan(1);
 
-    // every kept label has room for the ~41px "Jul 26" it draws
+    // every kept label has room for the ~41px "Jul '26" it draws
     const xs = narrow.map((t) => +attr(t, "x")).sort((a, b) => a - b);
     const pitch = Math.min(...xs.slice(1).map((x, i) => x - xs[i]));
     expect(pitch, `labels ${pitch.toFixed(1)}px apart`).toBeGreaterThan(41);
@@ -194,7 +195,7 @@ describe("endpoint chart at a phone's width", () => {
     expect(svg, "the endpoint chart did not render").not.toBeNull();
     // no layout engine here, so the container measures 0 and the fallback applies
     expect(attr(svg!, "viewBox")).toBe(`0 0 ${DESIGN_VW} 324`);
-    expect(monthLabels(svg!).length).toBeGreaterThan(1);
+    expect(axisLabels(svg!).length).toBeGreaterThan(1);
   });
 });
 
