@@ -7,6 +7,7 @@ from trackllm_website.bi.selection import SelectionPolicy
 from trackllm_website.bi.state import EndpointBIState, Epoch, load_all_states
 from trackllm_website.bi.vetting import EndpointCache
 from trackllm_website.config import Endpoint
+from trackllm_website.generate_site.b3it import discover_b3it_views
 from trackllm_website.generate_site.lt import discover_lt_endpoints, load_all_lt_data
 from trackllm_website.generate_site.status import CatalogEntry
 from trackllm_website.generate_site.status_io import (
@@ -54,6 +55,14 @@ def site_statuses_for(root: Path, inputs: StatusInputs) -> SiteStatuses:
     lt_by_slug = {e.slug: e for e in lt_endpoints if e.slug in lt_data}
     bi_states = load_all_states(root / "data" / "b3it" / "state")
     return resolve_site_statuses(inputs, lt_by_slug, set(), bi_states)
+
+
+def b3it_views_for(root: Path):
+    """The B3ITViews render.py would derive for this synthetic site."""
+    b3it_dir = root / "data" / "b3it"
+    return discover_b3it_views(
+        b3it_dir / "state", b3it_dir / "phase_2", b3it_dir / "scan_backfill.json"
+    )
 
 
 def b3it_slug(model: str, provider: str) -> str:

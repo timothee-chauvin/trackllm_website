@@ -9,6 +9,23 @@ from trackllm_website.config import Endpoint, config
 from trackllm_website.util import atomic_write_bytes, slugify
 
 
+def format_query_date(date: datetime) -> str:
+    """A queries.json timestamp: the day of month and time, the month dir has the rest."""
+    return date.strftime("%d %H:%M:%S")
+
+
+def parse_query_date(year: int, month: int, date_str: str) -> datetime:
+    """The inverse of `format_query_date`, against the month dir the string lives in.
+
+    The year and month are spliced into the parsed string rather than filled in
+    afterwards: strptime on a bare day of month is deprecated from Python 3.13 and
+    changes behaviour in 3.15. Raises ValueError on a malformed string, as before.
+    """
+    return datetime.strptime(
+        f"{year:04d}-{month:02d}-{date_str}", "%Y-%m-%d %H:%M:%S"
+    ).replace(tzinfo=timezone.utc)
+
+
 class PartialMonthlyDataError(RuntimeError):
     """A month directory holds an incomplete/inconsistent file set (crashed write).
 
@@ -141,16 +158,7 @@ class MonthlyData:
 
         for date_str, idx in queries_data:
             # Parse date from "dd HH:MM:SS" format using the known year and month
-            day_time = datetime.strptime(date_str, "%d %H:%M:%S")
-            full_date = datetime(
-                year,
-                month,
-                day_time.day,
-                day_time.hour,
-                day_time.minute,
-                day_time.second,
-                tzinfo=timezone.utc,
-            )
+            full_date = parse_query_date(year, month, date_str)
             if isinstance(idx, int):
                 # Index of a ResponseLogprob
                 logprob_responses.append((full_date, logprob_vectors[idx]))
@@ -229,7 +237,7 @@ class MonthlyData:
                     IdxLogprobVector(tokens=token_indices, logprobs=logprobs.logprobs)
                 )
 
-            queries.append((date.strftime("%d %H:%M:%S"), logprob_idx))
+            queries.append((format_query_date(date), logprob_idx))
 
         return seen_tokens, idx_logprobs, queries
 
@@ -252,7 +260,7 @@ class MonthlyData:
             except ValueError:
                 seen_errors.append(error)
                 error_idx = len(seen_errors) - 1
-            queries.append((date.strftime("%d %H:%M:%S"), f"e{error_idx}"))
+            queries.append((format_query_date(date), f"e{error_idx}"))
 
         return seen_errors, queries
 

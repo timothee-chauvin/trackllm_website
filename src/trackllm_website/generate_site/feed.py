@@ -67,15 +67,17 @@ def change_links(change: dict) -> dict:
     """Display names and page slugs for one change -- shared with hero.py.
 
     An endpoint that has left the fleet reaches changes.json through the
-    merge_changes fallback: model = its own slug, no provider. No model or
-    provider page is generated for it, so it gets no slugs -- the UI renders
-    those names as plain text rather than linking a 404.
+    merge_changes fallback: model = its own slug, no provider. No endpoint, model
+    or provider page is generated for it, so it gets no page slugs -- the UI
+    renders those names as plain text rather than linking a 404.
     """
     model = change["model"]
     provider = change["provider"] or ""
     in_fleet = bool(provider)
     return {
         "slug": change["slug"],
+        # The slug an endpoint page was written under; empty when there is none.
+        "endpointSlug": change["slug"] if in_fleet else "",
         "model": model.split("/")[-1],
         "org": model.split("/")[0],
         "modelSlug": slugify(model) if in_fleet else "",

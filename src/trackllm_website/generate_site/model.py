@@ -95,12 +95,16 @@ def _build_endpoint(
     lt_out = None
     lt = load_lt_data(lt_dir, slug) if ep is not None else None
     if lt is not None:
+        # The changes are published whether or not the drift lane has points to
+        # level them against: an empty lane (lt_drift.py yields none under three
+        # distinct observation days) makes each level unknown, not each change
+        # nonexistent. Dropping them would leave the endpoint page and the
+        # directory row disagreeing about how many changes this endpoint has.
         drift_pairs = [(d.date().isoformat(), v) for d, v in lt.drift]
-        if drift_pairs:
-            lt_out = {
-                "drift": [list(p) for p in _downsample_pairs(drift_pairs, TRACE_LEN)],
-                "changes": _lt_changes(_by_method(canonical, "LT"), drift_pairs),
-            }
+        lt_out = {
+            "drift": [list(p) for p in _downsample_pairs(drift_pairs, TRACE_LEN)],
+            "changes": _lt_changes(_by_method(canonical, "LT"), drift_pairs),
+        }
 
     b3it_out = None
     if view is not None and view.tv_series["dates"]:
@@ -118,6 +122,12 @@ def _build_endpoint(
         date_range += [lt_out["drift"][0][0], lt_out["drift"][-1][0]]
     if b3it_out and b3it_out["tv"]:
         date_range += [b3it_out["tv"][0][0], b3it_out["tv"][-1][0]]
+    # The changes are on the axis too, and a change can fall outside the observed
+    # span (one recorded after the endpoint's last sampled point). model.ts maps
+    # dates onto date_min..date_max, so leaving it out puts its mark -- the dashed
+    # "level unknown" rule -- outside the viewBox, where it is simply invisible.
+    for lane in (lt_out, b3it_out):
+        date_range += [c["date"] for c in lane["changes"]] if lane else []
 
     n_changes = (len(lt_out["changes"]) if lt_out else 0) + (
         len(b3it_out["changes"]) if b3it_out else 0

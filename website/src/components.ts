@@ -300,6 +300,7 @@ export interface FeedItem {
   iso: string;
   daysAgo: number;
   slug: string;
+  endpointSlug: string;
   model: string;
   org: string;
   modelSlug: string;
@@ -321,11 +322,14 @@ export interface FeedItem {
 export function eventRow(e: FeedItem): string {
   const isLT = e.method === "lt";
   const color = isLT ? "var(--accent)" : "var(--b3it)";
+  // no endpointSlug: the endpoint has left the fleet and no page was generated for
+  // it (feed.py leaves its page slugs empty), so the name is text, not a 404 link
+  const names = `<span class="model">${esc(e.model)}</span>
+        <span class="at">@ ${esc(e.provider)}</span>`;
   return `<div class="event" style="--sev:var(--${e.sevKey})">
     <div class="when">${esc(e.date)}<span class="rel">${relDays(e.daysAgo)}</span></div>
     <div class="what">
-      <div><a href="endpoints/${esc(e.slug)}.html"><span class="model">${esc(e.model)}</span>
-        <span class="at">@ ${esc(e.provider)}</span></a></div>
+      <div>${e.endpointSlug ? `<a href="endpoints/${esc(e.endpointSlug)}.html">${names}</a>` : names}</div>
       <div class="desc">${esc(e.desc)}</div>
     </div>
     <div class="spark">${sparkline(e.trace, isLT ? LT_CAP : B3IT_CAP, color, e.changeFrac)}</div>

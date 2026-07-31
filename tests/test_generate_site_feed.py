@@ -4,12 +4,13 @@ from datetime import datetime, timezone
 import pytest
 
 from conftest import (
+    b3it_views_for,
     empty_status_inputs,
     site_statuses_for,
     write_b3it_state,
     write_lt_endpoint,
 )
-from trackllm_website.generate_site.b3it import B3ITView, discover_b3it_views
+from trackllm_website.generate_site.b3it import B3ITView
 from trackllm_website.generate_site.feed import build_feed_items, downsample_trace
 from trackllm_website.generate_site.lt import discover_lt_endpoints, load_all_lt_data
 from trackllm_website.generate_site.overview import build_overview
@@ -74,6 +75,7 @@ def test_lt_item_carries_drift_magnitude_and_link_slugs():
     assert item["providerSlug"] == "chutes"
     assert item["modelSlug"] == "org2fmodel-x"
     assert item["slug"] == "m2fa23p"
+    assert item["endpointSlug"] == "m2fa23p"
     assert item["secondary"] == "40σ conf"
     assert item["trace"]
 
@@ -155,6 +157,8 @@ def test_change_without_a_fleet_entry_gets_no_page_slugs():
     (item,) = build_feed_items(changes, {}, {}, NOW)
     assert item["modelSlug"] == ""
     assert item["providerSlug"] == ""
+    assert item["endpointSlug"] == ""
+    # the identity stays: the log still groups and counts this endpoint's changes
     assert item["slug"] == "gone2fslug"
 
 
@@ -221,9 +225,7 @@ def fake_site_feed_agreement(tmp_path):
     lt_dir = root / "data" / "lt"
     lt_endpoints = list(discover_lt_endpoints(lt_dir))
     lt_data = load_all_lt_data(lt_dir, [e.slug for e in lt_endpoints])
-    views = discover_b3it_views(
-        root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
-    )
+    views = b3it_views_for(root)
     site = site_statuses_for(root, empty_status_inputs())
     return build_overview(root, lt_data, lt_endpoints, views, None, site), changes
 

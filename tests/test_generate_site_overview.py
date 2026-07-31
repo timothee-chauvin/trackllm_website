@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from conftest import (
+    b3it_views_for,
     catalog_entry,
     empty_status_inputs,
     site_statuses_for,
@@ -14,7 +15,6 @@ from conftest import (
 )
 from trackllm_website.bi.state import RetiredInfo
 from trackllm_website.config import Endpoint, HeroConfig
-from trackllm_website.generate_site.b3it import discover_b3it_views
 from trackllm_website.generate_site.changes import merge_changes, to_json
 from trackllm_website.generate_site.lt import discover_lt_endpoints, load_all_lt_data
 from trackllm_website.generate_site.feed import downsample_trace
@@ -27,9 +27,7 @@ def _build_overview_with(root: Path, inputs) -> dict:
     lt_dir = root / "data" / "lt"
     lt_endpoints = list(discover_lt_endpoints(lt_dir)) if lt_dir.exists() else []
     lt_data = load_all_lt_data(lt_dir, [e.slug for e in lt_endpoints])
-    b3it_views = discover_b3it_views(
-        root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
-    )
+    b3it_views = b3it_views_for(root)
     site = site_statuses_for(root, inputs)
     return build_overview(root, lt_data, lt_endpoints, b3it_views, None, site)
 
@@ -178,9 +176,7 @@ def test_feed_includes_b3it_item_from_view_transition(tmp_path):
     )
     _write_b3it_with_transition(root, "m/b", "q", status="monitoring")
     # the feed reads B3IT items from the merged change list, as render.py writes it
-    views = discover_b3it_views(
-        root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
-    )
+    views = b3it_views_for(root)
     (root / "data" / "changes.json").write_text(
         json.dumps(to_json(merge_changes({}, {}, views)))
     )
@@ -331,9 +327,7 @@ def test_now_spans_b3it_observations_newer_than_the_last_lt_one(tmp_path):
         month="2026-06",
         tokens=["A"] * 12 + ["B"] * 12,
     )
-    views = discover_b3it_views(
-        root / "data" / "b3it" / "state", root / "data" / "b3it" / "phase_2"
-    )
+    views = b3it_views_for(root)
     (root / "data" / "changes.json").write_text(
         json.dumps(to_json(merge_changes({}, {}, views)))
     )

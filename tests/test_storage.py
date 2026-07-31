@@ -11,6 +11,8 @@ from trackllm_website.storage import (
     ResponseError,
     ResponseLogprobs,
     ResultsStorage,
+    format_query_date,
+    parse_query_date,
 )
 from trackllm_website.util import slugify
 
@@ -122,3 +124,30 @@ def test_is_stalled_ignores_non_directory_artifacts(tmp_path):
     (model_dir / "someprompt").mkdir()  # a real prompt directory
 
     assert storage.is_stalled(ENDPOINT) is False
+
+
+def test_leap_day_round_trips(tmp_path):
+    """queries.json stores the day of month alone; the year and month come from the
+    directory, so a Feb 29 must survive the round trip."""
+    leap = datetime(2028, 2, 29, 10, 0, 0, tzinfo=timezone.utc)
+    data = MonthlyData(
+        year=2028,
+        month=2,
+        logprob_responses=[(leap, _lp(("a", -0.1)))],
+        error_responses=[],
+    )
+    data.serialize(tmp_path)
+
+    loaded = MonthlyData.load_existing(tmp_path, year=2028, month=2)
+    assert [d for d, _ in loaded.logprob_responses] == [leap]
+
+
+def test_query_date_round_trips_through_its_month_dir():
+    """The stored string carries no year: the parse must take it from the caller,
+    never from strptime's default (deprecated on 3.13, raises from 3.15)."""
+    for date in (
+        _date(1),
+        _date(28, hour=23),
+        datetime(2028, 2, 29, tzinfo=timezone.utc),
+    ):
+        assert parse_query_date(date.year, date.month, format_query_date(date)) == date
