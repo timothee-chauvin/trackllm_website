@@ -260,19 +260,51 @@ async def monitor() -> MonitorReport:
             logger.error(f"{key}: no strategy resolved ({failed.get(key)}); skipped")
             failures.append(key)
 
-    async def run_isolated(state: EndpointBIState) -> None:
-        try:
-            await run_endpoint(
-                client,
-                strategies[str(state.endpoint)],
-                state,
-                now,
-                probe_spend,
-                event_rows=event_rows,
+    # Absolute, so the probe above and every wave of endpoints eat into the same
+    # budget: what matters is when the *job* ends, not how long each part took.
+    deadline = (
+        asyncio.get_running_loop().time() + config.bi.monitor.job_deadline_seconds
+    )
+
+    def cut_off(state: EndpointBIState, why: str) -> None:
+        logger.error(f"{state.endpoint}: {why}")
+        failures.append(str(state.endpoint))
+        event_rows.append(
+            MonitorRow(
+                state.endpoint.model,
+                state.endpoint.provider,
+                "deadline_cutoff",
+                None,
+                None,
+                0.0,
             )
-        except Exception:
-            logger.exception(f"Monitor run failed for {state.endpoint}")
-            failures.append(str(state.endpoint))
+        )
+
+    async def run_isolated(state: EndpointBIState) -> None:
+        if asyncio.get_running_loop().time() >= deadline:
+            cut_off(state, "job deadline passed, not started")
+            return
+        try:
+            # Nested so that only the job deadline expiring reaches the outer
+            # handler: run_endpoint raises a TimeoutError of its own when a re-init
+            # hits its deadline, and that is a different event.
+            async with asyncio.timeout_at(deadline):
+                try:
+                    await run_endpoint(
+                        client,
+                        strategies[str(state.endpoint)],
+                        state,
+                        now,
+                        probe_spend,
+                        event_rows=event_rows,
+                    )
+                except Exception:
+                    logger.exception(f"Monitor run failed for {state.endpoint}")
+                    failures.append(str(state.endpoint))
+        except TimeoutError:
+            # Nothing is persisted beyond the batch run_endpoint already saved, so
+            # the next run re-detects whatever this one was in the middle of.
+            cut_off(state, "cut off by the job deadline")
 
     try:
         runnable = [s for s in monitoring if str(s.endpoint) in strategies]
