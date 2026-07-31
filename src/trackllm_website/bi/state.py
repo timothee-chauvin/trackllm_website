@@ -27,16 +27,23 @@ class Epoch(BaseModel):
     params: dict | None = None  # detection params in force when the epoch closed
 
     def filter_results(self, results: dict) -> dict:
-        """Restrict phase 2 results to this epoch: its border inputs, from its start.
+        """Restrict phase 2 results to this epoch: its border inputs, from its
+        start to its end (inclusive; an open epoch has no upper bound).
 
         The single definition of "results belonging to an epoch", shared by the
         live detector (monitor.decide) and the site build (generate_site.b3it).
+        Bounding by `end` is what keeps a closed epoch from scoring later days
+        against its stale reference: border inputs carried over into the next
+        epoch keep being sampled, so those days would otherwise be measured
+        twice. The end batch stays in: it is the evidence the closure was
+        decided on, and the next epoch drops it as its own reference.
         """
         return {
             p: {
                 ts: s
                 for ts, s in results.get(p, {}).items()
-                if datetime.fromisoformat(ts) >= self.start
+                if self.start <= datetime.fromisoformat(ts)
+                and (self.end is None or datetime.fromisoformat(ts) <= self.end)
             }
             for p in self.border_inputs
         }
