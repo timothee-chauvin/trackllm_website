@@ -287,14 +287,21 @@ export function chartSvg(lt: FocusLT | null, b3it: FocusB3IT | null, vw: number)
     ...(b3it?.changes ?? []).map((c) => ({ x: fx(c.date), col: "var(--b3it)", lab: fmtTV(c.peakTV), baseY: TOP2 - 8 })),
   ];
   // A changepoint label is centred on its dot and shares a baseline with the lane
-  // title, so on a plot this narrow they overprint each other and the title. Two
-  // corrections, both no-ops while everything still fits: pull a label at either
-  // end of the span back inside the SVG (which clips), and lift one that would land
-  // on an already-occupied stretch of the baseline into the row above.
-  const CHAR_W = 6.3; // var(--mono) at font-size 10.5
-  const TITLE_CHAR_W = 6.9; // ... and at the 11.5 the lane titles use
-  const ROW_H = 12;
-  // one row up is all the clear space there is above either baseline
+  // title, so on a plot this narrow they overprint each other and the title. Three
+  // corrections, all no-ops while everything still fits: pull a label at either
+  // end of the span back inside the SVG (which clips), lift one that would land
+  // on an already-occupied stretch of the baseline into the row above, and drop the
+  // one that finds every row taken -- its dashed rule and dot still mark the day,
+  // and the changes table below the chart lists every change with its magnitude.
+  // measured with getBBox in Chromium and rounded up: reserving a little too much
+  // only ever lifts a label that would have just fitted
+  const CHAR_W = 6.4; // var(--mono) at font-size 10.5
+  const TITLE_CHAR_W = 7.2; // ... and at the 11.5 the lane titles use
+  // 14, not the 12 the two font sizes suggest: at 12 a lifted label's box still
+  // shared a pixel row with the lane title's
+  const ROW_H = 14;
+  // one row up is all the clear space there is above either baseline: row 2 would
+  // leave the SVG over the LT lane and cut into the drift plot over the B3IT one
   const MAX_ROW = 1;
   // per baseline, the right edge already occupied in each row -- row 0 starts at
   // the end of the lane title
@@ -309,12 +316,14 @@ export function chartSvg(lt: FocusLT | null, b3it: FocusB3IT | null, vw: number)
       const labX = Math.min(Math.max(c.x, half), VW - half);
       const ends = rowEnd.get(c.baseY)!;
       let row = 0;
-      while (row < ends.length && row < MAX_ROW && labX - half < ends[row] + 4) row++;
-      if (row === ends.length) ends.push(0);
-      ends[row] = labX + half;
+      while (row <= MAX_ROW && labX - half < (ends[row] ?? 0) + 4) row++;
+      if (row <= MAX_ROW) ends[row] = labX + half;
+      const label =
+        row <= MAX_ROW
+          ? `<text x="${labX.toFixed(1)}" y="${c.baseY - row * ROW_H}" fill="${c.col}" font-size="10.5" font-family="var(--mono)" font-weight="600" text-anchor="middle">${esc(c.lab)}</text>`
+          : "";
       return `<line x1="${c.x.toFixed(1)}" y1="${TOP1 - 4}" x2="${c.x.toFixed(1)}" y2="${TOP2 + LANE_H}" stroke="${c.col}" stroke-width="1" stroke-dasharray="3 3" opacity="0.55"/>
-        <circle cx="${c.x.toFixed(1)}" cy="${(c.baseY + 4).toFixed(1)}" r="2.6" fill="${c.col}"/>
-        <text x="${labX.toFixed(1)}" y="${c.baseY - row * ROW_H}" fill="${c.col}" font-size="10.5" font-family="var(--mono)" font-weight="600" text-anchor="middle">${esc(c.lab)}</text>`;
+        <circle cx="${c.x.toFixed(1)}" cy="${(c.baseY + 4).toFixed(1)}" r="2.6" fill="${c.col}"/>${label}`;
     })
     .join("");
 

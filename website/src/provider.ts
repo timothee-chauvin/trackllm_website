@@ -5,7 +5,6 @@ import {
   B3IT_CAP,
   LT_CAP,
   MIN_ENDPOINT_YEARS,
-  TIP_LINE,
   bindFilterChips,
   bindTips,
   esc,
@@ -226,12 +225,12 @@ export async function init(): Promise<void> {
       // on top of each other (and the right-hand one wraps mid-label).
       const lastIdx = MONTHS.length - 1;
       const ticks = MONTHS.map((m, i) =>
-        i % 3 === 0 || (i === lastIdx && lastIdx % 3 >= 2)
+        i % 3 === 0 || (i === lastIdx && lastIdx % 3 === 2)
           ? `<span style="left:${((i / NM) * 100).toFixed(1)}%">${monthLabel(m)}</span>`
           : ""
       ).join("");
       timelineEl.innerHTML = `<div class="tl">${lanes}</div>
-        <div class="tlaxis"><div class="ticks">${ticks}</div></div>${TIP_LINE}`;
+        <div class="tlaxis"><div class="ticks">${ticks}</div></div>`;
       bindTips(timelineEl);
     }
   }

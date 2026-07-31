@@ -312,8 +312,10 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
    never sees a hover-only <title> (components.ts::stripTip / bindTips). Nothing is
    selected on load, and an empty box costs no height, so the panel looks unchanged
    until someone asks. */
-.tipline:not(:empty) { padding: 0.45rem 1.1rem; border-top: 1px solid var(--border-soft);
-  font-family: var(--mono); font-size: 0.72rem; color: var(--text-muted); }
+/* built under the strip it captions, so it is as wide as that strip and no wider:
+   an unbroken run of dates has to wrap rather than push the row's columns apart */
+.tipline { padding: 0.3rem 0 0.1rem; font-family: var(--mono); font-size: 0.72rem;
+  line-height: 1.4; color: var(--text-muted); overflow-wrap: anywhere; }
 
 /* model page */
 .head h1 .org { color: var(--text-dim); font-weight: 500; }

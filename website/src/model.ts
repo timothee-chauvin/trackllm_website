@@ -4,7 +4,6 @@
 import {
   B3IT_CAP,
   MONTH_NAMES,
-  TIP_LINE,
   bindTips,
   esc,
   headlineBadge,
@@ -324,7 +323,7 @@ export async function init(): Promise<void> {
         return header + list.map(row).join("");
       })
       .join("") +
-    (hasTimeline ? `<div class="axis"><div class="ticks" id="ticks"></div></div>${TIP_LINE}` : "");
+    (hasTimeline ? `<div class="axis"><div class="ticks" id="ticks"></div></div>` : "");
   bindTips(cmpEl);
 
   const ticksEl = document.getElementById("ticks");

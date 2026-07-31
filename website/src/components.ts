@@ -249,21 +249,46 @@ export function stripTip(lead: string, parts: string[]): string {
   return ` tabindex="0" role="img" aria-label="${text}" data-tip="${text}"`;
 }
 
-/** The line a tapped strip writes into. aria-hidden because a screen reader has
- *  already read the same words off the strip that put them there. Empty until
- *  something is tapped, and styled to take no space until then. */
-export const TIP_LINE = '<div class="tipline" aria-hidden="true"></div>';
+/** The caption a strip writes into, built directly under the strip that was
+ *  activated: one caption at the foot of the panel sits below every other row, which
+ *  on a model page listing dozens of endpoints puts it thousands of pixels down the
+ *  page -- a reader who taps the first strip sees nothing but a focus ring.
+ *  aria-hidden because a screen reader has already read these words off the strip. */
+function tipLine(text: string): HTMLElement {
+  const el = document.createElement("div");
+  el.className = "tipline";
+  el.setAttribute("aria-hidden", "true");
+  el.textContent = text;
+  return el;
+}
 
-/** Tapping or focusing a strip shows its text in the chart's caption line. */
+/** Tapping, or focusing, a strip captions it; tapping it again, or leaving it,
+ *  takes the caption away. */
 export function bindTips(root: Element): void {
-  const line = root.querySelector(".tipline");
-  if (!line) return;
-  const show = (e: Event): void => {
-    const el = (e.target as Element).closest?.("[data-tip]");
-    if (el) line.textContent = el.getAttribute("data-tip");
+  // `byFocus` is what keeps a tap from undoing itself: one tap is a focusin and
+  // then a click, and only the second of the two may close what the first opened.
+  let open: { el: Element; byFocus: boolean } | null = null;
+  const close = (): void => {
+    root.querySelector(".tipline")?.remove();
+    open = null;
   };
-  root.addEventListener("click", show);
-  root.addEventListener("focusin", show);
+  const show = (el: Element, byFocus: boolean): void => {
+    close();
+    el.insertAdjacentElement("afterend", tipLine(el.getAttribute("data-tip")!));
+    open = { el, byFocus };
+  };
+  bindActivation(root, "[data-tip]", (el) => {
+    if (open?.el === el && !open.byFocus) close();
+    else show(el, false);
+  });
+  root.addEventListener("focusin", (e) => {
+    const el = (e.target as Element).closest?.("[data-tip]");
+    if (el && open?.el !== el) show(el, true);
+  });
+  root.addEventListener("focusout", close);
+  root.addEventListener("click", (e) => {
+    if (!(e.target as Element).closest?.("[data-tip]")) close();
+  });
 }
 
 /** The standard filter toolbar: each .chip toggles its data-f flag, then re-renders. */
