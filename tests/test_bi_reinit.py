@@ -99,9 +99,7 @@ def test_reinit_bad_temperature_on_high_prevalence(monkeypatch):
     assert result.reason == "bad_temperature"
 
 
-def test_reinit_inconclusive_gate_does_not_cache_bad_temperature(
-    monkeypatch, tmp_path
-):
+def test_reinit_inconclusive_gate_does_not_cache_bad_temperature(monkeypatch, tmp_path):
     # The gate couldn't get enough data (transient outage): onboarding proceeds and
     # the gate retries next run, instead of excluding the endpoint for 14 days.
     monkeypatch.setattr(reinit_mod, "sample_prompts", fake_sampler({"p1": ["a", "b"]}))

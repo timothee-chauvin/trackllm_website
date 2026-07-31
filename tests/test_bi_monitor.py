@@ -180,9 +180,7 @@ def test_reinit_timeout_is_a_reported_failure(tmp_path, monkeypatch):
         monitor_mod, "get_output_path", lambda ep, ym: tmp_path / "monthly.json"
     )
     monkeypatch.setattr(monitor_mod, "load_phase2_results", lambda d: results)
-    monkeypatch.setattr(
-        monitor_mod.config.bi.reinit, "onboard_timeout_seconds", 0.05
-    )
+    monkeypatch.setattr(monitor_mod.config.bi.reinit, "onboard_timeout_seconds", 0.05)
 
     event_rows = []
 

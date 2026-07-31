@@ -257,7 +257,9 @@ def test_providers_rule_honors_patterns():
         ep("m/c", "together", 0.00002),
         ep("m/d", "novita", 0.00002),
     ]
-    selected, _ = select_monitoring_targets(cands, _providers_policy(["deepinfra*"]), [])
+    selected, _ = select_monitoring_targets(
+        cands, _providers_policy(["deepinfra*"]), []
+    )
     assert sorted(e.provider for e in selected) == ["deepinfra", "deepinfra-turbo"]
 
 
