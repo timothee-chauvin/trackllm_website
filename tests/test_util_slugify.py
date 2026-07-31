@@ -40,7 +40,9 @@ def test_ordinary_names_keep_their_slug(name):
     # Regression guard: the traversal fix must only ever touch all-dot names,
     # since a changed slug means an orphaned data directory / dead URL.
     expected = "".join(
-        c if (c.isalnum() or c in "._-+=@~,") else ("-" if c == " " else f"{ord(c):02x}")
+        c
+        if (c.isalnum() or c in "._-+=@~,")
+        else ("-" if c == " " else f"{ord(c):02x}")
         for c in name
     )
     assert slugify(name) == expected

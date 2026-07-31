@@ -236,7 +236,7 @@ def test_monitoring_email_plain_has_event(tmp_path):
 def test_link_html_escapes_model_and_provider():
     from trackllm_website.bi.digest import _link_html
 
-    html = _link_html('<script>alert(1)</script>', 'a"b&c')
+    html = _link_html("<script>alert(1)</script>", 'a"b&c')
     assert "<script>" not in html
     assert "&lt;script&gt;alert(1)&lt;/script&gt;" in html
     assert "&quot;" in html and "&amp;" in html
