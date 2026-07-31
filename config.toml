@@ -100,10 +100,18 @@ max_concurrent_endpoints = 20
 # ~50 min at 5 rps) plus reference collection (target_border_inputs=50 x
 # reference samples ~= 5k queries, ~17 min), ~67 min total, so 1h would cut off
 # exactly the endpoints that just changed; 1.5h clears it with margin. Hung
-# endpoints burn one deadline per wave of max_concurrent_endpoints: 3 waves of
-# 20 = 60 inside the job limit, where the 3h onboarding budget blows it at 21.
-# A cut-off re-init resumes from its persisted phase-1 progress next run.
+# endpoints burn one deadline per wave of max_concurrent_endpoints: with ~40 min
+# of daily sampling first, 2 waves of 20 = 40 hung endpoints fit inside the job
+# deadline below, where the 3h onboarding budget would blow it at 21.
+# A cut-off re-init resumes from its persisted phase-1 progress next run — but only
+# if the run gets to commit it, which is what job_deadline_seconds below protects.
 reinit_timeout_seconds = 5400
+# The monitor must end itself before bi-monitor.yml's timeout-minutes: 300. A hard
+# kill there is reported as "cancelled", which skips the commit step: every
+# endpoint's saved batch, spend line and state update is thrown away, not just the
+# work of whatever was still running (this is what lost 2026-07-30 entirely). The
+# 30 minutes of headroom cover the digest, the commit and the push.
+job_deadline_seconds = 16200  # 270 min
 
 [bi.popularity]
 top_n = 5

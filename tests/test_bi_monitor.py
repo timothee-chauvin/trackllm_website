@@ -11,6 +11,8 @@ from trackllm_website.bi.common import PlainStrategy
 from trackllm_website.bi.migrate_state import migrate_endpoint
 from trackllm_website.bi.monitor import Decision, decide, monitor, run_endpoint
 from trackllm_website.config import Endpoint
+from trackllm_website.storage import Response
+from trackllm_website.util import slugify
 
 FIXTURES = Path("tests/fixtures/phase_2")
 ENDPOINT = Endpoint(api="openrouter", model="m/x", provider="p", cost=(1, 1))
@@ -199,23 +201,24 @@ def test_reinit_timeout_is_a_reported_failure(tmp_path, monkeypatch):
     assert (tmp_path / "spend").exists()
 
 
+class FakeClient:
+    def __init__(self, *args, **kwargs):
+        pass
+
+    async def close(self):
+        pass
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, *args):
+        pass
+
+
 def test_unresolved_strategy_is_a_reported_failure(monkeypatch):
     """An endpoint resolve_strategies drops must not be silently skipped: no batch
     is written, so the stall detector never advances and it would idle forever."""
     state, _ = open_state_from_fixture("openai2fgpt-4o-mini23azure")
-
-    class FakeClient:
-        def __init__(self, *args, **kwargs):
-            pass
-
-        async def close(self):
-            pass
-
-        async def __aenter__(self):
-            return self
-
-        async def __aexit__(self, *args):
-            pass
 
     async def fake_resolve(client, endpoints, **kwargs):
         return {}, {str(state.endpoint): ["plain: 429 rate limited"]}
@@ -226,3 +229,163 @@ def test_unresolved_strategy_is_a_reported_failure(monkeypatch):
 
     report = asyncio.run(monitor())
     assert report.failures == [str(state.endpoint)]
+
+
+def _monitor_one_endpoint(monkeypatch, state, run_endpoint_impl):
+    async def fake_resolve(client, endpoints, **kwargs):
+        return {str(state.endpoint): PlainStrategy()}, {}
+
+    monkeypatch.setattr(monitor_mod, "load_all_states", lambda d: {state.slug: state})
+    monkeypatch.setattr(monitor_mod, "resolve_strategies", fake_resolve)
+    monkeypatch.setattr(monitor_mod, "OpenRouterClient", FakeClient)
+    monkeypatch.setattr(monitor_mod, "run_endpoint", run_endpoint_impl)
+    return asyncio.run(monitor())
+
+
+class FakeQueryClient(OpenRouterClient):
+    """Answers instantly, except for endpoints that never answer at all.
+
+    A real subclass because run_endpoint's signature is beartype-enforced; no
+    __init__ chaining, so no session and no API key.
+    """
+
+    def __init__(self):
+        self.hangs: set[str] = set()
+
+    async def close(self):
+        pass
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, *args):
+        pass
+
+    async def query(self, endpoint, prompt, **kwargs):
+        if str(endpoint) in self.hangs:
+            await asyncio.sleep(30)
+        return Response(
+            date=datetime(2026, 2, 15, tzinfo=timezone.utc),
+            endpoint=endpoint,
+            prompt=prompt,
+            content="tok",
+            cost=0.0,
+        )
+
+
+def _monitor_endpoints(monkeypatch, tmp_path, states, hangs):
+    """Run monitor() over `states` with a fake API, one query per border input.
+
+    Only the network is faked: run_endpoint, sample_prompts and decide are the real
+    ones, so a cut-off has to unwind the sampler the same way it does in production.
+    """
+    client = FakeQueryClient()
+    client.hangs = {str(s.endpoint) for s in states if s.slug in hangs}
+
+    async def fake_resolve(probe_client, endpoints, **kwargs):
+        return {str(ep): PlainStrategy() for ep in endpoints}, {}
+
+    monkeypatch.setattr(
+        monitor_mod, "load_all_states", lambda d: {s.slug: s for s in states}
+    )
+    monkeypatch.setattr(monitor_mod, "resolve_strategies", fake_resolve)
+    monkeypatch.setattr(monitor_mod, "OpenRouterClient", lambda *a, **kw: client)
+    monkeypatch.setattr(monitor_mod.config.bi, "data_dir", tmp_path)
+    monkeypatch.setattr(
+        type(monitor_mod.config), "spend_dir", property(lambda self: tmp_path / "spend")
+    )
+    monkeypatch.setattr(
+        monitor_mod,
+        "get_output_path",
+        lambda ep, ym: tmp_path / f"{slugify(str(ep))}.json",
+    )
+    monkeypatch.setattr(monitor_mod.config.bi.phase_2, "queries_per_token", 1)
+    monkeypatch.setattr(
+        monitor_mod.config.bi.phase_2, "requests_per_second_per_endpoint", 1000
+    )
+    return asyncio.run(monitor())
+
+
+def test_deadline_cutoff_keeps_the_work_the_run_already_did(tmp_path, monkeypatch):
+    """The reason the deadline exists: whatever finished must still be on disk for
+    the commit step. A hung endpoint costs its own batch, not everyone else's."""
+    done, results = open_state_from_fixture("openai2fgpt-4o-mini23azure")
+    done.endpoint = Endpoint(
+        api="openrouter", model="m/done", provider="p", cost=(1, 1)
+    )
+    hung, _ = open_state_from_fixture("openai2fgpt-4o-mini23azure")
+    hung.endpoint = Endpoint(
+        api="openrouter", model="m/hung", provider="p", cost=(1, 1)
+    )
+
+    monkeypatch.setattr(monitor_mod, "load_phase2_results", lambda d: results)
+    monkeypatch.setattr(monitor_mod.config.bi.monitor, "job_deadline_seconds", 1.0)
+    report = _monitor_endpoints(monkeypatch, tmp_path, [done, hung], hangs={hung.slug})
+
+    assert report.failures == [str(hung.endpoint)]
+    assert [(r.model, r.event) for r in report.rows] == [("m/hung", "deadline_cutoff")]
+
+    # the finished endpoint's batch and state survived the cut-off
+    batch = orjson.loads(
+        (tmp_path / f"{slugify(str(done.endpoint))}.json").read_bytes()
+    )
+    a_bi = done.current_epoch.border_inputs[0]
+    (samples,) = batch[a_bi].values()  # exactly one batch, the one just written
+    assert [tok for _, tok in samples] == ["tok"]
+    assert (monitor_mod.config.bi.state_dir / f"{done.slug}.json").exists()
+    # the hung one persisted nothing: tomorrow's run repeats it from scratch
+    assert not (monitor_mod.config.bi.state_dir / f"{hung.slug}.json").exists()
+
+
+def test_reinit_timeout_is_not_reported_as_a_deadline_cutoff(tmp_path, monkeypatch):
+    """The two deadlines are different events: one endpoint's re-init giving up must
+    not read as the whole job running out of time."""
+    state, results = open_state_from_fixture(
+        "deepseek2fdeepseek-chat-v3-032423hyperbolic2ffp8"
+    )
+
+    async def slow_reinit(*args, **kwargs):
+        await asyncio.sleep(30)
+
+    monkeypatch.setattr(monitor_mod, "load_phase2_results", lambda d: results)
+    monkeypatch.setattr(monitor_mod, "reinit", slow_reinit)
+    monkeypatch.setattr(monitor_mod.config.bi.monitor, "reinit_timeout_seconds", 0.05)
+    monkeypatch.setattr(monitor_mod.config.bi.monitor, "job_deadline_seconds", 30.0)
+    report = _monitor_endpoints(monkeypatch, tmp_path, [state], hangs=set())
+
+    assert report.failures == [str(state.endpoint)]
+    assert [r.event for r in report.rows] == ["reinit_timeout"]
+
+
+def test_job_deadline_cuts_a_hanging_endpoint_short(monkeypatch):
+    """The job must end itself before the workflow's hard timeout: a kill there is
+    reported as "cancelled", which skips the commit step and throws away every
+    endpoint's saved batch."""
+    state, _ = open_state_from_fixture("openai2fgpt-4o-mini23azure")
+
+    async def hanging_run_endpoint(*args, **kwargs):
+        await asyncio.sleep(30)
+        raise AssertionError("should have been cut off by the job deadline")
+
+    monkeypatch.setattr(monitor_mod.config.bi.monitor, "job_deadline_seconds", 0.05)
+    report = _monitor_one_endpoint(monkeypatch, state, hanging_run_endpoint)
+
+    assert report.failures == [str(state.endpoint)]
+    assert [r.event for r in report.rows] == ["deadline_cutoff"]
+
+
+def test_endpoints_left_after_the_deadline_are_not_started(monkeypatch):
+    """Once the deadline has passed, queueing more work would only push the job
+    further past it: report the endpoint instead of running it."""
+    state, _ = open_state_from_fixture("openai2fgpt-4o-mini23azure")
+    started = []
+
+    async def fake_run_endpoint(client, strategy, endpoint_state, *args, **kwargs):
+        started.append(str(endpoint_state.endpoint))
+
+    monkeypatch.setattr(monitor_mod.config.bi.monitor, "job_deadline_seconds", 0.0)
+    report = _monitor_one_endpoint(monkeypatch, state, fake_run_endpoint)
+
+    assert started == []
+    assert report.failures == [str(state.endpoint)]
+    assert [r.event for r in report.rows] == ["deadline_cutoff"]
