@@ -201,8 +201,13 @@ describe("endpoint chart at a phone's width", () => {
 describe("chart marks answer a tap", () => {
   // each test taps, so each starts from a page nothing has been tapped on yet
   beforeEach(() => renderPage("models/qwen2fqwen3-coder.html", "../src/model"));
+  /** A press and a release on the same spot -- the pair the caption reads, since a
+   *  `click` can be retargeted away from the strip by the reflow the caption causes
+   *  (browser-verified; happy-dom has no layout to reflow). */
   const tap = (el: Element): void => {
-    el.dispatchEvent(new Event("click", { bubbles: true }));
+    for (const type of ["pointerdown", "pointerup"]) {
+      el.dispatchEvent(new Event(type, { bubbles: true }));
+    }
   };
 
   test("a strip with changes is focusable and names them", () => {
@@ -254,12 +259,44 @@ describe("chart marks answer a tap", () => {
 
   test("the focus a tap brings does not undo the tap", () => {
     const strip = document.querySelector("#cmp [data-tip]")!;
-    // the order a touch tap arrives in: focus first, then the click
+    // the order a tap arrives in: the press, the focus it moves, then the release
+    strip.dispatchEvent(new Event("pointerdown", { bubbles: true }));
     strip.dispatchEvent(new Event("focusin", { bubbles: true }));
-    tap(strip);
+    strip.dispatchEvent(new Event("pointerup", { bubbles: true }));
     expect(document.querySelector("#cmp .tipline"), "the tap cancelled itself").not.toBeNull();
     strip.dispatchEvent(new Event("focusout", { bubbles: true }));
     expect(document.querySelector("#cmp .tipline"), "leaving the strip left the caption").toBeNull();
+  });
+
+  test("the focus leaving for another strip does not take that strip's caption", () => {
+    const [a, b] = [...document.querySelectorAll("#cmp [data-tip]")];
+    tap(a);
+    // pressing b captions it, and only then does focus leave a
+    tap(b);
+    a.dispatchEvent(new Event("focusout", { bubbles: true }));
+    b.dispatchEvent(new Event("focusin", { bubbles: true }));
+    const lines = [...document.querySelectorAll("#cmp .tipline")];
+    expect(lines.length).toBe(1);
+    expect(b.nextElementSibling).toBe(lines[0]);
+  });
+
+  test("a press that travels is a scroll, not a tap", () => {
+    const strip = document.querySelector("#cmp [data-tip]")!;
+    strip.dispatchEvent(Object.assign(new Event("pointerdown", { bubbles: true }), { clientX: 100, clientY: 300 }));
+    strip.dispatchEvent(Object.assign(new Event("pointerup", { bubbles: true }), { clientX: 100, clientY: 120 }));
+    expect(document.querySelector("#cmp .tipline"), "a scroll captioned a strip").toBeNull();
+  });
+
+  // keyboard focus itself is browser-verified: it turns on :focus-visible, which
+  // happy-dom answers false to (a tap must not caption through the focus it moves)
+  test("Enter on a strip captions it, and again clears it", () => {
+    const strip = document.querySelector("#cmp [data-tip]")!;
+    const key = (): boolean =>
+      strip.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    key();
+    expect(document.querySelector("#cmp .tipline"), "Enter should caption").not.toBeNull();
+    key();
+    expect(document.querySelector("#cmp .tipline")).toBeNull();
   });
 });
 

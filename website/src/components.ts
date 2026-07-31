@@ -200,28 +200,35 @@ export function monthTicks(d0: number, d1: number): Date[] {
   return out;
 }
 
-/** Delegated activation for the widgets that are not native buttons: a pointer
- *  click, plus the Enter/Space contract a role="button" element owes a keyboard.
+/** The Enter/Space contract a role="button"/role="img" widget owes a keyboard.
  *  Space is prevented so activating a control never scrolls the page instead. */
+export function bindKeyActivation(
+  el: Element,
+  selector: string,
+  handler: (target: HTMLElement) => void
+): void {
+  el.addEventListener("keydown", (e) => {
+    const ev = e as KeyboardEvent;
+    if (ev.key !== "Enter" && ev.key !== " ") return;
+    const t = (ev.target as HTMLElement).closest<HTMLElement>(selector);
+    if (!t) return;
+    ev.preventDefault();
+    handler(t);
+  });
+}
+
+/** Delegated activation for the widgets that are not native buttons: a pointer
+ *  click, plus the keyboard contract above. */
 export function bindActivation(
   el: Element,
   selector: string,
   handler: (target: HTMLElement) => void
 ): void {
-  const target = (e: Event): HTMLElement | null =>
-    (e.target as HTMLElement).closest(selector);
   el.addEventListener("click", (e) => {
-    const t = target(e);
+    const t = (e.target as HTMLElement).closest<HTMLElement>(selector);
     if (t) handler(t);
   });
-  el.addEventListener("keydown", (e) => {
-    const ev = e as KeyboardEvent;
-    if (ev.key !== "Enter" && ev.key !== " ") return;
-    const t = target(ev);
-    if (!t) return;
-    ev.preventDefault();
-    handler(t);
-  });
+  bindKeyActivation(el, selector, handler);
 }
 
 /** Toggle `f` in `set`, mirroring membership in the chip's .on class and, for
@@ -262,12 +269,17 @@ function tipLine(text: string): HTMLElement {
   return el;
 }
 
+/** How far a press may travel and still count as a tap rather than a scroll. */
+const TAP_SLOP = 10;
+
 /** Tapping, or focusing, a strip captions it; tapping it again, or leaving it,
  *  takes the caption away. */
 export function bindTips(root: Element): void {
   // `byFocus` is what keeps a tap from undoing itself: one tap is a focusin and
-  // then a click, and only the second of the two may close what the first opened.
+  // then an activation, and only the second of the two may close what the first
+  // opened.
   let open: { el: Element; byFocus: boolean } | null = null;
+  let press: { el: Element | null; x: number; y: number } | null = null;
   const close = (): void => {
     root.querySelector(".tipline")?.remove();
     open = null;
@@ -277,17 +289,50 @@ export function bindTips(root: Element): void {
     el.insertAdjacentElement("afterend", tipLine(el.getAttribute("data-tip")!));
     open = { el, byFocus };
   };
-  bindActivation(root, "[data-tip]", (el) => {
+  const activate = (el: Element): void => {
     if (open?.el === el && !open.byFocus) close();
     else show(el, false);
+  };
+
+  // The gesture is read from the pointer, not from `click`, because showing a
+  // caption takes the previous one away: when that one sat above the strip being
+  // pressed, the page reflows between press and release, the strip slides out from
+  // under the finger, and the browser retargets the click to a common ancestor --
+  // the tap is swallowed. What the press started on cannot be retargeted.
+  root.addEventListener("pointerdown", (e) => {
+    const p = e as PointerEvent;
+    press = {
+      el: (p.target as Element).closest?.("[data-tip]") ?? null,
+      x: p.clientX,
+      y: p.clientY,
+    };
   });
+  root.addEventListener("pointerup", (e) => {
+    const p = e as PointerEvent;
+    const from = press;
+    press = null;
+    if (!from) return;
+    if (Math.abs(p.clientX - from.x) > TAP_SLOP || Math.abs(p.clientY - from.y) > TAP_SLOP) return;
+    if (from.el) activate(from.el);
+    else close();
+  });
+  // a scroll that began on a strip is not a tap on it
+  root.addEventListener("pointercancel", () => {
+    press = null;
+  });
+  bindKeyActivation(root, "[data-tip]", activate);
+  // :focus-visible, because a pointer focuses too: a tap that dismisses a caption
+  // reflows the page, and the strip that slides under the finger would otherwise
+  // catch the focus the browser hands out afterwards and caption itself again.
+  // (happy-dom answers false to it, so the keyboard path is browser-verified.)
   root.addEventListener("focusin", (e) => {
     const el = (e.target as Element).closest?.("[data-tip]");
-    if (el && open?.el !== el) show(el, true);
+    if (el && open?.el !== el && el.matches(":focus-visible")) show(el, true);
   });
-  root.addEventListener("focusout", close);
-  root.addEventListener("click", (e) => {
-    if (!(e.target as Element).closest?.("[data-tip]")) close();
+  // only when the strip that owns the caption is the one being left: pressing
+  // another strip moves the caption first, and focus follows afterwards
+  root.addEventListener("focusout", (e) => {
+    if (open?.el === e.target) close();
   });
 }
 
