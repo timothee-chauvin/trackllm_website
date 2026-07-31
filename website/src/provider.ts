@@ -6,6 +6,7 @@ import {
   LT_CAP,
   MIN_ENDPOINT_YEARS,
   bindFilterChips,
+  bindTips,
   esc,
   magnitudeLabel,
   methodBadges,
@@ -14,6 +15,7 @@ import {
   prettyDate,
   rateBar,
   showLoadError,
+  stripTip,
   volGrid,
 } from "./components";
 import { EndpointRow, initDirectory } from "./directory";
@@ -81,7 +83,8 @@ export async function init(): Promise<void> {
   // "<base>/<variant>" otherwise; variant names come straight from the JSON.
   const variantOf = (provider: string): string =>
     provider === NAME ? "" : provider.slice(NAME.length + 1);
-  const variantLabel = (v: string): string => (v ? esc(NAME) + "/" + esc(v) : esc(NAME));
+  const variantName = (v: string): string => (v ? `${NAME}/${v}` : NAME);
+  const variantLabel = (v: string): string => esc(variantName(v));
 
   const variants = D.variants.slice().sort((a, b) => b.n_endpoints - a.n_endpoints);
   // one scale across the variant bars so they are comparable. Spans only what is
@@ -181,6 +184,10 @@ export async function init(): Promise<void> {
       ? `<path d="${line} L${W} ${base} L0 ${base} Z" fill="var(--text-dim)" opacity="0.16"/>
          <path d="${line}" fill="none" stroke="var(--text-dim)" stroke-width="1" opacity="0.5" vector-effect="non-scaling-stroke"/>`
       : "";
+    const title = (c: ProviderChange): string => {
+      const mag = magnitudeLabel(c.method, c.magnitude);
+      return `${c.date} · ${c.model} · ${c.method === "lt" ? "LT" : "B3IT"}${mag ? " · " + mag : ""}`;
+    };
     const dots = changes
       .map((c) => {
         const isLT = c.method === "lt";
@@ -188,13 +195,12 @@ export async function init(): Promise<void> {
         const r = 2.6 + Math.min(1, (c.magnitude ?? 0) / (isLT ? LT_CAP : B3IT_CAP)) * 3.2;
         const idx = MONTHS.indexOf(c.date.slice(0, 7));
         const cx = laneX(idx < 0 ? MONTHS.length - 1 : idx).toFixed(1);
-        const mag = magnitudeLabel(c.method, c.magnitude);
         return `<line x1="${cx}" y1="${base}" x2="${cx}" y2="6" stroke="${col}" stroke-width="1" opacity="0.22"/>
           <circle cx="${cx}" cy="${base - 14}" r="${r.toFixed(1)}" fill="${col}" fill-opacity="0.75" stroke="${col}" stroke-width="1">
-          <title>${esc(c.date)} · ${esc(c.model)} · ${isLT ? "LT" : "B3IT"}${mag ? " · " + esc(mag) : ""}</title></circle>`;
+          <title>${esc(title(c))}</title></circle>`;
       })
       .join("");
-    return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+    return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"${stripTip(variantName(v.name), changes.map(title))}>
       <line x1="0" y1="${base}" x2="${W}" y2="${base}" stroke="var(--border)" stroke-width="1"/>
       ${area}${dots}</svg>`;
   }
@@ -214,13 +220,18 @@ export async function init(): Promise<void> {
           </div>`;
         })
         .join("");
+      // Every third month, plus the last one -- but only when the last one is not
+      // already on the grid or the month right after it, where the two labels land
+      // on top of each other (and the right-hand one wraps mid-label).
+      const lastIdx = MONTHS.length - 1;
       const ticks = MONTHS.map((m, i) =>
-        i % 3 === 0 || i === MONTHS.length - 1
+        i % 3 === 0 || (i === lastIdx && lastIdx % 3 === 2)
           ? `<span style="left:${((i / NM) * 100).toFixed(1)}%">${monthLabel(m)}</span>`
           : ""
       ).join("");
       timelineEl.innerHTML = `<div class="tl">${lanes}</div>
         <div class="tlaxis"><div class="ticks">${ticks}</div></div>`;
+      bindTips(timelineEl);
     }
   }
 
