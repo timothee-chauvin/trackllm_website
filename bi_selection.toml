@@ -38,6 +38,7 @@ name = "flagships"           # models people care about, cheapest provider each
 kind = "models"
 patterns = [
     "anthropic/claude-sonnet-4.6",
+    "deepseek/deepseek-v4-flash-0731",
     "google/gemini-3.1-pro-preview",
     "mistralai/mistral-large-2512",
     "qwen/qwen3-max",
