@@ -3,6 +3,7 @@
   "openrouter#aion-labs/aion-1.0#aion-labs": null,
   "openrouter#aion-labs/aion-1.0-mini#aion-labs/bf16": null,
   "openrouter#aion-labs/aion-2.0#aion-labs": null,
+  "openrouter#aion-labs/aion-3.0-mini#aion-labs": null,
   "openrouter#aion-labs/aion-rp-llama-3.1-8b#aion-labs": null,
   "openrouter#amazon/nova-2-lite-v1#amazon-bedrock": null,
   "openrouter#amazon/nova-2-lite-v1#amazon-bedrock/eu-west-1": null,
@@ -20,6 +21,7 @@
   "openrouter#anthropic/claude-haiku-4.5#amazon-bedrock/eu-west-1": null,
   "openrouter#anthropic/claude-haiku-4.5#amazon-bedrock/global": null,
   "openrouter#anthropic/claude-haiku-4.5#anthropic": null,
+  "openrouter#anthropic/claude-haiku-4.5#azure/global": null,
   "openrouter#anthropic/claude-haiku-4.5#google-vertex/europe": null,
   "openrouter#anthropic/claude-haiku-4.5#google-vertex/global": null,
   "openrouter#anthropic/claude-opus-4#google-vertex": null,
@@ -74,12 +76,14 @@
   "openrouter#anthropic/claude-sonnet-4.5#anthropic": null,
   "openrouter#anthropic/claude-sonnet-4.5#anthropic/2": null,
   "openrouter#anthropic/claude-sonnet-4.5#anthropic/claude-on-aws": null,
+  "openrouter#anthropic/claude-sonnet-4.5#azure/global": null,
   "openrouter#anthropic/claude-sonnet-4.5#google-vertex/global": null,
   "openrouter#anthropic/claude-sonnet-4.5#google-vertex/us-east5": null,
   "openrouter#anthropic/claude-sonnet-4.6#amazon-bedrock/eu-west-1": null,
   "openrouter#anthropic/claude-sonnet-4.6#amazon-bedrock/global": null,
   "openrouter#anthropic/claude-sonnet-4.6#anthropic": null,
   "openrouter#anthropic/claude-sonnet-4.6#anthropic/2": null,
+  "openrouter#anthropic/claude-sonnet-4.6#azure/global": null,
   "openrouter#anthropic/claude-sonnet-4.6#azure/us-east-2": null,
   "openrouter#anthropic/claude-sonnet-4.6#google-vertex/europe": null,
   "openrouter#anthropic/claude-sonnet-4.6#google-vertex/global": null,
@@ -105,17 +109,21 @@
     "skip": "hidden reasoning"
   },
   "openrouter#deepcogito/cogito-v2.1-671b#together": null,
+  "openrouter#deepseek/deepseek-chat#deepinfra/fp4": null,
   "openrouter#deepseek/deepseek-chat#novita/fp8": null,
   "openrouter#deepseek/deepseek-chat#streamlake": null,
   "openrouter#deepseek/deepseek-chat-v3-0324#atlas-cloud/fp8": null,
+  "openrouter#deepseek/deepseek-chat-v3-0324#crusoe/bf16": null,
   "openrouter#deepseek/deepseek-chat-v3-0324#deepinfra/fp4": null,
   "openrouter#deepseek/deepseek-chat-v3-0324#gmicloud/fp8": null,
   "openrouter#deepseek/deepseek-chat-v3-0324#modelrun/fp4": null,
   "openrouter#deepseek/deepseek-chat-v3-0324#novita/fp8": null,
   "openrouter#deepseek/deepseek-chat-v3-0324#siliconflow/fp8": null,
   "openrouter#deepseek/deepseek-chat-v3.1#atlas-cloud/fp8": null,
+  "openrouter#deepseek/deepseek-chat-v3.1#coreweave/fp8": null,
   "openrouter#deepseek/deepseek-chat-v3.1#deepinfra/fp4": null,
   "openrouter#deepseek/deepseek-chat-v3.1#google-vertex/us-west2": null,
+  "openrouter#deepseek/deepseek-chat-v3.1#mara": null,
   "openrouter#deepseek/deepseek-chat-v3.1#novita/fp8": null,
   "openrouter#deepseek/deepseek-chat-v3.1#sambanova/fp8": null,
   "openrouter#deepseek/deepseek-chat-v3.1#siliconflow/fp8": null,
@@ -141,6 +149,7 @@
   "openrouter#deepseek/deepseek-v3.1-terminus#siliconflow/fp8": null,
   "openrouter#deepseek/deepseek-v3.1-terminus#streamlake": null,
   "openrouter#deepseek/deepseek-v3.2#alibaba": null,
+  "openrouter#deepseek/deepseek-v3.2#alibaba/fp8": null,
   "openrouter#deepseek/deepseek-v3.2#atlas-cloud/fp8": null,
   "openrouter#deepseek/deepseek-v3.2#baidu/fp8": null,
   "openrouter#deepseek/deepseek-v3.2#deepinfra/fp4": null,
@@ -148,57 +157,93 @@
   "openrouter#deepseek/deepseek-v3.2#friendli": null,
   "openrouter#deepseek/deepseek-v3.2#google-vertex": null,
   "openrouter#deepseek/deepseek-v3.2#novita/fp8": null,
+  "openrouter#deepseek/deepseek-v3.2#phala": null,
   "openrouter#deepseek/deepseek-v3.2#sambanova": null,
   "openrouter#deepseek/deepseek-v3.2#siliconflow/fp8": null,
   "openrouter#deepseek/deepseek-v3.2#streamlake": null,
+  "openrouter#deepseek/deepseek-v3.2#streamlake/fp8": null,
+  "openrouter#deepseek/deepseek-v3.2#venice": null,
   "openrouter#deepseek/deepseek-v3.2-exp#atlas-cloud/fp8": null,
   "openrouter#deepseek/deepseek-v3.2-exp#novita/fp8": null,
   "openrouter#deepseek/deepseek-v3.2-exp#siliconflow/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash#akashml/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash#alibaba": null,
+  "openrouter#deepseek/deepseek-v4-flash#alibaba/fp8": null,
+  "openrouter#deepseek/deepseek-v4-flash#ambient/fp4": null,
+  "openrouter#deepseek/deepseek-v4-flash#atlas-cloud/fp4": null,
   "openrouter#deepseek/deepseek-v4-flash#atlas-cloud/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash#baidu/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash#cloudflare": null,
+  "openrouter#deepseek/deepseek-v4-flash#coreweave/fp8": null,
+  "openrouter#deepseek/deepseek-v4-flash#deepinfra/fp4": null,
   "openrouter#deepseek/deepseek-v4-flash#deepseek": null,
   "openrouter#deepseek/deepseek-v4-flash#digitalocean": null,
   "openrouter#deepseek/deepseek-v4-flash#fireworks": null,
   "openrouter#deepseek/deepseek-v4-flash#gmicloud/fp8": null,
+  "openrouter#deepseek/deepseek-v4-flash#io-net/fp8": null,
+  "openrouter#deepseek/deepseek-v4-flash#ionstream/fp4": null,
+  "openrouter#deepseek/deepseek-v4-flash#mancer/fp4": null,
   "openrouter#deepseek/deepseek-v4-flash#morph": null,
   "openrouter#deepseek/deepseek-v4-flash#novita/fp8": null,
+  "openrouter#deepseek/deepseek-v4-flash#open-inference/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash#parasail/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash#siliconflow/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash#streamlake": null,
+  "openrouter#deepseek/deepseek-v4-flash#streamlake/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash#venice": null,
   "openrouter#deepseek/deepseek-v4-flash#wafer/fp4": null,
   "openrouter#deepseek/deepseek-v4-flash#wandb/fp8": null,
+  "openrouter#deepseek/deepseek-v4-flash-0731#cloudflare/fp8": null,
+  "openrouter#deepseek/deepseek-v4-flash-0731#deepinfra/fp4": null,
+  "openrouter#deepseek/deepseek-v4-flash-0731#deepseek/fp8": null,
+  "openrouter#deepseek/deepseek-v4-flash-0731#fireworks": null,
+  "openrouter#deepseek/deepseek-v4-flash-0731#gmicloud/fp8": null,
+  "openrouter#deepseek/deepseek-v4-flash-0731#parasail/fp8": null,
+  "openrouter#deepseek/deepseek-v4-flash-0731#siliconflow/fp8": null,
   "openrouter#deepseek/deepseek-v4-pro#alibaba": null,
+  "openrouter#deepseek/deepseek-v4-pro#alibaba/fp8": null,
   "openrouter#deepseek/deepseek-v4-pro#atlas-cloud/fp8": null,
   "openrouter#deepseek/deepseek-v4-pro#baidu/fp8": null,
+  "openrouter#deepseek/deepseek-v4-pro#baseten/fp4": null,
+  "openrouter#deepseek/deepseek-v4-pro#cloudflare": null,
+  "openrouter#deepseek/deepseek-v4-pro#coreweave/fp8": null,
   "openrouter#deepseek/deepseek-v4-pro#deepinfra/fp4": null,
   "openrouter#deepseek/deepseek-v4-pro#deepseek": null,
   "openrouter#deepseek/deepseek-v4-pro#digitalocean": null,
   "openrouter#deepseek/deepseek-v4-pro#fireworks": null,
   "openrouter#deepseek/deepseek-v4-pro#gmicloud/fp8": null,
+  "openrouter#deepseek/deepseek-v4-pro#ionstream/fp4": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-pro#nextbit/fp8": null,
   "openrouter#deepseek/deepseek-v4-pro#novita/fp8": null,
   "openrouter#deepseek/deepseek-v4-pro#parasail/fp8": null,
   "openrouter#deepseek/deepseek-v4-pro#siliconflow/fp8": null,
   "openrouter#deepseek/deepseek-v4-pro#streamlake": null,
+  "openrouter#deepseek/deepseek-v4-pro#streamlake/fp8": null,
   "openrouter#deepseek/deepseek-v4-pro#together": null,
   "openrouter#deepseek/deepseek-v4-pro#venice": null,
   "openrouter#deepseek/deepseek-v4-pro#wandb/fp8": null,
   "openrouter#essentialai/rnj-1-instruct#together": null,
   "openrouter#google/gemini-2.5-flash#google-ai-studio": null,
+  "openrouter#google/gemini-2.5-flash#google-ai-studio/flex": null,
+  "openrouter#google/gemini-2.5-flash#google-ai-studio/priority": null,
   "openrouter#google/gemini-2.5-flash#google-vertex": null,
   "openrouter#google/gemini-2.5-flash#google-vertex/eu": null,
   "openrouter#google/gemini-2.5-flash#google-vertex/global": null,
+  "openrouter#google/gemini-2.5-flash#google-vertex/global/priority": null,
   "openrouter#google/gemini-2.5-flash-image#google-ai-studio": null,
   "openrouter#google/gemini-2.5-flash-image#google-vertex/global": null,
   "openrouter#google/gemini-2.5-flash-lite#google-ai-studio": null,
+  "openrouter#google/gemini-2.5-flash-lite#google-ai-studio/flex": null,
+  "openrouter#google/gemini-2.5-flash-lite#google-ai-studio/priority": null,
   "openrouter#google/gemini-2.5-flash-lite#google-vertex": null,
   "openrouter#google/gemini-2.5-flash-lite#google-vertex/eu": null,
   "openrouter#google/gemini-2.5-flash-lite-preview-09-2025#google-vertex/global": null,
   "openrouter#google/gemini-2.5-pro#google-ai-studio": {
+    "max_tokens": 4
+  },
+  "openrouter#google/gemini-2.5-pro#google-ai-studio/flex": {
     "max_tokens": 4
   },
   "openrouter#google/gemini-2.5-pro#google-vertex/eu": {
@@ -213,16 +258,25 @@
   "openrouter#google/gemini-2.5-pro-preview#google-ai-studio": {
     "max_tokens": 4
   },
+  "openrouter#google/gemini-2.5-pro-preview#google-ai-studio/flex": {
+    "max_tokens": 4
+  },
   "openrouter#google/gemini-2.5-pro-preview#google-vertex/eu": {
     "skip": "hidden reasoning"
   },
   "openrouter#google/gemini-2.5-pro-preview#google-vertex/global": {
     "skip": "hidden reasoning"
   },
+  "openrouter#google/gemini-2.5-pro-preview#google-vertex/global/priority": {
+    "skip": "hidden reasoning"
+  },
   "openrouter#google/gemini-2.5-pro-preview#google-vertex/us": {
     "skip": "hidden reasoning"
   },
   "openrouter#google/gemini-2.5-pro-preview-05-06#google-ai-studio": {
+    "max_tokens": 4
+  },
+  "openrouter#google/gemini-2.5-pro-preview-05-06#google-ai-studio/flex": {
     "max_tokens": 4
   },
   "openrouter#google/gemini-2.5-pro-preview-05-06#google-vertex/eu": {
@@ -237,10 +291,28 @@
   "openrouter#google/gemini-3-flash-preview#google-ai-studio": {
     "skip": "hidden reasoning"
   },
+  "openrouter#google/gemini-3-flash-preview#google-ai-studio/flex": {
+    "skip": "hidden reasoning"
+  },
+  "openrouter#google/gemini-3-flash-preview#google-ai-studio/priority": {
+    "skip": "hidden reasoning"
+  },
   "openrouter#google/gemini-3-flash-preview#google-vertex/global": {
     "skip": "hidden reasoning"
   },
+  "openrouter#google/gemini-3-flash-preview#google-vertex/global/flex": {
+    "skip": "hidden reasoning"
+  },
+  "openrouter#google/gemini-3-flash-preview#google-vertex/global/priority": {
+    "skip": "hidden reasoning"
+  },
+  "openrouter#google/gemini-3-pro-image#google-ai-studio/global": {
+    "max_tokens": 4
+  },
   "openrouter#google/gemini-3-pro-image-preview#google-ai-studio/global": {
+    "max_tokens": 4
+  },
+  "openrouter#google/gemini-3-pro-image-preview#google-ai-studio/global/flex": {
     "max_tokens": 4
   },
   "openrouter#google/gemini-3-pro-image-preview#google-vertex/global": null,
@@ -253,10 +325,28 @@
   "openrouter#google/gemini-3.1-flash-lite#google-ai-studio": {
     "max_tokens": 4
   },
+  "openrouter#google/gemini-3.1-flash-lite#google-ai-studio/flex": {
+    "max_tokens": 4
+  },
+  "openrouter#google/gemini-3.1-flash-lite#google-ai-studio/priority": {
+    "max_tokens": 4
+  },
   "openrouter#google/gemini-3.1-flash-lite#google-vertex/global": {
     "max_tokens": 4
   },
+  "openrouter#google/gemini-3.1-flash-lite#google-vertex/global/flex": {
+    "max_tokens": 4
+  },
+  "openrouter#google/gemini-3.1-flash-lite#google-vertex/global/priority": {
+    "max_tokens": 4
+  },
   "openrouter#google/gemini-3.1-flash-lite-preview#google-ai-studio": {
+    "max_tokens": 4
+  },
+  "openrouter#google/gemini-3.1-flash-lite-preview#google-ai-studio/flex": {
+    "skip": "hidden reasoning"
+  },
+  "openrouter#google/gemini-3.1-flash-lite-preview#google-ai-studio/priority": {
     "max_tokens": 4
   },
   "openrouter#google/gemini-3.1-flash-lite-preview#google-vertex/global": {
@@ -274,14 +364,46 @@
   "openrouter#google/gemini-3.5-flash#google-ai-studio": {
     "skip": "hidden reasoning"
   },
+  "openrouter#google/gemini-3.5-flash#google-ai-studio/flex": {
+    "skip": "hidden reasoning"
+  },
+  "openrouter#google/gemini-3.5-flash#google-ai-studio/priority": {
+    "skip": "hidden reasoning"
+  },
   "openrouter#google/gemini-3.5-flash#google-vertex/global": {
+    "skip": "hidden reasoning"
+  },
+  "openrouter#google/gemini-3.5-flash#google-vertex/global/flex": {
+    "skip": "hidden reasoning"
+  },
+  "openrouter#google/gemini-3.5-flash#google-vertex/global/priority": {
+    "skip": "hidden reasoning"
+  },
+  "openrouter#google/gemini-3.5-flash-lite#google-ai-studio": {
+    "skip": "hidden reasoning"
+  },
+  "openrouter#google/gemini-3.5-flash-lite#google-ai-studio/flex": {
+    "skip": "hidden reasoning"
+  },
+  "openrouter#google/gemini-3.5-flash-lite#google-ai-studio/priority": {
+    "skip": "hidden reasoning"
+  },
+  "openrouter#google/gemini-3.6-flash#google-ai-studio": {
+    "skip": "hidden reasoning"
+  },
+  "openrouter#google/gemini-3.6-flash#google-ai-studio/flex": {
+    "skip": "hidden reasoning"
+  },
+  "openrouter#google/gemini-3.6-flash#google-ai-studio/priority": {
     "skip": "hidden reasoning"
   },
   "openrouter#google/gemma-2-27b-it#nextbit/int4": {
     "skip": "hidden reasoning"
   },
   "openrouter#google/gemma-3-12b-it#deepinfra/bf16": null,
+  "openrouter#google/gemma-3-27b-it#deepinfra/fp8": null,
   "openrouter#google/gemma-3-27b-it#nebius/fp8": null,
+  "openrouter#google/gemma-3-27b-it#novita/bf16": null,
   "openrouter#google/gemma-3-27b-it#parasail/fp8": null,
   "openrouter#google/gemma-3-27b-it#phala": {
     "skip": "hidden reasoning"
@@ -292,15 +414,23 @@
   "openrouter#google/gemma-4-26b-a4b-it#deepinfra/fp8": null,
   "openrouter#google/gemma-4-26b-a4b-it#dekallm/bf16": null,
   "openrouter#google/gemma-4-26b-a4b-it#google-vertex/global": null,
+  "openrouter#google/gemma-4-26b-a4b-it#ionstream/bf16": null,
   "openrouter#google/gemma-4-26b-a4b-it#nextbit/bf16": null,
   "openrouter#google/gemma-4-26b-a4b-it#novita/bf16": null,
   "openrouter#google/gemma-4-26b-a4b-it#parasail/bf16": null,
   "openrouter#google/gemma-4-26b-a4b-it#siliconflow/fp8": null,
   "openrouter#google/gemma-4-26b-a4b-it#venice/bf16": null,
+  "openrouter#google/gemma-4-31b-it#cerebras/fp16": null,
   "openrouter#google/gemma-4-31b-it#chutes/fp4": null,
+  "openrouter#google/gemma-4-31b-it#coreweave/bf16": null,
+  "openrouter#google/gemma-4-31b-it#crusoe": null,
   "openrouter#google/gemma-4-31b-it#deepinfra/fp8": null,
   "openrouter#google/gemma-4-31b-it#deepinfra/turbo": null,
+  "openrouter#google/gemma-4-31b-it#friendli": null,
+  "openrouter#google/gemma-4-31b-it#modelrun/fp4": null,
+  "openrouter#google/gemma-4-31b-it#morph/fp4": null,
   "openrouter#google/gemma-4-31b-it#novita/bf16": null,
+  "openrouter#google/gemma-4-31b-it#open-inference/bf16": null,
   "openrouter#google/gemma-4-31b-it#parasail/fp8": null,
   "openrouter#google/gemma-4-31b-it#phala": null,
   "openrouter#google/gemma-4-31b-it#siliconflow/fp8": null,
@@ -310,7 +440,9 @@
   "openrouter#gryphe/mythomax-l2-13b#deepinfra/fp16": null,
   "openrouter#gryphe/mythomax-l2-13b#mancer/fp8": null,
   "openrouter#gryphe/mythomax-l2-13b#nextbit/int4": null,
+  "openrouter#gryphe/mythomax-l2-13b#parasail/fp16": null,
   "openrouter#ibm-granite/granite-4.0-h-micro#cloudflare": null,
+  "openrouter#ibm-granite/granite-4.1-8b#coreweave/bf16": null,
   "openrouter#ibm-granite/granite-4.1-8b#wandb/bf16": null,
   "openrouter#inception/mercury-2#inception": {
     "skip": "hidden reasoning"
@@ -326,14 +458,19 @@
   "openrouter#mancer/weaver#mancer/fp8": {
     "skip": "hidden reasoning"
   },
+  "openrouter#meituan/longcat-2.0#atlas-cloud/fp8": {
+    "effort": "none"
+  },
   "openrouter#meta-llama/llama-3-70b-instruct#novita/fp8": null,
   "openrouter#meta-llama/llama-3-8b-instruct#together/int4": null,
   "openrouter#meta-llama/llama-3.1-70b-instruct#amazon-bedrock": {
     "skip": "hidden reasoning"
   },
+  "openrouter#meta-llama/llama-3.1-70b-instruct#coreweave/bf16": null,
   "openrouter#meta-llama/llama-3.1-70b-instruct#deepinfra/turbo": null,
   "openrouter#meta-llama/llama-3.1-70b-instruct#wandb/bf16": null,
   "openrouter#meta-llama/llama-3.1-8b-instruct#cloudflare/fp8": null,
+  "openrouter#meta-llama/llama-3.1-8b-instruct#coreweave/bf16": null,
   "openrouter#meta-llama/llama-3.1-8b-instruct#deepinfra/bf16": null,
   "openrouter#meta-llama/llama-3.1-8b-instruct#deepinfra/fp8": null,
   "openrouter#meta-llama/llama-3.1-8b-instruct#groq": null,
@@ -342,8 +479,11 @@
   "openrouter#meta-llama/llama-3.2-11b-vision-instruct#deepinfra/fp8": null,
   "openrouter#meta-llama/llama-3.2-1b-instruct#cloudflare": null,
   "openrouter#meta-llama/llama-3.2-3b-instruct#cloudflare": null,
+  "openrouter#meta-llama/llama-3.2-3b-instruct#parasail/bf16": null,
   "openrouter#meta-llama/llama-3.3-70b-instruct#akashml/fp8": null,
   "openrouter#meta-llama/llama-3.3-70b-instruct#cloudflare/fp8": null,
+  "openrouter#meta-llama/llama-3.3-70b-instruct#coreweave/fp16": null,
+  "openrouter#meta-llama/llama-3.3-70b-instruct#crusoe/bf16": null,
   "openrouter#meta-llama/llama-3.3-70b-instruct#deepinfra/turbo": null,
   "openrouter#meta-llama/llama-3.3-70b-instruct#google-vertex": null,
   "openrouter#meta-llama/llama-3.3-70b-instruct#google-vertex/us-central1": null,
@@ -356,6 +496,7 @@
   "openrouter#meta-llama/llama-3.3-70b-instruct#together/fp8": null,
   "openrouter#meta-llama/llama-3.3-70b-instruct#wandb/fp16": null,
   "openrouter#meta-llama/llama-4-maverick#deepinfra/base": null,
+  "openrouter#meta-llama/llama-4-maverick#digitalocean": null,
   "openrouter#meta-llama/llama-4-maverick#google-vertex/us-east5": null,
   "openrouter#meta-llama/llama-4-maverick#novita/fp8": null,
   "openrouter#meta-llama/llama-4-maverick#parasail/fp8": null,
@@ -389,6 +530,7 @@
   "openrouter#minimax/minimax-m2.5#akashml/fp8": null,
   "openrouter#minimax/minimax-m2.5#atlas-cloud/fp8": null,
   "openrouter#minimax/minimax-m2.5#chutes/fp8": null,
+  "openrouter#minimax/minimax-m2.5#coreweave/fp8": null,
   "openrouter#minimax/minimax-m2.5#deepinfra/fp8": null,
   "openrouter#minimax/minimax-m2.5#digitalocean": null,
   "openrouter#minimax/minimax-m2.5#friendli": null,
@@ -405,9 +547,12 @@
   "openrouter#minimax/minimax-m2.5#streamlake": null,
   "openrouter#minimax/minimax-m2.5#venice": null,
   "openrouter#minimax/minimax-m2.5#wandb/fp8": null,
+  "openrouter#minimax/minimax-m2.7#atlas-cloud/fp8": null,
   "openrouter#minimax/minimax-m2.7#deepinfra/fp8": null,
   "openrouter#minimax/minimax-m2.7#deepinfra/turbo": null,
   "openrouter#minimax/minimax-m2.7#fireworks": null,
+  "openrouter#minimax/minimax-m2.7#gmicloud/fp8": null,
+  "openrouter#minimax/minimax-m2.7#groq": null,
   "openrouter#minimax/minimax-m2.7#mara": null,
   "openrouter#minimax/minimax-m2.7#minimax/fp8": null,
   "openrouter#minimax/minimax-m2.7#minimax/highspeed": null,
@@ -431,6 +576,10 @@
   "openrouter#minimax/minimax-m3#parasail/fp8": {
     "effort": "none"
   },
+  "openrouter#minimax/minimax-m3#together": {
+    "effort": "none"
+  },
+  "openrouter#minimax/minimax-m3#venice/fp8": null,
   "openrouter#mistralai/codestral-2508#mistral": null,
   "openrouter#mistralai/devstral-2512#mistral": null,
   "openrouter#mistralai/ministral-14b-2512#mistral": null,
@@ -447,7 +596,12 @@
   "openrouter#mistralai/mistral-medium-3.1#mistral": null,
   "openrouter#mistralai/mistral-nemo#deepinfra/fp8": null,
   "openrouter#mistralai/mistral-nemo#dekallm/fp8": null,
+  "openrouter#mistralai/mistral-nemo#io-net/fp16": null,
   "openrouter#mistralai/mistral-nemo#mistral": null,
+  "openrouter#mistralai/mistral-nemo#novita/fp8": null,
+  "openrouter#mistralai/mistral-nemo#parasail/fp8": {
+    "skip": "hidden reasoning"
+  },
   "openrouter#mistralai/mistral-saba#mistral": null,
   "openrouter#mistralai/mistral-small-24b-instruct-2501#deepinfra/fp8": null,
   "openrouter#mistralai/mistral-small-2603#mistral": null,
@@ -468,6 +622,7 @@
     "max_tokens": 1
   },
   "openrouter#moonshotai/kimi-k2-thinking#novita/bf16": null,
+  "openrouter#moonshotai/kimi-k2.5#amazon-bedrock/us-east-2": null,
   "openrouter#moonshotai/kimi-k2.5#atlas-cloud/int4": null,
   "openrouter#moonshotai/kimi-k2.5#chutes/int4": null,
   "openrouter#moonshotai/kimi-k2.5#deepinfra/fp4": null,
@@ -483,6 +638,8 @@
   "openrouter#moonshotai/kimi-k2.6#baidu/fp4": null,
   "openrouter#moonshotai/kimi-k2.6#chutes/int4": null,
   "openrouter#moonshotai/kimi-k2.6#cloudflare": null,
+  "openrouter#moonshotai/kimi-k2.6#coreweave/fp4": null,
+  "openrouter#moonshotai/kimi-k2.6#crusoe/bf16": null,
   "openrouter#moonshotai/kimi-k2.6#decart/fp4": null,
   "openrouter#moonshotai/kimi-k2.6#deepinfra/fp4": null,
   "openrouter#moonshotai/kimi-k2.6#digitalocean": null,
@@ -490,6 +647,7 @@
   "openrouter#moonshotai/kimi-k2.6#io-net/int4": null,
   "openrouter#moonshotai/kimi-k2.6#moonshotai/int4": null,
   "openrouter#moonshotai/kimi-k2.6#novita": null,
+  "openrouter#moonshotai/kimi-k2.6#parasail/int4": null,
   "openrouter#moonshotai/kimi-k2.6#phala": null,
   "openrouter#moonshotai/kimi-k2.6#siliconflow/fp8": null,
   "openrouter#moonshotai/kimi-k2.6#streamlake": null,
@@ -500,15 +658,32 @@
   "openrouter#moonshotai/kimi-k2.7-code#ambient/int4": null,
   "openrouter#moonshotai/kimi-k2.7-code#atlas-cloud/int4": null,
   "openrouter#moonshotai/kimi-k2.7-code#cloudflare": null,
+  "openrouter#moonshotai/kimi-k2.7-code#coreweave/int4": null,
   "openrouter#moonshotai/kimi-k2.7-code#deepinfra/fp4": null,
+  "openrouter#moonshotai/kimi-k2.7-code#fireworks": null,
+  "openrouter#moonshotai/kimi-k2.7-code#inceptron/int4": null,
+  "openrouter#moonshotai/kimi-k2.7-code#modelrun/fp4": null,
   "openrouter#moonshotai/kimi-k2.7-code#moonshotai/highspeed": null,
   "openrouter#moonshotai/kimi-k2.7-code#moonshotai/int4": null,
   "openrouter#moonshotai/kimi-k2.7-code#novita": null,
+  "openrouter#moonshotai/kimi-k2.7-code#novita/int4": null,
   "openrouter#moonshotai/kimi-k2.7-code#parasail/int4": null,
+  "openrouter#moonshotai/kimi-k2.7-code#siliconflow/fp8": {
+    "skip": "hidden reasoning"
+  },
   "openrouter#moonshotai/kimi-k2.7-code#together": null,
   "openrouter#moonshotai/kimi-k2.7-code#venice/int4": null,
   "openrouter#morph/morph-v3-fast#morph": null,
   "openrouter#morph/morph-v3-large#morph": null,
+  "openrouter#nex-agi/nex-n2-mini#nex-agi/fp8": {
+    "max_tokens": 4
+  },
+  "openrouter#nex-agi/nex-n2-pro#nex-agi/fp8": {
+    "max_tokens": 1
+  },
+  "openrouter#nex-agi/nex-n2-pro#siliconflow": {
+    "max_tokens": 1
+  },
   "openrouter#nousresearch/hermes-3-llama-3.1-405b#deepinfra/fp8": null,
   "openrouter#nousresearch/hermes-3-llama-3.1-70b#deepinfra/fp8": {
     "effort": "none"
@@ -516,14 +691,19 @@
   "openrouter#nousresearch/hermes-4-405b#nebius/fp8": null,
   "openrouter#nousresearch/hermes-4-70b#nebius/fp8": null,
   "openrouter#nvidia/llama-3.3-nemotron-super-49b-v1.5#deepinfra/fp8": null,
+  "openrouter#nvidia/nemotron-3-nano-30b-a3b#crusoe/fp8": null,
   "openrouter#nvidia/nemotron-3-nano-30b-a3b#deepinfra/fp4": null,
   "openrouter#nvidia/nemotron-3-nano-30b-a3b#nebius/fp8": null,
+  "openrouter#nvidia/nemotron-3-nano-30b-a3b#novita/fp4": null,
   "openrouter#nvidia/nemotron-3-super-120b-a12b#deepinfra/bf16": null,
   "openrouter#nvidia/nemotron-3-super-120b-a12b#dekallm/fp8": null,
   "openrouter#nvidia/nemotron-3-super-120b-a12b#digitalocean": null,
   "openrouter#nvidia/nemotron-3-super-120b-a12b#nebius/fp4": null,
+  "openrouter#nvidia/nemotron-3-ultra-550b-a55b#baseten/fp4": null,
   "openrouter#nvidia/nemotron-3-ultra-550b-a55b#deepinfra/bf16": null,
+  "openrouter#nvidia/nemotron-3-ultra-550b-a55b#deepinfra/fp4": null,
   "openrouter#nvidia/nemotron-3-ultra-550b-a55b#together": null,
+  "openrouter#nvidia/nemotron-3-ultra-550b-a55b#venice/fp8": null,
   "openrouter#openai/gpt-3.5-turbo#openai": null,
   "openrouter#openai/gpt-3.5-turbo-0613#azure": null,
   "openrouter#openai/gpt-3.5-turbo-16k#azure": null,
@@ -559,9 +739,11 @@
   "openrouter#openai/gpt-4.1-nano#openai": {
     "skip": "hidden reasoning"
   },
+  "openrouter#openai/gpt-4o#azure": null,
   "openrouter#openai/gpt-4o#openai": null,
   "openrouter#openai/gpt-4o-2024-05-13#azure": null,
   "openrouter#openai/gpt-4o-2024-05-13#openai": null,
+  "openrouter#openai/gpt-4o-2024-08-06#azure": null,
   "openrouter#openai/gpt-4o-2024-08-06#openai": null,
   "openrouter#openai/gpt-4o-2024-11-20#openai": null,
   "openrouter#openai/gpt-4o-mini#azure": null,
@@ -729,7 +911,13 @@
   "openrouter#openai/gpt-oss-120b#cerebras/fp16": {
     "max_tokens": 4
   },
+  "openrouter#openai/gpt-oss-120b#coreweave/fp4": {
+    "max_tokens": 4
+  },
   "openrouter#openai/gpt-oss-120b#deepinfra/bf16": {
+    "max_tokens": 4
+  },
+  "openrouter#openai/gpt-oss-120b#deepinfra/turbo": {
     "max_tokens": 4
   },
   "openrouter#openai/gpt-oss-120b#digitalocean": null,
@@ -739,6 +927,7 @@
   "openrouter#openai/gpt-oss-120b#groq": {
     "max_tokens": 4
   },
+  "openrouter#openai/gpt-oss-120b#mancer/fp8": null,
   "openrouter#openai/gpt-oss-120b#mara": null,
   "openrouter#openai/gpt-oss-120b#nebius/fp4": {
     "max_tokens": 4
@@ -765,6 +954,9 @@
   },
   "openrouter#openai/gpt-oss-20b#amazon-bedrock/eu-west-1": {
     "skip": "hidden reasoning"
+  },
+  "openrouter#openai/gpt-oss-20b#coreweave/fp4": {
+    "max_tokens": 4
   },
   "openrouter#openai/gpt-oss-20b#deepinfra/bf16": {
     "max_tokens": 4
@@ -848,14 +1040,21 @@
   "openrouter#perplexity/sonar-reasoning-pro#perplexity": {
     "max_tokens": 16
   },
+  "openrouter#poolside/laguna-s-2.1#poolside/fp4": {
+    "effort": "none"
+  },
+  "openrouter#poolside/laguna-xs-2.1#poolside/fp8": null,
   "openrouter#prime-intellect/intellect-3#nebius/fp8": null,
   "openrouter#qwen/qwen-2.5-72b-instruct#deepinfra/fp8": null,
   "openrouter#qwen/qwen-2.5-7b-instruct#phala": null,
   "openrouter#qwen/qwen-2.5-7b-instruct#together/fp8": null,
   "openrouter#qwen/qwen-2.5-coder-32b-instruct#cloudflare": null,
   "openrouter#qwen/qwen-plus#alibaba": null,
+  "openrouter#qwen/qwen-plus#alibaba/fp8": null,
   "openrouter#qwen/qwen-plus-2025-07-28#alibaba": null,
+  "openrouter#qwen/qwen-plus-2025-07-28#alibaba/fp8": null,
   "openrouter#qwen/qwen-plus-2025-07-28:thinking#alibaba": null,
+  "openrouter#qwen/qwen2.5-vl-72b-instruct#nebius/fp8": null,
   "openrouter#qwen/qwen2.5-vl-72b-instruct#parasail/fp8": null,
   "openrouter#qwen/qwen3-14b#alibaba": null,
   "openrouter#qwen/qwen3-14b#deepinfra/fp8": {
@@ -866,14 +1065,18 @@
   },
   "openrouter#qwen/qwen3-235b-a22b#alibaba": null,
   "openrouter#qwen/qwen3-235b-a22b-2507#alibaba": null,
+  "openrouter#qwen/qwen3-235b-a22b-2507#alibaba/fp8": null,
   "openrouter#qwen/qwen3-235b-a22b-2507#atlas-cloud/fp8": null,
+  "openrouter#qwen/qwen3-235b-a22b-2507#crusoe/bf16": null,
   "openrouter#qwen/qwen3-235b-a22b-2507#deepinfra/fp8": null,
   "openrouter#qwen/qwen3-235b-a22b-2507#friendli": null,
   "openrouter#qwen/qwen3-235b-a22b-2507#google-vertex/us-south1": null,
+  "openrouter#qwen/qwen3-235b-a22b-2507#nebius/fp8": null,
   "openrouter#qwen/qwen3-235b-a22b-2507#novita/fp8": null,
   "openrouter#qwen/qwen3-235b-a22b-2507#parasail/fp8": null,
   "openrouter#qwen/qwen3-235b-a22b-2507#streamlake": null,
   "openrouter#qwen/qwen3-235b-a22b-2507#together": null,
+  "openrouter#qwen/qwen3-235b-a22b-2507#venice/fp8": null,
   "openrouter#qwen/qwen3-235b-a22b-2507#wandb/bf16": null,
   "openrouter#qwen/qwen3-235b-a22b-thinking-2507#alibaba": null,
   "openrouter#qwen/qwen3-235b-a22b-thinking-2507#atlas-cloud/fp8": null,
@@ -883,15 +1086,23 @@
   "openrouter#qwen/qwen3-235b-a22b-thinking-2507#novita/fp8": {
     "max_tokens": 1
   },
+  "openrouter#qwen/qwen3-235b-a22b-thinking-2507#venice/fp8": {
+    "max_tokens": 2
+  },
   "openrouter#qwen/qwen3-235b-a22b-thinking-2507#wandb/bf16": {
     "max_tokens": 1
   },
   "openrouter#qwen/qwen3-30b-a3b#alibaba": null,
+  "openrouter#qwen/qwen3-30b-a3b#deepinfra/fp8": {
+    "max_tokens": 1
+  },
   "openrouter#qwen/qwen3-30b-a3b#nextbit/fp8": {
     "max_tokens": 1
   },
   "openrouter#qwen/qwen3-30b-a3b-instruct-2507#alibaba": null,
+  "openrouter#qwen/qwen3-30b-a3b-instruct-2507#alibaba/fp8": null,
   "openrouter#qwen/qwen3-30b-a3b-instruct-2507#atlas-cloud/fp8": null,
+  "openrouter#qwen/qwen3-30b-a3b-instruct-2507#coreweave/bf16": null,
   "openrouter#qwen/qwen3-30b-a3b-instruct-2507#nebius/fp8": null,
   "openrouter#qwen/qwen3-30b-a3b-instruct-2507#siliconflow/fp8": null,
   "openrouter#qwen/qwen3-30b-a3b-instruct-2507#streamlake": null,
@@ -903,6 +1114,9 @@
   "openrouter#qwen/qwen3-32b#deepinfra/fp8": {
     "max_tokens": 1
   },
+  "openrouter#qwen/qwen3-32b#groq": {
+    "max_tokens": 2
+  },
   "openrouter#qwen/qwen3-32b#nebius/base": {
     "max_tokens": 1
   },
@@ -911,24 +1125,33 @@
   "openrouter#qwen/qwen3-8b#atlas-cloud/fp8": null,
   "openrouter#qwen/qwen3-coder#alibaba/opensource": null,
   "openrouter#qwen/qwen3-coder#atlas-cloud/fp8": null,
+  "openrouter#qwen/qwen3-coder#coreweave/bf16": null,
   "openrouter#qwen/qwen3-coder#deepinfra/turbo": null,
   "openrouter#qwen/qwen3-coder#google-vertex/us-south1": null,
   "openrouter#qwen/qwen3-coder#novita/fp8": null,
   "openrouter#qwen/qwen3-coder#venice/fp8": null,
   "openrouter#qwen/qwen3-coder#wandb/bf16": null,
   "openrouter#qwen/qwen3-coder-30b-a3b-instruct#alibaba": null,
+  "openrouter#qwen/qwen3-coder-30b-a3b-instruct#alibaba/fp8": null,
+  "openrouter#qwen/qwen3-coder-30b-a3b-instruct#digitalocean": null,
   "openrouter#qwen/qwen3-coder-30b-a3b-instruct#novita/fp8": null,
   "openrouter#qwen/qwen3-coder-30b-a3b-instruct#siliconflow/fp8": null,
   "openrouter#qwen/qwen3-coder-flash#alibaba": null,
+  "openrouter#qwen/qwen3-coder-flash#alibaba/fp8": null,
+  "openrouter#qwen/qwen3-coder-next#alibaba": null,
   "openrouter#qwen/qwen3-coder-next#atlas-cloud/fp8": null,
   "openrouter#qwen/qwen3-coder-next#ionstream/fp8": null,
   "openrouter#qwen/qwen3-coder-next#novita/fp8": null,
   "openrouter#qwen/qwen3-coder-next#parasail/bf16": null,
   "openrouter#qwen/qwen3-coder-next#streamlake": null,
   "openrouter#qwen/qwen3-coder-plus#alibaba": null,
+  "openrouter#qwen/qwen3-coder-plus#alibaba/fp8": null,
   "openrouter#qwen/qwen3-max#alibaba": null,
+  "openrouter#qwen/qwen3-max#alibaba/fp8": null,
   "openrouter#qwen/qwen3-max-thinking#alibaba": null,
+  "openrouter#qwen/qwen3-max-thinking#alibaba/fp8": null,
   "openrouter#qwen/qwen3-next-80b-a3b-instruct#alibaba": null,
+  "openrouter#qwen/qwen3-next-80b-a3b-instruct#alibaba/fp8": null,
   "openrouter#qwen/qwen3-next-80b-a3b-instruct#atlas-cloud/fp8": null,
   "openrouter#qwen/qwen3-next-80b-a3b-instruct#deepinfra/fp8": null,
   "openrouter#qwen/qwen3-next-80b-a3b-instruct#google-vertex/global": null,
@@ -940,6 +1163,7 @@
   "openrouter#qwen/qwen3-next-80b-a3b-thinking#nebius/fp8": null,
   "openrouter#qwen/qwen3-next-80b-a3b-thinking#novita/bf16": null,
   "openrouter#qwen/qwen3-vl-235b-a22b-instruct#alibaba": null,
+  "openrouter#qwen/qwen3-vl-235b-a22b-instruct#alibaba/fp8": null,
   "openrouter#qwen/qwen3-vl-235b-a22b-instruct#atlas-cloud/fp8": null,
   "openrouter#qwen/qwen3-vl-235b-a22b-instruct#deepinfra/fp8": null,
   "openrouter#qwen/qwen3-vl-235b-a22b-instruct#novita/bf16": null,
@@ -948,6 +1172,7 @@
   "openrouter#qwen/qwen3-vl-235b-a22b-thinking#alibaba": null,
   "openrouter#qwen/qwen3-vl-235b-a22b-thinking#novita/bf16": null,
   "openrouter#qwen/qwen3-vl-30b-a3b-instruct#alibaba": null,
+  "openrouter#qwen/qwen3-vl-30b-a3b-instruct#alibaba/fp8": null,
   "openrouter#qwen/qwen3-vl-30b-a3b-instruct#atlas-cloud/fp8": null,
   "openrouter#qwen/qwen3-vl-30b-a3b-instruct#deepinfra/fp8": null,
   "openrouter#qwen/qwen3-vl-30b-a3b-instruct#novita/bf16": null,
@@ -956,10 +1181,14 @@
   "openrouter#qwen/qwen3-vl-30b-a3b-thinking#novita/fp16": null,
   "openrouter#qwen/qwen3-vl-30b-a3b-thinking#siliconflow/fp8": null,
   "openrouter#qwen/qwen3-vl-32b-instruct#alibaba": null,
+  "openrouter#qwen/qwen3-vl-32b-instruct#alibaba/fp8": null,
+  "openrouter#qwen/qwen3-vl-8b-instruct#alibaba/fp8": null,
   "openrouter#qwen/qwen3-vl-8b-instruct#novita/fp8": null,
+  "openrouter#qwen/qwen3-vl-8b-instruct#parasail/bf16": null,
   "openrouter#qwen/qwen3-vl-8b-thinking#alibaba": null,
   "openrouter#qwen/qwen3.5-122b-a10b#alibaba": null,
   "openrouter#qwen/qwen3.5-122b-a10b#atlas-cloud/fp8": null,
+  "openrouter#qwen/qwen3.5-122b-a10b#deepinfra/fp4": null,
   "openrouter#qwen/qwen3.5-122b-a10b#novita/bf16": null,
   "openrouter#qwen/qwen3.5-122b-a10b#siliconflow/fp8": null,
   "openrouter#qwen/qwen3.5-27b#alibaba": null,
@@ -971,6 +1200,7 @@
   "openrouter#qwen/qwen3.5-35b-a3b#akashml/fp8": null,
   "openrouter#qwen/qwen3.5-35b-a3b#alibaba": null,
   "openrouter#qwen/qwen3.5-35b-a3b#atlas-cloud/fp8": null,
+  "openrouter#qwen/qwen3.5-35b-a3b#coreweave/fp8": null,
   "openrouter#qwen/qwen3.5-35b-a3b#deepinfra/fp8": null,
   "openrouter#qwen/qwen3.5-35b-a3b#nextbit/fp8": null,
   "openrouter#qwen/qwen3.5-35b-a3b#parasail/fp8": null,
@@ -991,6 +1221,7 @@
   "openrouter#qwen/qwen3.5-397b-a17b#together": null,
   "openrouter#qwen/qwen3.5-397b-a17b#venice": null,
   "openrouter#qwen/qwen3.5-9b#deepinfra/bf16": null,
+  "openrouter#qwen/qwen3.5-9b#parasail/bf16": null,
   "openrouter#qwen/qwen3.5-9b#siliconflow/fp8": null,
   "openrouter#qwen/qwen3.5-9b#together": null,
   "openrouter#qwen/qwen3.5-9b#venice/fp8": null,
@@ -999,6 +1230,7 @@
   "openrouter#qwen/qwen3.5-plus-20260420#alibaba": null,
   "openrouter#qwen/qwen3.6-27b#alibaba": null,
   "openrouter#qwen/qwen3.6-27b#chutes/fp8": null,
+  "openrouter#qwen/qwen3.6-27b#coreweave/fp8": null,
   "openrouter#qwen/qwen3.6-27b#deepinfra/fp8": null,
   "openrouter#qwen/qwen3.6-27b#io-net/fp8": null,
   "openrouter#qwen/qwen3.6-27b#morph": null,
@@ -1008,8 +1240,13 @@
   "openrouter#qwen/qwen3.6-27b#wandb/fp8": null,
   "openrouter#qwen/qwen3.6-35b-a3b#akashml/fp8": null,
   "openrouter#qwen/qwen3.6-35b-a3b#atlas-cloud/fp8": null,
+  "openrouter#qwen/qwen3.6-35b-a3b#coreweave/fp8": null,
+  "openrouter#qwen/qwen3.6-35b-a3b#deepinfra/fp8": null,
+  "openrouter#qwen/qwen3.6-35b-a3b#io-net/fp8": null,
   "openrouter#qwen/qwen3.6-35b-a3b#parasail/fp8": null,
+  "openrouter#qwen/qwen3.6-35b-a3b#phala": null,
   "openrouter#qwen/qwen3.6-35b-a3b#siliconflow/fp8": null,
+  "openrouter#qwen/qwen3.6-35b-a3b#venice/fp8": null,
   "openrouter#qwen/qwen3.6-35b-a3b#wandb/fp8": null,
   "openrouter#qwen/qwen3.6-flash#alibaba": null,
   "openrouter#qwen/qwen3.6-max-preview#alibaba": null,
@@ -1023,6 +1260,7 @@
   "openrouter#relace/relace-search#relace/bf16": null,
   "openrouter#sao10k/l3-lunaris-8b#deepinfra/turbo": null,
   "openrouter#sao10k/l3-lunaris-8b#novita/bf16": null,
+  "openrouter#sao10k/l3-lunaris-8b#parasail/bf16": null,
   "openrouter#sao10k/l3.1-70b-hanami-x1#infermatic/bf16": null,
   "openrouter#sao10k/l3.1-euryale-70b#deepinfra/fp8": null,
   "openrouter#sao10k/l3.1-euryale-70b#novita/fp8": null,
@@ -1031,15 +1269,41 @@
   "openrouter#stepfun/step-3.5-flash#siliconflow/fp8": null,
   "openrouter#stepfun/step-3.7-flash#deepinfra": null,
   "openrouter#stepfun/step-3.7-flash#novita": null,
+  "openrouter#stepfun/step-3.7-flash#novita/fp8": null,
   "openrouter#stepfun/step-3.7-flash#stepfun/fp8": null,
   "openrouter#switchpoint/router#switchpoint": null,
+  "openrouter#tencent/hunyuan-a13b-instruct#siliconflow/fp8": {
+    "max_tokens": 1
+  },
+  "openrouter#tencent/hy3#atlas-cloud/fp8": null,
+  "openrouter#tencent/hy3#deepinfra/fp8": null,
+  "openrouter#tencent/hy3#gmicloud/bf16": null,
+  "openrouter#tencent/hy3#novita": null,
+  "openrouter#tencent/hy3#tencent/fp8": null,
   "openrouter#tencent/hy3-preview#gmicloud/bf16": null,
   "openrouter#tencent/hy3-preview#siliconflow": null,
   "openrouter#thedrummer/cydonia-24b-v4.1#parasail/bf16": null,
   "openrouter#thedrummer/rocinante-12b#infermatic/bf16": null,
   "openrouter#thedrummer/rocinante-12b#nextbit/bf16": null,
+  "openrouter#thedrummer/rocinante-12b#parasail/bf16": null,
   "openrouter#thedrummer/skyfall-36b-v2#parasail/fp8": null,
   "openrouter#thedrummer/unslopnemo-12b#nextbit/fp8": null,
+  "openrouter#thedrummer/unslopnemo-12b#parasail/bf16": null,
+  "openrouter#thinkingmachines/inkling#baseten/fp8": {
+    "max_tokens": 2
+  },
+  "openrouter#thinkingmachines/inkling#deepinfra/fp8": {
+    "max_tokens": 1
+  },
+  "openrouter#thinkingmachines/inkling#together": {
+    "max_tokens": 1
+  },
+  "openrouter#thinkingmachines/inkling-small#deepinfra/fp8": {
+    "max_tokens": 1
+  },
+  "openrouter#thinkingmachines/inkling-small#together": {
+    "max_tokens": 1
+  },
   "openrouter#undi95/remm-slerp-l2-13b#mancer/fp8": null,
   "openrouter#undi95/remm-slerp-l2-13b#nextbit/bf16": null,
   "openrouter#upstage/solar-pro-3#upstage": {
@@ -1051,7 +1315,19 @@
   "openrouter#x-ai/grok-4.3#xai": null,
   "openrouter#x-ai/grok-build-0.1#xai": null,
   "openrouter#xiaomi/mimo-v2-flash#xiaomi/fp8": null,
+  "openrouter#xiaomi/mimo-v2.5#deepinfra/bf16": {
+    "effort": "none"
+  },
   "openrouter#xiaomi/mimo-v2.5#digitalocean": null,
+  "openrouter#xiaomi/mimo-v2.5#io-net/fp8": {
+    "effort": "none"
+  },
+  "openrouter#xiaomi/mimo-v2.5#parasail/fp8": {
+    "effort": "none"
+  },
+  "openrouter#xiaomi/mimo-v2.5#venice/fp8": {
+    "effort": "none"
+  },
   "openrouter#xiaomi/mimo-v2.5#xiaomi/fp8": {
     "effort": "none"
   },
@@ -1114,6 +1390,7 @@
   "openrouter#z-ai/glm-5#atlas-cloud/fp8": null,
   "openrouter#z-ai/glm-5#baidu/fp8": null,
   "openrouter#z-ai/glm-5#chutes/fp8": null,
+  "openrouter#z-ai/glm-5#deepinfra/fp4": null,
   "openrouter#z-ai/glm-5#digitalocean": null,
   "openrouter#z-ai/glm-5#friendli": null,
   "openrouter#z-ai/glm-5#gmicloud/fp8": null,
@@ -1126,30 +1403,61 @@
   "openrouter#z-ai/glm-5#venice/fp8": null,
   "openrouter#z-ai/glm-5#z-ai/fp8": null,
   "openrouter#z-ai/glm-5-turbo#atlas-cloud/fp8": null,
+  "openrouter#z-ai/glm-5-turbo#z-ai": null,
   "openrouter#z-ai/glm-5.1#ambient/fp8": null,
   "openrouter#z-ai/glm-5.1#atlas-cloud/fp8": null,
   "openrouter#z-ai/glm-5.1#baidu/fp8": null,
   "openrouter#z-ai/glm-5.1#baseten/fp4": null,
   "openrouter#z-ai/glm-5.1#chutes/fp8": null,
+  "openrouter#z-ai/glm-5.1#coreweave/fp8": null,
+  "openrouter#z-ai/glm-5.1#crusoe/fp8": null,
   "openrouter#z-ai/glm-5.1#deepinfra/fp4": null,
+  "openrouter#z-ai/glm-5.1#digitalocean": null,
   "openrouter#z-ai/glm-5.1#fireworks": null,
   "openrouter#z-ai/glm-5.1#friendli": null,
   "openrouter#z-ai/glm-5.1#gmicloud/fp8": null,
   "openrouter#z-ai/glm-5.1#inceptron/fp8": null,
+  "openrouter#z-ai/glm-5.1#nebius/fp8": null,
   "openrouter#z-ai/glm-5.1#novita/fp8": null,
   "openrouter#z-ai/glm-5.1#parasail/fp8": null,
   "openrouter#z-ai/glm-5.1#phala": null,
   "openrouter#z-ai/glm-5.1#siliconflow/fp8": null,
   "openrouter#z-ai/glm-5.1#streamlake": null,
+  "openrouter#z-ai/glm-5.1#streamlake/fp8": null,
   "openrouter#z-ai/glm-5.1#together": null,
   "openrouter#z-ai/glm-5.1#venice/fp8": null,
   "openrouter#z-ai/glm-5.1#wafer/fp4": null,
   "openrouter#z-ai/glm-5.1#z-ai/fp8": null,
+  "openrouter#z-ai/glm-5.2#akashml/fp8": null,
+  "openrouter#z-ai/glm-5.2#alibaba/fp8": null,
+  "openrouter#z-ai/glm-5.2#ambient/fp8": null,
   "openrouter#z-ai/glm-5.2#atlas-cloud/fp8": null,
+  "openrouter#z-ai/glm-5.2#baidu/fp8": null,
+  "openrouter#z-ai/glm-5.2#baseten/fast": null,
+  "openrouter#z-ai/glm-5.2#baseten/fp8": null,
+  "openrouter#z-ai/glm-5.2#chutes/fp4": null,
   "openrouter#z-ai/glm-5.2#cloudflare": null,
+  "openrouter#z-ai/glm-5.2#cloudflare/fast": null,
+  "openrouter#z-ai/glm-5.2#coreweave/fp4": null,
+  "openrouter#z-ai/glm-5.2#decart/fp4": null,
   "openrouter#z-ai/glm-5.2#deepinfra/fp4": null,
+  "openrouter#z-ai/glm-5.2#digitalocean": null,
+  "openrouter#z-ai/glm-5.2#fireworks": null,
+  "openrouter#z-ai/glm-5.2#fireworks/fast": null,
   "openrouter#z-ai/glm-5.2#friendli": null,
+  "openrouter#z-ai/glm-5.2#gmicloud/fp8": null,
+  "openrouter#z-ai/glm-5.2#inceptron/fp4": null,
   "openrouter#z-ai/glm-5.2#io-net/fp8": null,
+  "openrouter#z-ai/glm-5.2#ionstream/fp4": null,
+  "openrouter#z-ai/glm-5.2#morph": null,
   "openrouter#z-ai/glm-5.2#novita/fp8": null,
-  "openrouter#z-ai/glm-5.2#z-ai/fp8": null
+  "openrouter#z-ai/glm-5.2#parasail/fp4": null,
+  "openrouter#z-ai/glm-5.2#phala": null,
+  "openrouter#z-ai/glm-5.2#sail-research/fp8": null,
+  "openrouter#z-ai/glm-5.2#siliconflow/fp8": null,
+  "openrouter#z-ai/glm-5.2#streamlake/fp8": null,
+  "openrouter#z-ai/glm-5.2#together": null,
+  "openrouter#z-ai/glm-5.2#venice/fp8": null,
+  "openrouter#z-ai/glm-5.2#z-ai/fp8": null,
+  "openrouter#z-ai/glm-5v-turbo#z-ai/fp8": null
 }

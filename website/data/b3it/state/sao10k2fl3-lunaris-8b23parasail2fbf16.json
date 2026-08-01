@@ -1,0 +1,25 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "sao10k/l3-lunaris-8b",
+    "provider": "parasail/bf16",
+    "cost": [
+      0.04,
+      0.05
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 5.3e-7,
+    "created": "2024-08-13T00:00:00Z",
+    "last_seen": "2026-08-01T04:17:01Z",
+    "supports_temperature": true,
+    "supports_logprobs": true
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "no_bis",
+    "since": "2026-08-01T04:28:30Z",
+    "last_recheck": "2026-08-01T04:28:30Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}

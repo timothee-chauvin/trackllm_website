@@ -1,0 +1,25 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "deepseek/deepseek-v4-flash-0731",
+    "provider": "fireworks",
+    "cost": [
+      0.14,
+      0.28
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 2.744e-6,
+    "created": "2026-07-31T06:21:48Z",
+    "last_seen": "2026-08-01T04:17:01Z",
+    "supports_temperature": true,
+    "supports_logprobs": true
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "no_bis",
+    "since": "2026-08-01T04:28:30Z",
+    "last_recheck": "2026-08-01T04:28:30Z"
+  },
+  "epochs": [],
+  "deselected_since": null
+}
