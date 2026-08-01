@@ -6,10 +6,22 @@ endpoints_lt:
   - 0.01
   - 0.03
 - api: openrouter
+  model: mistralai/mistral-nemo
+  provider: parasail/fp8
+  cost:
+  - 0.03
+  - 0.03
+- api: openrouter
   model: meta-llama/llama-3.1-8b-instruct
   provider: novita/fp8
   cost:
   - 0.02
+  - 0.05
+- api: openrouter
+  model: sao10k/l3-lunaris-8b
+  provider: parasail/bf16
+  cost:
+  - 0.04
   - 0.05
 - api: openrouter
   model: gryphe/mythomax-l2-13b
@@ -150,6 +162,12 @@ endpoints_lt:
   - 0.14
   - 0.28
 - api: openrouter
+  model: deepseek/deepseek-v4-flash
+  provider: open-inference/fp8
+  cost:
+  - 0.14
+  - 0.28
+- api: openrouter
   model: meta-llama/llama-3.1-8b-instruct
   provider: coreweave/bf16
   cost:
@@ -240,6 +258,12 @@ endpoints_lt:
   - 0.06
   - 0.5
 - api: openrouter
+  model: google/gemma-4-26b-a4b-it
+  provider: nextbit/bf16
+  cost:
+  - 0.15
+  - 0.45
+- api: openrouter
   model: mistralai/ministral-8b-2512
   provider: nextbit/fp8
   cost:
@@ -251,12 +275,6 @@ endpoints_lt:
   cost:
   - 0.13
   - 0.52
-- api: openrouter
-  model: google/gemma-4-26b-a4b-it
-  provider: nextbit/bf16
-  cost:
-  - 0.18
-  - 0.5
 - api: openrouter
   model: inclusionai/ling-2.6-1t
   provider: novita
@@ -767,6 +785,12 @@ endpoints_lt:
   cost:
   - 1.74
   - 3.48
+- api: openrouter
+  model: z-ai/glm-5.2
+  provider: wafer
+  cost:
+  - 1.26
+  - 3.96
 - api: openrouter
   model: z-ai/glm-5.2
   provider: wafer/fp4
