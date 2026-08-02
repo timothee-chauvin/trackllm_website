@@ -9,6 +9,10 @@ on:
 permissions:
   contents: write  # Allow pushing commits
 
+# Freeze uv on the committed lockfile — see the comment in run-main.yml.
+env:
+  UV_FROZEN: "1"
+
 # Shared with bi-monitor.yml: both write website/data/b3it/state and phase_2, which are
 # plain JSON with no merge driver, so an overlap is a last-write-wins silent loss.
 # cancel-in-progress: false to queue rather than drop. run-main.yml is deliberately
