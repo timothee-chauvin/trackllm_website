@@ -154,9 +154,8 @@ def test_all_errors_batch_lands_in_event_rows(tmp_path, monkeypatch):
     assert any(r.event == "all_errors" for r in event_rows)
 
 
-def test_reinit_timeout_is_a_reported_failure(tmp_path, monkeypatch):
-    """A hanging change-triggered re-init (full discovery is ~15k queries) must not
-    stall the daily monitor job: it is bounded, reported, and persists nothing."""
+def _reinit_case(tmp_path, monkeypatch, reinit_impl):
+    """Wire run_endpoint up to a change-detecting fixture with a fake re-init."""
     state, results = open_state_from_fixture(
         "deepseek2fdeepseek-chat-v3-032423hyperbolic2ffp8"
     )
@@ -166,17 +165,12 @@ def test_reinit_timeout_is_a_reported_failure(tmp_path, monkeypatch):
     async def fake_sample_prompts(*args, **kwargs):
         return {bi: [(now.isoformat(), "tok")] for bi in epoch.border_inputs}, 0
 
-    async def slow_reinit(*args, **kwargs):
-        await asyncio.sleep(10)
-        raise AssertionError("re-init should have been cancelled by the timeout")
-
     monkeypatch.setattr(monitor_mod.config.bi, "data_dir", tmp_path)
     monkeypatch.setattr(
         type(monitor_mod.config), "spend_dir", property(lambda self: tmp_path / "spend")
     )
-    state_dir = monitor_mod.config.bi.state_dir
     monkeypatch.setattr(monitor_mod, "sample_prompts", fake_sample_prompts)
-    monkeypatch.setattr(monitor_mod, "reinit", slow_reinit)
+    monkeypatch.setattr(monitor_mod, "reinit", reinit_impl)
     monkeypatch.setattr(
         monitor_mod, "get_output_path", lambda ep, ym: tmp_path / "monthly.json"
     )
@@ -185,20 +179,89 @@ def test_reinit_timeout_is_a_reported_failure(tmp_path, monkeypatch):
 
     event_rows = []
 
-    async def go():
-        async with OpenRouterClient() as client:
-            await run_endpoint(
-                client, PlainStrategy(), state, now, event_rows=event_rows
-            )
+    def go():
+        async def _go():
+            async with OpenRouterClient() as client:
+                await run_endpoint(
+                    client, PlainStrategy(), state, now, event_rows=event_rows
+                )
+
+        asyncio.run(_go())
+
+    return state, now, event_rows, go
+
+
+async def _hanging_reinit(*args, **kwargs):
+    await asyncio.sleep(10)
+    raise AssertionError("re-init should have been cancelled by the timeout")
+
+
+def _saved_state(state):
+    from trackllm_website.bi.state import EndpointBIState
+
+    path = monitor_mod.config.bi.state_dir / f"{state.slug}.json"
+    return EndpointBIState.model_validate_json(path.read_bytes())
+
+
+def test_reinit_timeout_is_a_reported_failure(tmp_path, monkeypatch):
+    """A hanging change-triggered re-init (full discovery is ~15k queries) must not
+    stall the daily monitor job: it is bounded and reported, and only the timeout
+    streak is persisted — the epoch stays open so the next run retries."""
+    state, now, event_rows, go = _reinit_case(tmp_path, monkeypatch, _hanging_reinit)
 
     with pytest.raises(TimeoutError):  # run_isolated turns this into a report failure
-        asyncio.run(go())
+        go()
 
     assert any(r.event == "reinit_timeout" for r in event_rows)
-    # nothing persisted: the next daily run re-detects the change and retries
-    assert not (state_dir / f"{state.slug}.json").exists()
+    saved = _saved_state(state)
+    assert saved.reinit_timeout_streak == 1
+    assert saved.status == "monitoring"
+    # epoch still open: the next daily run re-detects the change and retries
+    assert saved.epochs[-1].end is None
     # the spend of the abandoned re-init is still recorded
     assert (tmp_path / "spend").exists()
+
+
+def test_reinit_timeout_streak_hits_threshold_and_retires(tmp_path, monkeypatch):
+    """An endpoint whose re-init times out every day would otherwise re-detect the
+    same change and burn the full timeout forever: after max_reinit_timeouts, give
+    up and retire it (the recheck schedule re-onboards it from scratch later)."""
+    state, now, event_rows, go = _reinit_case(tmp_path, monkeypatch, _hanging_reinit)
+    state.reinit_timeout_streak = monitor_mod.config.bi.monitor.max_reinit_timeouts - 1
+
+    go()  # no TimeoutError: giving up is a decision, not a failure
+
+    assert [r.event for r in event_rows] == ["retired_reinit_timeout"]
+    saved = _saved_state(state)
+    assert saved.status == "retired"
+    assert saved.retired.reason == "reinit_timeout"
+    # the detected change is recorded as the closed epoch's end, as facts
+    assert saved.epochs[-1].end_reason == "change_detected"
+    assert saved.epochs[-1].change_date is not None
+
+
+def test_successful_reinit_resets_timeout_streak(tmp_path, monkeypatch):
+    from trackllm_website.bi.reinit import ReinitResult
+    from trackllm_website.bi.state import Epoch
+
+    now = datetime(2026, 2, 15, tzinfo=timezone.utc)
+
+    async def ok_reinit(*args, **kwargs):
+        return ReinitResult(
+            epoch=Epoch(start=now, border_inputs=["bi"], reference={"bi": []}),
+            reason="ok",
+        )
+
+    state, now, event_rows, go = _reinit_case(tmp_path, monkeypatch, ok_reinit)
+    state.reinit_timeout_streak = 1
+
+    go()
+
+    saved = _saved_state(state)
+    assert saved.reinit_timeout_streak == 0
+    assert saved.status == "monitoring"
+    assert saved.epochs[-2].end_reason == "change_detected"
+    assert saved.epochs[-1].end is None
 
 
 class FakeClient:

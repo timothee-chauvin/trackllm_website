@@ -159,16 +159,25 @@ async def run_endpoint(
                 )
             )
     elif decision.action == "reinit":
-        epoch.end = now
-        epoch.end_reason = "change_detected"
-        epoch.change_date = decision.change_date
-        detector_cfg = (
-            config.bi.scan if decision.detector == "scan" else config.bi.detection
-        )
-        epoch.params = {"detector": decision.detector, **detector_cfg.model_dump()}
         logger.warning(
             f"{state.endpoint}: change detected (onset {decision.change_date})"
         )
+        change_date_str = (
+            decision.change_date.date().isoformat() if decision.change_date else None
+        )
+
+        # The epoch is closed only once the re-init's outcome is known, so that the
+        # timeout path can persist the streak below without also persisting a
+        # half-closed epoch.
+        def close_epoch() -> None:
+            epoch.end = now
+            epoch.end_reason = "change_detected"
+            epoch.change_date = decision.change_date
+            detector_cfg = (
+                config.bi.scan if decision.detector == "scan" else config.bi.detection
+            )
+            epoch.params = {"detector": decision.detector, **detector_cfg.model_dump()}
+
         timed_out = False
         with track() as reinit_spend:
             try:
@@ -178,48 +187,68 @@ async def run_endpoint(
                     # inside the daily monitor job, so one hanging endpoint would stall
                     # the whole workflow. Its own deadline, not the onboarding one:
                     # this job's budget is 300 minutes (see config.toml).
-                    # TODO: an endpoint that times out here every day re-detects the
-                    # same change and burns the deadline again forever. It needs a
-                    # give-up path (retire after N consecutive re-init timeouts, or
-                    # back off), which needs a counter in EndpointBIState.
                     timeout=config.bi.monitor.reinit_timeout_seconds,
                 )
             except asyncio.TimeoutError:
                 timed_out = True
         append_entry(config.spend_dir, state.slug, "reinit", reinit_spend, now)
         if timed_out:
+            state.reinit_timeout_streak += 1
+            if state.reinit_timeout_streak >= config.bi.monitor.max_reinit_timeouts:
+                # Every retry re-detects the same change and burns the full timeout
+                # again (deepseek-v4-flash@fireworks, rate-limited upstream, did this
+                # daily): give up and retire. The recheck schedule re-onboards it
+                # from scratch later. Giving up is a decision, not a failure.
+                close_epoch()
+                state.status = "retired"
+                state.retired = RetiredInfo(
+                    reason="reinit_timeout", since=now, last_recheck=now
+                )
+                logger.warning(
+                    f"{state.endpoint}: retired after "
+                    f"{state.reinit_timeout_streak} consecutive re-init timeouts"
+                )
+                if event_rows is not None:
+                    event_rows.append(
+                        MonitorRow(
+                            state.endpoint.model,
+                            state.endpoint.provider,
+                            "retired_reinit_timeout",
+                            change_date_str,
+                            None,
+                            reinit_spend.cost,
+                        )
+                    )
+                state.save(config.bi.state_dir)
+                return
+            # Persist only the streak: the epoch stays open, so the next daily run
+            # re-detects the change and retries (resuming phase-1 progress).
+            state.save(config.bi.state_dir)
             if event_rows is not None:
                 event_rows.append(
                     MonitorRow(
                         state.endpoint.model,
                         state.endpoint.provider,
                         "reinit_timeout",
-                        (
-                            decision.change_date.date().isoformat()
-                            if decision.change_date
-                            else None
-                        ),
+                        change_date_str,
                         None,
                         reinit_spend.cost,
                     )
                 )
-            # Raise so run_isolated reports it in report.failures: nothing was saved,
-            # so the next daily run re-detects the change and retries.
+            # Raise so run_isolated reports it in report.failures.
             raise TimeoutError(
                 f"{state.endpoint}: re-init exceeded "
                 f"{config.bi.monitor.reinit_timeout_seconds}s"
             )
+        state.reinit_timeout_streak = 0
+        close_epoch()
         if event_rows is not None:
             event_rows.append(
                 MonitorRow(
                     state.endpoint.model,
                     state.endpoint.provider,
                     event="reonboarded" if result.epoch else "reonboard_no_bis",
-                    change_date=(
-                        decision.change_date.date().isoformat()
-                        if decision.change_date
-                        else None
-                    ),
+                    change_date=change_date_str,
                     n_bis_after=(
                         len(result.epoch.border_inputs) if result.epoch else None
                     ),
@@ -233,9 +262,10 @@ async def run_endpoint(
             state.retired = RetiredInfo(reason="no_bis", since=now, last_recheck=now)
         else:
             state.epochs.append(result.epoch)
-    # State is deliberately saved once, after reinit completes. A crash mid-reinit
-    # persists nothing; the next daily run idempotently re-detects the change and
-    # retries (facts-vs-derivations design: state files record only committed facts).
+    # State is saved once a re-init's outcome is settled (or immediately for the
+    # other actions). A crash mid-reinit persists nothing; the next daily run
+    # idempotently re-detects the change and retries (facts-vs-derivations design:
+    # state files record only committed facts).
     state.save(config.bi.state_dir)
 
 

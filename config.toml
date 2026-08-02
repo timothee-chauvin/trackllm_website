@@ -106,6 +106,13 @@ max_concurrent_endpoints = 20
 # A cut-off re-init resumes from its persisted phase-1 progress next run — but only
 # if the run gets to commit it, which is what job_deadline_seconds below protects.
 reinit_timeout_seconds = 5400
+# A re-init that hits its timeout leaves the epoch open, so the next run re-detects
+# the same change and retries (resuming from persisted phase-1 progress). Without a
+# bound, a throttled endpoint burns the full timeout daily forever (deepseek-v4-flash
+# @fireworks, rate-limited upstream, did this on 2026-07-31 and 08-01). Three tries
+# is ~4.5h of cumulative discovery, more than a fresh onboarding's 3h budget; after
+# that, retire and let the 14-day recheck re-onboard from scratch.
+max_reinit_timeouts = 3
 # The monitor must end itself before bi-monitor.yml's timeout-minutes: 300. A hard
 # kill there is reported as "cancelled", which skips the commit step: every
 # endpoint's saved batch, spend line and state update is thrown away, not just the

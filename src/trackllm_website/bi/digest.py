@@ -27,6 +27,7 @@ OUTCOME = {
     "reinit_timeout": ("re-init timed out (retries tomorrow)", "#cf222e"),
     "retired_stalled": ("retired (stalled)", "#6e7781"),
     "retired_unreachable": ("retired (provider gone)", "#6e7781"),
+    "retired_reinit_timeout": ("retired (re-init kept timing out)", "#6e7781"),
     "all_errors": ("all queries errored", "#cf222e"),
 }
 
