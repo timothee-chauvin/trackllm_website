@@ -9,6 +9,14 @@ on:
 permissions:
   contents: write  # Allow pushing commits
 
+# uv.lock uses a relative exclude-newer-span, so a bare `uv sync`/`uv run` re-locks
+# whenever the rolling window moves past a release — leaving uv.lock unstaged, which
+# makes push-with-rebase.sh fail every run until someone re-locks (2026-08-02 outage).
+# UV_FROZEN makes uv use the committed lockfile as-is; deps only change via a
+# deliberate local `uv lock`.
+env:
+  UV_FROZEN: "1"
+
 # Deliberately NOT in the repo-write concurrency group that update-endpoints.yml and
 # bi-monitor.yml share. This workflow is hourly and update-endpoints runs for 3-5h, so
 # sharing the group would leave a run-main run pending for most of that window — and a
