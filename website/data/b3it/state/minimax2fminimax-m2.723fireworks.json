@@ -8077,5 +8077,6 @@
       "params": null
     }
   ],
-  "deselected_since": null
+  "deselected_since": null,
+  "reinit_timeout_streak": 0
 }

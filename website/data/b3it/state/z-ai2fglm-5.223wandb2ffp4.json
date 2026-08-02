@@ -14,8 +14,12 @@
     "supports_temperature": true,
     "supports_logprobs": null
   },
-  "status": "monitoring",
-  "retired": null,
+  "status": "retired",
+  "retired": {
+    "reason": "unreachable",
+    "since": "2026-08-02T21:44:12Z",
+    "last_recheck": "2026-08-02T21:44:12Z"
+  },
   "epochs": [
     {
       "start": "2026-07-17T04:07:41Z",
@@ -8083,11 +8087,12 @@
           ]
         ]
       },
-      "end": null,
-      "end_reason": null,
+      "end": "2026-08-02T21:44:12Z",
+      "end_reason": "unreachable",
       "change_date": null,
       "params": null
     }
   ],
-  "deselected_since": "2026-07-31T04:30:35Z"
+  "deselected_since": "2026-07-31T04:30:35Z",
+  "reinit_timeout_streak": 0
 }

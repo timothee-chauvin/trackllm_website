@@ -11,7 +11,8 @@
     "cost_per_request": null,
     "created": null,
     "last_seen": null,
-    "supports_temperature": null
+    "supports_temperature": null,
+    "supports_logprobs": null
   },
   "status": "monitoring",
   "retired": null,
@@ -31999,5 +32000,6 @@
       "params": null
     }
   ],
-  "deselected_since": null
+  "deselected_since": null,
+  "reinit_timeout_streak": 0
 }

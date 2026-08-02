@@ -11,7 +11,8 @@
     "cost_per_request": 1.118e-6,
     "created": "2026-04-22T17:15:50Z",
     "last_seen": null,
-    "supports_temperature": true
+    "supports_temperature": true,
+    "supports_logprobs": null
   },
   "status": "monitoring",
   "retired": null,
@@ -8084,5 +8085,6 @@
       "params": null
     }
   ],
-  "deselected_since": "2026-07-17T04:07:41Z"
+  "deselected_since": "2026-07-17T04:07:41Z",
+  "reinit_timeout_streak": 0
 }

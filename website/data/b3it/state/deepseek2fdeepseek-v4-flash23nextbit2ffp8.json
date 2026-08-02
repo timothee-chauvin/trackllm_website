@@ -11,10 +11,15 @@
     "cost_per_request": 9.8e-7,
     "created": "2026-04-24T03:17:46Z",
     "last_seen": null,
-    "supports_temperature": true
+    "supports_temperature": true,
+    "supports_logprobs": null
   },
-  "status": "monitoring",
-  "retired": null,
+  "status": "retired",
+  "retired": {
+    "reason": "unreachable",
+    "since": "2026-08-02T21:44:12Z",
+    "last_recheck": "2026-08-02T21:44:12Z"
+  },
   "epochs": [
     {
       "start": "2026-07-11T04:12:35Z",
@@ -8074,11 +8079,12 @@
           ]
         ]
       },
-      "end": null,
-      "end_reason": null,
+      "end": "2026-08-02T21:44:12Z",
+      "end_reason": "unreachable",
       "change_date": null,
       "params": null
     }
   ],
-  "deselected_since": "2026-07-29T04:10:56Z"
+  "deselected_since": "2026-07-29T04:10:56Z",
+  "reinit_timeout_streak": 0
 }
