@@ -9,7 +9,11 @@ from pydantic import BaseModel
 
 from trackllm_website.api import OpenRouterClient
 from trackllm_website.bi.results import load_phase2_results
-from trackllm_website.bi.common import QueryStrategy, resolve_strategies
+from trackllm_website.bi.common import (
+    QueryStrategy,
+    probe_errors_unreachable,
+    resolve_strategies,
+)
 from trackllm_website.bi.detection import adaptive_transitions, epoch_tv_series
 from trackllm_website.bi.phase_2 import (
     get_output_path,
@@ -256,9 +260,40 @@ async def monitor() -> MonitorReport:
     # in "monitoring" forever with a green check. Report it so main() fails loudly.
     for state in monitoring:
         key = str(state.endpoint)
-        if key not in strategies:
-            logger.error(f"{key}: no strategy resolved ({failed.get(key)}); skipped")
-            failures.append(key)
+        if key in strategies:
+            continue
+        # All probes 404'd and the catalog already dropped the endpoint: the
+        # provider is gone from OpenRouter's routing, so retire it now rather
+        # than fail the run daily for the rest of the deselection grace period.
+        # If it comes back, the catalog re-lists it and the recheck schedule
+        # resurrects it. All-404 on a still-listed endpoint is an anomaly, not
+        # a known removal, and keeps failing loudly.
+        if state.deselected_since is not None and probe_errors_unreachable(
+            failed.get(key, [])
+        ):
+            epoch = state.current_epoch
+            if epoch is not None:
+                epoch.end = now
+                epoch.end_reason = "unreachable"
+            state.status = "retired"
+            state.retired = RetiredInfo(
+                reason="unreachable", since=now, last_recheck=now
+            )
+            state.save(config.bi.state_dir)
+            logger.warning(f"{key}: retired (unreachable, all probes 404)")
+            event_rows.append(
+                MonitorRow(
+                    state.endpoint.model,
+                    state.endpoint.provider,
+                    "retired_unreachable",
+                    None,
+                    None,
+                    0.0,
+                )
+            )
+            continue
+        logger.error(f"{key}: no strategy resolved ({failed.get(key)}); skipped")
+        failures.append(key)
 
     # Absolute, so the probe above and every wave of endpoints eat into the same
     # budget: what matters is when the *job* ends, not how long each part took.

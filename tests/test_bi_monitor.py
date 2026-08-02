@@ -219,16 +219,64 @@ def test_unresolved_strategy_is_a_reported_failure(monkeypatch):
     """An endpoint resolve_strategies drops must not be silently skipped: no batch
     is written, so the stall detector never advances and it would idle forever."""
     state, _ = open_state_from_fixture("openai2fgpt-4o-mini23azure")
+    report = _monitor_unresolved(monkeypatch, state, ["plain: 429 rate limited"])
+    assert report.failures == [str(state.endpoint)]
 
+
+def _monitor_unresolved(monkeypatch, state, errors):
     async def fake_resolve(client, endpoints, **kwargs):
-        return {}, {str(state.endpoint): ["plain: 429 rate limited"]}
+        return {}, {str(state.endpoint): errors}
 
     monkeypatch.setattr(monitor_mod, "load_all_states", lambda d: {state.slug: state})
     monkeypatch.setattr(monitor_mod, "resolve_strategies", fake_resolve)
     monkeypatch.setattr(monitor_mod, "OpenRouterClient", FakeClient)
+    return asyncio.run(monitor())
 
-    report = asyncio.run(monitor())
+
+PROBE_404 = 'plain: 404 {"message":"No allowed providers are available"}'
+
+
+def test_unreachable_deselected_endpoint_is_retired_not_failed(tmp_path, monkeypatch):
+    """All probes 404 and the catalog already dropped the endpoint: the provider is
+    gone from OpenRouter's routing. Retire it instead of failing the run daily for
+    the rest of the 30-day deselection grace period (runs #46/#47)."""
+    state, _ = open_state_from_fixture("openai2fgpt-4o-mini23azure")
+    state.deselected_since = datetime(2026, 7, 29, tzinfo=timezone.utc)
+    epoch = state.current_epoch
+    monkeypatch.setattr(monitor_mod.config.bi, "data_dir", tmp_path)
+
+    report = _monitor_unresolved(monkeypatch, state, [PROBE_404, PROBE_404])
+
+    assert report.failures == []
+    assert state.status == "retired"
+    assert state.retired.reason == "unreachable"
+    assert epoch.end is not None and epoch.end_reason == "unreachable"
+    assert [r.event for r in report.rows] == ["retired_unreachable"]
+    assert (monitor_mod.config.bi.state_dir / f"{state.slug}.json").exists()
+
+
+def test_unreachable_but_still_listed_endpoint_stays_a_failure(monkeypatch):
+    """All-404 probes on an endpoint the catalog still lists is an anomaly, not a
+    known removal: keep failing loudly."""
+    state, _ = open_state_from_fixture("openai2fgpt-4o-mini23azure")
+    assert state.deselected_since is None
+
+    report = _monitor_unresolved(monkeypatch, state, [PROBE_404])
+
     assert report.failures == [str(state.endpoint)]
+    assert state.status == "monitoring"
+
+
+def test_transient_probe_failure_stays_a_failure(monkeypatch):
+    """429s/timeouts are transient even on a deselected endpoint: not proof the
+    provider is gone, so no retirement."""
+    state, _ = open_state_from_fixture("openai2fgpt-4o-mini23azure")
+    state.deselected_since = datetime(2026, 7, 29, tzinfo=timezone.utc)
+
+    report = _monitor_unresolved(monkeypatch, state, ["plain: 429 rate limited"])
+
+    assert report.failures == [str(state.endpoint)]
+    assert state.status == "monitoring"
 
 
 def _monitor_one_endpoint(monkeypatch, state, run_endpoint_impl):

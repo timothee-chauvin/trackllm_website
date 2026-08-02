@@ -22,7 +22,9 @@ class Epoch(BaseModel):
     border_inputs: list[str]
     reference: ReferenceSamples
     end: datetime | None = None
-    end_reason: Literal["change_detected", "stalled", "gap"] | None = None
+    end_reason: Literal["change_detected", "stalled", "gap", "unreachable"] | None = (
+        None
+    )
     change_date: datetime | None = None
     params: dict | None = None  # detection params in force when the epoch closed
 
