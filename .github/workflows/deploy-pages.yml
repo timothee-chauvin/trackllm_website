@@ -20,6 +20,10 @@ permissions:
   pages: write
   id-token: write
 
+# Freeze uv on the committed lockfile — see the comment in run-main.yml.
+env:
+  UV_FROZEN: "1"
+
 concurrency:
   group: "pages"
   cancel-in-progress: false

@@ -9,6 +9,10 @@ on:
 permissions:
   contents: write  # Allow pushing commits
 
+# Freeze uv on the committed lockfile — see the comment in run-main.yml.
+env:
+  UV_FROZEN: "1"
+
 # Shared with update-endpoints.yml — see the comment there.
 concurrency:
   group: repo-write
