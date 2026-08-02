@@ -22,7 +22,9 @@ class Epoch(BaseModel):
     border_inputs: list[str]
     reference: ReferenceSamples
     end: datetime | None = None
-    end_reason: Literal["change_detected", "stalled", "gap"] | None = None
+    end_reason: Literal["change_detected", "stalled", "gap", "unreachable"] | None = (
+        None
+    )
     change_date: datetime | None = None
     params: dict | None = None  # detection params in force when the epoch closed
 
@@ -50,7 +52,7 @@ class Epoch(BaseModel):
 
 
 class RetiredInfo(BaseModel):
-    reason: Literal["stalled", "no_bis", "delisted", "unreachable"]
+    reason: Literal["stalled", "no_bis", "delisted", "unreachable", "reinit_timeout"]
     since: datetime
     last_recheck: datetime
 
@@ -62,6 +64,9 @@ class EndpointBIState(BaseModel):
     epochs: list[Epoch]
     # set when the endpoint drops out of the selected set; cleared if it returns.
     deselected_since: datetime | None = None
+    # consecutive re-init timeouts since the last one that completed; at
+    # bi.monitor.max_reinit_timeouts the endpoint is retired instead of retried.
+    reinit_timeout_streak: int = 0
 
     @property
     def slug(self) -> str:

@@ -53,6 +53,9 @@ jobs:
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-        git add website/data
+        # resolve_strategies rewrites the probe-strategy cache whenever a probe
+        # result changes; leaving it unstaged makes `git pull --rebase` refuse and
+        # discards the whole run (runs #46/#47).
+        git add website/data strategies_test_reasoning.json
         git diff --staged --quiet || git commit -m "[bot] Daily BI monitor run"
         bash .github/scripts/push-with-rebase.sh

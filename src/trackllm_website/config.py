@@ -147,6 +147,7 @@ class PopularityConfig(BaseModel):
 class MonitorConfig(BaseModel):
     max_concurrent_endpoints: int
     reinit_timeout_seconds: int
+    max_reinit_timeouts: int
     job_deadline_seconds: int
 
 
