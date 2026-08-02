@@ -36,12 +36,6 @@ endpoints_lt:
   - 0.017
   - 0.112
 - api: openrouter
-  model: qwen/qwen-2.5-7b-instruct
-  provider: phala
-  cost:
-  - 0.04
-  - 0.1
-- api: openrouter
   model: ibm-granite/granite-4.1-8b
   provider: coreweave/bf16
   cost:
