@@ -36,6 +36,7 @@ STATUS_COPY: dict[str, str] = {
     "retired:unreachable": "Monitoring was retired: the endpoint stopped answering our queries.",
     "retired:delisted": "Monitoring was retired: the endpoint left the OpenRouter catalog.",
     "retired:stalled": "Monitoring was retired: the endpoint stopped yielding usable samples.",
+    "retired:reinit_timeout": "Monitoring was retired: re-initialization after a detected change repeatedly ran out of time.",
     "bad_temperature": "This API rejects or ignores the temperature parameter, so T=0 sampling is impossible — presumably to prevent distillation.",
     "liar": "This endpoint bills more than its advertised price implies, so we refuse to fund it.",
     "excluded": "Our selection policy explicitly excludes this endpoint.",
@@ -55,7 +56,9 @@ ERRORS_OUT = frozenset(
 )
 # retired:unreachable is deliberately absent: it reads as "errors out", and the
 # retired headline would otherwise shadow errors_out entirely.
-_RETIRED_HEADLINE = frozenset({"retired:no_bis", "retired:delisted", "retired:stalled"})
+_RETIRED_HEADLINE = frozenset(
+    {"retired:no_bis", "retired:delisted", "retired:stalled", "retired:reinit_timeout"}
+)
 
 HEADLINE_ORDER = [
     "tracked",
