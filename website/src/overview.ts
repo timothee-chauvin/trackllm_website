@@ -5,7 +5,6 @@ import {
   FeedItem,
   MIN_ENDPOINT_YEARS,
   bindActivation,
-  bindFilterChips,
   esc,
   eventRow,
   highlight,
@@ -269,19 +268,12 @@ export async function init(): Promise<void> {
       "Ranked by monitoring volume: the more we have watched, the tighter the ceiling on their true rate.", quiet);
 
   const provQ = document.getElementById("provQ") as HTMLInputElement;
-  const provFilters = new Set<string>();
   const provSort = initSortHeaders<ProviderSortKey>(
     "psort", "lt_rate", -1, ["n_endpoints", "lt_rate", "last_change"], renderProviders);
 
   function renderProviders(): void {
     const q = provQ.value.trim().toLowerCase();
-    const list = provs.filter(p => {
-      if (q && !p.name.toLowerCase().includes(q)) return false;
-      if (provFilters.has("changed") && p.lt_changes === 0) return false;
-      if (provFilters.has("rateable") && p.lt_rate === null) return false;
-      if (provFilters.has("b3it") && p.b3it_endpoints === 0) return false;
-      return true;
-    });
+    const list = provs.filter(p => !q || p.name.toLowerCase().includes(q));
     list.sort((a, b) => {
       let av: string | number, bv: string | number;
       if (provSort.key === "lt_rate") {
@@ -315,7 +307,6 @@ export async function init(): Promise<void> {
     provSort.paintSort();
   }
   provQ.addEventListener("input", renderProviders);
-  bindFilterChips(document.getElementById("provChips")!, provFilters, renderProviders);
   renderProviders();
 
   // ---- endpoint directory ----
