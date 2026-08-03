@@ -5,7 +5,7 @@ on stdin and prints "verdict=infra" or "verdict=code" for $GITHUB_OUTPUT.
 
 Only called for runs that concluded "failure". In an infra failure no step ever
 reached conclusion "failure": e.g. "job was not acquired by a runner" leaves the
-starved job cancelled with zero steps. Any actually-failed step means our code
+starved job canceled with zero steps. Any actually-failed step means our code
 failed. A misclassified "infra" costs one retry at most: the attempt-2 failure
 always emails.
 

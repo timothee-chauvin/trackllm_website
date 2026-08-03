@@ -83,7 +83,7 @@ def test_latest_n_popular_exclude_integration():
     glm5 = next(e for e in candidates if e.model == "z-ai/glm-5")
     assert labels.get(glm5) != "flagships"
 
-    # popular non-flagship model present in candidates is selected and labelled "popular".
+    # popular non-flagship model present in candidates is selected and labeled "popular".
     mistral = next(e for e in candidates if e.model == "mistralai/mistral-small")
     assert mistral in selected
     assert labels[mistral] == "popular"

@@ -19,7 +19,7 @@ def parse_query_date(year: int, month: int, date_str: str) -> datetime:
 
     The year and month are spliced into the parsed string rather than filled in
     afterwards: strptime on a bare day of month is deprecated from Python 3.13 and
-    changes behaviour in 3.15. Raises ValueError on a malformed string, as before.
+    changes behavior in 3.15. Raises ValueError on a malformed string, as before.
     """
     return datetime.strptime(
         f"{year:04d}-{month:02d}-{date_str}", "%Y-%m-%d %H:%M:%S"

@@ -90,7 +90,7 @@ a { color: inherit; text-decoration: none; }
 .badge.b3it { color: var(--b3it); background: var(--b3it-quiet); border-color: color-mix(in srgb, var(--b3it) 34%, transparent); }
 
 /* headline status badges (components.ts::headlineBadge / _macros.html.j2); the
-   quieter fates share the dim base, the notable ones get a colour of their own */
+   quieter fates share the dim base, the notable ones get a color of their own */
 .badge.st { text-transform: none; letter-spacing: 0.02em; white-space: nowrap; color: var(--text-dim); background: var(--surface-2); border-color: var(--border); }
 .badge.st-tracked { color: var(--stable); background: var(--stable-bg); border-color: color-mix(in srgb, var(--stable) 32%, transparent); }
 .badge.st-retired { color: var(--retired); background: var(--retired-bg); border-color: color-mix(in srgb, var(--retired) 36%, transparent); }

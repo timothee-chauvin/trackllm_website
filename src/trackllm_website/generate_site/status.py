@@ -9,7 +9,7 @@ inputs the caller loads — no file IO, no network, no re-run of selection
 feed).
 
 Statuses are per-method: LT and BI are independent (grok-4.5 is LT-tracked and
-BI-too-expensive), and one derived headline summarises the endpoint. All
+BI-too-expensive), and one derived headline summarizes the endpoint. All
 user-facing status text lives in STATUS_COPY; templates never invent wording.
 """
 

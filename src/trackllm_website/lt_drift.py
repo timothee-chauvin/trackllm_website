@@ -1,7 +1,7 @@
-"""Drift-from-reference for LT: distance of daily behaviour from a baseline period.
+"""Drift-from-reference for LT: distance of daily behavior from a baseline period.
 
 Display-only companion to the change-detection statistic in lt_scores.py: the LT
-analogue of B3IT total variation. 0 while the endpoint matches its reference
+analog of B3IT total variation. 0 while the endpoint matches its reference
 period; rises and stays elevated after a real change.
 """
 
