@@ -220,12 +220,15 @@ def render_site(
     # page with an endpoint count consistent with that model's own page (Task 7).
     slug_to_model_slug: dict[str, str] = {}
     slug_to_n_endpoints: dict[str, int] = {}
+    slug_to_n_providers: dict[str, int] = {}
     slug_to_status_summary: dict[str, str] = {}
     for mslug, view in model_views.items():
         n_endpoints = view["n_endpoints"]
+        n_providers = view["n_providers"]
         for e in view["endpoints"]:
             slug_to_model_slug[e["slug"]] = mslug
             slug_to_n_endpoints[e["slug"]] = n_endpoints
+            slug_to_n_providers[e["slug"]] = n_providers
             slug_to_status_summary[e["slug"]] = view["status_summary"]
 
     index_html = index_template.render(
@@ -290,6 +293,8 @@ def render_site(
             provider_has_page=provider_slug in provider_views,
             model_slug=slug_to_model_slug.get(slug, ""),
             n_endpoints=slug_to_n_endpoints.get(slug, 1),
+            n_providers=slug_to_n_providers.get(slug, 1),
+            n_models=provider_views.get(provider_slug, {}).get("n_models", 1),
             status_summary=slug_to_status_summary.get(slug, ""),
         )
         (endpoints_dir / f"{slug}.html").write_text(endpoint_html)
