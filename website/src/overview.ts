@@ -266,7 +266,7 @@ export async function init(): Promise<void> {
   document.getElementById("provBoards")!.innerHTML =
     board("Most drift-prone", "LT · rate", "Bar is the point estimate, the faint band its 95% interval.", drifty) +
     board("Nothing detected yet", "LT · upper bound",
-      "Ranked by monitoring volume, which sets the upper bound on their true rate.", quiet);
+      "Ranked by monitoring volume.", quiet);
 
   const provQ = document.getElementById("provQ") as HTMLInputElement;
   const provFilters = new Set<string>();
