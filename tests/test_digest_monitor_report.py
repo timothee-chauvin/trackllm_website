@@ -275,6 +275,8 @@ def test_monitor_records_unexpected_endpoint_failures(monkeypatch, tmp_path):
     report = asyncio.run(monitor())
 
     assert report.failures == ["openrouter#m/x#p"]
+    # the digest names it too, so the failure email always has a companion detail
+    assert [r.event for r in report.rows] == ["error"]
 
 
 def test_main_fails_after_digest_when_endpoints_failed(monkeypatch):

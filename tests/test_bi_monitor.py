@@ -3,7 +3,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import orjson
-import pytest
 
 from trackllm_website.api import OpenRouterClient
 from trackllm_website.bi import monitor as monitor_mod
@@ -203,14 +202,15 @@ def _saved_state(state):
     return EndpointBIState.model_validate_json(path.read_bytes())
 
 
-def test_reinit_timeout_is_a_reported_failure(tmp_path, monkeypatch):
+def test_reinit_timeout_is_a_digest_row_not_a_failure(tmp_path, monkeypatch):
     """A hanging change-triggered re-init (full discovery is ~15k queries) must not
-    stall the daily monitor job: it is bounded and reported, and only the timeout
-    streak is persisted — the epoch stays open so the next run retries."""
+    stall the daily monitor job: it is bounded, and only the timeout streak is
+    persisted — the epoch stays open so the next run retries. It is a diagnosed
+    condition with its own resolution path (retirement at max_reinit_timeouts), so
+    it is reported in the digest, not as a workflow failure."""
     state, now, event_rows, go = _reinit_case(tmp_path, monkeypatch, _hanging_reinit)
 
-    with pytest.raises(TimeoutError):  # run_isolated turns this into a report failure
-        go()
+    go()  # must not raise: a failed workflow is reserved for bugs
 
     assert any(r.event == "reinit_timeout" for r in event_rows)
     saved = _saved_state(state)
@@ -278,12 +278,15 @@ class FakeClient:
         pass
 
 
-def test_unresolved_strategy_is_a_reported_failure(monkeypatch):
+def test_unresolved_strategy_is_a_digest_row(monkeypatch):
     """An endpoint resolve_strategies drops must not be silently skipped: no batch
-    is written, so the stall detector never advances and it would idle forever."""
+    is written, so the stall detector never advances and it would idle forever. A
+    probes_failed digest row keeps it visible every day it recurs, without paging
+    a workflow failure for a condition that is not a bug."""
     state, _ = open_state_from_fixture("openai2fgpt-4o-mini23azure")
     report = _monitor_unresolved(monkeypatch, state, ["plain: 429 rate limited"])
-    assert report.failures == [str(state.endpoint)]
+    assert report.failures == []
+    assert [r.event for r in report.rows] == ["probes_failed"]
 
 
 def _monitor_unresolved(monkeypatch, state, errors):
@@ -318,27 +321,30 @@ def test_unreachable_deselected_endpoint_is_retired_not_failed(tmp_path, monkeyp
     assert (monitor_mod.config.bi.state_dir / f"{state.slug}.json").exists()
 
 
-def test_unreachable_but_still_listed_endpoint_stays_a_failure(monkeypatch):
+def test_unreachable_but_still_listed_endpoint_is_not_retired(monkeypatch):
     """All-404 probes on an endpoint the catalog still lists is an anomaly, not a
-    known removal: keep failing loudly."""
+    known removal: no retirement, but a red digest row every day until the catalog
+    deselects it (or the provider comes back)."""
     state, _ = open_state_from_fixture("openai2fgpt-4o-mini23azure")
     assert state.deselected_since is None
 
     report = _monitor_unresolved(monkeypatch, state, [PROBE_404])
 
-    assert report.failures == [str(state.endpoint)]
+    assert report.failures == []
+    assert [r.event for r in report.rows] == ["probes_failed"]
     assert state.status == "monitoring"
 
 
-def test_transient_probe_failure_stays_a_failure(monkeypatch):
+def test_transient_probe_failure_is_not_a_retirement(monkeypatch):
     """429s/timeouts are transient even on a deselected endpoint: not proof the
-    provider is gone, so no retirement."""
+    provider is gone, so no retirement — a digest row, retried tomorrow."""
     state, _ = open_state_from_fixture("openai2fgpt-4o-mini23azure")
     state.deselected_since = datetime(2026, 7, 29, tzinfo=timezone.utc)
 
     report = _monitor_unresolved(monkeypatch, state, ["plain: 429 rate limited"])
 
-    assert report.failures == [str(state.endpoint)]
+    assert report.failures == []
+    assert [r.event for r in report.rows] == ["probes_failed"]
     assert state.status == "monitoring"
 
 
@@ -433,7 +439,7 @@ def test_deadline_cutoff_keeps_the_work_the_run_already_did(tmp_path, monkeypatc
     monkeypatch.setattr(monitor_mod.config.bi.monitor, "job_deadline_seconds", 1.0)
     report = _monitor_endpoints(monkeypatch, tmp_path, [done, hung], hangs={hung.slug})
 
-    assert report.failures == [str(hung.endpoint)]
+    assert report.failures == []
     assert [(r.model, r.event) for r in report.rows] == [("m/hung", "deadline_cutoff")]
 
     # the finished endpoint's batch and state survived the cut-off
@@ -464,7 +470,7 @@ def test_reinit_timeout_is_not_reported_as_a_deadline_cutoff(tmp_path, monkeypat
     monkeypatch.setattr(monitor_mod.config.bi.monitor, "job_deadline_seconds", 30.0)
     report = _monitor_endpoints(monkeypatch, tmp_path, [state], hangs=set())
 
-    assert report.failures == [str(state.endpoint)]
+    assert report.failures == []
     assert [r.event for r in report.rows] == ["reinit_timeout"]
 
 
@@ -481,7 +487,7 @@ def test_job_deadline_cuts_a_hanging_endpoint_short(monkeypatch):
     monkeypatch.setattr(monitor_mod.config.bi.monitor, "job_deadline_seconds", 0.05)
     report = _monitor_one_endpoint(monkeypatch, state, hanging_run_endpoint)
 
-    assert report.failures == [str(state.endpoint)]
+    assert report.failures == []
     assert [r.event for r in report.rows] == ["deadline_cutoff"]
 
 
@@ -498,5 +504,5 @@ def test_endpoints_left_after_the_deadline_are_not_started(monkeypatch):
     report = _monitor_one_endpoint(monkeypatch, state, fake_run_endpoint)
 
     assert started == []
-    assert report.failures == [str(state.endpoint)]
+    assert report.failures == []
     assert [r.event for r in report.rows] == ["deadline_cutoff"]
