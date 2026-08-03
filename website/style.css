@@ -311,6 +311,7 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 .tblwrap { max-width: 100%; overflow-x: auto; }
 .changes-tbl { width: 100%; border-collapse: collapse; }
 .changes-tbl th { text-align: left; font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-dim); font-weight: 600; padding: 0.6rem 1.1rem; border-bottom: 1px solid var(--border); }
+.changes-tbl th .tipline { text-transform: none; letter-spacing: normal; }
 .changes-tbl th.r, .changes-tbl td.r { text-align: right; }
 .changes-tbl td { padding: 0.6rem 1.1rem; border-bottom: 1px solid var(--border-soft); font-size: 0.88rem; }
 .changes-tbl tr:last-child td { border-bottom: none; }
@@ -344,6 +345,13 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
    an unbroken run of dates has to wrap rather than push the row's columns apart */
 .tipline { padding: 0.3rem 0 0.1rem; font-family: var(--mono); font-size: 0.72rem;
   line-height: 1.4; color: var(--text-muted); overflow-wrap: anywhere; }
+
+/* An info button beside a label (e.g. "Vetting" on the spend page), sharing the
+   tap/click/focus data-tip + bindTips mechanism above. */
+.info-label { display: inline-flex; align-items: center; gap: 0.3rem; }
+.info-btn { width: 1.1rem; height: 1.1rem; padding: 0; border-radius: 50%; border: 1px solid var(--border);
+  background: var(--surface-2); color: var(--text-dim); font-size: 0.66rem; line-height: 1; cursor: pointer; }
+.info-btn:hover, .info-btn:focus-visible { color: var(--accent); border-color: var(--accent); }
 
 /* model page */
 .head h1 .org { color: var(--text-dim); font-weight: 500; }

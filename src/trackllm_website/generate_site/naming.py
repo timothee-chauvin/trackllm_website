@@ -13,3 +13,12 @@ def base_provider(provider: str) -> str:
 def variant_name(provider: str) -> str:
     """The serving variant, or "" for a provider's default serving stack."""
     return provider.split("/", 1)[1] if "/" in provider else ""
+
+
+def display_name(model: str, provider: str) -> str:
+    """The human-readable "model @ provider" form of an endpoint.
+
+    This -- never a slug -- is what a reader should see; slugify() is for
+    filenames/URLs only (see util.py).
+    """
+    return f"{model} @ {provider}"
