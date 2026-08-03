@@ -2,7 +2,7 @@
 
 The accumulator lives in a ContextVar so OpenRouterClient.query can add each
 response's cost without threading a parameter through every call path, and so a
-cancelled (timed-out) coroutine still leaves its partial spend in the caller-owned
+canceled (timed-out) coroutine still leaves its partial spend in the caller-owned
 bucket. The ledger records only facts (money spent), one line per logical activity.
 """
 

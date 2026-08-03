@@ -310,7 +310,7 @@ export function toggleChip(chip: HTMLElement, set: Set<string>, f: string): void
   chip.setAttribute("aria-pressed", String(set.has(f)));
 }
 
-/** How many marks a strip spells out before it summarises the rest. */
+/** How many marks a strip spells out before it summarizes the rest. */
 const TIP_MAX = 6;
 
 /** An SVG <title> only ever appears on hover, so a touch device never sees it --

@@ -96,7 +96,7 @@ def derive_b3it(
         changes=[{"date": ts, "kind": "onset"} for ts in changes]
         + [{"date": ev["date"], "kind": "scan"} for ev in backfill],
         # From the raw results, not the TV series: the series drops the epoch's
-        # reference batch, so a freshly re-initialised endpoint has none.
+        # reference batch, so a freshly re-initialized endpoint has none.
         last_query=last_phase2_query(results),
     )
 

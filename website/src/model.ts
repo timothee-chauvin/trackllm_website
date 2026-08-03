@@ -129,7 +129,7 @@ export async function init(): Promise<void> {
       ? `Served by <b>${D.n_providers}</b> ${D.n_providers === 1 ? "provider" : "providers"}` +
         ` on ${plural(D.n_endpoints, "tracked endpoint")}. ` +
         `<span class="hl">${D.n_changed}</span> of those ${D.n_changed === 1 ? "shows" : "show"}` +
-        ` at least one detected change since launch — evidence the served behaviour drifts even when the model version doesn't.` +
+        ` at least one detected change since launch.` +
         ` ${esc(D.status_summary)} across the catalog.`
       : `This model is not tracked: ${esc(D.status_summary)}. Each endpoint below says why.`;
   }

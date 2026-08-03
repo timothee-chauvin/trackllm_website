@@ -192,7 +192,7 @@ def select_monitoring_targets(
             for prov, eps in sorted(by_provider.items()):
                 # Patterns match provider names here (the by_provider key, i.e. the
                 # provider without its /fp8-style suffix), not models; ["*"] keeps
-                # the every-provider fill behaviour.
+                # the every-provider fill behavior.
                 if not any(fnmatch.fnmatch(prov, p) for p in rule.patterns):
                     continue
                 for e in eps[: rule.endpoints_per_provider]:

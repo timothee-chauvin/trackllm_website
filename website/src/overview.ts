@@ -266,7 +266,7 @@ export async function init(): Promise<void> {
   document.getElementById("provBoards")!.innerHTML =
     board("Most drift-prone", "LT · rate", "Bar is the point estimate, the faint band its 95% interval.", drifty) +
     board("Nothing detected yet", "LT · upper bound",
-      "Ranked by monitoring volume: the more we have watched, the tighter the ceiling on their true rate.", quiet);
+      "Ranked by monitoring volume, which sets the upper bound on their true rate.", quiet);
 
   const provQ = document.getElementById("provQ") as HTMLInputElement;
   const provFilters = new Set<string>();
@@ -341,7 +341,7 @@ export async function init(): Promise<void> {
       // by the change criterion alone (only observed endpoints can have changes),
       // exactly as before the status chips existed
       const changeChip = active.has("everchanged") || active.has("recent");
-      // grey out whatever the current mode ignores, so chips never look
+      // gray out whatever the current mode ignores, so chips never look
       // toggleable while having no effect
       const chipsEl = document.getElementById("chips")!;
       chipsEl.classList.toggle("bypass-all", !!q);
