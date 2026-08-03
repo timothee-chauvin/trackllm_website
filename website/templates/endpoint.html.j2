@@ -22,15 +22,15 @@
     </div>
     {% if methods %}<div class="statuscard" id="statuscard"></div>{% endif %}
   </div>
+  {# a model with no tracked providers, or a provider with no page, has nothing worth
+     crosslinking here -- omit that line (or the whole box) rather than show a "0" #}
+  {% set show_model_line = model_slug and n_providers > 0 %}
+  {% if show_model_line or provider_has_page %}
   <div class="compare">
-    <div class="t"><b>{{ model_name }}</b>
-      {% if methods %}<span>is tracked on {{ n_endpoints }} endpoint{{ "s" if n_endpoints != 1 else "" }} — compare {{ "its" if n_endpoints == 1 else "their" }} drift side by side.</span>
-      {% else %}<span>— {{ status_summary }}.</span>{% endif %}</div>
-    <div style="display:flex;gap:1rem;flex-wrap:wrap">
-      {% if model_slug %}<a class="go" href="{{ nav_prefix }}models/{{ model_slug }}.html">View model page →</a>{% endif %}
-      {% if provider_has_page %}<a class="go" href="{{ nav_prefix }}providers/{{ provider_slug }}.html">All of {{ provider_base }} →</a>{% endif %}
-    </div>
+    {% if show_model_line %}<p><a href="{{ nav_prefix }}models/{{ model_slug }}.html">{{ model_name }}</a> is served by <a href="{{ nav_prefix }}models/{{ model_slug }}.html">{{ n_providers }} provider{{ "s" if n_providers != 1 else "" }}</a>.</p>{% endif %}
+    {% if provider_has_page %}<p><a href="{{ nav_prefix }}providers/{{ provider_slug }}.html">{{ provider_base }}</a> serves <a href="{{ nav_prefix }}providers/{{ provider_slug }}.html">{{ n_models }} model{{ "s" if n_models != 1 else "" }}</a>.</p>{% endif %}
   </div>
+  {% endif %}
 </div>
 
 <main class="wrap">
@@ -56,7 +56,7 @@
     </div>
   </section>
 
-  <section class="block">
+  <section class="block" id="changesSection">
     <div class="sec-head"><h2>Detected changes</h2></div>
     <div class="panel">
       <div class="tblwrap">

@@ -25,3 +25,12 @@
   <input id="{{ id }}" type="text" placeholder="{{ placeholder }}" autocomplete="off" aria-label="{{ label }}">
 </label>
 {%- endmacro %}
+
+{# A label with a tap/click/focus-activated explanation, via the same data-tip +
+   bindTips mechanism chart strips use (components.ts::stripTip/bindTips) -- a
+   bare title= only reaches desktop hover, never a touch screen. The button
+   carries the full text as its aria-label since the caption bindTips writes on
+   activation is aria-hidden (screen readers already have it from here). #}
+{% macro info_label(label, tip) -%}
+<span class="info-label">{{ label }} <button type="button" class="info-btn" data-tip="{{ tip }}" aria-label="{{ tip }}">?</button></span>
+{%- endmacro %}
