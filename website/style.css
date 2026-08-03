@@ -269,12 +269,11 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 .statuscard .v small { font-weight: 500; color: var(--text-dim); }
 @media (max-width: 620px) { .statuscard { grid-template-columns: repeat(2, auto); } }
 
-.compare { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1.4rem;
-  padding: 0.85rem 1.2rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); flex-wrap: wrap; }
-.compare .t { font-size: 0.9rem; } .compare .t b { color: var(--accent); }
-.compare .t span { color: var(--text-muted); }
-.compare a.go { font-family: var(--mono); font-size: 0.82rem; color: var(--accent); white-space: nowrap; }
-.compare a.go:hover { text-decoration: underline; }
+.compare { display: flex; flex-direction: column; gap: 0.3rem; margin-top: 1.4rem;
+  padding: 0.85rem 1.2rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+.compare p { margin: 0; font-size: 0.9rem; color: var(--text-muted); }
+.compare a { color: var(--accent); font-weight: 600; }
+.compare a:hover { text-decoration: underline; }
 
 /* endpoint page: per-method tracking status */
 .status-methods { padding: 0.95rem 1.4rem; display: grid; gap: 0.55rem; }
