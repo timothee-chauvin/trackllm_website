@@ -60,7 +60,7 @@
     {{ paper_ref(B3IT_PAPER) }}
     <div class="panel">
       <p class="prose">Where logprobs aren't exposed, we operate in a strict black box, observing only output tokens. The first phase identifies <b>border inputs</b>: inputs for which sampling at T=0 doesn't always give the same output, i.e. for which there exists more than one output top token. They can easily be found just from black-box sampling, trying thousands of short inputs and keeping the border inputs. These inputs are then sampled repeatedly, to check whether the endpoint has moved away from its borders.</p>
-      <p class="prose">Optimal change detection depends on the model's Jacobian and the Fisher information of the output distribution; analyzing these in low-temperature regimes shows that border inputs enable powerful change detection tests. B3IT performs <b>on par with the best available grey-box approaches</b> while reducing costs by <b>30x</b>.</p>
+      <p class="prose">Optimal change detection depends on the model's Jacobian and the Fisher information of the output distribution; analyzing these in low-temperature regimes shows that border inputs enable powerful change detection tests. B3IT performs <b>on par with the best available gray-box approaches</b> while reducing costs by <b>30x</b>.</p>
     </div>
   </section>
 
@@ -76,6 +76,4 @@
     </ul>
   </section>
 </main>
-
-<div class="note">Every endpoint page shows which of the two methods it is monitored with.</div>
 {% endblock %}

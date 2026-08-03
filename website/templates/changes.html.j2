@@ -56,7 +56,7 @@
   </section>
 </main>
 
-<div class="note">Magnitude is the drift level reached after the changepoint — nats for LT, total variation for B3IT. σ is confidence, not size: a change can be certain and behaviourally small.</div>
+<div class="note">Magnitude is the drift level reached after the changepoint — nats for LT, total variation for B3IT. σ is one of the metrics feeding LT's change-detection criterion, not a size measure: a change can score high on σ and still be behaviorally small.</div>
 {% endblock %}
 
 {% block scripts %}

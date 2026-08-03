@@ -208,7 +208,7 @@ def test_monitoring_with_reference_yields_tv_series():
 def test_consecutive_epochs_do_not_measure_the_same_day_twice():
     """Each day belongs to exactly one epoch, so the series stays sorted and unique.
 
-    When a re-initialised epoch keeps some of the previous epoch's border inputs,
+    When a re-initialized epoch keeps some of the previous epoch's border inputs,
     those keep being sampled; a closed epoch that ignored its own end would score
     every later day a second time against its stale reference.
     """

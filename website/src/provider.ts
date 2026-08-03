@@ -165,7 +165,7 @@ export async function init(): Promise<void> {
       rateCard("Border input tracking", '<span class="badge b3it">B3IT</span>', D.b3it);
   }
 
-  // monitoring lanes: grey area = endpoints under monitoring per month, dots = changes
+  // monitoring lanes: gray area = endpoints under monitoring per month, dots = changes
   const MONTHS = D.months;
   const NM = Math.max(1, MONTHS.length - 1);
   const laneX = (i: number): number => (i / NM) * LANE_W;

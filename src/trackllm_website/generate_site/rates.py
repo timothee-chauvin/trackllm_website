@@ -1,4 +1,4 @@
-"""Normalised drift rates and their uncertainty. Pure: no I/O, no build state."""
+"""Normalized drift rates and their uncertainty. Pure: no I/O, no build state."""
 
 import math
 
