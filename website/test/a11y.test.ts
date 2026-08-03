@@ -60,6 +60,12 @@ async function renderOverview(): Promise<void> {
   await (await import("../src/overview")).init();
 }
 
+async function renderChanges(): Promise<void> {
+  document.documentElement.innerHTML = readFileSync(requireBuilt("changes.html"), "utf8");
+  stubFetch(".");
+  await (await import("../src/changes")).init();
+}
+
 const shownCount = (): number =>
   Number(/^(\d+) of /.exec(document.getElementById("dirFoot")!.textContent ?? "")?.[1]);
 
@@ -102,14 +108,16 @@ describe("filter chips", () => {
     expect(chip.getAttribute("aria-pressed")).toBe("true");
   });
 
-  test("the second chip group on the Overview is keyboard-operable too", async () => {
-    await renderOverview();
-    const chip = document.querySelector<HTMLElement>('#provChips .chip[data-f="changed"]')!;
-    const foot = document.getElementById("provFoot")!;
-    const before = foot.textContent;
+  // the Overview binds its chips directly; the other pages go through
+  // bindFilterChips, which has its own keyboard wiring to get right
+  test("a bindFilterChips group is keyboard-operable too", async () => {
+    await renderChanges();
+    const chip = document.querySelector<HTMLElement>('#chips .chip[data-f="lt"]')!;
+    const count = document.getElementById("logCount")!;
+    const before = count.textContent;
     press(chip, "Enter");
     expect(chip.getAttribute("aria-pressed")).toBe("true");
-    expect(foot.textContent).not.toBe(before);
+    expect(count.textContent).not.toBe(before);
   });
 });
 
@@ -158,15 +166,6 @@ describe("sortable column headers", () => {
 });
 
 describe("changes-page month histogram", () => {
-  async function renderChanges(): Promise<void> {
-    document.documentElement.innerHTML = readFileSync(
-      requireBuilt("changes.html"),
-      "utf8",
-    );
-    stubFetch(".");
-    await (await import("../src/changes")).init();
-  }
-
   /** The month's two counts, from its accessible name. */
   const counts = (b: Element): number[] =>
     [...(b.getAttribute("aria-label") ?? "").matchAll(/(\d+) (?:LT|B3IT)/g)].map((m) => +m[1]);

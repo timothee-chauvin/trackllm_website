@@ -7,7 +7,7 @@ views, changes.json, spend.json) -- never raw logprobs.
 """
 
 import json
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import datetime
 from pathlib import Path
 
@@ -230,8 +230,24 @@ def build_overview(
             if lo_days <= (now - datetime.fromisoformat(c["date"])).days < hi_days
         )
 
+    # Catalog/previously-tracked endpoints with no series: rows with a status in
+    # place of a trace.
+    untracked_recs = [
+        _untracked_row(slug, site)
+        for slug in sorted(set(site.statuses) - set(all_slugs))
+    ]
+    # The headline (status.py) is what the directory's status chips filter on, so
+    # the headline numbers up top must be counted the same way -- over every row,
+    # including the ones with no series. A row's `status` is a display state read
+    # off the trace's date gaps: an endpoint whose queries have started failing
+    # still reads "stable" for two weeks, and one we monitor but have not plotted
+    # yet has no `status` at all, so counting it here would disagree with the
+    # "Tracked" chip right below.
+    headlines = Counter(r["headline"] for r in endpoint_recs + untracked_recs)
+
     stats = {
-        "endpoints": len(endpoint_recs),
+        # the fleet we have ever tracked: everything the two chips below cover
+        "endpoints": headlines["tracked"] + headlines["retired"],
         "providers": len({r["provider"] for r in endpoint_recs}),
         "provider_companies": len(
             {base_provider(r["provider"]) for r in endpoint_recs}
@@ -241,7 +257,7 @@ def build_overview(
         "changes_total": len(changes),
         "changes_lt": len(lt_changes),
         "changes_b3it": sum(1 for c in changes if c["method"] == "B3IT"),
-        "active": sum(1 for r in endpoint_recs if r["status"] != "retired"),
+        "active": headlines["tracked"],
         "changed_endpoints": sum(1 for r in endpoint_recs if r["nChanges"] > 0),
         "changes_30d": _changes_in_window(0, 30),
         "lt_endpoints": len(lt_data),
@@ -265,13 +281,6 @@ def build_overview(
         "last_query_lt": latest(e.last_query_date for e in lt_endpoints),
         "last_query_b3it": latest(v.last_query for v in b3it_views.values()),
     }
-
-    # Catalog/previously-tracked endpoints with no series: rows with a status in
-    # place of a trace. The stats above describe the tracked fleet only.
-    untracked_recs = [
-        _untracked_row(slug, site)
-        for slug in sorted(set(site.statuses) - set(all_slugs))
-    ]
 
     return {
         "stats": stats,
