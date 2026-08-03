@@ -305,6 +305,12 @@ function renderChangesTable(lt: FocusLT | null, b3it: FocusB3IT | null): void {
   (b3it?.changes ?? []).forEach((c) =>
     rows.push({ date: c.date, method: "b3it", mag: fmtTV(c.peakTV), conf: "—" })
   );
+  // no detected changes yet: the section (heading included) is omitted rather
+  // than left as an empty table, matching the rest of the site's convention.
+  if (!rows.length) {
+    document.getElementById("changesSection")?.remove();
+    return;
+  }
   rows.sort((a, b) => td(b.date) - td(a.date));
   el.innerHTML = rows
     .map(
