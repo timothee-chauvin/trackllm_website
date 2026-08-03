@@ -1451,8 +1451,8 @@ endpoints_catalog:
 - model: deepseek/deepseek-v4-flash
   provider: baidu/fp8
   cost:
-  - 0.0896
-  - 0.1792
+  - 0.0882
+  - 0.1764
   created: '2026-04-24T03:17:46+00:00'
   supports_temperature: true
   supports_logprobs: false
@@ -1516,15 +1516,6 @@ endpoints_catalog:
   cost:
   - 0.0938
   - 0.1876
-  created: '2026-04-24T03:17:46+00:00'
-  supports_temperature: true
-  supports_logprobs: false
-  free: false
-- model: deepseek/deepseek-v4-flash
-  provider: io-net/fp8
-  cost:
-  - 0.139
-  - 0.278
   created: '2026-04-24T03:17:46+00:00'
   supports_temperature: true
   supports_logprobs: false
@@ -1595,8 +1586,8 @@ endpoints_catalog:
 - model: deepseek/deepseek-v4-flash
   provider: streamlake/fp8
   cost:
-  - 0.0896
-  - 0.1792
+  - 0.0938
+  - 0.1876
   created: '2026-04-24T03:17:46+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -1658,8 +1649,17 @@ endpoints_catalog:
 - model: deepseek/deepseek-v4-flash-0731
   provider: gmicloud/fp8
   cost:
-  - 0.133
-  - 0.266
+  - 0.14
+  - 0.28
+  created: '2026-07-31T06:21:48+00:00'
+  supports_temperature: true
+  supports_logprobs: true
+  free: false
+- model: deepseek/deepseek-v4-flash-0731
+  provider: io-net/fp8
+  cost:
+  - 0.18
+  - 0.34
   created: '2026-07-31T06:21:48+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -1721,8 +1721,8 @@ endpoints_catalog:
 - model: deepseek/deepseek-v4-pro
   provider: baidu/fp8
   cost:
-  - 0.6422
-  - 1.2844
+  - 1.2337
+  - 2.4674
   created: '2026-04-24T03:17:59+00:00'
   supports_temperature: true
   supports_logprobs: false
@@ -1838,8 +1838,8 @@ endpoints_catalog:
 - model: deepseek/deepseek-v4-pro
   provider: streamlake/fp8
   cost:
-  - 0.624834
-  - 1.249668
+  - 1.168062
+  - 2.336124
   created: '2026-04-24T03:17:59+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -4689,6 +4689,15 @@ endpoints_catalog:
   supports_logprobs: true
   free: false
 - model: moonshotai/kimi-k3
+  provider: morph/fast
+  cost:
+  - 6.0
+  - 22.5
+  created: '2026-07-16T15:30:58+00:00'
+  supports_temperature: true
+  supports_logprobs: true
+  free: false
+- model: moonshotai/kimi-k3
   provider: together
   cost:
   - 3.0
@@ -4702,6 +4711,15 @@ endpoints_catalog:
   cost:
   - 3.0
   - 15.0
+  created: '2026-07-16T15:30:58+00:00'
+  supports_temperature: true
+  supports_logprobs: false
+  free: false
+- model: moonshotai/kimi-k3
+  provider: wafer/fast
+  cost:
+  - 4.5
+  - 22.5
   created: '2026-07-16T15:30:58+00:00'
   supports_temperature: true
   supports_logprobs: false
@@ -5745,7 +5763,7 @@ endpoints_catalog:
   provider: amazon-bedrock/us-east-1
   cost:
   - 0.22
-  - 1.3200000000000003
+  - 1.32
   created: '2026-07-09T09:54:24+00:00'
   supports_temperature: false
   supports_logprobs: false
@@ -5772,7 +5790,7 @@ endpoints_catalog:
   provider: openai
   cost:
   - 0.1
-  - 0.6000000000000001
+  - 0.6
   created: '2026-07-09T09:54:24+00:00'
   supports_temperature: false
   supports_logprobs: false
@@ -5781,7 +5799,7 @@ endpoints_catalog:
   provider: openai/flex
   cost:
   - 0.05
-  - 0.30000000000000004
+  - 0.3
   created: '2026-07-09T09:54:24+00:00'
   supports_temperature: false
   supports_logprobs: false
@@ -5790,7 +5808,7 @@ endpoints_catalog:
   provider: openai/priority
   cost:
   - 0.2
-  - 1.2000000000000002
+  - 1.2
   created: '2026-07-09T09:54:24+00:00'
   supports_temperature: false
   supports_logprobs: false
@@ -5817,7 +5835,7 @@ endpoints_catalog:
   provider: openai
   cost:
   - 0.1
-  - 0.6000000000000001
+  - 0.6
   created: '2026-07-09T09:54:27+00:00'
   supports_temperature: false
   supports_logprobs: false
@@ -5826,7 +5844,7 @@ endpoints_catalog:
   provider: openai/flex
   cost:
   - 0.05
-  - 0.30000000000000004
+  - 0.3
   created: '2026-07-09T09:54:27+00:00'
   supports_temperature: false
   supports_logprobs: false
@@ -5835,7 +5853,7 @@ endpoints_catalog:
   provider: openai/priority
   cost:
   - 0.2
-  - 1.2000000000000002
+  - 1.2
   created: '2026-07-09T09:54:27+00:00'
   supports_temperature: false
   supports_logprobs: false
@@ -5843,7 +5861,7 @@ endpoints_catalog:
 - model: openai/gpt-5.6-sol
   provider: amazon-bedrock/us-east-1
   cost:
-  - 5.500000000000001
+  - 5.5
   - 33.0
   created: '2026-07-09T09:54:10+00:00'
   supports_temperature: false
@@ -5942,7 +5960,7 @@ endpoints_catalog:
 - model: openai/gpt-5.6-terra
   provider: amazon-bedrock/us-east-1
   cost:
-  - 2.2000000000000006
+  - 2.2
   - 13.2
   created: '2026-07-09T09:54:17+00:00'
   supports_temperature: false
@@ -5969,7 +5987,7 @@ endpoints_catalog:
 - model: openai/gpt-5.6-terra
   provider: openai
   cost:
-  - 1.0000000000000002
+  - 1.0
   - 6.0
   created: '2026-07-09T09:54:17+00:00'
   supports_temperature: false
@@ -5978,7 +5996,7 @@ endpoints_catalog:
 - model: openai/gpt-5.6-terra
   provider: openai/flex
   cost:
-  - 0.5000000000000001
+  - 0.5
   - 3.0
   created: '2026-07-09T09:54:17+00:00'
   supports_temperature: false
@@ -5987,7 +6005,7 @@ endpoints_catalog:
 - model: openai/gpt-5.6-terra
   provider: openai/priority
   cost:
-  - 2.0000000000000004
+  - 2.0
   - 12.0
   created: '2026-07-09T09:54:17+00:00'
   supports_temperature: false
@@ -6014,7 +6032,7 @@ endpoints_catalog:
 - model: openai/gpt-5.6-terra-pro
   provider: openai
   cost:
-  - 1.0000000000000002
+  - 1.0
   - 6.0
   created: '2026-07-09T09:54:21+00:00'
   supports_temperature: false
@@ -6023,7 +6041,7 @@ endpoints_catalog:
 - model: openai/gpt-5.6-terra-pro
   provider: openai/flex
   cost:
-  - 0.5000000000000001
+  - 0.5
   - 3.0
   created: '2026-07-09T09:54:21+00:00'
   supports_temperature: false
@@ -6032,7 +6050,7 @@ endpoints_catalog:
 - model: openai/gpt-5.6-terra-pro
   provider: openai/priority
   cost:
-  - 2.0000000000000004
+  - 2.0
   - 12.0
   created: '2026-07-09T09:54:21+00:00'
   supports_temperature: false
@@ -6158,7 +6176,7 @@ endpoints_catalog:
 - model: openai/gpt-oss-120b
   provider: mancer/fp8
   cost:
-  - 0.06
+  - 0.1
   - 0.5
   created: '2025-08-05T17:17:11+00:00'
   supports_temperature: true
@@ -8082,6 +8100,15 @@ endpoints_catalog:
   supports_logprobs: false
   free: false
 - model: tencent/hy3-preview
+  provider: baidu/fp8
+  cost:
+  - 0.066
+  - 0.26
+  created: '2026-04-22T17:15:50+00:00'
+  supports_temperature: true
+  supports_logprobs: false
+  free: false
+- model: tencent/hy3-preview
   provider: gmicloud/bf16
   cost:
   - 0.063
@@ -8147,7 +8174,7 @@ endpoints_catalog:
 - model: thinkingmachines/inkling
   provider: deepinfra/fp8
   cost:
-  - 1.0
+  - 0.95
   - 4.05
   created: '2026-07-17T22:05:56+00:00'
   supports_temperature: true
@@ -8165,7 +8192,7 @@ endpoints_catalog:
 - model: thinkingmachines/inkling-small
   provider: deepinfra/fp8
   cost:
-  - 0.5
+  - 0.45
   - 1.2
   created: '2026-07-30T20:25:17+00:00'
   supports_temperature: true
@@ -9153,6 +9180,15 @@ endpoints_catalog:
   supports_logprobs: true
   free: false
 - model: z-ai/glm-5.2
+  provider: crusoe/fp8
+  cost:
+  - 1.4
+  - 4.4
+  created: '2026-06-16T17:45:30+00:00'
+  supports_temperature: true
+  supports_logprobs: false
+  free: false
+- model: z-ai/glm-5.2
   provider: decart/fp4
   cost:
   - 0.72
@@ -9245,8 +9281,8 @@ endpoints_catalog:
 - model: z-ai/glm-5.2
   provider: novita/fp8
   cost:
-  - 0.385
-  - 1.21
+  - 0.7546
+  - 2.3716
   created: '2026-06-16T17:45:30+00:00'
   supports_temperature: true
   supports_logprobs: false
@@ -9290,8 +9326,8 @@ endpoints_catalog:
 - model: z-ai/glm-5.2
   provider: streamlake/fp8
   cost:
-  - 0.3864
-  - 1.2144
+  - 0.924
+  - 2.904
   created: '2026-06-16T17:45:30+00:00'
   supports_temperature: true
   supports_logprobs: true
