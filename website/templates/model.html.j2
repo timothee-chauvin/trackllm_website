@@ -26,8 +26,13 @@
       <span class="k"><i style="background:var(--accent)"></i> LT change</span>
       <span class="k"><i style="background:var(--b3it)"></i> B3IT change</span>
       <span class="k" style="color:var(--text-dim)">line = drift from baseline · dot height = how far it moved</span>
+      <span class="k" style="color:var(--text-dim)">hover or tap a strip to read every provider on the same day</span>
     </div>
-    <div class="cmp" id="cmp"></div>
+    {# the tip is a sibling of the panel, not a child: .cmp clips its own overflow #}
+    <div class="chartbox">
+      <div class="cmp" id="cmp"></div>
+      <div class="chart-tip" id="cmptip" hidden></div>
+    </div>
   </section>
 </main>
 {% endblock %}
