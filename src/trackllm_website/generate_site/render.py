@@ -132,7 +132,10 @@ def render_site(
     print(f"\nFound {n_active} active, {n_total - n_active} inactive endpoints")
 
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    spend = spend_mod.aggregate_spend(website_dir / "data" / "spend", today)
+    endpoint_names = spend_mod.build_endpoint_names(discovered, bi_states)
+    spend = spend_mod.aggregate_spend(
+        website_dir / "data" / "spend", today, endpoint_names
+    )
     (website_dir / "data" / "spend.json").write_text(json.dumps(spend))
 
     overview = overview_mod.build_overview(
@@ -241,6 +244,7 @@ def render_site(
     spend_html = spend_template.render(
         spend=spend,
         tracked=set(lt_by_slug) | set(b3it_views),
+        vetting_tip=spend_mod.VETTING_TIP,
         css_path="style.css",
         body_class="spend",
     )

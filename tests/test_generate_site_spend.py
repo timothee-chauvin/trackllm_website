@@ -1,6 +1,17 @@
 import json
 
-from trackllm_website.generate_site.spend import aggregate_spend, group_for_kind
+from trackllm_website.bi.state import EndpointBIState
+from trackllm_website.bi.vetting import EndpointCache, UnprobeableEntry
+from trackllm_website.config import Endpoint
+from trackllm_website.generate_site import spend as spend_mod
+from trackllm_website.generate_site.lt import EndpointInfo
+from trackllm_website.generate_site.spend import (
+    GROUP_LABEL,
+    GROUP_ORDER,
+    aggregate_spend,
+    build_endpoint_names,
+    group_for_kind,
+)
 
 
 def test_group_for_kind():
@@ -35,7 +46,7 @@ def test_aggregate(tmp_path):
     d.mkdir(parents=True)
     (d / "2026-06.jsonl").write_text(_line("2026-06-20T00:00:00Z", "lt", 0.03) + "\n")
 
-    out = aggregate_spend(tmp_path, "2026-06-24")
+    out = aggregate_spend(tmp_path, "2026-06-24", {"s1": "org/model @ provider"})
 
     # Existing assertions (with updated monitoring total: 0.03 instead of 0.02)
     assert round(out["cumulative"]["onboarding"], 2) == 0.10
@@ -62,12 +73,79 @@ def test_aggregate(tmp_path):
     assert out["by_endpoint"][0]["slug"] == "s1"
     assert out["by_endpoint"][1]["slug"] == "s2"
 
+    # A resolvable slug gets its human-readable name; an unresolved one (s2, not
+    # in `names`) falls back to the slug itself rather than showing nothing.
+    assert out["by_endpoint"][0]["name"] == "org/model @ provider"
+    assert out["by_endpoint"][1]["name"] == "s2"
+
 
 def test_group_order_emitted_and_zero_cost_groups_kept(tmp_path):
     d = tmp_path / "s0"
     d.mkdir(parents=True)
     (d / "2026-06.jsonl").write_text(_line("2026-06-24T00:00:00Z", "lt", 0.0) + "\n")
-    out = aggregate_spend(tmp_path, "2026-06-24")
+    out = aggregate_spend(tmp_path, "2026-06-24", {})
     assert out["group_order"] == ["onboarding", "monitoring", "lt", "vetting", "other"]
     # A zero-cost run is data ("billed $0"), distinct from "no data": the key stays.
     assert out["by_endpoint"][0]["groups"]["lt"] == 0.0
+
+
+def test_group_label_covers_every_group_and_renames_per_spec():
+    # The exact rename the spend page asked for (never the raw internal keys).
+    assert GROUP_LABEL["onboarding"] == "B3IT (onboarding)"
+    assert GROUP_LABEL["monitoring"] == "B3IT (monitoring)"
+    assert GROUP_LABEL["lt"] == "LT"
+    assert GROUP_LABEL["vetting"] == "Vetting"
+    assert set(GROUP_ORDER) <= set(GROUP_LABEL)
+
+
+def test_build_endpoint_names_resolves_from_discovered_and_bi_state(
+    tmp_path, monkeypatch
+):
+    # Isolate from the real repo's BI catalogs / reject cache, so this only
+    # exercises the `discovered` and `bi_states` sources.
+    monkeypatch.setattr(spend_mod.config, "endpoints_bi", [])
+    monkeypatch.setattr(spend_mod.config, "endpoints_bi_prevalence", [])
+    monkeypatch.setattr(
+        spend_mod, "ENDPOINTS_CACHE_BI_PATH", tmp_path / "no-such-cache.yaml"
+    )
+
+    discovered = [
+        EndpointInfo(model="m/a", provider="p", slug="m2fa23p", prompts=[]),
+    ]
+    bi_states = {
+        "m2fb23p": EndpointBIState(
+            endpoint=Endpoint(api="openrouter", model="m/b", provider="p", cost=(1, 1)),
+            status="monitoring",
+            epochs=[],
+        )
+    }
+
+    names = build_endpoint_names(discovered, bi_states)
+    assert names == {"m2fa23p": "m/a @ p", "m2fb23p": "m/b @ p"}
+    assert "unknown-slug" not in names
+
+
+def test_build_endpoint_names_uses_reject_cache_when_never_onboarded(
+    tmp_path, monkeypatch
+):
+    """A liar/too-expensive/unprobeable endpoint was probed but never onboarded,
+    so it has no BI state -- the reject cache is its only source of a name."""
+    monkeypatch.setattr(spend_mod.config, "endpoints_bi", [])
+    monkeypatch.setattr(spend_mod.config, "endpoints_bi_prevalence", [])
+    cache_path = tmp_path / "endpoints_cache_bi.yaml"
+    monkeypatch.setattr(spend_mod, "ENDPOINTS_CACHE_BI_PATH", cache_path)
+
+    liar = Endpoint(api="openrouter", model="m/liar", provider="p", cost=(1, 1))
+    unprobeable = Endpoint(api="openrouter", model="m/flaky", provider="p", cost=(1, 1))
+    EndpointCache(
+        liars=[liar],
+        too_expensive=[],
+        bad_temperature=[],
+        unprobeable=[
+            UnprobeableEntry(endpoint=unprobeable, reason="flaky", detail="boom")
+        ],
+    ).save(cache_path)
+
+    names = build_endpoint_names([], {})
+    assert names["m2fliar23p"] == "m/liar @ p"
+    assert names["m2fflaky23p"] == "m/flaky @ p"

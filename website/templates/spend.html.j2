@@ -1,4 +1,5 @@
 {% extends "base.html.j2" %}
+{% from "_macros.html.j2" import info_label %}
 {% block title %}Spend | TrackLLM{% endblock %}
 {% block content %}
 <div class="wrap">
@@ -21,7 +22,7 @@
           <thead><tr><th scope="col">Group</th><th scope="col" class="r">Cost (USD)</th></tr></thead>
           <tbody>
           {% for group, cost in spend.cumulative.items() %}
-            <tr><td>{{ group }}</td><td class="r num">${{ "%.4f"|format(cost) }}</td></tr>
+            <tr><td>{% if group == "vetting" %}{{ info_label(spend.group_label[group], vetting_tip) }}{% else %}{{ spend.group_label[group] }}{% endif %}</td><td class="r num">${{ "%.4f"|format(cost) }}</td></tr>
           {% endfor %}
           </tbody>
         </table>
@@ -46,7 +47,7 @@
         <thead>
           <tr>
             <th scope="col">Endpoint</th>
-            {% for g in spend.group_order %}<th scope="col" class="r">{{ g }}</th>{% endfor %}
+            {% for g in spend.group_order %}<th scope="col" class="r">{% if g == "vetting" %}{{ info_label(spend.group_label[g], vetting_tip) }}{% else %}{{ spend.group_label[g] }}{% endif %}</th>{% endfor %}
             <th scope="col" class="r">Total</th>
           </tr>
         </thead>
@@ -54,9 +55,12 @@
         {% for ep in spend.by_endpoint %}
           <tr>
             {# spend covers every slug we were billed for, including discovery probes
-               and endpoints with no series -- neither of which has a page #}
-            <td>{% if ep.slug in tracked %}<a href="endpoints/{{ ep.slug }}.html">{{ ep.slug }}</a>
-              {%- else %}<span class="untracked">{{ ep.slug }}</span>{% endif %}</td>
+               and endpoints with no series -- neither of which has a page. Never the
+               slug itself as visible text (only as the URL) -- ep.name is the
+               human-readable "model @ provider" form, or the slug as a last resort
+               when no registry can name it (see build_endpoint_names). #}
+            <td>{% if ep.slug in tracked %}<a href="endpoints/{{ ep.slug }}.html">{{ ep.name }}</a>
+              {%- else %}<span class="untracked">{{ ep.name }}</span>{% endif %}</td>
             {% for g in spend.group_order %}
             <td class="r num">{% if g in ep.groups %}${{ "%.4f"|format(ep.groups[g]) }}{% else %}—{% endif %}</td>
             {% endfor %}
