@@ -21,6 +21,8 @@ import {
 import { EndpointRow, initDirectory, initSortHeaders } from "./directory";
 
 interface Stats {
+  // headline counts, so they agree with the directory's status chips: `endpoints`
+  // is the fleet we ever tracked (tracked + retired) and `active` its tracked half
   endpoints: number;
   providers: number;
   provider_companies: number;

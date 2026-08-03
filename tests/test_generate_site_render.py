@@ -344,7 +344,8 @@ def test_generated_json_is_rewritten_from_scratch_but_data_survives(tmp_path):
 def test_endpoint_with_nothing_to_show_gets_a_status_page_if_ever_tracked(tmp_path):
     """A never-tracked endpoint that already left the catalog stays absent. One we
     tracked (a BI state file) keeps an explained page and directory row -- with a
-    status instead of a chart -- but stays out of the tracked-fleet stats."""
+    status instead of a chart -- and counts in the fleet stats, which follow the
+    headline rather than the presence of a series."""
     _scaffold(tmp_path)
     # an LT endpoint whose queries all errored (never observed, no catalog entry),
     # and a B3IT one retired before its first post-reference batch
@@ -366,7 +367,8 @@ def test_endpoint_with_nothing_to_show_gets_a_status_page_if_ever_tracked(tmp_pa
     assert {e["slug"] for e in overview["endpoints"]} == {"m2fa23p", gone_slug}
     gone_row = next(e for e in overview["endpoints"] if e["slug"] == gone_slug)
     assert gone_row["methods"] == [] and gone_row["headline"] == "retired"
-    assert overview["stats"]["endpoints"] == 1
+    # both rows are retired endpoints we once tracked; neither is active
+    assert overview["stats"]["endpoints"] == 2 and overview["stats"]["active"] == 0
 
     model = json.loads(
         (tmp_path / "data" / "models" / f"{slugify('m/a')}.json").read_text()

@@ -213,12 +213,54 @@ def test_b3it_only_retired_endpoint_gets_retired_status(tmp_path):
     (root / "data" / "changes.json").write_text(json.dumps([]))
     (root / "data" / "spend.json").write_text(json.dumps({"cumulative": {}}))
 
-    ov = _build_overview(root)
+    inputs = empty_status_inputs()
+    inputs.endpoints_lt = [
+        Endpoint(api="openrouter", model="m/a", provider="p", cost=(1, 2))
+    ]
+    ov = _build_overview_with(root, inputs)
     ep = next(e for e in ov["endpoints"] if e["slug"] == "m2fb23q")
     assert ep["methods"] == ["b3it"]
     assert ep["status"] == "retired"
     assert len(ep["trace"]) > 0
     assert ov["stats"]["active"] == 1  # only the still-monitoring LT endpoint
+
+
+def test_a_stalled_endpoint_with_a_fresh_trace_is_not_active(tmp_path):
+    """`active` is the headline count the "Tracked" chip filters on, not a trace
+    verdict: an endpoint whose queries have all started failing keeps a "stable"
+    trace status for RETIRED_GAP_DAYS after its last good day, and counting that
+    as active made the headline claim more endpoints than the chip could show."""
+    root = tmp_path / "website"
+    dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 31)]
+    write_lt_endpoint(
+        root, "m2fa23p", "m/a", "p", dates=dates, changes=[], drift=[0.1] * 30
+    )
+    (root / "data" / "changes.json").write_text(json.dumps([]))
+    (root / "data" / "spend.json").write_text(json.dumps({"cumulative": {}}))
+
+    # observed but absent from endpoints_lt, so status.py reads it as stalled
+    ov = _build_overview(root)
+    row = next(e for e in ov["endpoints"] if e["slug"] == "m2fa23p")
+    assert (row["headline"], row["status"]) == ("retired", "stable")
+    assert ov["stats"]["active"] == 0
+    assert ov["stats"]["endpoints"] == 1
+
+
+def test_a_monitored_endpoint_without_a_series_is_active(tmp_path):
+    """The other direction: a freshly onboarded B3IT endpoint is monitored before
+    its second batch gives it a series, so it has no trace status to read."""
+    root = tmp_path / "website"
+    write_b3it_state(root, "m/b", "q", status="monitoring")
+    (root / "data" / "changes.json").write_text(json.dumps([]))
+    (root / "data" / "spend.json").write_text(json.dumps({"cumulative": {}}))
+
+    # its view carries no series, so tracked.py withholds it from the fleet
+    site = site_statuses_for(root, empty_status_inputs())
+    ov = build_overview(root, {}, [], {}, None, site)
+    row = next(e for e in ov["endpoints"] if e["slug"] == slugify("m/b#q"))
+    assert (row["headline"], row["status"]) == ("tracked", None)
+    assert ov["stats"]["active"] == 1
+    assert ov["stats"]["endpoints"] == 1
 
 
 def test_change_count_follows_changes_json_not_the_recomputed_scores(fake_site):
