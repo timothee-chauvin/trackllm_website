@@ -178,9 +178,10 @@ def test_render_endpoint_page_context_for_multi_provider_model(tmp_path):
     assert 'href="../index.html"' in page
     # compare banner links to the model page with the model's own slug
     assert f'href="../models/{model_slug}.html"' in page
-    # endpoint count text, sourced from view["n_endpoints"] -- the banner counts
-    # serving endpoints, which is not the same thing as provider companies
-    assert "tracked on 2 endpoints" in page
+    # provider count text, sourced from view["n_providers"] -- the banner counts
+    # provider companies, which is not the same thing as serving endpoints
+    assert "is served by" in page
+    assert ">2 providers</a>" in page
 
 
 def test_render_emits_provider_pages_and_data(tmp_path):
