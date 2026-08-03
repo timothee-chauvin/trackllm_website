@@ -418,10 +418,10 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 .rbar > u { position: absolute; top: 3px; bottom: 3px; width: 2px; background: var(--text); opacity: 0.55; text-decoration: none; }
 .rbar > b { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-family: var(--mono); font-variant-numeric: tabular-nums;
   font-size: 0.74rem; color: var(--text); font-weight: 600; }
-.rbar.zero { background: transparent; }
+.rbar.zero { background: transparent; height: auto; min-height: 22px; }
 .rbar.zero > b { position: static; display: inline-flex; align-items: center; gap: 0.35rem; color: var(--stable); transform: none; padding-top: 3px; }
-.rbar.zero > b::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--stable); }
-.rbar.nd { background: transparent; }
+.rbar.zero > b::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--stable); flex-shrink: 0; }
+.rbar.nd { background: transparent; height: auto; min-height: 22px; }
 .rbar.nd > b { position: static; transform: none; color: var(--text-dim); font-weight: 500; padding-top: 3px; }
 
 /* ranked boards */
