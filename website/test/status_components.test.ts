@@ -24,12 +24,20 @@ describe("highlight", () => {
 describe("headlineBadge", () => {
   test("dashes the class, spaces the label", () => {
     expect(headlineBadge("too_expensive")).toBe(
-      '<span class="badge st st-too-expensive">too expensive</span>',
+      '<span class="badge st st-too-expensive" role="button" tabindex="0" ' +
+        'data-tip="This endpoint costs more than our tracking budget allows.">too expensive</span>',
     );
   });
 
   test("tracked stays as is", () => {
-    expect(headlineBadge("tracked")).toBe('<span class="badge st st-tracked">tracked</span>');
+    expect(headlineBadge("tracked")).toBe(
+      '<span class="badge st st-tracked" role="button" tabindex="0" ' +
+        'data-tip="This endpoint is actively tracked.">tracked</span>',
+    );
+  });
+
+  test("every headline has a popover", () => {
+    for (const h of HEADLINE_ORDER) expect(headlineBadge(h)).toContain("data-tip=");
   });
 });
 

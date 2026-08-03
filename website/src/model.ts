@@ -386,7 +386,9 @@ export async function init(): Promise<void> {
       })
       .join("") +
     (hasTimeline ? `<div class="axis"><div class="ticks" id="ticks"></div></div>` : "");
-  bindTips(cmpEl);
+  // document.body, not cmpEl: the status badge up in #summary (headlineBadge, above)
+  // wants the same popover as the ones in #cmp, and one binding covers both.
+  bindTips(document.body);
   if (hasTimeline) bindReadout(cmpEl);
 
   const ticksEl = document.getElementById("ticks");

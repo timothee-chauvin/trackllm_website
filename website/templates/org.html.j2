@@ -62,3 +62,8 @@
   </section>
 </main>
 {% endblock %}
+
+{% block scripts %}
+    {# no other script on this page; it only needs the model badges' popover #}
+    <script type="module" src="{{ nav_prefix }}js/tips.js"></script>
+{% endblock %}

@@ -96,6 +96,9 @@ a { color: inherit; text-decoration: none; }
 .badge.st-retired { color: var(--retired); background: var(--retired-bg); border-color: color-mix(in srgb, var(--retired) 36%, transparent); }
 .badge.st-untrackable { color: var(--changed); background: var(--changed-bg); border-color: color-mix(in srgb, var(--changed) 34%, transparent); }
 .badge.st-errors-out { color: var(--alert); background: var(--alert-bg); border-color: color-mix(in srgb, var(--alert) 34%, transparent); }
+/* every badge, pill and status chip carries a data-tip popover (components.ts::bindTips) */
+.badge[data-tip], .pill[data-tip], .chip[data-tip] { cursor: help; }
+.badge[data-tip]:hover, .pill[data-tip]:hover { filter: brightness(1.12); }
 
 mark { background: var(--accent-quiet); color: var(--accent); border-radius: 3px; padding: 0 1px; }
 
@@ -244,6 +247,14 @@ td .prov-cell { color: var(--text-muted); font-family: var(--mono); font-size: 0
 /* untracked directory rows: the one-line reason sits where the sparkline would */
 td.reason-cell { max-width: 340px; }
 td.reason-cell .reason { display: block; max-width: 340px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-dim); font-size: 0.78rem; }
+/* Status/trace cell: the badge or pill is its own popover tap target (bindTips),
+   so the link to the endpoint page cannot wrap it (a button inside an <a> is
+   invalid, and would eat the badge's own clicks). .cell-go instead stretches
+   over the whole cell, under the badge in z-order -- see components.ts::
+   untrackedDirCells / directory.ts::trackedDirCells. */
+td.cell-tip { position: relative; }
+td.cell-tip > .badge, td.cell-tip > .pill { position: relative; z-index: 1; }
+td.cell-tip > .cell-go { position: absolute; inset: 0; z-index: 0; }
 td .cc { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 td .cc.zero { color: var(--text-dim); }
 td .cc.some { color: var(--changed); font-weight: 600; }
@@ -261,7 +272,7 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 .head h1 { font-size: clamp(1.4rem, 3vw, 1.9rem); font-weight: 660; letter-spacing: -0.02em; margin: 0.2rem 0 0.3rem; }
 .head .prov { font-family: var(--mono); color: var(--text-muted); font-size: 0.95rem; }
 .head h1 a:hover, .head .prov a:hover { color: var(--accent); }
-.head .badges { display: flex; gap: 0.4rem; margin-top: 0.7rem; }
+.head .badges { display: flex; gap: 0.4rem; margin-top: 0.7rem; flex-wrap: wrap; }
 
 .statuscard { display: grid; grid-template-columns: repeat(3, auto); gap: 1.6rem; padding: 0.9rem 1.3rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
 .statuscard .k { font-size: 0.68rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.25rem; }
@@ -344,7 +355,8 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 /* built under the strip it captions, so it is as wide as that strip and no wider:
    an unbroken run of dates has to wrap rather than push the row's columns apart */
 .tipline { padding: 0.3rem 0 0.1rem; font-family: var(--mono); font-size: 0.72rem;
-  line-height: 1.4; color: var(--text-muted); overflow-wrap: anywhere; }
+  line-height: 1.4; color: var(--text-muted); overflow-wrap: anywhere;
+  flex-basis: 100%; /* drop to its own line in a flex row (.head .badges, .cmp .pv .mm) */ }
 
 /* An info button beside a label (e.g. "Vetting" on the spend page), sharing the
    tap/click/focus data-tip + bindTips mechanism above. */
@@ -377,7 +389,7 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 .cmp .row:hover { background: var(--surface-2); }
 .cmp .pv a { font-family: var(--mono); font-size: 0.84rem; font-weight: 550; }
 .cmp .pv a:hover { color: var(--accent); }
-.cmp .pv .mm { display: flex; align-items: center; gap: 0.3rem; margin-top: 0.2rem; }
+.cmp .pv .mm { display: flex; align-items: center; gap: 0.3rem; margin-top: 0.2rem; flex-wrap: wrap; }
 .cmp .pv .mm a { font-size: 0.65rem; font-weight: 400; color: var(--text-dim); }
 /* the strips are the shared readout's hit target: touch-action keeps a swipe over
    one scrolling the page, while a sideways drag scrubs the timeline */

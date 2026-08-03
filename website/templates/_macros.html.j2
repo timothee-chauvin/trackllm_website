@@ -1,14 +1,20 @@
-{# Headline status badge; must stay in sync with components.ts::headlineBadge. #}
-{% macro headline_badge(h) %}<span class="badge st st-{{ h | replace("_", "-") }}">{{ h | replace("_", " ") }}</span>{% endmacro %}
+{# Headline status badge; must stay in sync with components.ts::headlineBadge
+   (both look their meaning up in STATUS_COPY -- render.py registers it as a
+   Jinja global, components.ts::HEADLINE_COPY is its hand-kept TS twin). The
+   popover itself is components.ts::bindTips, bound page-wide; a badge only
+   has to carry data-tip and the button contract (see the chip macro below). #}
+{% macro headline_badge(h) %}<span class="badge st st-{{ h | replace("_", "-") }}" role="button" tabindex="0" data-tip="{{ STATUS_COPY[h] }}">{{ h | replace("_", " ") }}</span>{% endmacro %}
 
 {# A filter chip. It is a span, not a button, so the button role and the pressed
    state have to be spelled out here; components.ts::toggleChip keeps aria-pressed
    in sync from then on, and bindActivation gives it Enter/Space. `attr` is the
    dataset key the page's handler reads ("f" for the method/change filters, "st"
-   for the status group). #}
+   for the status group). A "st" chip's value is a headline name, so its meaning
+   is the same STATUS_COPY lookup the badge above uses -- "f" chips are feature
+   filters with no single-status meaning, so they get no tip. #}
 {% macro chip(label, attr, value, state="", on=false) -%}
 <span class="chip{{ " " ~ state if state }}{{ " on" if on }}" data-{{ attr }}="{{ value }}"
-  role="button" tabindex="0" aria-pressed="{{ "true" if on else "false" }}">{{ label }}</span>
+  role="button" tabindex="0" aria-pressed="{{ "true" if on else "false" }}"{% if attr == "st" %} data-tip="{{ STATUS_COPY[value] }}"{% endif %}>{{ label }}</span>
 {%- endmacro %}
 
 {# The toolbar search box: the label's only content is a decorative magnifier, so
