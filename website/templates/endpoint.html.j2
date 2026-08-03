@@ -90,5 +90,7 @@
 
 {% block scripts %}
     <script type="application/json" id="manifest">{{ manifest | tojson }}</script>
-    {% if methods %}<script type="module" src="../js/endpoint.js"></script>{% endif %}
+    {% if methods %}<script type="module" src="../js/endpoint.js"></script>
+    {% else %}{# untracked: only the server-rendered headline badge needs the popover #}
+    <script type="module" src="../js/tips.js"></script>{% endif %}
 {% endblock %}

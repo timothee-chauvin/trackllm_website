@@ -6,6 +6,7 @@ import {
   MIN_ENDPOINT_YEARS,
   bindActivation,
   bindFilterChips,
+  bindTips,
   esc,
   eventRow,
   highlight,
@@ -374,6 +375,8 @@ export async function init(): Promise<void> {
     toggleChip(chip, st ? statusFilters : active, st ?? chip.dataset.f!);
     render();
   });
+  // one binding for the status chips above and every directory badge/pill render() draws
+  bindTips(document.body);
 }
 
 init();

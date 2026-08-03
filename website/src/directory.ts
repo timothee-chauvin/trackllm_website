@@ -103,10 +103,11 @@ function stableCell(r: EndpointRow): string {
 }
 
 /** The five directory cells after model/provider for a row with a series --
- *  the untracked counterpart is components.ts::untrackedDirCells. */
+ *  the untracked counterpart is components.ts::untrackedDirCells, including the
+ *  .cell-tip / .cell-go split that keeps the pill's own popover out of the link. */
 function trackedDirCells(r: EndpointRow, root: string): string {
   const isLT = r.methods.includes("lt");
-  return `<td><a href="${root}endpoints/${esc(r.slug)}.html">${statusPill(r.status!)}</a></td>
+  return `<td class="cell-tip">${statusPill(r.status!)}<a class="cell-go" href="${root}endpoints/${esc(r.slug)}.html" aria-label="View endpoint"></a></td>
     <td class="r"><span class="cc ${r.nChanges ? "some" : "zero"}">${r.nChanges}</span></td>
     <td class="col-hide"><span class="methods">${methodBadges(r.methods)}</span></td>
     <td class="r col-hide">${stableCell(r)}</td>

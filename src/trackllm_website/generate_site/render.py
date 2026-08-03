@@ -16,7 +16,7 @@ from trackllm_website.generate_site import overview as overview_mod
 from trackllm_website.generate_site import provider as provider_mod
 from trackllm_website.generate_site import spend as spend_mod
 from trackllm_website.generate_site.naming import base_provider
-from trackllm_website.generate_site.status import status_json
+from trackllm_website.generate_site.status import STATUS_COPY, status_json
 from trackllm_website.generate_site.status_io import (
     StatusInputs,
     lt_stalled_slugs,
@@ -64,6 +64,9 @@ def render_site(
     endpoints_dir.mkdir(parents=True, exist_ok=True)
 
     env = Environment(loader=FileSystemLoader(templates_dir), autoescape=True)
+    # headline_badge and the "st" filter chips look their tooltip text up here, so
+    # STATUS_COPY (status.py) stays the one place that copy is written.
+    env.globals["STATUS_COPY"] = STATUS_COPY
     index_template = env.get_template("index.html.j2")
     endpoint_template = env.get_template("endpoint.html.j2")
     spend_template = env.get_template("spend.html.j2")

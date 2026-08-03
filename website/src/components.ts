@@ -110,9 +110,31 @@ export function showLoadError(mountId: string, what: string): void {
     This is a loading error, not an absence of data — try reloading the page.</div>`;
 }
 
-/** Headline status badge; must stay in sync with the Jinja macro (_macros.html.j2). */
+/** Why a headline is what it is, in the visitor's words -- the popover text for
+ *  headlineBadge. Must stay in sync with STATUS_COPY (status.py): every
+ *  HEADLINE_ORDER name is also a STATUS_COPY key, with the same meaning, so
+ *  this is that subset copied by hand (the Jinja macro reads STATUS_COPY
+ *  itself instead, via the Jinja global render.py registers). */
+export const HEADLINE_COPY: Record<string, string> = {
+  tracked: "This endpoint is actively tracked.",
+  retired: "We tracked this endpoint, but tracking has since been retired.",
+  untrackable:
+    "This endpoint claims neither temperature control nor logprobs, so no tracking method can work — presumably to prevent distillation.",
+  too_expensive: "This endpoint costs more than our tracking budget allows.",
+  not_selected:
+    "This endpoint vetted fine, but the selection budget went to more popular models.",
+  errors_out: "Our probes of this endpoint error out.",
+  pending: "This endpoint has not been evaluated for tracking yet.",
+  free_excluded:
+    "Free endpoints are excluded from tracking: their routing and rate limits are too unstable.",
+};
+
+/** Headline status badge; must stay in sync with the Jinja macro (_macros.html.j2).
+ *  data-tip is bindTips' contract (see below): hover, tap, and Enter/Space all
+ *  read it off the element itself, so one popover implementation serves every
+ *  badge and chip in the site. */
 export function headlineBadge(headline: string): string {
-  return `<span class="badge st st-${headline.replace(/_/g, "-")}">${esc(headline.replace(/_/g, " "))}</span>`;
+  return `<span class="badge st st-${headline.replace(/_/g, "-")}" role="button" tabindex="0" data-tip="${esc(HEADLINE_COPY[headline])}">${esc(headline.replace(/_/g, " "))}</span>`;
 }
 
 /** Sort rank for a directory's Status column: tracked rows by trace status,
@@ -129,12 +151,16 @@ export function statusRank(r: {
 }
 
 /** The five directory cells after model/provider for a row with no series:
- *  headline badge in the status column, the one-line reason in the trace column. */
+ *  headline badge in the status column, the one-line reason in the trace column.
+ *  The badge is its own tap target (bindTips) and a real link to the endpoint page
+ *  has to sit somewhere too -- an anchor cannot wrap a button, so .cell-go is a
+ *  sibling stretched over the cell instead (.cell-tip in style.css), under the
+ *  badge in z-order. See trackedDirCells (directory.ts) for the tracked twin. */
 export function untrackedDirCells(
   r: { slug: string; headline: string; reason: string },
   root: string
 ): string {
-  return `<td><a href="${root}endpoints/${esc(r.slug)}.html">${headlineBadge(r.headline)}</a></td>
+  return `<td class="cell-tip">${headlineBadge(r.headline)}<a class="cell-go" href="${root}endpoints/${esc(r.slug)}.html" aria-label="View endpoint"></a></td>
     <td class="r"><span class="cc zero">—</span></td>
     <td class="col-hide"></td>
     <td class="r col-hide"><span class="org-cell">—</span></td>
@@ -147,8 +173,19 @@ export function methodBadges(methods: string[]): string {
     .join("");
 }
 
+/** The trace-status pill's popover text. Mirrors overview.py::_row_state: an
+ *  endpoint is "retired" there once its pipeline verdict says so or its last
+ *  observation is more than RETIRED_GAP_DAYS (14) old; otherwise "changed" if
+ *  its last detected change is within RECENT_CHANGE_DAYS (60d), else "stable". */
+const TRACE_COPY: Record<string, string> = {
+  changed: "This endpoint is actively tracked and moved within the last 60 days.",
+  stable: "This endpoint is actively tracked and has shown no change in the last 60 days.",
+  retired:
+    "This endpoint was tracked, but has gone quiet: either the pipeline retired it, or it hasn't answered in over 14 days.",
+};
+
 export function statusPill(status: string): string {
-  return `<span class="pill ${status}"><span class="led"></span>${status}</span>`;
+  return `<span class="pill ${status}" role="button" tabindex="0" data-tip="${esc(TRACE_COPY[status])}"><span class="led"></span>${status}</span>`;
 }
 
 export function relDays(n: number): string {
@@ -327,15 +364,27 @@ export function stripTip(lead: string, parts: string[]): string {
   return ` tabindex="0" role="img" aria-label="${text}" data-tip="${text}"`;
 }
 
-/** The caption a strip writes into, built directly under the strip that was
- *  activated: one caption at the foot of the panel sits below every other row, which
- *  on a model page listing dozens of endpoints puts it thousands of pixels down the
- *  page -- a reader who taps the first strip sees nothing but a focus ring.
- *  aria-hidden because a screen reader has already read these words off the strip. */
-function tipLine(text: string): HTMLElement {
+/** The caption a strip or badge writes into, built directly under the element that
+ *  was activated: one caption at the foot of the panel sits below every other row,
+ *  which on a model page listing dozens of endpoints puts it thousands of pixels
+ *  down the page -- a reader who taps the first one sees nothing but a focus ring.
+ *
+ *  A strip's aria-label already says these same words (stripTip), so its caption is
+ *  aria-hidden -- purely visual, for the sighted readers a hover-only <title> would
+ *  have missed. A badge has no aria-label (its own visible text is its name), so
+ *  its caption instead gets an id and becomes the accessible description: bindTips
+ *  wires it to the badge via aria-describedby while it is open, which is how a
+ *  screen reader user gets the same words a sighted tap or hover reveals. */
+let tipId = 0;
+function tipLine(text: string, described: boolean): HTMLElement {
   const el = document.createElement("div");
   el.className = "tipline";
-  el.setAttribute("aria-hidden", "true");
+  if (described) {
+    el.id = `tip-${++tipId}`;
+    el.setAttribute("role", "status");
+  } else {
+    el.setAttribute("aria-hidden", "true");
+  }
   el.textContent = text;
   return el;
 }
@@ -343,26 +392,45 @@ function tipLine(text: string): HTMLElement {
 /** How far a press may travel and still count as a tap rather than a scroll. */
 const TAP_SLOP = 10;
 
-/** Tapping, or focusing, a strip captions it; tapping it again, or leaving it,
- *  takes the caption away. */
+/** How a caption got opened, ranked by how deliberate the gesture was. A mouse
+ *  moving onto a hover-capable element opens it "hover"-cheap, and a real click
+ *  on that same element arrives right after (the browser fires mouseover before
+ *  the pointer events a click resolves into) -- ORIGIN_RANK is what lets that
+ *  click *pin* the caption open instead of reading as "close what hover just
+ *  opened". Only a tap/click/Enter on an already-tap-pinned element closes it. */
+const ORIGIN_RANK = { hover: 0, focus: 1, tap: 2 };
+type TipOrigin = keyof typeof ORIGIN_RANK;
+
+/** Tapping, hovering, or focusing a strip or badge captions it; tapping it again,
+ *  leaving it, or moving the pointer or focus elsewhere takes the caption away.
+ *  One binding (on `root`, typically document.body) serves every [data-tip]
+ *  element on the page, present at bind time or added to the DOM afterwards. */
 export function bindTips(root: Element): void {
-  // `byFocus` is what keeps a tap from undoing itself: one tap is a focusin and
-  // then an activation, and only the second of the two may close what the first
-  // opened.
-  let open: { el: Element; byFocus: boolean } | null = null;
+  let open: { el: Element; origin: TipOrigin } | null = null;
   let press: { el: Element | null; x: number; y: number } | null = null;
   const close = (): void => {
-    root.querySelector(".tipline")?.remove();
+    const line = root.querySelector(".tipline");
+    if (line?.hasAttribute("role")) open?.el.removeAttribute("aria-describedby");
+    line?.remove();
     open = null;
   };
-  const show = (el: Element, byFocus: boolean): void => {
+  const show = (el: Element, origin: TipOrigin): void => {
+    // already open on this element: a weaker origin (e.g. a hover while a tap
+    // already pinned it) must not steal the pin, so only ever rank up
+    if (open?.el === el) {
+      if (ORIGIN_RANK[origin] > ORIGIN_RANK[open.origin]) open.origin = origin;
+      return;
+    }
     close();
-    el.insertAdjacentElement("afterend", tipLine(el.getAttribute("data-tip")!));
-    open = { el, byFocus };
+    const described = !el.hasAttribute("aria-label");
+    const line = tipLine(el.getAttribute("data-tip")!, described);
+    el.insertAdjacentElement("afterend", line);
+    if (described) el.setAttribute("aria-describedby", line.id);
+    open = { el, origin };
   };
   const activate = (el: Element): void => {
-    if (open?.el === el && !open.byFocus) close();
-    else show(el, false);
+    if (open?.el === el && open.origin === "tap") close();
+    else show(el, "tap");
   };
 
   // The gesture is read from the pointer, not from `click`, because showing a
@@ -385,12 +453,33 @@ export function bindTips(root: Element): void {
     if (!from) return;
     if (Math.abs(p.clientX - from.x) > TAP_SLOP || Math.abs(p.clientY - from.y) > TAP_SLOP) return;
     if (from.el) activate(from.el);
-    else close();
+    // Deferred: closing here shrinks whatever cell the caption was in, and for a
+    // badge sharing its cell with a stretched .cell-go link, a mouse's click
+    // fires synchronously right after this same pointerup -- Chromium hit-tests
+    // it fresh, against the now-shrunk layout, and can retarget it clean off the
+    // link. A tick later, the link (if that is what was pressed) has already had
+    // its click; nothing here is waiting on the caption being gone yet.
+    else setTimeout(close, 0);
   });
   // a scroll that began on a strip is not a tap on it
   root.addEventListener("pointercancel", () => {
     press = null;
   });
+  // A tap can grow or shrink the page (opening or closing a caption elsewhere,
+  // e.g. a status chip's own popover further up the page) before the browser gets
+  // around to synthesizing touch's compatibility click event, and Chromium then
+  // retargets that click to whatever is now under the finger -- for a badge
+  // sharing its cell with a stretched .cell-go link, that is a real navigation.
+  // touchend, unlike pointerup, is what suppresses the click it would otherwise
+  // produce; its own target is never retargeted, so it still names the element
+  // the finger actually landed on.
+  root.addEventListener(
+    "touchend",
+    (e) => {
+      if ((e.target as Element).closest?.("[data-tip]")) e.preventDefault();
+    },
+    { passive: false }
+  );
   bindKeyActivation(root, "[data-tip]", activate);
   // :focus-visible, because a pointer focuses too: a tap that dismisses a caption
   // reflows the page, and the strip that slides under the finger would otherwise
@@ -398,13 +487,48 @@ export function bindTips(root: Element): void {
   // (happy-dom answers false to it, so the keyboard path is browser-verified.)
   root.addEventListener("focusin", (e) => {
     const el = (e.target as Element).closest?.("[data-tip]");
-    if (el && open?.el !== el && el.matches(":focus-visible")) show(el, true);
+    if (el && open?.el !== el && el.matches(":focus-visible")) show(el, "focus");
   });
-  // only when the strip that owns the caption is the one being left: pressing
-  // another strip moves the caption first, and focus follows afterwards
+  // leaving the element that owns the caption closes it outright, regardless of
+  // how it was opened -- a tap-pinned caption should not survive its own blur.
+  // Exception: a badge sharing its cell with a stretched .cell-go link (the
+  // tracked/untracked directory rows) loses focus to that very link on the
+  // press that is about to click it -- closing here would shrink the cell out
+  // from under a click already in flight (the retargeting stripTip's own
+  // comment above describes) for a real navigation this time, not a caption.
+  // The link is about to take the page away regardless, so the caption is left
+  // to whatever removes it next.
   root.addEventListener("focusout", (e) => {
-    if (open?.el === e.target) close();
+    const to = (e as FocusEvent).relatedTarget;
+    if (open?.el === e.target && !(to instanceof Node && open.el.parentElement?.contains(to))) {
+      close();
+    }
   });
+
+  // Hover, for the desktop mice that never tap: gated on a real hover-capable
+  // pointer so a touchscreen's compatibility mouse events (dispatched well after
+  // the tap this same gesture already handled) never fight the tap-toggle above.
+  if (matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    root.addEventListener("mouseover", (e) => {
+      const el = (e.target as Element).closest?.("[data-tip]");
+      if (el) show(el, "hover");
+    });
+    root.addEventListener("mouseout", (e) => {
+      const from = (e.target as Element).closest?.("[data-tip]");
+      const to = (e as MouseEvent).relatedTarget;
+      // moving onto the caption itself, or deeper into the same element, is not a
+      // leave; and a hover only ever closes what hover itself opened -- a click's
+      // pin outlives the mouse moving away
+      if (
+        from &&
+        open?.el === from &&
+        open.origin === "hover" &&
+        !(to instanceof Node && from.parentElement?.contains(to))
+      ) {
+        close();
+      }
+    });
+  }
 }
 
 /** The standard filter toolbar: each .chip toggles its data-f flag, then re-renders. */
