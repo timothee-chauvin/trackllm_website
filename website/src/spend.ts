@@ -1,13 +1,19 @@
 import Plotly from "plotly.js-dist-min";
 
-import { showLoadError } from "./components";
+import { bindTips, showLoadError } from "./components";
 
 interface SpendData {
   group_order: string[];
+  group_label: Record<string, string>;
   cumulative: Record<string, number>;
   last_30d: Record<string, number>;
   daily: { date: string; groups: Record<string, number> }[];
-  by_endpoint: { slug: string; groups: Record<string, number>; total: number }[];
+  by_endpoint: {
+    slug: string;
+    name: string;
+    groups: Record<string, number>;
+    total: number;
+  }[];
 }
 
 // Group names and order come from spend.json (single source: generate_site/spend.py);
@@ -47,6 +53,9 @@ function textColors(c: string): Record<string, string> {
 }
 
 async function init(): Promise<void> {
+  // Wired up unconditionally: the group tables (and the Vetting info button in
+  // them) are server-rendered regardless of whether the chart itself mounts.
+  bindTips(document.body);
   const el = document.getElementById("spend-chart");
   if (!el) return;
   let data: SpendData;
@@ -66,7 +75,7 @@ async function init(): Promise<void> {
       x: dates,
       y: data.daily.map((d) => d.groups[g] ?? 0),
       type: "bar" as const,
-      name: g,
+      name: data.group_label[g] ?? g,
       marker: { color: GROUP_COLOR[g] ?? DEFAULT_GROUP_COLOR },
     }));
   // The color goes into the first paint, not into a relayout after it: Plotly
