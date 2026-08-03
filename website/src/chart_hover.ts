@@ -2,7 +2,7 @@
 // tapping one names the day under the pointer and that lane's value on it, in that
 // lane's units. There is no crosshair across both -- the two lanes answer different
 // questions and are compared through the changes table, not by eye at a pixel.
-import { esc } from "./components";
+import { MARK_R, placeTip, tipHTML } from "./chart_tip";
 import {
   type FocusB3IT,
   type FocusLT,
@@ -12,10 +12,6 @@ import {
   laneGeoms,
   laneY,
 } from "./chart_geom";
-
-const MARK_R = 3.4;
-const TIP_DX = 14; // the tip sits beside the pointer, never under it
-const TIP_DY = -10;
 
 /** Index of the sample nearest `xPx` (SVG user units). The series is sorted, but
  *  short enough that a scan is cheaper to read than a bisection. */
@@ -88,13 +84,9 @@ export function bindHover(
     const [date, v] = lane.series[i];
     const x = axis.fx(date);
     mark.innerHTML = `<circle cx="${x.toFixed(1)}" cy="${laneY(lane, v).toFixed(1)}" r="${MARK_R}" fill="${lane.col}" stroke="var(--surface-2)" stroke-width="1.5"/>`;
-    tipEl.innerHTML = `<span class="d">${esc(date)}</span><span class="v" style="color:${lane.col}">${esc(lane.fmt(v))}</span>`;
+    tipEl.innerHTML = tipHTML(date, [{ text: lane.fmt(v), col: lane.col }]);
     tipEl.hidden = false;
-
-    const wrap = chartEl.getBoundingClientRect();
-    const left = ev.clientX - wrap.left + TIP_DX;
-    tipEl.style.left = `${Math.max(0, Math.min(left, wrap.width - tipEl.offsetWidth))}px`;
-    tipEl.style.top = `${ev.clientY - wrap.top + TIP_DY}px`;
+    placeTip(tipEl, chartEl, ev);
   };
 
   const laneOf = (ev: Event): LaneGeom | undefined => {
