@@ -235,11 +235,12 @@ async def run_endpoint(
                         reinit_spend.cost,
                     )
                 )
-            # Raise so run_isolated reports it in report.failures.
-            raise TimeoutError(
+            logger.warning(
                 f"{state.endpoint}: re-init exceeded "
-                f"{config.bi.monitor.reinit_timeout_seconds}s"
+                f"{config.bi.monitor.reinit_timeout_seconds}s (streak "
+                f"{state.reinit_timeout_streak}/{config.bi.monitor.max_reinit_timeouts})"
             )
+            return
         state.reinit_timeout_streak = 0
         close_epoch()
         if event_rows is not None:
@@ -286,8 +287,8 @@ async def monitor() -> MonitorReport:
     failures: list[str] = []
 
     # An endpoint dropped by resolve_strategies is never sampled: no batch means
-    # the stall detector never advances, so without a failure entry it would sit
-    # in "monitoring" forever with a green check. Report it so main() fails loudly.
+    # the stall detector never advances, so without a digest row it would sit
+    # in "monitoring" forever, invisibly. The row recurs daily until resolved.
     for state in monitoring:
         key = str(state.endpoint)
         if key in strategies:
@@ -297,7 +298,7 @@ async def monitor() -> MonitorReport:
         # than fail the run daily for the rest of the deselection grace period.
         # If it comes back, the catalog re-lists it and the recheck schedule
         # resurrects it. All-404 on a still-listed endpoint is an anomaly, not
-        # a known removal, and keeps failing loudly.
+        # a known removal: no retirement, a red digest row every day it lasts.
         if state.deselected_since is not None and probe_errors_unreachable(
             failed.get(key, [])
         ):
@@ -323,7 +324,16 @@ async def monitor() -> MonitorReport:
             )
             continue
         logger.error(f"{key}: no strategy resolved ({failed.get(key)}); skipped")
-        failures.append(key)
+        event_rows.append(
+            MonitorRow(
+                state.endpoint.model,
+                state.endpoint.provider,
+                "probes_failed",
+                None,
+                None,
+                0.0,
+            )
+        )
 
     # Absolute, so the probe above and every wave of endpoints eat into the same
     # budget: what matters is when the *job* ends, not how long each part took.
@@ -333,7 +343,6 @@ async def monitor() -> MonitorReport:
 
     def cut_off(state: EndpointBIState, why: str) -> None:
         logger.error(f"{state.endpoint}: {why}")
-        failures.append(str(state.endpoint))
         event_rows.append(
             MonitorRow(
                 state.endpoint.model,
@@ -351,8 +360,8 @@ async def monitor() -> MonitorReport:
             return
         try:
             # Nested so that only the job deadline expiring reaches the outer
-            # handler: run_endpoint raises a TimeoutError of its own when a re-init
-            # hits its deadline, and that is a different event.
+            # handler: an exception escaping run_endpoint is a different event —
+            # a bug, the only thing that still fails the workflow.
             async with asyncio.timeout_at(deadline):
                 try:
                     await run_endpoint(
@@ -366,6 +375,16 @@ async def monitor() -> MonitorReport:
                 except Exception:
                     logger.exception(f"Monitor run failed for {state.endpoint}")
                     failures.append(str(state.endpoint))
+                    event_rows.append(
+                        MonitorRow(
+                            state.endpoint.model,
+                            state.endpoint.provider,
+                            "error",
+                            None,
+                            None,
+                            0.0,
+                        )
+                    )
         except TimeoutError:
             # Nothing is persisted beyond the batch run_endpoint already saved, so
             # the next run re-detects whatever this one was in the middle of.
@@ -391,8 +410,9 @@ async def monitor() -> MonitorReport:
 def main() -> None:
     report = asyncio.run(monitor())
     send_monitoring_digest(report, config.spend_dir)
-    # Fail the run (after saving and sending the digest) so a green check
-    # really means every endpoint's batch was saved.
+    # Fail the run (after saving and sending the digest) only for exceptions that
+    # escaped run_endpoint: a failure email means a bug. Diagnosed conditions
+    # (re-init timeouts, unresolved probes, deadline cutoffs) are digest rows.
     if report.failures:
         raise RuntimeError(
             f"monitor run failed unexpectedly for {len(report.failures)} "
