@@ -231,9 +231,11 @@ export async function init(): Promise<void> {
       ).join("");
       timelineEl.innerHTML = `<div class="tl">${lanes}</div>
         <div class="tlaxis"><div class="ticks">${ticks}</div></div>`;
-      bindTips(timelineEl);
     }
   }
+  // document.body, not timelineEl: the directory table further down the page
+  // carries the same popover on its status pills and badges (directory.ts).
+  bindTips(document.body);
 
   const variantBody = document.getElementById("variantBody");
   if (variantBody) {
