@@ -246,12 +246,6 @@ endpoints_lt:
   - 0.15
   - 0.4
 - api: openrouter
-  model: openai/gpt-oss-120b
-  provider: mancer/fp8
-  cost:
-  - 0.06
-  - 0.5
-- api: openrouter
   model: google/gemma-4-26b-a4b-it
   provider: nextbit/bf16
   cost:
@@ -263,6 +257,12 @@ endpoints_lt:
   cost:
   - 0.3
   - 0.3
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: mancer/fp8
+  cost:
+  - 0.1
+  - 0.5
 - api: openrouter
   model: qwen/qwen3-30b-a3b-instruct-2507
   provider: alibaba/fp8

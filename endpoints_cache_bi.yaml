@@ -693,6 +693,12 @@ too_expensive:
   - 15.0
 - api: openrouter
   model: moonshotai/kimi-k3
+  provider: morph/fast
+  cost:
+  - 6.0
+  - 22.5
+- api: openrouter
+  model: moonshotai/kimi-k3
   provider: nebius/fp4
   cost:
   - 3.0
@@ -2794,6 +2800,14 @@ unprobeable:
   reason: flaky
   detail: 'cached: hidden reasoning'
 - api: openrouter
+  model: google/gemini-2.5-pro-preview
+  provider: google-vertex/us
+  cost:
+  - 1.25
+  - 10.0
+  reason: flaky
+  detail: 'cached: hidden reasoning'
+- api: openrouter
   model: google/gemini-2.5-pro-preview-05-06
   provider: google-vertex/eu
   cost:
@@ -3060,6 +3074,14 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
+  model: mistralai/mistral-nemo
+  provider: parasail/fp8
+  cost:
+  - 0.03
+  - 0.03
+  reason: flaky
+  detail: 'cached: hidden reasoning'
+- api: openrouter
   model: moonshotai/kimi-k2.6
   provider: baseten/fp4
   cost:
@@ -3211,12 +3233,8 @@ unprobeable:
   reason: flaky
   detail: 'cached: hidden reasoning'
 failure_streaks:
-  openrouter#deepseek/deepseek-v4-flash-0731#atlas-cloud/fp8:
-    count: 2
-    last_error: 'plain: 0 Timeout after 15.0s'
-  openrouter#google/gemini-2.5-pro-preview#google-vertex/us:
-    count: 2
-    last_error: 'cached: hidden reasoning'
-  openrouter#mistralai/mistral-nemo#parasail/fp8:
-    count: 2
-    last_error: 'cached: hidden reasoning'
+  openrouter#tencent/hy3-preview#baidu/fp8:
+    count: 1
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"tencent/hy3-preview
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rat...'

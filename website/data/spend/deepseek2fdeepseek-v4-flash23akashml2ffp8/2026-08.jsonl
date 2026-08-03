@@ -25,3 +25,4 @@
 {"timestamp":"2026-08-02T21:44:12Z","kind":"reinit","cost":0.01458729999999643,"n_queries":15562,"n_errors":677}
 {"timestamp":"2026-08-03T00:12:30Z","kind":"lt","cost":1.372e-6,"n_queries":2,"n_errors":0}
 {"timestamp":"2026-08-03T04:02:25Z","kind":"lt","cost":1.372e-6,"n_queries":2,"n_errors":0}
+{"timestamp":"2026-08-03T04:26:55Z","kind":"vetting","cost":6.86e-7,"n_queries":1,"n_errors":0}
