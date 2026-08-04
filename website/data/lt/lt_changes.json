@@ -1035,5 +1035,6 @@
   "deepseek2fdeepseek-v4-flash23ionstream2ffp4": [],
   "z-ai2fglm-5.223wafer2ffast": [],
   "google2fgemma-4-26b-a4b-it23ionstream2fbf16": [],
-  "deepseek2fdeepseek-v4-pro23cloudflare": []
+  "deepseek2fdeepseek-v4-pro23cloudflare": [],
+  "gryphe2fmythomax-l2-13b23parasail2ffp16": []
 }
