@@ -64,6 +64,9 @@ jobs:
       - name: Generate static site
         run: uv run python -m trackllm_website.generate_site
 
+      - name: Prune files the site never serves
+        run: ./scripts/prune_pages_artifact.sh website
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
         with:
