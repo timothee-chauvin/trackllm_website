@@ -1,0 +1,26 @@
+{
+  "endpoint": {
+    "api": "openrouter",
+    "model": "moonshotai/kimi-k2.6",
+    "provider": "decart/fp4",
+    "cost": [
+      0.59,
+      3.4
+    ],
+    "max_logprobs": null,
+    "cost_per_request": 8.71e-6,
+    "created": "2026-04-20T15:36:42Z",
+    "last_seen": "2026-08-04T04:00:38Z",
+    "supports_temperature": true,
+    "supports_logprobs": true
+  },
+  "status": "retired",
+  "retired": {
+    "reason": "no_bis",
+    "since": "2026-08-04T04:07:03Z",
+    "last_recheck": "2026-08-04T04:07:03Z"
+  },
+  "epochs": [],
+  "deselected_since": null,
+  "reinit_timeout_streak": 0
+}
