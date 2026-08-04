@@ -1,0 +1,18 @@
+{
+  "prompt": "x",
+  "endpoint": {
+    "api": "openrouter",
+    "model": "qwen/qwen3-vl-32b-instruct",
+    "provider": "alibaba/fp8",
+    "cost": [
+      0.104,
+      0.416
+    ],
+    "max_logprobs": null,
+    "cost_per_request": null,
+    "created": null,
+    "last_seen": null,
+    "supports_temperature": null,
+    "supports_logprobs": null
+  }
+}
