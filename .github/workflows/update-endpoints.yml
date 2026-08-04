@@ -29,6 +29,13 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
+    - name: Checkout data repo
+      uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      with:
+        repository: timothee-chauvin/trackllm_data
+        path: website/data
+        ssh-key: ${{ secrets.DATA_REPO_DEPLOY_KEY }}
+
     - name: Set up Python
       uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
       with:
@@ -55,11 +62,11 @@ jobs:
       # cancel stays a clean abort (cancelled() => this step is skipped).
       if: ${{ !cancelled() }}
       run: |
-        git config --local user.email "github-actions[bot]@users.noreply.github.com"
-        git config --local user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
         # Scoped to what update_endpoints.py writes. Keep in sync when a new writer
         # is added: a missing pathspec silently drops that run's data.
-        # website/data/b3it rather than its state/phase_2/onboarding_progress subdirs:
+        # b3it rather than its state/phase_2/onboarding_progress subdirs:
         # onboarding_progress is rmtree'd on every normal onboarding return, and
         # `git add` on a path that is in neither the worktree nor the index exits 128,
         # which under `bash -e` would abort this step before the commit — turning an
@@ -68,14 +75,18 @@ jobs:
         # hundreds of tracked files) and the other subdirs under it (tokenizers,
         # logprob_stats, phase_1, bi_prevalence) are written only by manual CLI
         # modules, never by update_endpoints.py, so nothing extra can land from CI.
+        # Data repo first: onboarding data is the expensive part; the endpoint
+        # yaml lists are cheap to regenerate if the second push fails.
+        (cd website/data
+         git add spend b3it
+         git diff --staged --quiet || git commit -m "[bot] Daily update of target endpoints"
+         bash "$GITHUB_WORKSPACE/.github/scripts/push-with-rebase.sh")
         git add \
           endpoints_lt.yaml \
           endpoints_cache_lt.yaml \
           endpoints_catalog.yaml \
           endpoints_bi.yaml \
           endpoints_cache_bi.yaml \
-          strategies_test_reasoning.json \
-          website/data/spend \
-          website/data/b3it
+          strategies_test_reasoning.json
         git diff --staged --quiet || git commit -m "[bot] Daily update of target endpoints"
         bash .github/scripts/push-with-rebase.sh

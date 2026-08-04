@@ -9,6 +9,14 @@ Static website for tracking LLM API logprob responses.
 
 ## Development
 
+Raw monitoring data lives in [trackllm_data](https://github.com/timothee-chauvin/trackllm_data),
+expected at `website/data` (gitignored here). Clone it there once — or symlink an
+existing clone, one per worktree:
+
+```bash
+git clone git@github.com:timothee-chauvin/trackllm_data website/data
+```
+
 ```bash
 # Build and serve locally
 make serve
@@ -59,18 +67,19 @@ website/
 ├── templates/          # Jinja2 templates (base + one per page kind)
 ├── style.css           # the whole design system
 ├── test/               # bun tests: render the generated pages, check links and a11y
-├── data/               # committed data + generated page JSON
+├── data/               # the trackllm_data repo (see Development) + generated page JSON
 │   ├── lt/             # collected logprob responses, per endpoint/prompt/month
 │   ├── b3it/           # border-input state, phase-2 samples, per-endpoint views
 │   ├── spend/          # per-endpoint spend ledgers
-│   └── *.json          # generated: overview, changes, changes_page, models/, providers/
+│   └── *.json          # generated, untracked: overview, changes, changes_page, models/, providers/
 └── (generated pages)   # index, changes, spend, methodology + endpoints/ models/ providers/ orgs/
 ```
 
 ## Data pipeline
 
 The site is a view over data four scheduled GitHub Actions workflows collect and
-commit back to the repo:
+commit to [trackllm_data](https://github.com/timothee-chauvin/trackllm_data)
+(endpoint fleets and vetting caches stay in this repo):
 
 | Workflow | Schedule | What it does |
 | --- | --- | --- |
