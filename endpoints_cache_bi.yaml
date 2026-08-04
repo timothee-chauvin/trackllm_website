@@ -651,6 +651,12 @@ too_expensive:
   - 4.0
 - api: openrouter
   model: moonshotai/kimi-k3
+  provider: chutes/mxfp4
+  cost:
+  - 3.0
+  - 15.0
+- api: openrouter
+  model: moonshotai/kimi-k3
   provider: digitalocean
   cost:
   - 3.0
@@ -938,6 +944,12 @@ too_expensive:
   - 0.117
   - 0.455
 - api: openrouter
+  model: qwen/qwen3-coder
+  provider: alibaba/opensource
+  cost:
+  - 0.975
+  - 4.875
+- api: openrouter
   model: qwen/qwen3-next-80b-a3b-thinking
   provider: alibaba
   cost:
@@ -1213,6 +1225,12 @@ too_expensive:
   cost:
   - 0.32
   - 1.28
+- api: openrouter
+  model: qwen/qwen3.8-max
+  provider: alibaba
+  cost:
+  - 2.0
+  - 6.0
 - api: openrouter
   model: thedrummer/cydonia-24b-v4.1
   provider: parasail/bf16

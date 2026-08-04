@@ -48,12 +48,6 @@ endpoints_lt:
   - 0.03
   - 0.13
 - api: openrouter
-  model: mistralai/mistral-nemo
-  provider: io-net/fp16
-  cost:
-  - 0.035
-  - 0.13
-- api: openrouter
   model: gryphe/mythomax-l2-13b
   provider: parasail/fp16
   cost:
@@ -186,6 +180,18 @@ endpoints_lt:
   - 0.12
   - 0.36
 - api: openrouter
+  model: google/gemma-4-26b-a4b-it
+  provider: nextbit/bf16
+  cost:
+  - 0.12
+  - 0.4
+- api: openrouter
+  model: qwen/qwen3-vl-32b-instruct
+  provider: alibaba/fp8
+  cost:
+  - 0.104
+  - 0.416
+- api: openrouter
   model: google/gemma-3-27b-it
   provider: parasail/fp8
   cost:
@@ -246,17 +252,11 @@ endpoints_lt:
   - 0.15
   - 0.4
 - api: openrouter
-  model: google/gemma-4-26b-a4b-it
-  provider: nextbit/bf16
+  model: qwen/qwen3-vl-8b-instruct
+  provider: alibaba/fp8
   cost:
-  - 0.15
-  - 0.45
-- api: openrouter
-  model: mistralai/ministral-8b-2512
-  provider: nextbit/fp8
-  cost:
-  - 0.3
-  - 0.3
+  - 0.117
+  - 0.455
 - api: openrouter
   model: openai/gpt-oss-120b
   provider: mancer/fp8
@@ -265,6 +265,12 @@ endpoints_lt:
   - 0.5
 - api: openrouter
   model: qwen/qwen3-30b-a3b-instruct-2507
+  provider: alibaba/fp8
+  cost:
+  - 0.13
+  - 0.52
+- api: openrouter
+  model: qwen/qwen3-vl-30b-a3b-instruct
   provider: alibaba/fp8
   cost:
   - 0.13
@@ -443,6 +449,12 @@ endpoints_lt:
   cost:
   - 0.1
   - 1.1
+- api: openrouter
+  model: qwen/qwen3-vl-235b-a22b-instruct
+  provider: alibaba/fp8
+  cost:
+  - 0.26
+  - 1.04
 - api: openrouter
   model: qwen/qwen3.6-flash
   provider: alibaba/fp8
