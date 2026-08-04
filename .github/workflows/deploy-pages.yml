@@ -44,6 +44,15 @@ jobs:
           # pushed to ("main"), whose tip includes that just-pushed data.
           ref: ${{ github.event.workflow_run.head_branch || github.ref }}
 
+      # No ssh-key: the data repo is public and this job must not hold a write
+      # credential. Always the tip of the data repo, so a deploy triggered by
+      # run-main picks up the data that run just pushed.
+      - name: Checkout data repo
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: timothee-chauvin/trackllm_data
+          path: website/data
+
       - name: Set up Bun
         uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
 

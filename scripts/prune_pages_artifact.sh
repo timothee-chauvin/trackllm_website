@@ -15,6 +15,9 @@ site="$1"
 
 rm -rf "$site/node_modules"
 
+# The data checkout at data/ brings its own repository metadata.
+rm -rf "$site/data/.git"
+
 # Pipeline spend ledger; the site only fetches the aggregated data/spend.json.
 rm -rf "$site/data/spend"
 
