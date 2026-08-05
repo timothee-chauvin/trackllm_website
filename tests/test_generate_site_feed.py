@@ -118,6 +118,44 @@ def test_b3it_item_uses_peak_tv_from_the_view():
     assert item["sevKey"] == "alert"
 
 
+def _b3it_change(date: str) -> dict:
+    return {
+        "date": date,
+        "slug": "s1",
+        "model": "org/model-x",
+        "provider": "p/fp8",
+        "method": "B3IT",
+        "magnitude": None,
+        "magnitude_display": "",
+    }
+
+
+def test_change_frac_lands_on_the_drawn_point():
+    # The sparkline draws point i at i/(n-1), so a change on the last sample
+    # must get frac 1.0 -- dividing by the window length instead put the mark
+    # one point-width early (visible as a rule left of the peak it dates).
+    view = _b3it_view("s1")
+    (item,) = build_feed_items(
+        [_b3it_change(view.tv_series["dates"][-1])], {}, {"s1": view}, NOW
+    )
+    assert item["changeFrac"] == 1.0
+
+
+def test_change_frac_lands_on_the_drawn_point_after_downsampling():
+    view = _b3it_view("s1")
+    view.tv_series = {
+        "dates": [
+            f"2026-{3 + d // 28:02d}-{d % 28 + 1:02d}T00:00:00Z" for d in range(100)
+        ],
+        "values": [0.05] * 99 + [0.8],
+    }
+    (item,) = build_feed_items(
+        [_b3it_change(view.tv_series["dates"][-1])], {}, {"s1": view}, NOW
+    )
+    assert len(item["trace"]) == 40
+    assert item["changeFrac"] == 1.0
+
+
 def test_b3it_item_without_a_view_reports_no_magnitude():
     """A real detected change whose B3IT view is missing must not publish a
     fabricated TV of 0.00 -- the magnitude is unknown, and says so."""
