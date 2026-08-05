@@ -1,4 +1,5 @@
 from pathlib import Path
+import numpy as np
 
 import orjson
 
@@ -75,6 +76,25 @@ def test_late_change_dated_at_first_changed_batch():
     event = scan_pvalue(results)
     assert event is not None
     assert event.split_ts == change_at
+
+
+def test_localization_not_fooled_by_small_last_batch():
+    # A 10-sample final batch gets ~sum p(1-p)/n of statistic inflation for
+    # free, so a raw argmax drifts to the smallest post side instead of the
+    # true boundary. The debiased localizer must not.
+    rng = np.random.default_rng(3)
+    days = [f"2026-07-{d:02d}T21:00:00+00:00" for d in range(10, 22)]
+    results = {}
+    for prompt in ("p1", "p2", "p3"):
+        batches = {}
+        for i, ts in enumerate(days):
+            n = 10 if i == len(days) - 1 else 100
+            k = rng.binomial(n, 0.5 if i < 10 else 0.8)
+            batches[ts] = [(ts, "A")] * k + [(ts, "B")] * (n - k)
+        results[prompt] = batches
+    event = scan_pvalue(results)
+    assert event is not None
+    assert event.split_ts == days[10]
 
 
 def test_change_before_first_monitoring_batch_is_out_of_reach():
