@@ -112,7 +112,12 @@ def scan_pvalue(
     perms = np.array([rng.permutation(n) for _ in range(cfg.permutations)])
     perm_max, _ = _max_over_splits(counts, perms, min_side_total)
     p = float((1 + (perm_max >= obs_max[0] - 1e-12).sum()) / (cfg.permutations + 1))
-    return ScanEvent(split_ts=all_ts[int(obs_split[0])], p_value=p)
+    # The admissible argmax dates the change up to 2 batches early when it
+    # fires at the earliest possible moment (the true boundary leaves fewer
+    # than min_side_samples on the post side). min_side_total exists to
+    # calibrate the test, not to localize: re-locate the split without it.
+    _, loc_split = _max_over_splits(counts, identity, 1)
+    return ScanEvent(split_ts=all_ts[int(loc_split[0])], p_value=p)
 
 
 def changepoint_scan(
