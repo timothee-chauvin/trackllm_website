@@ -40,7 +40,7 @@ def split_statistic(pre: dict[str, dict], post: dict[str, dict]) -> float:
 
 
 def _max_over_splits(
-    counts: list[np.ndarray], orders: np.ndarray, min_side_total: int
+    counts: list[np.ndarray], orders: np.ndarray, min_side_total: int, debias: bool
 ) -> tuple[np.ndarray, np.ndarray]:
     """Max statistic over admissible splits, for each batch ordering.
 
@@ -48,6 +48,12 @@ def _max_over_splits(
     orders: (n_orderings, n_batches) permutations of batch indices.
     Returns (max_stat, argmax_split) per ordering; -inf where no split is
     admissible (min_side_total samples summed over prompts on each side).
+
+    debias subtracts the statistic's null expectation Σ p(1-p)(1/n_pre +
+    1/n_post) per prompt (pooled p): a small side gets that much inflation for
+    free, so a raw argmax drifts toward the smallest side. Debiased, the argmax
+    is a consistent localizer; the permutation test keeps the raw statistic it
+    was calibrated for.
     """
     n = orders.shape[1]
     stats = np.zeros((orders.shape[0], n - 1))
@@ -58,9 +64,13 @@ def _max_over_splits(
         n_pre = prefix.sum(axis=2)
         n_post = total.sum() - n_pre
         pre_sizes += n_pre
-        with np.errstate(invalid="ignore"):
+        with np.errstate(invalid="ignore", divide="ignore"):
             diff = prefix / n_pre[:, :, None] - (total - prefix) / n_post[:, :, None]
-        stats += np.where((n_pre > 0) & (n_post > 0), np.nansum(diff**2, axis=2), 0.0)
+            term = np.nansum(diff**2, axis=2)
+            if debias:
+                p = total / total.sum()
+                term = term - float((p * (1 - p)).sum()) * (1 / n_pre + 1 / n_post)
+        stats += np.where((n_pre > 0) & (n_post > 0), term, 0.0)
     total_all = sum(float(c.sum()) for c in counts)
     admissible = (pre_sizes >= min_side_total) & (
         total_all - pre_sizes >= min_side_total
@@ -103,16 +113,22 @@ def scan_pvalue(
 
     min_side_total = cfg.min_side_samples * len(counts)
     identity = np.arange(n)[None, :]
-    obs_max, obs_split = _max_over_splits(counts, identity, min_side_total)
+    obs_max, obs_split = _max_over_splits(counts, identity, min_side_total, False)
     if not np.isfinite(obs_max[0]):
         return None
 
     if rng is None:
         rng = np.random.default_rng(0)
     perms = np.array([rng.permutation(n) for _ in range(cfg.permutations)])
-    perm_max, _ = _max_over_splits(counts, perms, min_side_total)
+    perm_max, _ = _max_over_splits(counts, perms, min_side_total, False)
     p = float((1 + (perm_max >= obs_max[0] - 1e-12).sum()) / (cfg.permutations + 1))
-    return ScanEvent(split_ts=all_ts[int(obs_split[0])], p_value=p)
+    # The admissible argmax dates the change up to 2 batches early when it
+    # fires at the earliest possible moment (the true boundary leaves fewer
+    # than min_side_samples on the post side). min_side_total exists to
+    # calibrate the test, not to localize: re-locate the split without it,
+    # debiased so tiny sides don't win by noise.
+    _, loc_split = _max_over_splits(counts, identity, 1, True)
+    return ScanEvent(split_ts=all_ts[int(loc_split[0])], p_value=p)
 
 
 def changepoint_scan(
