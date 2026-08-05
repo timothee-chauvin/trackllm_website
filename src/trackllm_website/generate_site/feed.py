@@ -54,7 +54,12 @@ def _window(pairs: list[tuple[datetime, float]], k: int) -> tuple[list[float], f
     window = [v for _, v in pairs[lo:hi]]
     if len(window) < FEED_MIN_WINDOW:
         return [], FEED_DEFAULT_CHANGE_FRAC
-    return downsample_trace(window, FEED_TRACE_LEN), round((k - lo) / (hi - lo), 3)
+    # The sparkline draws point i of n at x = i/(n-1): map the change to its
+    # (possibly downsampled) point index and normalize by n-1, or the mark
+    # lands one point-width left of the sample it dates.
+    n = min(len(window), FEED_TRACE_LEN)
+    bucket = (k - lo) * n // len(window)
+    return downsample_trace(window, FEED_TRACE_LEN), round(bucket / (n - 1), 3)
 
 
 def _severity(value: float, alert: float) -> str:
