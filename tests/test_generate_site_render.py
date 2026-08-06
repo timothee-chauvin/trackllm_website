@@ -151,12 +151,12 @@ def test_render_emits_spend(tmp_path):
 
     # Assert spend data renders with correct cost value
     spend_html = (tmp_path / "spend.html").read_text()
-    assert "$0.0500" in spend_html, "Cost should render as $0.0500 (4 decimal places)"
+    assert "$0.050" in spend_html, "Cost should render with util.format_cost"
     assert "m2fa23p" in spend_html, "Endpoint slug should appear in spend table"
 
-    # Zero-billed group renders as $0.0000 (lt cell + total), not as the no-data dash
+    # Zero-billed group renders as $0.00 (lt cell + total), not as the no-data dash
     zero_row = next(r for r in spend_html.split("<tr>") if "zero2fcost23ep" in r)
-    assert zero_row.count("$0.0000") == 2
+    assert zero_row.count("$0.00") == 2
 
     # Assert emitted spend.json has expected cumulative cost
     spend_data = json.loads((tmp_path / "data" / "spend.json").read_text())

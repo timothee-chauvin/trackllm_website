@@ -22,7 +22,7 @@
           <thead><tr><th scope="col">Group</th><th scope="col" class="r">Cost (USD)</th></tr></thead>
           <tbody>
           {% for group, cost in spend.cumulative.items() %}
-            <tr><td>{% if group == "vetting" %}{{ info_label(spend.group_label[group], vetting_tip) }}{% else %}{{ spend.group_label[group] }}{% endif %}</td><td class="r num">${{ "%.4f"|format(cost) }}</td></tr>
+            <tr><td>{% if group == "vetting" %}{{ info_label(spend.group_label[group], vetting_tip) }}{% else %}{{ spend.group_label[group] }}{% endif %}</td><td class="r num">${{ cost|fmt_cost }}</td></tr>
           {% endfor %}
           </tbody>
         </table>
@@ -62,9 +62,9 @@
             <td>{% if ep.slug in tracked %}<a href="endpoints/{{ ep.slug }}.html">{{ ep.name }}</a>
               {%- else %}<span class="untracked">{{ ep.name }}</span>{% endif %}</td>
             {% for g in spend.group_order %}
-            <td class="r num">{% if g in ep.groups %}${{ "%.4f"|format(ep.groups[g]) }}{% else %}—{% endif %}</td>
+            <td class="r num">{% if g in ep.groups %}${{ ep.groups[g]|fmt_cost }}{% else %}—{% endif %}</td>
             {% endfor %}
-            <td class="r num">${{ "%.4f"|format(ep.total) }}</td>
+            <td class="r num">${{ ep.total|fmt_cost }}</td>
           </tr>
         {% endfor %}
         </tbody>

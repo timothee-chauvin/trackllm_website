@@ -1,5 +1,6 @@
 import asyncio
 import hashlib
+import math
 import os
 import tempfile
 from collections.abc import AsyncIterator, Coroutine
@@ -88,6 +89,38 @@ async def gather_with_concurrency_streaming(
             raise result.exc
         start_next()
         yield result
+
+
+def _two_significant_digits(x: float) -> str:
+    """x at two significant digits, always in decimal form (never an exponent)."""
+    return f"{x:.{-math.floor(math.log10(abs(x))) + 1}f}"
+
+
+def format_cost(x: float) -> str:
+    """Format a billed USD amount: two decimals, but never fewer than two
+    significant digits, so amounts under $0.10 keep their information instead of
+    collapsing ($0.0567 is "0.057", not "0.06"; $0.000012 is not "0.00").
+
+    Returns the bare number, so callers own the "$" and any suffix. Mirrored in
+    TypeScript by fmtCost (website/src/components.ts) for the client-rendered
+    pages; keep the two in step.
+    """
+    if x == 0:
+        return "0.00"
+    return f"{x:.2f}" if abs(x) >= 0.1 else _two_significant_digits(x)
+
+
+def format_price(x: float) -> str:
+    """Format a per-Mtok list price: two decimals, which is how providers quote
+    them ("$0.02", not "$0.020").
+
+    Unlike format_cost, precision only grows to keep a nonzero price off "0.00":
+    a price is a round advertised number, not a measurement.
+    """
+    two = f"{x:.2f}"
+    if x == 0 or float(two) != 0:
+        return two
+    return _two_significant_digits(x)
 
 
 def trim_to_length(s: str, length: int) -> str:

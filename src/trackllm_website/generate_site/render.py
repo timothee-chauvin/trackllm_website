@@ -23,7 +23,7 @@ from trackllm_website.generate_site.status_io import (
     resolve_site_statuses,
 )
 from trackllm_website.generate_site.tracked import with_observations
-from trackllm_website.util import slugify
+from trackllm_website.util import format_cost, format_price, slugify
 
 from .lt import EndpointInfo, discover_lt_endpoints, load_all_lt_data
 
@@ -67,6 +67,8 @@ def render_site(
     # headline_badge and the "st" filter chips look their tooltip text up here, so
     # STATUS_COPY (status.py) stays the one place that copy is written.
     env.globals["STATUS_COPY"] = STATUS_COPY
+    env.filters["fmt_cost"] = format_cost
+    env.filters["fmt_price"] = format_price
     index_template = env.get_template("index.html.j2")
     endpoint_template = env.get_template("endpoint.html.j2")
     spend_template = env.get_template("spend.html.j2")
