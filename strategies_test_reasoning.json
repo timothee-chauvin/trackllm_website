@@ -24,6 +24,7 @@
   "openrouter#anthropic/claude-haiku-4.5#azure/global": null,
   "openrouter#anthropic/claude-haiku-4.5#google-vertex/europe": null,
   "openrouter#anthropic/claude-haiku-4.5#google-vertex/global": null,
+  "openrouter#anthropic/claude-haiku-4.5#google-vertex/us-east5": null,
   "openrouter#anthropic/claude-opus-4#google-vertex": null,
   "openrouter#anthropic/claude-opus-4.1#amazon-bedrock": null,
   "openrouter#anthropic/claude-opus-4.1#anthropic": null,
@@ -198,7 +199,9 @@
   "openrouter#deepseek/deepseek-v4-flash-0731#ambient/fp4": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#atlas-cloud/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#baidu/fp8": null,
+  "openrouter#deepseek/deepseek-v4-flash-0731#baseten/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#cloudflare/fp8": null,
+  "openrouter#deepseek/deepseek-v4-flash-0731#coreweave/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#deepinfra/fp4": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#deepseek/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#fireworks": null,
@@ -210,6 +213,7 @@
   "openrouter#deepseek/deepseek-v4-flash-0731#novita/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#parasail/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#phala": null,
+  "openrouter#deepseek/deepseek-v4-flash-0731#sail-research/fp4": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#siliconflow/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#together": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#venice": null,
@@ -495,6 +499,7 @@
   },
   "openrouter#inclusionai/ling-2.6-1t#novita": null,
   "openrouter#inclusionai/ling-2.6-flash#novita": null,
+  "openrouter#inclusionai/ling-3.0-flash#deepinfra/bf16": null,
   "openrouter#inclusionai/ring-2.6-1t#novita": {
     "max_tokens": 4
   },
@@ -1375,6 +1380,9 @@
   "openrouter#upstage/solar-pro-3#upstage": {
     "skip": "hidden reasoning"
   },
+  "openrouter#upstage/solar-pro-3#upstage/fp4": {
+    "skip": "hidden reasoning"
+  },
   "openrouter#writer/palmyra-x5#amazon-bedrock": null,
   "openrouter#x-ai/grok-4.20#xai": null,
   "openrouter#x-ai/grok-4.20-multi-agent#xai": null,
@@ -1446,6 +1454,7 @@
   "openrouter#z-ai/glm-4.7#cerebras/fp16": null,
   "openrouter#z-ai/glm-4.7#deepinfra/fp4": null,
   "openrouter#z-ai/glm-4.7#google-vertex": null,
+  "openrouter#z-ai/glm-4.7#mancer/fp4": null,
   "openrouter#z-ai/glm-4.7#novita/fp8": null,
   "openrouter#z-ai/glm-4.7#phala": null,
   "openrouter#z-ai/glm-4.7#streamlake": null,
