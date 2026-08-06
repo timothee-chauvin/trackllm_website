@@ -317,6 +317,47 @@ def test_provider_view_carries_the_shared_timeline(fake_site):
     assert [(c["date"], c["model"]) for c in tl["changes"]] == [("2026-06-25", "org/a")]
 
 
+def test_provider_timeline_rows_sort_by_last_successful_query(tmp_path):
+    """Same rule as the model page: a provider serving a long-dead model must not
+    open its page with it, however many changes that model ran up."""
+    root = tmp_path / "website"
+    stale = [f"2026-01-{d:02d}T00:00:00Z" for d in range(1, 21)]
+    fresh = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 21)]
+    write_lt_endpoint(
+        root,
+        "org2fold23p",
+        "org/old",
+        "p",
+        dates=stale,
+        changes=[{"index": 15, "sigma": 12.0}],
+        drift=[0.1] * 15 + [1.2] * 5,
+    )
+    write_lt_endpoint(
+        root, "org2fnew23p", "org/new", "p", dates=fresh, changes=[], drift=[0.1] * 20
+    )
+    (root / "data" / "changes.json").write_text(
+        json.dumps(
+            [
+                {
+                    "date": stale[15],
+                    "slug": "org2fold23p",
+                    "model": "org/old",
+                    "provider": "p",
+                    "method": "LT",
+                    "magnitude": 12.0,
+                    "magnitude_display": "12σ",
+                }
+            ]
+        )
+    )
+    (root / "data" / "spend.json").write_text(json.dumps({"cumulative": {}}))
+
+    tl = _views(root)["p"]["timeline"]
+    # the changed-but-dead model would lead under the change-count ordering alone
+    assert [e["model"] for e in tl["endpoints"]] == ["org/new", "org/old"]
+    assert tl["endpoints"][0]["last_query"] == "2026-06-20"
+
+
 def test_untracked_catalog_endpoints_stay_out_of_the_timeline(fake_site):
     """The directory table below already lists them with their status badge."""
     inputs = empty_status_inputs()

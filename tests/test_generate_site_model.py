@@ -180,6 +180,69 @@ def _two_variant_model(root: Path):
     _write_changes_json(root)
 
 
+def test_timeline_rows_sort_by_last_successful_query(tmp_path):
+    """A long-retired endpoint with a change to its name must not open the page:
+    rows lead with whoever answered us most recently."""
+    root = tmp_path / "website"
+    stale = [f"2026-01-{d:02d}T00:00:00Z" for d in range(1, 21)]
+    fresh = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 21)]
+    write_lt_endpoint(
+        root,
+        "m2fa23stale",
+        "m/a",
+        "stale",
+        dates=stale,
+        changes=[{"index": 15, "sigma": 12.0}],
+        drift=[0.1] * 15 + [1.2] * 5,
+    )
+    write_lt_endpoint(
+        root, "m2fa23fresh", "m/a", "fresh", dates=fresh, changes=[], drift=[0.1] * 20
+    )
+    _write_changes_json(root)
+
+    view = _build_model_views(root)[slugify("m/a")]
+    assert [e["provider"] for e in view["endpoints"]] == ["fresh", "stale"]
+    assert view["endpoints"][0]["last_query"] == "2026-06-20"
+    assert view["endpoints"][1]["last_query"] == "2026-01-20"
+
+
+def test_rows_tied_on_freshness_keep_the_most_changed_first(tmp_path):
+    root = tmp_path / "website"
+    dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 21)]
+    write_lt_endpoint(
+        root, "m2fa23quiet", "m/a", "quiet", dates=dates, changes=[], drift=[0.1] * 20
+    )
+    write_lt_endpoint(
+        root,
+        "m2fa23moved",
+        "m/a",
+        "moved",
+        dates=dates,
+        changes=[{"index": 15, "sigma": 12.0}],
+        drift=[0.1] * 15 + [1.2] * 5,
+    )
+    _write_changes_json(root)
+
+    view = _build_model_views(root)[slugify("m/a")]
+    assert [e["provider"] for e in view["endpoints"]] == ["moved", "quiet"]
+
+
+def test_b3it_only_row_is_dated_by_its_last_phase_2_sample(tmp_path):
+    """The B3IT series drops the epoch's reference batch, so freshness comes from
+    the raw phase-2 results (B3ITView.last_query), not from the drawn series."""
+    root = tmp_path / "website"
+    dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 6)]
+    write_lt_endpoint(
+        root, "m2fa23p1", "m/a", "p1", dates=dates, changes=[], drift=[0.1] * 5
+    )
+    _write_b3it_with_transition(root, "m2fa23p2", "m/a", "p2")  # January samples
+    _write_changes_json(root)
+
+    view = _build_model_views(root)[slugify("m/a")]
+    assert [e["provider"] for e in view["endpoints"]] == ["p1", "p2"]
+    assert view["endpoints"][1]["last_query"] == "2026-01-24"
+
+
 def test_endpoint_and_provider_counts_are_separate_quantities(tmp_path):
     """Two serving variants of one company are two endpoints, one provider."""
     root = tmp_path / "website"
@@ -440,3 +503,4 @@ def test_tracked_endpoints_carry_status_and_sort_before_untracked(tmp_path):
     tracked, untracked = view["endpoints"]
     assert tracked["slug"] == "m2fa23p" and tracked["status"]["lt"] == "tracked"
     assert untracked["provider"] == "q" and untracked["methods"] == []
+    assert untracked["last_query"] is None

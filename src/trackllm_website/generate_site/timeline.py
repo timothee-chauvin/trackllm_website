@@ -9,9 +9,11 @@ comes straight from the view's tv_series.
 
 import json
 from collections import defaultdict
+from datetime import date
 from pathlib import Path
 
 from trackllm_website.generate_site.b3it import B3ITView
+from trackllm_website.generate_site.freshness import latest
 from trackllm_website.generate_site.lt import EndpointInfo, load_lt_data
 from trackllm_website.generate_site.naming import base_provider
 from trackllm_website.generate_site.peaks import (
@@ -84,6 +86,27 @@ def _b3it_changes(
             {"date": day, "peakTV": round(peak, 3) if peak is not None else None}
         )
     return out
+
+
+def _last_query(ep: EndpointInfo | None, view: B3ITView | None) -> str | None:
+    """The UTC day this endpoint last answered us, over both methods: LT records
+    the last non-error query, B3IT the last phase-2 sample (from the raw results,
+    so a freshly re-initialized endpoint counts as alive with an empty series).
+
+    Truncated to the day on purpose: everything queried in the same round is
+    equally alive, and ordering those by the second would hand the top of the page
+    to whichever endpoint the round happened to reach first.
+    """
+    instant = latest(
+        [ep.last_query_date if ep else None, view.last_query if view else None]
+    )
+    return instant[:10] if instant else None
+
+
+def _staleness(day: str | None) -> int:
+    """Row rank, most recently alive first. A real day ranks as its negated
+    ordinal, so the 0 of an endpoint that never answered sorts after all of them."""
+    return -date.fromisoformat(day).toordinal() if day else 0
 
 
 def _naming(model: str, provider: str) -> dict:
@@ -160,6 +183,7 @@ def _build_endpoint(
             "methods": methods,
             "first": min(date_range) if date_range else None,
             "last": max(date_range) if date_range else None,
+            "last_query": _last_query(ep, view),
             "n_changes": n_changes,
             "lt": lt_out,
             "b3it": b3it_out,
@@ -178,6 +202,7 @@ def _untracked_endpoint(
         "methods": [],
         "first": None,
         "last": None,
+        "last_query": None,
         "n_changes": 0,
         "lt": None,
         "b3it": None,
@@ -212,7 +237,17 @@ def build_timeline(
         rec["status"] = status_json(st)
         endpoints.append(rec)
         alldates += date_range
-    endpoints.sort(key=lambda e: (not e["methods"], -e["n_changes"], e["provider"]))
+    # Freshest first: a page opening on a pile of retired endpoints says nothing
+    # about the fleet it is meant to describe. Endpoints that never answered (and
+    # the badge-only catalog rows) sort last, then the change count breaks ties.
+    endpoints.sort(
+        key=lambda e: (
+            not e["methods"],
+            _staleness(e["last_query"]),
+            -e["n_changes"],
+            e["provider"],
+        )
+    )
 
     changes = sorted(
         [
