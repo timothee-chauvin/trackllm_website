@@ -14,7 +14,7 @@ import {
   stripTip,
   td,
 } from "./components";
-import { sampleAt } from "./chart_geom";
+import { areaPath, sampleAt, segments, strokePath } from "./chart_geom";
 import { type StripRow, STRIP_VW, bindSharedHover, dayAt, readCells } from "./model_hover";
 
 // drift/peakTV are null when the level the change reached is unknown: the series
@@ -51,8 +51,11 @@ export interface TimelineEndpoint {
   // arrive sorted by it (timeline.py); the groups are sorted on it here.
   last_query: string | null;
   n_changes: number;
-  lt: { drift: [string, number][]; changes: LTChange[] } | null;
-  b3it: { tv: [string, number][]; changes: B3ITChange[] } | null;
+  // `breaks` are the indices into the drawn points that start a new run of
+  // consecutive observed days -- the strip's series is thinned at build time, so
+  // timeline.py has to publish where the missing days fell (see chart_geom.ts).
+  lt: { drift: [string, number][]; breaks: number[]; changes: LTChange[] } | null;
+  b3it: { tv: [string, number][]; breaks: number[]; changes: B3ITChange[] } | null;
   status: EndpointStatusJSON;
 }
 
@@ -139,10 +142,16 @@ export function renderTimeline(panel: HTMLElement, D: TimelineData, labels: Time
    *  (an lt lane can carry changes and no points at all -- timeline.py), on that
    *  method's own scale. Shared with the pointer readout, which puts its dot on the
    *  same curve. */
-  function drawn(ep: TimelineEndpoint): { series: [string, number][]; dmax: number; col: string } {
+  function drawn(ep: TimelineEndpoint): {
+    series: [string, number][];
+    breaks: number[];
+    dmax: number;
+    col: string;
+  } {
     const onLT = !!ep.lt?.drift.length;
     return {
       series: onLT ? ep.lt!.drift : ep.b3it ? ep.b3it.tv : [],
+      breaks: (onLT ? ep.lt!.breaks : ep.b3it?.breaks) ?? [],
       dmax: onLT ? LT_MAX : B3IT_CAP,
       col: onLT || !ep.b3it ? "var(--accent)" : "var(--b3it)",
     };
@@ -152,13 +161,15 @@ export function renderTimeline(panel: HTMLElement, D: TimelineData, labels: Time
    *  reached. An LT dot and a B3IT dot never share a scale: nats go through the
    *  page-wide LT scale, total variation through its own 0..B3IT_CAP one. */
   function strip(ep: TimelineEndpoint): string {
-    const { series: sig, dmax, col } = drawn(ep);
-    const path =
-      sig.length > 1
-        ? sig
-            .map((p, i) => `${i ? "L" : "M"}${xpos(p[0]).toFixed(1)} ${stripY(p[1], dmax).toFixed(1)}`)
-            .join(" ")
-        : "";
+    const { series: sig, breaks, dmax, col } = drawn(ep);
+    const at = (p: [string, number]): string =>
+      `${xpos(p[0]).toFixed(1)} ${stripY(p[1], dmax).toFixed(1)}`;
+    const runs = segments(sig, breaks);
+    const path = strokePath(runs, at);
+    // The fill is this row's missing-data indicator, so it is closed on the run's own
+    // first and last day -- not on the strip's edges, which would spread it across
+    // every month the *page* spans and every day this endpoint went unobserved.
+    const areas = areaPath(runs, (p) => xpos(p[0]), (p) => stripY(p[1], dmax), STRIP_H);
     const marks: Mark[] = [
       ...(ep.lt
         ? ep.lt.changes.map(
@@ -194,7 +205,7 @@ export function renderTimeline(panel: HTMLElement, D: TimelineData, labels: Time
       })
       .join("");
     return `<svg viewBox="0 0 ${W} ${STRIP_H}" preserveAspectRatio="none"${stripTip(labels.name(ep), marks.map((m) => m.title))}>${gridLines(STRIP_H)}
-      ${path ? `<path d="${path} L${W} ${STRIP_H} L0 ${STRIP_H} Z" fill="${col}" opacity="0.10"/>
+      ${path ? `<path d="${areas}" fill="${col}" opacity="0.10"/>
       <path d="${path}" fill="none" stroke="${col}" stroke-width="1.3" opacity="0.65" vector-effect="non-scaling-stroke"/>` : ""}
       ${dots}${HOVER_MARK}</svg>`;
   }

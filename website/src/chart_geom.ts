@@ -1,7 +1,7 @@
 // Geometry of the endpoint page's stacked-lane chart, shared by the renderer
 // (endpoint.ts) and the pointer readout (chart_hover.ts). Everything here is pure:
 // no DOM, no measurement beyond the container width it is handed.
-import { td } from "./components";
+import { DAY_MS, td } from "./components";
 
 export interface LTChange {
   date: string;
@@ -16,6 +16,7 @@ export interface B3ITChange {
 
 export interface FocusLT {
   drift: [string, number][];
+  breaks: number[]; // see downsampleRuns: where the days the endpoint was not observed fall
   changes: LTChange[];
   // raw LT observation range from lt_scores.json's own `dates`, independent of the
   // drift trace (which may be empty/absent pre-backfill) -- see buildLT.
@@ -25,6 +26,7 @@ export interface FocusLT {
 
 export interface FocusB3IT {
   tv: [string, number][];
+  breaks: number[];
   changes: B3ITChange[];
   // raw tv_series observation range, independent of the (possibly downsampled) `tv` trace.
   firstDate: string;
@@ -32,6 +34,86 @@ export interface FocusB3IT {
 }
 
 export const last = <T,>(arr: T[]): T | undefined => arr[arr.length - 1];
+
+// ---- missing days --------------------------------------------------------------
+// A day the endpoint was not sampled on is a hole in the series, and the area under
+// the curve is where the reader sees it: neither the line nor the fill may cross a hole.
+// The holes have to be found before the series is thinned for drawing -- afterwards
+// every step looks like a gap -- so `breaks` travels with the thinned points: the
+// indices into them that start a new run of consecutive observed days. timeline.py
+// publishes the same field for the shared timeline, thinned at build time.
+
+/** The runs of `series` delimited by `breaks`. */
+export function segments<T>(series: T[], breaks: number[]): T[][] {
+  const cuts = [0, ...breaks, series.length];
+  return cuts.slice(1).map((end, i) => series.slice(cuts[i], end)).filter((s) => s.length);
+}
+
+/** One `M...L...` subpath per run, so the stroke stops at every hole. A one-point
+ *  run has no length to stroke and is skipped, like its zero-width fill. */
+export function strokePath<T>(runs: T[][], at: (p: T) => string): string {
+  return runs
+    .filter((run) => run.length > 1)
+    .map((run) => run.map((p, i) => `${i ? "L" : "M"}${at(p)}`).join(" "))
+    .join(" ");
+}
+
+/** One closed area subpath per run, closed on the run's own first and last x so the
+ *  fill covers exactly the observed days. A one-point run gets a hairline tick of
+ *  fill -- with no line and no dot, an isolated observed day would otherwise vanish. */
+export function areaPath<T>(
+  runs: T[][],
+  x: (p: T) => number,
+  y: (p: T) => number,
+  base: number
+): string {
+  const b = base.toFixed(1);
+  return runs
+    .map((run) => {
+      if (run.length === 1) {
+        const [cx, cy] = [x(run[0]), y(run[0]).toFixed(1)];
+        const [x0, x1] = [(cx - 0.75).toFixed(1), (cx + 0.75).toFixed(1)];
+        return `M${x0} ${b} L${x0} ${cy} L${x1} ${cy} L${x1} ${b} Z`;
+      }
+      const pts = run.map((p) => `L${x(p).toFixed(1)} ${y(p).toFixed(1)}`).join(" ");
+      return `M${x(run[0]).toFixed(1)} ${b} ${pts} L${x(last(run)!).toFixed(1)} ${b} Z`;
+    })
+    .join(" ");
+}
+
+/** `k` evenly spaced points of `run`, both ends kept so the fill under it stops
+ *  exactly where the observations do. */
+function pick(run: [string, number][], k: number): [string, number][] {
+  if (k >= run.length) return run;
+  if (k === 1) return run.slice(0, 1);
+  return Array.from({ length: k }, (_, i) => run[Math.round((i * (run.length - 1)) / (k - 1))]);
+}
+
+/** Thin a daily series to about `n` points, and say where its missing days are. */
+export function downsampleRuns(
+  pairs: [string, number][],
+  n: number
+): { series: [string, number][]; breaks: number[] } {
+  const runs: [string, number][][] = [];
+  let prev: number | null = null;
+  for (const p of pairs) {
+    const t = td(p[0]);
+    if (prev === null || t - prev > DAY_MS) runs.push([]);
+    last(runs)!.push(p);
+    prev = t;
+  }
+  const thinned =
+    pairs.length > n
+      ? runs.map((r) => pick(r, Math.max(1, Math.round((n * r.length) / pairs.length))))
+      : runs;
+  const series: [string, number][] = [];
+  const breaks: number[] = [];
+  for (const r of thinned) {
+    if (series.length) breaks.push(series.length);
+    series.push(...r);
+  }
+  return { series, breaks };
+}
 
 export function round(v: number, n: number): number {
   const f = 10 ** n;
@@ -111,6 +193,7 @@ export function chartAxis(lt: FocusLT | null, b3it: FocusB3IT | null, vw: number
 export interface LaneGeom {
   key: "lt" | "b3it";
   series: [string, number][];
+  breaks: number[];
   topY: number;
   maxV: number;
   col: string;
@@ -127,6 +210,7 @@ export function laneGeoms(lt: FocusLT | null, b3it: FocusB3IT | null): LaneGeom[
     {
       key: "lt",
       series: drift,
+      breaks: lt?.breaks ?? [],
       topY: TOP1,
       maxV: drift.length ? Math.max(1, ...drift.map(([, v]) => v)) * LT_HEADROOM : 1,
       col: "var(--accent)",
@@ -136,6 +220,7 @@ export function laneGeoms(lt: FocusLT | null, b3it: FocusB3IT | null): LaneGeom[
     {
       key: "b3it",
       series: b3it?.tv ?? [],
+      breaks: b3it?.breaks ?? [],
       topY: TOP2,
       maxV: 1,
       col: "var(--b3it)",

@@ -29,6 +29,7 @@ const LT = {
   drift: [
     ["2025-01-01", 0.02], ["2025-06-01", 0.05], ["2025-06-20", 0.62], ["2026-02-01", 0.58],
   ] as [string, number][],
+  breaks: [], // already thinned: these fixtures are what the chart draws
   changes: [{ date: "2025-06-20", sigma: "42σ", drift: 0.62 }],
   firstDate: "2025-01-01",
   lastDate: "2026-02-01",

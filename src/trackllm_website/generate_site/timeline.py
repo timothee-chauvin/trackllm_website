@@ -41,11 +41,45 @@ def changes_by_slug(changes: list[dict]) -> dict[str, list[dict]]:
     return out
 
 
-def _downsample_pairs(pairs: list[tuple], n: int) -> list[tuple]:
-    """Nearest-point downsample to at most n (date, value) pairs, keeping real dates."""
-    if len(pairs) <= n:
-        return pairs
-    return [pairs[i * len(pairs) // n] for i in range(n)]
+def _runs(pairs: list[tuple]) -> list[list[tuple]]:
+    """The series split at every missing day. A run is a stretch the strip may fill
+    under; between two runs the endpoint was simply not observed."""
+    runs: list[list[tuple]] = []
+    prev: date | None = None
+    for p in pairs:
+        day = date.fromisoformat(p[0])
+        if prev is None or (day - prev).days > 1:
+            runs.append([])
+        runs[-1].append(p)
+        prev = day
+    return runs
+
+
+def _pick(run: list[tuple], k: int) -> list[tuple]:
+    """k evenly spaced points of `run`, both ends kept, so the fill under it stops
+    exactly where the observations do."""
+    if k >= len(run):
+        return run
+    if k == 1:
+        return run[:1]
+    return [run[round(i * (len(run) - 1) / (k - 1))] for i in range(k)]
+
+
+def downsample_runs(pairs: list[tuple], n: int) -> tuple[list[tuple], list[int]]:
+    """Thin a daily series to about n (date, value) pairs and say where its missing
+    days are: the kept points, plus the indices into them starting a new run of
+    consecutive observed days. The strips are drawn from the thinned points, so a gap
+    the raw series has is invisible to the frontend unless it is published here."""
+    runs = _runs(pairs)
+    if len(pairs) > n:
+        runs = [_pick(r, max(1, round(n * len(r) / len(pairs)))) for r in runs]
+    kept: list[tuple] = []
+    breaks: list[int] = []
+    for run in runs:
+        if kept:
+            breaks.append(len(kept))
+        kept += run
+    return kept, breaks
 
 
 def _by_method(changes: list[dict], method: str) -> list[dict]:
@@ -145,8 +179,10 @@ def _build_endpoint(
         # nonexistent. Dropping them would leave the endpoint page and the
         # directory row disagreeing about how many changes this endpoint has.
         drift_pairs = [(d.date().isoformat(), v) for d, v in lt.drift]
+        kept, breaks = downsample_runs(drift_pairs, TRACE_LEN)
         lt_out = {
-            "drift": [list(p) for p in _downsample_pairs(drift_pairs, TRACE_LEN)],
+            "drift": [list(p) for p in kept],
+            "breaks": breaks,
             "changes": _lt_changes(_by_method(canonical, "LT"), drift_pairs),
         }
 
@@ -156,8 +192,10 @@ def _build_endpoint(
             (d[:10], v)
             for d, v in zip(view.tv_series["dates"], view.tv_series["values"])
         ]
+        kept, breaks = downsample_runs(tv_pairs, TRACE_LEN)
         b3it_out = {
-            "tv": [list(p) for p in _downsample_pairs(tv_pairs, TRACE_LEN)],
+            "tv": [list(p) for p in kept],
+            "breaks": breaks,
             "changes": _b3it_changes(_by_method(canonical, "B3IT"), tv_pairs),
         }
 
