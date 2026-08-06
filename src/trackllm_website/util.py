@@ -92,17 +92,17 @@ async def gather_with_concurrency_streaming(
 
 
 def format_cost(x: float) -> str:
-    """Format a USD amount for display: two decimals, or two significant digits
-    when two decimals would round to zero (a $0.000012 price is not "$0.00").
+    """Format a USD amount for display: two decimals, but never fewer than two
+    significant digits, so amounts under $0.10 keep their information instead of
+    collapsing ($0.0567 is "0.057", not "0.06"; $0.000012 is not "0.00").
 
     Returns the bare number, so callers own the "$" and any suffix. Mirrored in
     TypeScript by fmtCost (website/src/components.ts) for the client-rendered
     pages; keep the two in step.
     """
-    two = f"{x:.2f}"
-    if x == 0 or float(two) != 0:
-        return two
-    decimals = -math.floor(math.log10(abs(x))) + 1
+    if x == 0:
+        return "0.00"
+    decimals = max(2, -math.floor(math.log10(abs(x))) + 1)
     return f"{x:.{decimals}f}"
 
 

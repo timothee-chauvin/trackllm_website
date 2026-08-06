@@ -151,7 +151,7 @@ def test_render_emits_spend(tmp_path):
 
     # Assert spend data renders with correct cost value
     spend_html = (tmp_path / "spend.html").read_text()
-    assert "$0.05" in spend_html, "Cost should render with util.format_cost"
+    assert "$0.050" in spend_html, "Cost should render with util.format_cost"
     assert "m2fa23p" in spend_html, "Endpoint slug should appear in spend table"
 
     # Zero-billed group renders as $0.00 (lt cell + total), not as the no-data dash
