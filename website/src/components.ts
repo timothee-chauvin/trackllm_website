@@ -9,6 +9,17 @@ export function esc(s: string): string {
   );
 }
 
+/** USD amount for display: two decimals, or two significant digits when two
+ *  decimals would round to zero. Bare number — callers own the "$" and suffix.
+ *  Twin of util.format_cost (Python), which formats the server-rendered prices. */
+export function fmtCost(x: number): string {
+  const two = x.toFixed(2);
+  if (x === 0 || parseFloat(two) !== 0) return two;
+  // toFixed caps at 100 decimals; nothing we bill approaches that, but a price
+  // that did would throw rather than print.
+  return x.toFixed(Math.min(100, -Math.floor(Math.log10(Math.abs(x))) + 1));
+}
+
 export function sparkline(
   trace: number[],
   cap: number,

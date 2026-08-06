@@ -1,5 +1,6 @@
 import asyncio
 import hashlib
+import math
 import os
 import tempfile
 from collections.abc import AsyncIterator, Coroutine
@@ -88,6 +89,21 @@ async def gather_with_concurrency_streaming(
             raise result.exc
         start_next()
         yield result
+
+
+def format_cost(x: float) -> str:
+    """Format a USD amount for display: two decimals, or two significant digits
+    when two decimals would round to zero (a $0.000012 price is not "$0.00").
+
+    Returns the bare number, so callers own the "$" and any suffix. Mirrored in
+    TypeScript by fmtCost (website/src/components.ts) for the client-rendered
+    pages; keep the two in step.
+    """
+    two = f"{x:.2f}"
+    if x == 0 or float(two) != 0:
+        return two
+    decimals = -math.floor(math.log10(abs(x))) + 1
+    return f"{x:.{decimals}f}"
 
 
 def trim_to_length(s: str, length: int) -> str:

@@ -8,6 +8,7 @@ import {
   bindTips,
   esc,
   eventRow,
+  fmtCost,
   highlight,
   magnitudeLabel,
   methodBadges,
@@ -238,7 +239,7 @@ export async function init(): Promise<void> {
 
   const perM = S.spend_cumulative / (S.queries / 1e6);
   document.getElementById("cap")!.innerHTML =
-    `Cheap enough to run continuously — <b>${fmtM(S.queries)}</b> logprob queries for <b>$${S.spend_cumulative.toFixed(2)}</b> total (~$${perM.toFixed(2)}/M). ` +
+    `Cheap enough to run continuously — <b>${fmtM(S.queries)}</b> logprob queries for <b>$${fmtCost(S.spend_cumulative)}</b> total (~$${fmtCost(perM)}/M). ` +
     `LT on ${S.lt_endpoints} endpoints since ${S.since}; B3IT on ${S.b3it_endpoints} since ${S.b3it_since} (${S.b3it_monitoring} still active).`;
 
   document.getElementById("feed")!.innerHTML = DATA.feed.map(eventRow).join("");
