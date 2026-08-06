@@ -47,6 +47,9 @@ export interface TimelineEndpoint {
   methods: string[];
   first: string | null;
   last: string | null;
+  // the day the endpoint last answered a query, null if it never did. The rows
+  // arrive sorted by it (timeline.py); the groups are sorted on it here.
+  last_query: string | null;
   n_changes: number;
   lt: { drift: [string, number][]; changes: LTChange[] } | null;
   b3it: { tv: [string, number][]; changes: B3ITChange[] } | null;
@@ -292,7 +295,10 @@ export function renderTimeline(panel: HTMLElement, D: TimelineData, labels: Time
     bindSharedHover(panel, wrap, tipEl, strips, xpos, (f) => dayAt(D0, D1, f));
   }
 
-  // one group of sibling rows per labels.group key, most-changed first
+  // one group of sibling rows per labels.group key, freshest first (rows keep the
+  // order timeline.py sorted them in). A group is as fresh as its liveliest
+  // endpoint, so one retired sibling can't sink the whole company; groups that
+  // tie -- everything still queried today does -- fall back to most-changed.
   const byKey = new Map<string, TimelineEndpoint[]>();
   for (const e of D.endpoints) {
     const k = labels.group(e).key;
@@ -300,7 +306,11 @@ export function renderTimeline(panel: HTMLElement, D: TimelineData, labels: Time
   }
   const total = (list: TimelineEndpoint[]): number =>
     list.reduce((s, e) => s + e.n_changes, 0);
-  const groups = [...byKey.values()].sort((a, b) => total(b) - total(a));
+  const freshest = (list: TimelineEndpoint[]): string =>
+    list.reduce((m, e) => (e.last_query && e.last_query > m ? e.last_query : m), "");
+  const groups = [...byKey.values()].sort(
+    (a, b) => freshest(b).localeCompare(freshest(a)) || total(b) - total(a)
+  );
 
   const tracked = D.endpoints.filter((e) => e.methods.length);
   const nChanged = tracked.filter((e) => e.n_changes).length;
