@@ -20,6 +20,18 @@ import {
   volGrid,
 } from "./components";
 import { EndpointRow, initDirectory, initSortHeaders } from "./directory";
+import {
+  HERO_CLEAR_GAP,
+  HERO_HIT_WIDTH,
+  HERO_TIP_DX,
+  HERO_TIP_DY,
+  HERO_TOP,
+  HERO_VB_H,
+  HERO_W,
+  HERO_WIDE,
+  heroDrawnTo,
+  heroStretch,
+} from "./hero_geom";
 
 interface Stats {
   // headline counts, so they agree with the directory's status chips: `endpoints`
@@ -90,17 +102,6 @@ const BOARD_SIZE = 5;
 const QUIET_MIN_YEARS = 1; // a "nothing detected yet" board entry needs real exposure
 const FRESH_TICK_MS = 60_000; // the line's own resolution, so no point ticking faster
 
-// Hero trace geometry, in the SVG's own box. Both hero layers are sized to the clear
-// space above the stat cards, so the curve is never half-hidden behind them however
-// the hero reflows: zero drift sits on the cards' top edge and the fill between them
-// is the area under the curve.
-const HERO_W = 1200;
-const HERO_VB_H = 200; // also the zero line
-const HERO_TOP = 14;
-const HERO_HIT_WIDTH = 18; // invisible fat stroke: the curve is 1.6 units thin
-const HERO_TIP_DX = 16;
-const HERO_TIP_DY = 18;
-
 export async function init(): Promise<void> {
   let DATA: {
     stats: Stats;
@@ -161,15 +162,24 @@ export async function init(): Promise<void> {
       <div class="what">Live data from this endpoint — ${method} detected a change on
         ${esc(h.date)} (${relDays(h.daysAgo)}), moving from
         ${magnitudeLabel(h.method, h.baseline)} to ${magnitudeLabel(h.method, h.magnitude)}.
-        Showing ${esc(h.start)} to ${esc(h.end)}, one point per day.</div>
+        Showing ${esc(h.start)} to <span class="drawn-to">${esc(h.end)}</span>, one point per day.</div>
       <div class="go">Open the endpoint →</div>`;
 
     // Both layers stop where the stat cards begin, so no part of the curve is drawn
     // behind them and no pointer event over a card reaches the hit stroke.
     const cards = document.getElementById("telemetry")!;
+    const lede = document.querySelector(".lede")!; // the hero's widest line
+    const wide = matchMedia(HERO_WIDE);
     function fitLayers(): void {
-      const top = cards.getBoundingClientRect().top - hero.getBoundingClientRect().top;
-      for (const el of [svg, hitLayer]) el.style.height = Math.max(0, top) + "px";
+      const box = hero.getBoundingClientRect();
+      const top = cards.getBoundingClientRect().top - box.top;
+      const clearTo = lede.getBoundingClientRect().right - box.left + HERO_CLEAR_GAP;
+      const stretch = wide.matches ? heroStretch(h.changeFrac, box.width, clearTo) : 1;
+      for (const el of [svg, hitLayer]) {
+        el.style.height = Math.max(0, top) + "px";
+        el.style.width = (stretch * 100).toFixed(2) + "%";
+      }
+      tip.querySelector(".drawn-to")!.textContent = heroDrawnTo(h.start, h.end, stretch);
     }
     for (const el of [svg, hitLayer]) {
       el.setAttribute("viewBox", `0 0 ${HERO_W} ${HERO_VB_H}`);
