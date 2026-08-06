@@ -209,6 +209,15 @@ def test_model_view_has_flattened_change_list(tmp_path):
     assert {c["provider"] for c in view["changes"]} == {"chutes", "chutes/fp8"}
 
 
+def test_model_endpoints_carry_model_fields_for_the_shared_timeline(tmp_path):
+    root = tmp_path / "website"
+    _two_variant_model(root)
+    view = _build_model_views(root)[slugify("m/a")]
+    assert {e["model"] for e in view["endpoints"]} == {"m/a"}
+    assert {e["modelSlug"] for e in view["endpoints"]} == {slugify("m/a")}
+    assert {c["model"] for c in view["changes"]} == {"m/a"}
+
+
 def test_change_count_follows_changes_json_not_the_recomputed_scores(tmp_path):
     """changes.json is canonical; the build-time recompute stored in lt_scores.json
     double-detects some changes on adjacent days, and those must neither be drawn

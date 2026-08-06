@@ -8,7 +8,6 @@ Reads only already-generated data (the parsed lt_scores.json series, B3IT
 build-time views, changes.json) -- never raw logprobs.
 """
 
-import json
 import math
 from collections import defaultdict
 from datetime import datetime
@@ -21,6 +20,12 @@ from trackllm_website.generate_site.lt import EndpointInfo, LTData
 from trackllm_website.generate_site.months import month_range
 from trackllm_website.generate_site.naming import base_provider, variant_name
 from trackllm_website.generate_site.rates import drift_rate, poisson_interval
+from trackllm_website.generate_site.status_io import SiteStatuses
+from trackllm_website.generate_site.timeline import (
+    build_timeline,
+    changes_by_slug,
+    load_changes,
+)
 from trackllm_website.util import slugify
 
 DAYS_PER_YEAR = 365.25
@@ -93,13 +98,14 @@ def build_provider_views(
     lt_endpoints: list[EndpointInfo],
     b3it_views: dict[str, B3ITView],
     endpoint_rows: list[dict],
+    site: SiteStatuses,
 ) -> dict[str, dict]:
     data_dir = website_dir / "data"
     lt_by_slug = {e.slug: e for e in lt_endpoints}
     rows_by_slug = {r["slug"]: r for r in endpoint_rows}
 
-    changes_path = data_dir / "changes.json"
-    changes = json.loads(changes_path.read_text()) if changes_path.exists() else []
+    changes = load_changes(data_dir)
+    canonical = changes_by_slug(changes)
 
     lt_span = {
         slug: (_day(d.dates[0]), _day(d.dates[-1])) for slug, d in lt_data.items()
@@ -177,9 +183,18 @@ def build_provider_views(
             )
         ]
 
+        # The same shared-axis strips the model page draws, one per tracked
+        # endpoint; untracked catalog rows stay in the directory table below.
+        # No observed span means no timeline: the page omits the section
+        # rather than rendering an empty chart.
+        timeline = build_timeline(
+            sorted(slugs), lt_by_slug, b3it_views, site, data_dir / "lt", canonical
+        )
+
         views[slugify(base)] = {
             "name": base,
             "slug": slugify(base),
+            "timeline": timeline if timeline["date_min"] else None,
             "n_endpoints": len(slugs),
             "n_models": len(models[base]),
             "n_variants": len(variants),

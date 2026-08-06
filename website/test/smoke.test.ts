@@ -53,7 +53,7 @@ const PAGES: Page[] = [
     html: "providers/chutes.html",
     entry: "../src/provider.ts",
     ready: "#epBody tr",
-    mounts: ["lede", "summary", "ratecards", "timeline", "variantBody", "epBody"],
+    mounts: ["lede", "summary", "ratecards", "cmp", "timeline", "variantBody", "epBody"],
   },
   {
     // Chosen for its provider mix: one company serving two variants, nine serving
@@ -169,13 +169,14 @@ describe.each(PAGES)("$name page", (page) => {
     }
   });
 
-  // A group banner exists to say "these rows are the same company"; over a lone
-  // row it says nothing and just costs a full-width band of surface-3.
-  test.if(page.name === "model")("banners only over groups of more than one row", () => {
+  // A group banner exists to say "these rows are the same company" (the same
+  // model, on the provider page); over a lone row it says nothing and just costs
+  // a full-width band of surface-3.
+  test.if(["model", "provider"].includes(page.name))("banners only over groups of more than one row", () => {
     const banners = document.querySelectorAll("#cmp .grp-h");
     expect(
       banners.length,
-      "no banner at all -- the page above no longer has a multi-variant provider",
+      "no banner at all -- the page above no longer has a multi-variant group",
     ).toBeGreaterThan(0);
     for (const b of banners) {
       let rows = 0;
