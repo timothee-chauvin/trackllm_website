@@ -21,6 +21,7 @@ import {
   TOP2,
   VH,
   chartAxis,
+  downsampleRuns,
   fmtDrift,
   fmtTV,
   laneGeoms,
@@ -28,6 +29,7 @@ import {
   last,
   packMarks,
   round,
+  segments,
 } from "./chart_geom";
 
 interface ManifestData {
@@ -66,11 +68,6 @@ const fmtMon = (s: string): string => {
   return `${MONTH_NAMES[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
 };
 
-function downsamplePairs(pairs: [string, number][], n: number): [string, number][] {
-  if (pairs.length <= n) return pairs;
-  return Array.from({ length: n }, (_, i) => pairs[Math.floor((i * pairs.length) / n)]);
-}
-
 async function fetchJSON<T>(url: string): Promise<T | null> {
   const res = await fetch(url);
   // 404 is a real state -- the file is absent because that method never ran for
@@ -91,8 +88,10 @@ export function buildLT(scores: LTScoresData | null, changes: LTChange[]): Focus
   const driftDates = scores.drift_dates ?? [];
   const drift = scores.drift ?? [];
   const pairs: [string, number][] = driftDates.map((d, i) => [d.slice(0, 10), round(drift[i], 3)]);
+  const { series, breaks } = downsampleRuns(pairs, TRACE_LEN);
   return {
-    drift: downsamplePairs(pairs, TRACE_LEN),
+    drift: series,
+    breaks,
     changes,
     firstDate: scores.dates[0].slice(0, 10),
     lastDate: last(scores.dates)!.slice(0, 10),
@@ -105,8 +104,10 @@ export function buildB3IT(data: B3ITData | null, changes: B3ITChange[]): FocusB3
     d.slice(0, 10),
     round(data.tv_series.values[i], 3),
   ]);
+  const { series, breaks } = downsampleRuns(pairs, TRACE_LEN);
   return {
-    tv: downsamplePairs(pairs, TRACE_LEN),
+    tv: series,
+    breaks,
     changes,
     firstDate: data.tv_series.dates.length ? data.tv_series.dates[0].slice(0, 10) : "",
     lastDate: data.tv_series.dates.length ? last(data.tv_series.dates)!.slice(0, 10) : "",
@@ -177,15 +178,22 @@ export function chartSvg(lt: FocusLT | null, b3it: FocusB3IT | null, vw: number)
   const [ltGeom, b3Geom] = laneGeoms(lt, b3it);
 
   function lane(g: LaneGeom, label: string): string {
-    const { series, topY, maxV, col, fill } = g;
+    const { series, breaks, topY, maxV, col, fill } = g;
     const yv = (v: number): number => laneY(g, v);
     const pts = series
       .map(([d, v], i) => `${i ? "L" : "M"}${fx(d).toFixed(1)} ${yv(v).toFixed(1)}`)
       .join(" ");
-    const area =
-      `M${fx(series[0][0]).toFixed(1)} ${(topY + LANE_H).toFixed(1)} ` +
-      series.map(([d, v]) => `L${fx(d).toFixed(1)} ${yv(v).toFixed(1)}`).join(" ") +
-      ` L${fx(last(series)![0]).toFixed(1)} ${(topY + LANE_H).toFixed(1)} Z`;
+    // one closed area per run of observed days: the fill is what tells the reader
+    // which days this endpoint was actually sampled on
+    const base = (topY + LANE_H).toFixed(1);
+    const area = segments(series, breaks)
+      .map(
+        (run) =>
+          `M${fx(run[0][0]).toFixed(1)} ${base} ` +
+          run.map(([d, v]) => `L${fx(d).toFixed(1)} ${yv(v).toFixed(1)}`).join(" ") +
+          ` L${fx(last(run)![0]).toFixed(1)} ${base} Z`
+      )
+      .join(" ");
     const grid = ticks
       .map(({ t }) => {
         const x = fx(new Date(t).toISOString().slice(0, 10));
