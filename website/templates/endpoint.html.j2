@@ -71,7 +71,7 @@
   <section class="block">
     <div class="sec-head"><h2>Endpoint details</h2><span class="hint">from the OpenRouter catalog snapshot</span></div>
     <div class="panel meta-grid">
-      <div><div class="k">Pricing (per Mtok)</div><div class="v">{% if meta.free %}Free{% else %}${{ meta.cost[0]|fmt_cost }} in · ${{ meta.cost[1]|fmt_cost }} out{% endif %}</div></div>
+      <div><div class="k">Pricing (per Mtok)</div><div class="v">{% if meta.free %}Free{% else %}${{ meta.cost[0]|fmt_price }} in · ${{ meta.cost[1]|fmt_price }} out{% endif %}</div></div>
       <div><div class="k">Listed since</div><div class="v">{{ meta.created[:10] if meta.created else "—" }}</div></div>
       <div><div class="k">Claims temperature</div><div class="v">{{ "unknown" if meta.supports_temperature is none else ("yes" if meta.supports_temperature else "no") }}</div></div>
       <div><div class="k">Claims logprobs</div><div class="v">{{ "unknown" if meta.supports_logprobs is none else ("yes" if meta.supports_logprobs else "no") }}</div></div>

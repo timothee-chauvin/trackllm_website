@@ -91,8 +91,13 @@ async def gather_with_concurrency_streaming(
         yield result
 
 
+def _two_significant_digits(x: float) -> str:
+    """x at two significant digits, always in decimal form (never an exponent)."""
+    return f"{x:.{-math.floor(math.log10(abs(x))) + 1}f}"
+
+
 def format_cost(x: float) -> str:
-    """Format a USD amount for display: two decimals, but never fewer than two
+    """Format a billed USD amount: two decimals, but never fewer than two
     significant digits, so amounts under $0.10 keep their information instead of
     collapsing ($0.0567 is "0.057", not "0.06"; $0.000012 is not "0.00").
 
@@ -102,8 +107,20 @@ def format_cost(x: float) -> str:
     """
     if x == 0:
         return "0.00"
-    decimals = max(2, -math.floor(math.log10(abs(x))) + 1)
-    return f"{x:.{decimals}f}"
+    return f"{x:.2f}" if abs(x) >= 0.1 else _two_significant_digits(x)
+
+
+def format_price(x: float) -> str:
+    """Format a per-Mtok list price: two decimals, which is how providers quote
+    them ("$0.02", not "$0.020").
+
+    Unlike format_cost, precision only grows to keep a nonzero price off "0.00":
+    a price is a round advertised number, not a measurement.
+    """
+    two = f"{x:.2f}"
+    if x == 0 or float(two) != 0:
+        return two
+    return _two_significant_digits(x)
 
 
 def trim_to_length(s: str, length: int) -> str:
