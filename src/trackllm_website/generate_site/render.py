@@ -145,7 +145,7 @@ def render_site(
         website_dir, lt_data, endpoints, b3it_views, hero_pin, site
     )
     provider_views = provider_mod.build_provider_views(
-        website_dir, lt_data, endpoints, b3it_views, overview["endpoints"]
+        website_dir, lt_data, endpoints, b3it_views, overview["endpoints"], site
     )
     overview["providers"] = provider_mod.overview_rows(provider_views)
     (website_dir / "data" / "overview.json").write_text(json.dumps(overview))

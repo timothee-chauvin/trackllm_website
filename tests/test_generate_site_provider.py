@@ -83,7 +83,7 @@ def _views_with(root, inputs):
     b3it = b3it_views_for(root)
     site = site_statuses_for(root, inputs)
     rows = build_overview(root, lt_data, lt_endpoints, b3it, None, site)["endpoints"]
-    return build_provider_views(root, lt_data, lt_endpoints, b3it, rows)
+    return build_provider_views(root, lt_data, lt_endpoints, b3it, rows, site)
 
 
 def _views(root):
@@ -303,6 +303,41 @@ def test_change_links_use_the_slug_the_provider_view_is_keyed_by(tmp_path):
     assert list(views) == [slug]
     (item,) = views[slug]["changes"]
     assert item["providerSlug"] == slug
+
+
+def test_provider_view_carries_the_shared_timeline(fake_site):
+    tl = _views(fake_site)["p"]["timeline"]
+    assert tl["date_min"] == "2026-06-01"
+    assert tl["date_max"] == "2026-06-30"
+    assert {e["slug"] for e in tl["endpoints"]} == {"org2fa23p", "org2fb23p2ffp8"}
+    ep = next(e for e in tl["endpoints"] if e["slug"] == "org2fa23p")
+    assert ep["model"] == "org/a" and ep["modelSlug"] == slugify("org/a")
+    assert set(ep["methods"]) == {"lt", "b3it"}
+    assert ep["lt"]["changes"][0]["drift"] == 1.5
+    assert [(c["date"], c["model"]) for c in tl["changes"]] == [("2026-06-25", "org/a")]
+
+
+def test_untracked_catalog_endpoints_stay_out_of_the_timeline(fake_site):
+    """The directory table below already lists them with their status badge."""
+    inputs = empty_status_inputs()
+    inputs.catalog = [catalog_entry("org/new", "p/fp4", supports_logprobs=False)]
+    tl = _views_with(fake_site, inputs)["p"]["timeline"]
+    assert slugify("org/new#p/fp4") not in {e["slug"] for e in tl["endpoints"]}
+
+
+def test_timeline_omitted_when_no_series_has_points(tmp_path):
+    """No axis span, no timeline: the page omits the section rather than
+    rendering an empty chart."""
+    root = tmp_path / "website"
+    dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 11)]
+    write_lt_endpoint(
+        root, "org2fa23q", "org/a", "q", dates=dates, changes=[], drift=[]
+    )
+    (root / "data" / "changes.json").write_text(json.dumps([]))
+    (root / "data" / "spend.json").write_text(json.dumps({"cumulative": {}}))
+    view = _views(root)["q"]
+    assert view["timeline"] is None
+    assert {e["slug"] for e in view["endpoints"]} == {"org2fa23q"}
 
 
 def test_overview_rows_are_one_per_provider_with_last_change(fake_site):

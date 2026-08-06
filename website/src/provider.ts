@@ -19,6 +19,7 @@ import {
   volGrid,
 } from "./components";
 import { EndpointRow, initDirectory } from "./directory";
+import { type TimelineData, renderTimeline } from "./timeline";
 
 interface MethodBlock {
   endpoints: number;
@@ -59,6 +60,8 @@ interface ProviderData {
   variants: Variant[];
   changes: ProviderChange[];
   endpoints: EndpointRow[];
+  // null when no endpoint has an observed span: the section is omitted, not empty
+  timeline: TimelineData | null;
 }
 
 const LANE_W = 600;
@@ -163,6 +166,27 @@ export async function init(): Promise<void> {
     cardsEl.innerHTML =
       rateCard("Logprob tracking", '<span class="badge lt">LT</span>', D.lt) +
       rateCard("Border input tracking", '<span class="badge b3it">B3IT</span>', D.b3it);
+  }
+
+  // the shared timeline model pages draw, mirrored: rows named by model, grouped
+  // per model, most-changed group first
+  const driftSec = document.getElementById("driftSec");
+  const cmpEl = document.getElementById("cmp");
+  if (driftSec && cmpEl) {
+    if (!D.timeline) {
+      driftSec.remove();
+    } else {
+      renderTimeline(cmpEl, D.timeline, {
+        name: (ep) => (variantOf(ep.provider) ? `${ep.model} · ${variantOf(ep.provider)}` : ep.model),
+        changeName: (c) => c.model,
+        group: (ep) => ({
+          key: ep.modelSlug,
+          label: ep.model,
+          href: `../models/${ep.modelSlug}.html`,
+          page: "model page",
+        }),
+      });
+    }
   }
 
   // monitoring lanes: gray area = endpoints under monitoring per month, dots = changes

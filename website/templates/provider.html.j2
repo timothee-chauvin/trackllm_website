@@ -1,5 +1,5 @@
 {% extends "base.html.j2" %}
-{% from "_macros.html.j2" import chip, search_box %}
+{% from "_macros.html.j2" import chip, search_box, timeline_panel %}
 
 {% block title %}{{ provider }} | TrackLLM{% endblock %}
 
@@ -25,6 +25,13 @@
       <h2>Drift rate</h2>
     </div>
     <div class="ratecards" id="ratecards"></div>
+  </section>
+
+  {# provider.ts removes the whole section when no endpoint has an observed span #}
+  <section class="block" id="driftSec">
+    <div class="sec-head"><h2>Drift by model</h2></div>
+    <p class="sec-desc">Every endpoint {{ provider }} serves, on one timeline. Each strip is that endpoint's drift from its own reference period; dots mark detected changes, placed at the drift level they reached. <b>Shared y-scale within each method</b>, so strip heights are comparable.</p>
+    {{ timeline_panel("hover or tap a strip to read every endpoint on the same day") }}
   </section>
 
   <section class="block">
