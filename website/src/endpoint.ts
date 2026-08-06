@@ -29,7 +29,9 @@ import {
   last,
   packMarks,
   round,
+  areaPath,
   segments,
+  strokePath,
 } from "./chart_geom";
 
 interface ManifestData {
@@ -180,20 +182,11 @@ export function chartSvg(lt: FocusLT | null, b3it: FocusB3IT | null, vw: number)
   function lane(g: LaneGeom, label: string): string {
     const { series, breaks, topY, maxV, col, fill } = g;
     const yv = (v: number): number => laneY(g, v);
-    const pts = series
-      .map(([d, v], i) => `${i ? "L" : "M"}${fx(d).toFixed(1)} ${yv(v).toFixed(1)}`)
-      .join(" ");
+    const runs = segments(series, breaks);
+    const pts = strokePath(runs, ([d, v]) => `${fx(d).toFixed(1)} ${yv(v).toFixed(1)}`);
     // one closed area per run of observed days: the fill is what tells the reader
     // which days this endpoint was actually sampled on
-    const base = (topY + LANE_H).toFixed(1);
-    const area = segments(series, breaks)
-      .map(
-        (run) =>
-          `M${fx(run[0][0]).toFixed(1)} ${base} ` +
-          run.map(([d, v]) => `L${fx(d).toFixed(1)} ${yv(v).toFixed(1)}`).join(" ") +
-          ` L${fx(last(run)![0]).toFixed(1)} ${base} Z`
-      )
-      .join(" ");
+    const area = areaPath(runs, ([d]) => fx(d), ([, v]) => yv(v), topY + LANE_H);
     const grid = ticks
       .map(({ t }) => {
         const x = fx(new Date(t).toISOString().slice(0, 10));

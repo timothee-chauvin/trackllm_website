@@ -70,6 +70,24 @@ const GAPPED = {
 /** The lane fills: one closed area subpath per run of observed days. */
 const areaPaths = (svg: Element): Element[] =>
   [...svg.querySelectorAll("path")].filter((p) => (p.getAttribute("fill") ?? "none") !== "none");
+/** The stroked line on top of the fill. */
+const strokePaths = (svg: Element): Element[] =>
+  [...svg.querySelectorAll("path")].filter(
+    (p) => p.getAttribute("fill") === "none" && p.getAttribute("stroke")
+  );
+
+describe("areaPath", () => {
+  test("a single-day run still shows as a hairline of fill", async () => {
+    const { areaPath, segments } = await import("../src/chart_geom");
+    const pairs = series([...days("2026-01-01", 5), "2026-01-10", ...days("2026-01-20", 5)]);
+    const runs = segments(pairs, [5, 6]);
+    const d = areaPath(runs, ([q]) => Date.parse(q) / 86400000, ([, v]) => 100 - v, 100);
+    const subpaths = d.split("Z").filter((s) => s.trim());
+    expect(subpaths.length).toBe(3);
+    const lone = xs(subpaths[1] + "Z");
+    expect(Math.max(...lone) - Math.min(...lone)).toBeGreaterThan(0);
+  });
+});
 
 describe("the endpoint chart's lane fill", () => {
   test("a gap in the series leaves a hole in the fill", async () => {
@@ -83,6 +101,12 @@ describe("the endpoint chart's lane fill", () => {
     const flat = { ...GAPPED, tv: series(days("2026-07-01", 10)), breaks: [] };
     const d = areaPaths(parse(chartSvg(null, flat, 1000)))[0].getAttribute("d")!;
     expect(d.match(/Z/g)?.length).toBe(1);
+  });
+
+  test("the line breaks at the gap too", async () => {
+    const { chartSvg } = await import("../src/endpoint");
+    const d = strokePaths(parse(chartSvg(null, GAPPED, 1000)))[0].getAttribute("d")!;
+    expect(d.match(/M/g)?.length, "the line was drawn straight across the gap").toBe(2);
   });
 });
 
@@ -147,5 +171,13 @@ describe("the shared timeline's strip fill", () => {
       .map((p) => p.getAttribute("d")!)
       .join(" ");
     expect(d.match(/Z/g)?.length, "the fill was drawn straight across the gap").toBe(2);
+  });
+
+  test("the line breaks at the gap too", async () => {
+    const svg = await renderStrip();
+    const d = strokePaths(svg)
+      .map((p) => p.getAttribute("d")!)
+      .join(" ");
+    expect(d.match(/M/g)?.length, "the line was drawn straight across the gap").toBe(2);
   });
 });

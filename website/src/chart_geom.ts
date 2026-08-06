@@ -37,7 +37,7 @@ export const last = <T,>(arr: T[]): T | undefined => arr[arr.length - 1];
 
 // ---- missing days --------------------------------------------------------------
 // A day the endpoint was not sampled on is a hole in the series, and the area under
-// the curve is where the reader sees it: the line may cross a hole, the fill may not.
+// the curve is where the reader sees it: neither the line nor the fill may cross a hole.
 // The holes have to be found before the series is thinned for drawing -- afterwards
 // every step looks like a gap -- so `breaks` travels with the thinned points: the
 // indices into them that start a new run of consecutive observed days. timeline.py
@@ -47,6 +47,38 @@ export const last = <T,>(arr: T[]): T | undefined => arr[arr.length - 1];
 export function segments<T>(series: T[], breaks: number[]): T[][] {
   const cuts = [0, ...breaks, series.length];
   return cuts.slice(1).map((end, i) => series.slice(cuts[i], end)).filter((s) => s.length);
+}
+
+/** One `M...L...` subpath per run, so the stroke stops at every hole. A one-point
+ *  run has no length to stroke and is skipped, like its zero-width fill. */
+export function strokePath<T>(runs: T[][], at: (p: T) => string): string {
+  return runs
+    .filter((run) => run.length > 1)
+    .map((run) => run.map((p, i) => `${i ? "L" : "M"}${at(p)}`).join(" "))
+    .join(" ");
+}
+
+/** One closed area subpath per run, closed on the run's own first and last x so the
+ *  fill covers exactly the observed days. A one-point run gets a hairline tick of
+ *  fill -- with no line and no dot, an isolated observed day would otherwise vanish. */
+export function areaPath<T>(
+  runs: T[][],
+  x: (p: T) => number,
+  y: (p: T) => number,
+  base: number
+): string {
+  const b = base.toFixed(1);
+  return runs
+    .map((run) => {
+      if (run.length === 1) {
+        const [cx, cy] = [x(run[0]), y(run[0]).toFixed(1)];
+        const [x0, x1] = [(cx - 0.75).toFixed(1), (cx + 0.75).toFixed(1)];
+        return `M${x0} ${b} L${x0} ${cy} L${x1} ${cy} L${x1} ${b} Z`;
+      }
+      const pts = run.map((p) => `L${x(p).toFixed(1)} ${y(p).toFixed(1)}`).join(" ");
+      return `M${x(run[0]).toFixed(1)} ${b} ${pts} L${x(last(run)!).toFixed(1)} ${b} Z`;
+    })
+    .join(" ");
 }
 
 /** `k` evenly spaced points of `run`, both ends kept so the fill under it stops

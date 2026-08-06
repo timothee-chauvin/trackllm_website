@@ -14,7 +14,7 @@ import {
   stripTip,
   td,
 } from "./components";
-import { last, sampleAt, segments } from "./chart_geom";
+import { areaPath, sampleAt, segments, strokePath } from "./chart_geom";
 import { type StripRow, STRIP_VW, bindSharedHover, dayAt, readCells } from "./model_hover";
 
 // drift/peakTV are null when the level the change reached is unknown: the series
@@ -164,16 +164,12 @@ export function renderTimeline(panel: HTMLElement, D: TimelineData, labels: Time
     const { series: sig, breaks, dmax, col } = drawn(ep);
     const at = (p: [string, number]): string =>
       `${xpos(p[0]).toFixed(1)} ${stripY(p[1], dmax).toFixed(1)}`;
-    const path = sig.length > 1 ? sig.map((p, i) => `${i ? "L" : "M"}${at(p)}`).join(" ") : "";
+    const runs = segments(sig, breaks);
+    const path = strokePath(runs, at);
     // The fill is this row's missing-data indicator, so it is closed on the run's own
     // first and last day -- not on the strip's edges, which would spread it across
     // every month the *page* spans and every day this endpoint went unobserved.
-    const areas = segments(sig, breaks)
-      .map(
-        (run) =>
-          `M${xpos(run[0][0]).toFixed(1)} ${STRIP_H} ${run.map((p) => `L${at(p)}`).join(" ")} L${xpos(last(run)![0]).toFixed(1)} ${STRIP_H} Z`
-      )
-      .join(" ");
+    const areas = areaPath(runs, (p) => xpos(p[0]), (p) => stripY(p[1], dmax), STRIP_H);
     const marks: Mark[] = [
       ...(ep.lt
         ? ep.lt.changes.map(

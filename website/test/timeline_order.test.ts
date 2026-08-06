@@ -23,7 +23,7 @@ const ep = (base: string, name: string, lastQuery: string | null, nChanges: numb
   last: "2026-06-30",
   last_query: lastQuery,
   n_changes: nChanges,
-  lt: { drift: [["2026-01-01", 0.1], ["2026-06-30", 0.2]], changes: [] },
+  lt: { drift: [["2026-01-01", 0.1], ["2026-06-30", 0.2]], breaks: [], changes: [] },
   b3it: null,
   status: { lt: "tracked", bi: "pending", headline: "tracked", reason: "" },
 });
