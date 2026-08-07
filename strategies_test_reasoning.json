@@ -215,6 +215,7 @@
   "openrouter#deepseek/deepseek-v4-flash-0731#phala": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#sail-research/fp4": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#siliconflow/fp8": null,
+  "openrouter#deepseek/deepseek-v4-flash-0731#streamlake": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#together": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#venice": null,
   "openrouter#deepseek/deepseek-v4-pro#alibaba": null,
@@ -500,6 +501,7 @@
   "openrouter#inclusionai/ling-2.6-1t#novita": null,
   "openrouter#inclusionai/ling-2.6-flash#novita": null,
   "openrouter#inclusionai/ling-3.0-flash#deepinfra/bf16": null,
+  "openrouter#inclusionai/ling-3.0-flash#novita": null,
   "openrouter#inclusionai/ring-2.6-1t#novita": {
     "max_tokens": 4
   },
@@ -691,6 +693,7 @@
   "openrouter#moonshotai/kimi-k2.5#venice": null,
   "openrouter#moonshotai/kimi-k2.6#atlas-cloud/int4": null,
   "openrouter#moonshotai/kimi-k2.6#baidu/fp4": null,
+  "openrouter#moonshotai/kimi-k2.6#baseten/fp4": null,
   "openrouter#moonshotai/kimi-k2.6#chutes/int4": null,
   "openrouter#moonshotai/kimi-k2.6#cloudflare": null,
   "openrouter#moonshotai/kimi-k2.6#coreweave/fp4": null,

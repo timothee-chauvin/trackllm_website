@@ -255,7 +255,7 @@ endpoints_lt:
   model: openai/gpt-oss-120b
   provider: mancer/fp8
   cost:
-  - 0.1
+  - 0.09
   - 0.5
 - api: openrouter
   model: qwen/qwen3-30b-a3b-instruct-2507
@@ -862,6 +862,12 @@ endpoints_lt:
   provider: xai/zdr/priority
   cost:
   - 2.5
+  - 5.0
+- api: openrouter
+  model: anthracite-org/magnum-v4-72b
+  provider: mancer/fp8
+  cost:
+  - 3.0
   - 5.0
 - api: openrouter
   model: x-ai/grok-4.5
