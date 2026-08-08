@@ -1667,8 +1667,8 @@ endpoints_catalog:
 - model: deepseek/deepseek-v4-flash
   provider: open-inference/fp8
   cost:
-  - 0.14
-  - 0.28
+  - 0.07
+  - 0.18
   created: '2026-04-24T03:17:46+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -1795,6 +1795,15 @@ endpoints_catalog:
   cost:
   - 0.14
   - 0.28
+  created: '2026-07-31T06:21:48+00:00'
+  supports_temperature: true
+  supports_logprobs: true
+  free: false
+- model: deepseek/deepseek-v4-flash-0731
+  provider: digitalocean
+  cost:
+  - 0.126
+  - 0.252
   created: '2026-07-31T06:21:48+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -1937,8 +1946,8 @@ endpoints_catalog:
 - model: deepseek/deepseek-v4-pro
   provider: baidu/fp8
   cost:
-  - 1.2337
-  - 2.4674
+  - 0.338
+  - 0.676
   created: '2026-04-24T03:17:59+00:00'
   supports_temperature: true
   supports_logprobs: false
@@ -1964,8 +1973,8 @@ endpoints_catalog:
 - model: deepseek/deepseek-v4-pro
   provider: coreweave/fp8
   cost:
-  - 1.74
-  - 3.48
+  - 1.15
+  - 2.55
   created: '2026-04-24T03:17:59+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -2027,8 +2036,8 @@ endpoints_catalog:
 - model: deepseek/deepseek-v4-pro
   provider: novita/fp8
   cost:
-  - 1.168
-  - 2.336
+  - 0.59952
+  - 1.19904
   created: '2026-04-24T03:17:59+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -2054,8 +2063,8 @@ endpoints_catalog:
 - model: deepseek/deepseek-v4-pro
   provider: streamlake/fp8
   cost:
-  - 0.6525
-  - 1.305
+  - 0.348
+  - 0.696
   created: '2026-04-24T03:17:59+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -2654,6 +2663,15 @@ endpoints_catalog:
   supports_temperature: true
   supports_logprobs: false
   free: false
+- model: google/gemini-3.1-flash-lite
+  provider: google-vertex/us
+  cost:
+  - 0.275
+  - 1.65
+  created: '2026-05-07T15:47:08+00:00'
+  supports_temperature: true
+  supports_logprobs: false
+  free: false
 - model: google/gemini-3.1-flash-lite-image
   provider: google-ai-studio
   cost:
@@ -2834,6 +2852,15 @@ endpoints_catalog:
   supports_temperature: true
   supports_logprobs: false
   free: false
+- model: google/gemini-3.5-flash
+  provider: google-vertex/us
+  cost:
+  - 1.65
+  - 9.9
+  created: '2026-05-19T12:30:00+00:00'
+  supports_temperature: true
+  supports_logprobs: false
+  free: false
 - model: google/gemini-3.5-flash-lite
   provider: google-ai-studio
   cost:
@@ -2884,6 +2911,15 @@ endpoints_catalog:
   cost:
   - 0.54
   - 4.5
+  created: '2026-07-21T15:12:06+00:00'
+  supports_temperature: false
+  supports_logprobs: false
+  free: false
+- model: google/gemini-3.5-flash-lite
+  provider: google-vertex/us
+  cost:
+  - 0.33
+  - 2.75
   created: '2026-07-21T15:12:06+00:00'
   supports_temperature: false
   supports_logprobs: false
@@ -3242,7 +3278,7 @@ endpoints_catalog:
 - model: google/gemma-4-31b-it
   provider: open-inference/bf16
   cost:
-  - 0.1
+  - 0.08
   - 0.35
   created: '2026-04-02T16:48:06+00:00'
   supports_temperature: true
@@ -3350,8 +3386,8 @@ endpoints_catalog:
 - model: gryphe/mythomax-l2-13b
   provider: mancer/fp8
   cost:
-  - 0.45
-  - 0.65
+  - 0.4
+  - 0.6
   created: '2023-07-02T00:00:00+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -4592,8 +4628,8 @@ endpoints_catalog:
 - model: moonshotai/kimi-k2.6
   provider: baidu/fp4
   cost:
-  - 0.589
-  - 2.48
+  - 0.5795
+  - 2.44
   created: '2026-04-20T15:36:42+00:00'
   supports_temperature: true
   supports_logprobs: false
@@ -4934,8 +4970,8 @@ endpoints_catalog:
 - model: moonshotai/kimi-k3
   provider: digitalocean
   cost:
-  - 3.0
-  - 15.0
+  - 2.85
+  - 14.25
   created: '2026-07-16T15:30:58+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -4979,7 +5015,7 @@ endpoints_catalog:
 - model: moonshotai/kimi-k3
   provider: morph
   cost:
-  - 2.9
+  - 2.5
   - 14.0
   created: '2026-07-16T15:30:58+00:00'
   supports_temperature: true
@@ -5967,15 +6003,6 @@ endpoints_catalog:
   supports_logprobs: false
   free: false
 - model: openai/gpt-5.3-chat
-  provider: azure
-  cost:
-  - 1.75
-  - 14.0
-  created: '2026-03-03T18:54:21+00:00'
-  supports_temperature: false
-  supports_logprobs: false
-  free: false
-- model: openai/gpt-5.3-chat
   provider: openai
   cost:
   - 1.75
@@ -6865,6 +6892,15 @@ endpoints_catalog:
   created: '2026-05-05T16:56:52+00:00'
   supports_temperature: false
   supports_logprobs: false
+  free: false
+- model: openai/gpt-oss-120b
+  provider: akashml/bf16
+  cost:
+  - 0.037
+  - 0.49
+  created: '2025-08-05T17:17:11+00:00'
+  supports_temperature: true
+  supports_logprobs: true
   free: false
 - model: openai/gpt-oss-120b
   provider: amazon-bedrock
@@ -9290,8 +9326,8 @@ endpoints_catalog:
 - model: xiaomi/mimo-v2.5
   provider: gmicloud/fp8
   cost:
-  - 0.112
-  - 0.224
+  - 0.14
+  - 0.28
   created: '2026-04-22T16:11:09+00:00'
   supports_temperature: true
   supports_logprobs: false
@@ -9362,8 +9398,8 @@ endpoints_catalog:
 - model: xiaomi/mimo-v2.5-pro
   provider: gmicloud/bf16
   cost:
-  - 0.348
-  - 0.696
+  - 0.435
+  - 0.87
   created: '2026-04-22T16:11:13+00:00'
   supports_temperature: true
   supports_logprobs: false
@@ -9956,8 +9992,8 @@ endpoints_catalog:
 - model: z-ai/glm-5.2
   provider: baidu/fp8
   cost:
-  - 1.176
-  - 3.696
+  - 0.406
+  - 1.276
   created: '2026-06-16T17:45:30+00:00'
   supports_temperature: true
   supports_logprobs: false
@@ -10037,8 +10073,8 @@ endpoints_catalog:
 - model: z-ai/glm-5.2
   provider: digitalocean
   cost:
-  - 0.7
-  - 2.2
+  - 1.4
+  - 4.4
   created: '2026-06-16T17:45:30+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -10100,8 +10136,8 @@ endpoints_catalog:
 - model: z-ai/glm-5.2
   provider: novita/fp8
   cost:
-  - 0.6986
-  - 2.1956
+  - 0.4186
+  - 1.3156
   created: '2026-06-16T17:45:30+00:00'
   supports_temperature: true
   supports_logprobs: false
@@ -10145,8 +10181,8 @@ endpoints_catalog:
 - model: z-ai/glm-5.2
   provider: streamlake/fp8
   cost:
-  - 0.7
-  - 2.2
+  - 0.4046
+  - 1.2716
   created: '2026-06-16T17:45:30+00:00'
   supports_temperature: true
   supports_logprobs: true
