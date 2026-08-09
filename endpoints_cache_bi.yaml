@@ -273,6 +273,12 @@ too_expensive:
   - 15.0
 - api: openrouter
   model: moonshotai/kimi-k3
+  provider: deepinfra/bf16
+  cost:
+  - 2.85
+  - 14.25
+- api: openrouter
+  model: moonshotai/kimi-k3
   provider: digitalocean
   cost:
   - 3.0
@@ -944,6 +950,12 @@ bad_temperature:
   cost:
   - 1.0
   - 6.0
+- api: openrouter
+  model: google/gemini-3.1-pro-preview
+  provider: google-ai-studio/priority
+  cost:
+  - 3.6
+  - 21.6
 - api: openrouter
   model: google/gemini-3.1-pro-preview
   provider: google-vertex/global
@@ -1740,6 +1752,14 @@ unprobeable:
     \"ovCHB3y-2kFHot-a2734bb81ad47a72\",\n  \"error\": {\n    \"message\": \"Unable
     to access non-serverless mode...'
 - api: openrouter
+  model: cohere/command-a
+  provider: cohere
+  cost:
+  - 2.5
+  - 10.0
+  reason: flaky
+  detail: 'cached: hidden reasoning'
+- api: openrouter
   model: cohere/command-r7b-12-2024
   provider: cohere
   cost:
@@ -2207,6 +2227,16 @@ unprobeable:
   - 0.18
   reason: flaky
   detail: 'cached: hidden reasoning'
+- api: openrouter
+  model: minimax/minimax-m2.7
+  provider: fireworks
+  cost:
+  - 0.3
+  - 1.2
+  reason: flaky
+  detail: '{"message":"Provider returned error","code":429,"metadata":{"raw":"minimax/minimax-m2.7
+    is temporarily rate-limited upstream. Please retry shortly, or add your own key
+    to accumulate your rate limits: ...'
 - api: openrouter
   model: minimax/minimax-m3
   provider: atlas-cloud/fp8
@@ -2786,6 +2816,16 @@ unprobeable:
     modality contain audio.\",\n...'
 - api: openrouter
   model: openai/gpt-oss-20b
+  provider: fireworks
+  cost:
+  - 0.07
+  - 0.3
+  reason: flaky
+  detail: '{"message":"Provider returned error","code":429,"metadata":{"raw":"openai/gpt-oss-20b
+    is temporarily rate-limited upstream. Please retry shortly, or add your own key
+    to accumulate your rate limits: ht...'
+- api: openrouter
+  model: openai/gpt-oss-20b
   provider: parasail/fp4
   cost:
   - 0.03
@@ -2995,27 +3035,47 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
-  openrouter#cohere/command-a#cohere:
-    count: 2
-    last_error: 'cached: hidden reasoning'
   openrouter#deepseek/deepseek-v4-flash#sail-research/fp4:
     count: 1
     last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4-flash
       is temporarily rate-limited upstream. Please retry shortly, or add your own
       key to accumulate y...'
-  openrouter#google/gemini-3.5-flash#google-vertex/us:
+  openrouter#google/gemini-3.1-flash-lite-preview#google-ai-studio/flex:
     count: 1
-    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1786157390-EYmhTWtDsNIxMA5xBcze","object":"chat.completion","created":1786157390,"model":"google/gemini-3.5-flash","provider":"Google","system_fingerp...'
-  openrouter#minimax/minimax-m2.7#fireworks:
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-3.5-flash#google-vertex/us:
     count: 2
-    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"minimax/minimax-m2.7
-      is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulate your rate limits: ...'
-  openrouter#openai/gpt-oss-20b#fireworks:
-    count: 2
-    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"openai/gpt-oss-20b
-      is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulate your rate limits: ht...'
+    last_error: 'cached: hidden reasoning'
+  openrouter#openai/gpt-4.1-mini#azure:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#openai/gpt-4.1-mini#azure/swedencentral:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#openai/gpt-4.1-mini#openai:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#openai/gpt-4.1-nano#azure:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#openai/gpt-4.1-nano#azure/swedencentral:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#openai/gpt-4.1-nano#openai:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#openai/gpt-oss-120b#amazon-bedrock:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#openai/gpt-oss-120b#amazon-bedrock/eu-west-1:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#openai/gpt-oss-20b#amazon-bedrock:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#openai/gpt-oss-20b#amazon-bedrock/eu-west-1:
+    count: 1
+    last_error: 'cached: hidden reasoning'
   openrouter#upstage/solar-pro-3#upstage:
     count: 1
     last_error: 'cached: hidden reasoning'

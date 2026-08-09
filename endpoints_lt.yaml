@@ -42,12 +42,6 @@ endpoints_lt:
   - 0.05
   - 0.1
 - api: openrouter
-  model: qwen/qwen3.7-flash
-  provider: alibaba
-  cost:
-  - 0.03
-  - 0.13
-- api: openrouter
   model: gryphe/mythomax-l2-13b
   provider: parasail/fp16
   cost:
@@ -83,12 +77,6 @@ endpoints_lt:
   cost:
   - 0.084
   - 0.168
-- api: openrouter
-  model: deepseek/deepseek-v4-flash
-  provider: akashml/fp8
-  cost:
-  - 0.098
-  - 0.196
 - api: openrouter
   model: bytedance/ui-tars-1.5-7b
   provider: parasail/bf16
@@ -384,12 +372,6 @@ endpoints_lt:
   - 0.25
   - 0.75
 - api: openrouter
-  model: qwen/qwen3-235b-a22b-2507
-  provider: friendli
-  cost:
-  - 0.2
-  - 0.8
-- api: openrouter
   model: qwen/qwen3-vl-8b-instruct
   provider: parasail/bf16
   cost:
@@ -449,12 +431,6 @@ endpoints_lt:
   cost:
   - 0.26
   - 1.04
-- api: openrouter
-  model: qwen/qwen3.6-flash
-  provider: alibaba/fp8
-  cost:
-  - 0.1875
-  - 1.125
 - api: openrouter
   model: qwen/qwen3-next-80b-a3b-instruct
   provider: google-vertex/global
@@ -516,12 +492,6 @@ endpoints_lt:
   - 0.4
   - 1.2
 - api: openrouter
-  model: qwen/qwen3.7-plus
-  provider: alibaba/fp8
-  cost:
-  - 0.32
-  - 1.28
-- api: openrouter
   model: qwen/qwen3-next-80b-a3b-instruct
   provider: novita/bf16
   cost:
@@ -546,12 +516,6 @@ endpoints_lt:
   - 0.8
   - 1.0
 - api: openrouter
-  model: qwen/qwen3.5-plus-02-15
-  provider: alibaba/fp8
-  cost:
-  - 0.26
-  - 1.56
-- api: openrouter
   model: deepseek/deepseek-v3.2
   provider: friendli
   cost:
@@ -568,12 +532,6 @@ endpoints_lt:
   provider: google-vertex/us-south1
   cost:
   - 0.22
-  - 1.8
-- api: openrouter
-  model: qwen/qwen3.5-plus-20260420
-  provider: alibaba/fp8
-  cost:
-  - 0.3
   - 1.8
 - api: openrouter
   model: qwen/qwen3-vl-235b-a22b-instruct
@@ -600,12 +558,6 @@ endpoints_lt:
   - 0.56
   - 1.68
 - api: openrouter
-  model: qwen/qwen3.6-plus
-  provider: alibaba/fp8
-  cost:
-  - 0.325
-  - 1.95
-- api: openrouter
   model: deepseek/deepseek-chat-v3.1
   provider: google-vertex/us-west2
   cost:
@@ -624,23 +576,11 @@ endpoints_lt:
   - 0.26
   - 2.08
 - api: openrouter
-  model: qwen/qwen3-coder
-  provider: coreweave/bf16
-  cost:
-  - 1.0
-  - 1.5
-- api: openrouter
   model: deepseek/deepseek-v4-pro
   provider: digitalocean
   cost:
   - 0.87
   - 1.74
-- api: openrouter
-  model: qwen/qwen3.5-397b-a17b
-  provider: alibaba/fp8
-  cost:
-  - 0.39
-  - 2.34
 - api: openrouter
   model: morph/morph-v3-large
   provider: morph
@@ -786,23 +726,11 @@ endpoints_lt:
   - 1.26
   - 3.96
 - api: openrouter
-  model: z-ai/glm-5.1
-  provider: alibaba/fp8
-  cost:
-  - 1.33
-  - 4.18
-- api: openrouter
   model: qwen/qwen3-coder
   provider: alibaba/opensource
   cost:
   - 0.975
   - 4.875
-- api: openrouter
-  model: qwen/qwen3.7-max
-  provider: alibaba/fp8
-  cost:
-  - 1.475
-  - 4.425
 - api: openrouter
   model: x-ai/grok-build-0.1
   provider: xai/priority
