@@ -315,6 +315,12 @@ too_expensive:
   - 22.5
 - api: openrouter
   model: moonshotai/kimi-k3
+  provider: sail-research/fp4
+  cost:
+  - 3.0
+  - 15.0
+- api: openrouter
+  model: moonshotai/kimi-k3
   provider: wafer
   cost:
   - 3.0
@@ -1652,6 +1658,12 @@ bad_temperature:
   cost:
   - 5.0
   - 30.0
+- api: openrouter
+  model: sakana/namazu
+  provider: sakana
+  cost:
+  - 0.95
+  - 4.0
 unprobeable:
 - api: openrouter
   model: anthropic/claude-fable-5:batch
@@ -2020,6 +2032,14 @@ unprobeable:
   reason: flaky
   detail: 'plain: 200 No usage in response; body: {"id":"gen-1786074402-AXaJFsiET4RpbTGQ1WZT","object":"chat.completion","created":1786074402,"model":"google/gemini-3.1-flash-lite-image","provider":"Google","sys...'
 - api: openrouter
+  model: google/gemini-3.1-flash-lite-preview
+  provider: google-ai-studio/flex
+  cost:
+  - 0.125
+  - 0.75
+  reason: flaky
+  detail: 'cached: hidden reasoning'
+- api: openrouter
   model: google/gemini-3.1-flash-lite:batch
   provider: google-vertex/global
   cost:
@@ -2375,6 +2395,30 @@ unprobeable:
   reason: flaky
   detail: 'cached: hidden reasoning'
 - api: openrouter
+  model: openai/gpt-4.1-mini
+  provider: azure
+  cost:
+  - 0.4
+  - 1.6
+  reason: flaky
+  detail: 'cached: hidden reasoning'
+- api: openrouter
+  model: openai/gpt-4.1-mini
+  provider: azure/swedencentral
+  cost:
+  - 0.44
+  - 1.76
+  reason: flaky
+  detail: 'cached: hidden reasoning'
+- api: openrouter
+  model: openai/gpt-4.1-mini
+  provider: openai
+  cost:
+  - 0.4
+  - 1.6
+  reason: flaky
+  detail: 'cached: hidden reasoning'
+- api: openrouter
   model: openai/gpt-4.1-mini:batch
   provider: openai
   cost:
@@ -2382,6 +2426,30 @@ unprobeable:
   - 0.8
   reason: batch
   detail: null
+- api: openrouter
+  model: openai/gpt-4.1-nano
+  provider: azure
+  cost:
+  - 0.1
+  - 0.4
+  reason: flaky
+  detail: 'cached: hidden reasoning'
+- api: openrouter
+  model: openai/gpt-4.1-nano
+  provider: azure/swedencentral
+  cost:
+  - 0.11
+  - 0.44
+  reason: flaky
+  detail: 'cached: hidden reasoning'
+- api: openrouter
+  model: openai/gpt-4.1-nano
+  provider: openai
+  cost:
+  - 0.1
+  - 0.4
+  reason: flaky
+  detail: 'cached: hidden reasoning'
 - api: openrouter
   model: openai/gpt-4.1-nano:batch
   provider: openai
@@ -2823,6 +2891,38 @@ unprobeable:
     {\n    \"message\": \"This model requires that either input content or output
     modality contain audio.\",\n...'
 - api: openrouter
+  model: openai/gpt-oss-120b
+  provider: amazon-bedrock
+  cost:
+  - 0.15
+  - 0.6
+  reason: flaky
+  detail: 'cached: hidden reasoning'
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: amazon-bedrock/eu-west-1
+  cost:
+  - 0.15
+  - 0.6
+  reason: flaky
+  detail: 'cached: hidden reasoning'
+- api: openrouter
+  model: openai/gpt-oss-20b
+  provider: amazon-bedrock
+  cost:
+  - 0.07
+  - 0.15
+  reason: flaky
+  detail: 'cached: hidden reasoning'
+- api: openrouter
+  model: openai/gpt-oss-20b
+  provider: amazon-bedrock/eu-west-1
+  cost:
+  - 0.07
+  - 0.15
+  reason: flaky
+  detail: 'cached: hidden reasoning'
+- api: openrouter
   model: openai/gpt-oss-20b
   provider: fireworks
   cost:
@@ -3043,44 +3143,6 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
-  openrouter#deepseek/deepseek-v4-flash#sail-research/fp4:
-    count: 1
-    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4-flash
-      is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulate y...'
-  openrouter#google/gemini-3.1-flash-lite-preview#google-ai-studio/flex:
-    count: 2
-    last_error: 'cached: hidden reasoning'
-  openrouter#openai/gpt-4.1-mini#azure:
-    count: 2
-    last_error: 'cached: hidden reasoning'
-  openrouter#openai/gpt-4.1-mini#azure/swedencentral:
-    count: 2
-    last_error: 'cached: hidden reasoning'
-  openrouter#openai/gpt-4.1-mini#openai:
-    count: 2
-    last_error: 'cached: hidden reasoning'
-  openrouter#openai/gpt-4.1-nano#azure:
-    count: 2
-    last_error: 'cached: hidden reasoning'
-  openrouter#openai/gpt-4.1-nano#azure/swedencentral:
-    count: 2
-    last_error: 'cached: hidden reasoning'
-  openrouter#openai/gpt-4.1-nano#openai:
-    count: 2
-    last_error: 'cached: hidden reasoning'
-  openrouter#openai/gpt-oss-120b#amazon-bedrock:
-    count: 2
-    last_error: 'cached: hidden reasoning'
-  openrouter#openai/gpt-oss-120b#amazon-bedrock/eu-west-1:
-    count: 2
-    last_error: 'cached: hidden reasoning'
-  openrouter#openai/gpt-oss-20b#amazon-bedrock:
-    count: 2
-    last_error: 'cached: hidden reasoning'
-  openrouter#openai/gpt-oss-20b#amazon-bedrock/eu-west-1:
-    count: 2
-    last_error: 'cached: hidden reasoning'
   openrouter#upstage/solar-pro-3#upstage:
     count: 1
     last_error: 'cached: hidden reasoning'

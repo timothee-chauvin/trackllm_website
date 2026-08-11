@@ -78,6 +78,18 @@ endpoints_lt:
   - 0.07
   - 0.18
 - api: openrouter
+  model: deepseek/deepseek-v4-flash
+  provider: sail-research/fp4
+  cost:
+  - 0.09
+  - 0.18
+- api: openrouter
+  model: deepseek/deepseek-v4-flash-0731
+  provider: sail-research/fp4
+  cost:
+  - 0.09
+  - 0.18
+- api: openrouter
   model: bytedance/ui-tars-1.5-7b
   provider: parasail/bf16
   cost:
@@ -606,6 +618,12 @@ endpoints_lt:
   - 1.0
   - 2.0
 - api: openrouter
+  model: moonshotai/kimi-k2.6
+  provider: streamlake/fp8
+  cost:
+  - 0.5985
+  - 2.52
+- api: openrouter
   model: qwen/qwen3.6-27b
   provider: alibaba/fp8
   cost:
@@ -635,12 +653,6 @@ endpoints_lt:
   cost:
   - 1.131
   - 2.262
-- api: openrouter
-  model: moonshotai/kimi-k2.6
-  provider: streamlake/fp8
-  cost:
-  - 0.6745
-  - 2.84
 - api: openrouter
   model: deepseek/deepseek-v4-pro
   provider: cloudflare
