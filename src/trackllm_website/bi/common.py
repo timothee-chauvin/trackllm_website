@@ -177,6 +177,25 @@ async def discover_strategy(
     if (te := _too_expensive(r)) is not None:
         return None, te
     if not r.error and extract_first_token(r):
+        if not r.reasoning_content and not r.reasoning_tokens:
+            return PlainStrategy(), None
+        # Plain "works" but bills a reasoning trace: some providers exempt
+        # reasoning from max_completion_tokens, so every 1-token query pays for
+        # the full trace. Prefer effort=none if it genuinely stops the reasoning.
+        r2 = await client.query(
+            endpoint,
+            config.bi.probe.prompt,
+            logprobs=False,
+            reasoning={"effort": "none"},
+            max_retries=config.bi.probe.max_retries,
+        )
+        if (
+            not r2.error
+            and extract_first_token(r2)
+            and not r2.reasoning_content
+            and not r2.reasoning_tokens
+        ):
+            return ReasoningDisabledStrategy(), None
         return PlainStrategy(), None
     _record_error(r, "plain")
     if r.error and r.error.http_code in TRANSIENT_CODES:
