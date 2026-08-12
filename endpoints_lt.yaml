@@ -175,6 +175,12 @@ endpoints_lt:
   - 0.4
 - api: openrouter
   model: qwen/qwen3-vl-32b-instruct
+  provider: alibaba
+  cost:
+  - 0.104
+  - 0.416
+- api: openrouter
+  model: qwen/qwen3-vl-32b-instruct
   provider: alibaba/fp8
   cost:
   - 0.104
@@ -247,6 +253,12 @@ endpoints_lt:
   - 0.4
 - api: openrouter
   model: qwen/qwen3-vl-8b-instruct
+  provider: alibaba
+  cost:
+  - 0.117
+  - 0.455
+- api: openrouter
+  model: qwen/qwen3-vl-8b-instruct
   provider: alibaba/fp8
   cost:
   - 0.117
@@ -259,7 +271,19 @@ endpoints_lt:
   - 0.5
 - api: openrouter
   model: qwen/qwen3-30b-a3b-instruct-2507
+  provider: alibaba
+  cost:
+  - 0.13
+  - 0.52
+- api: openrouter
+  model: qwen/qwen3-30b-a3b-instruct-2507
   provider: alibaba/fp8
+  cost:
+  - 0.13
+  - 0.52
+- api: openrouter
+  model: qwen/qwen3-vl-30b-a3b-instruct
+  provider: alibaba
   cost:
   - 0.13
   - 0.52
@@ -281,6 +305,12 @@ endpoints_lt:
   cost:
   - 0.22
   - 0.5
+- api: openrouter
+  model: qwen/qwen3-235b-a22b-2507
+  provider: alibaba
+  cost:
+  - 0.1495
+  - 0.598
 - api: openrouter
   model: qwen/qwen3-235b-a22b-2507
   provider: alibaba/fp8
@@ -343,6 +373,12 @@ endpoints_lt:
   - 0.66
 - api: openrouter
   model: qwen/qwen3-next-80b-a3b-instruct
+  provider: alibaba
+  cost:
+  - 0.0975
+  - 0.78
+- api: openrouter
+  model: qwen/qwen3-next-80b-a3b-instruct
   provider: alibaba/fp8
   cost:
   - 0.0975
@@ -391,6 +427,12 @@ endpoints_lt:
   - 0.75
 - api: openrouter
   model: qwen/qwen-plus
+  provider: alibaba
+  cost:
+  - 0.26
+  - 0.78
+- api: openrouter
+  model: qwen/qwen-plus
   provider: alibaba/fp8
   cost:
   - 0.26
@@ -427,6 +469,12 @@ endpoints_lt:
   - 0.65
 - api: openrouter
   model: qwen/qwen3-coder-flash
+  provider: alibaba
+  cost:
+  - 0.195
+  - 0.975
+- api: openrouter
+  model: qwen/qwen3-coder-flash
   provider: alibaba/fp8
   cost:
   - 0.195
@@ -437,6 +485,12 @@ endpoints_lt:
   cost:
   - 0.1
   - 1.1
+- api: openrouter
+  model: qwen/qwen3-vl-235b-a22b-instruct
+  provider: alibaba
+  cost:
+  - 0.26
+  - 1.04
 - api: openrouter
   model: qwen/qwen3-vl-235b-a22b-instruct
   provider: alibaba/fp8
@@ -481,6 +535,12 @@ endpoints_lt:
   - 0.71
 - api: openrouter
   model: qwen/qwen3.5-35b-a3b
+  provider: alibaba
+  cost:
+  - 0.1625
+  - 1.3
+- api: openrouter
+  model: qwen/qwen3.5-35b-a3b
   provider: alibaba/fp8
   cost:
   - 0.1625
@@ -499,6 +559,12 @@ endpoints_lt:
   - 0.8
 - api: openrouter
   model: qwen/qwen-plus-2025-07-28:thinking
+  provider: alibaba
+  cost:
+  - 0.4
+  - 1.2
+- api: openrouter
+  model: qwen/qwen-plus-2025-07-28:thinking
   provider: alibaba/fp8
   cost:
   - 0.4
@@ -511,10 +577,22 @@ endpoints_lt:
   - 1.5
 - api: openrouter
   model: qwen/qwen3-coder-30b-a3b-instruct
+  provider: alibaba
+  cost:
+  - 0.2925
+  - 1.4625
+- api: openrouter
+  model: qwen/qwen3-coder-30b-a3b-instruct
   provider: alibaba/fp8
   cost:
   - 0.2925
   - 1.4625
+- api: openrouter
+  model: qwen/qwen3.5-27b
+  provider: alibaba
+  cost:
+  - 0.195
+  - 1.56
 - api: openrouter
   model: qwen/qwen3.5-27b
   provider: alibaba/fp8
@@ -583,6 +661,12 @@ endpoints_lt:
   - 1.7
 - api: openrouter
   model: qwen/qwen3.5-122b-a10b
+  provider: alibaba
+  cost:
+  - 0.26
+  - 2.08
+- api: openrouter
+  model: qwen/qwen3.5-122b-a10b
   provider: alibaba/fp8
   cost:
   - 0.26
@@ -623,6 +707,12 @@ endpoints_lt:
   cost:
   - 0.5985
   - 2.52
+- api: openrouter
+  model: qwen/qwen3.6-27b
+  provider: alibaba
+  cost:
+  - 0.45
+  - 2.7
 - api: openrouter
   model: qwen/qwen3.6-27b
   provider: alibaba/fp8
@@ -690,11 +780,11 @@ endpoints_lt:
   - 1.25
   - 2.5
 - api: openrouter
-  model: z-ai/glm-5.2
-  provider: gmicloud/fp8
+  model: qwen/qwen3-coder-plus
+  provider: alibaba
   cost:
-  - 0.924
-  - 2.904
+  - 0.65
+  - 3.25
 - api: openrouter
   model: qwen/qwen3-coder-plus
   provider: alibaba/fp8
@@ -721,7 +811,19 @@ endpoints_lt:
   - 3.6
 - api: openrouter
   model: qwen/qwen3-max
+  provider: alibaba
+  cost:
+  - 0.78
+  - 3.9
+- api: openrouter
+  model: qwen/qwen3-max
   provider: alibaba/fp8
+  cost:
+  - 0.78
+  - 3.9
+- api: openrouter
+  model: qwen/qwen3-max-thinking
+  provider: alibaba
   cost:
   - 0.78
   - 3.9
@@ -773,6 +875,12 @@ endpoints_lt:
   cost:
   - 3.0
   - 4.0
+- api: openrouter
+  model: qwen/qwen3.6-max-preview
+  provider: alibaba
+  cost:
+  - 1.027
+  - 6.162
 - api: openrouter
   model: qwen/qwen3.6-max-preview
   provider: alibaba/fp8

@@ -104,6 +104,12 @@ too_expensive:
   - 0.2
   - 0.9
 - api: openrouter
+  model: deepseek/deepseek-r1
+  provider: novita/fp8
+  cost:
+  - 0.7
+  - 2.5
+- api: openrouter
   model: deepseek/deepseek-r1-0528
   provider: siliconflow/fp8
   cost:
@@ -363,10 +369,22 @@ too_expensive:
   - 30.0
 - api: openrouter
   model: qwen/qwen-plus-2025-07-28:thinking
+  provider: alibaba
+  cost:
+  - 0.4
+  - 1.2
+- api: openrouter
+  model: qwen/qwen-plus-2025-07-28:thinking
   provider: alibaba/fp8
   cost:
   - 0.4
   - 1.2
+- api: openrouter
+  model: qwen/qwen3-14b
+  provider: alibaba
+  cost:
+  - 0.2275
+  - 0.91
 - api: openrouter
   model: qwen/qwen3-14b
   provider: alibaba/fp8
@@ -375,10 +393,22 @@ too_expensive:
   - 0.91
 - api: openrouter
   model: qwen/qwen3-235b-a22b
+  provider: alibaba
+  cost:
+  - 0.455
+  - 1.82
+- api: openrouter
+  model: qwen/qwen3-235b-a22b
   provider: alibaba/fp8
   cost:
   - 0.455
   - 1.82
+- api: openrouter
+  model: qwen/qwen3-235b-a22b-thinking-2507
+  provider: alibaba
+  cost:
+  - 0.23
+  - 2.3
 - api: openrouter
   model: qwen/qwen3-235b-a22b-thinking-2507
   provider: alibaba/fp8
@@ -387,10 +417,22 @@ too_expensive:
   - 2.3
 - api: openrouter
   model: qwen/qwen3-30b-a3b
+  provider: alibaba
+  cost:
+  - 0.13
+  - 0.52
+- api: openrouter
+  model: qwen/qwen3-30b-a3b
   provider: alibaba/fp8
   cost:
   - 0.13
   - 0.52
+- api: openrouter
+  model: qwen/qwen3-30b-a3b-thinking-2507
+  provider: alibaba
+  cost:
+  - 0.2
+  - 2.4
 - api: openrouter
   model: qwen/qwen3-30b-a3b-thinking-2507
   provider: alibaba/fp8
@@ -405,6 +447,12 @@ too_expensive:
   - 0.57
 - api: openrouter
   model: qwen/qwen3-8b
+  provider: alibaba
+  cost:
+  - 0.117
+  - 0.455
+- api: openrouter
+  model: qwen/qwen3-8b
   provider: alibaba/fp8
   cost:
   - 0.117
@@ -417,10 +465,22 @@ too_expensive:
   - 4.875
 - api: openrouter
   model: qwen/qwen3-next-80b-a3b-thinking
+  provider: alibaba
+  cost:
+  - 0.15
+  - 1.2
+- api: openrouter
+  model: qwen/qwen3-next-80b-a3b-thinking
   provider: alibaba/fp8
   cost:
   - 0.15
   - 1.2
+- api: openrouter
+  model: qwen/qwen3-vl-235b-a22b-thinking
+  provider: alibaba
+  cost:
+  - 0.4
+  - 4.0
 - api: openrouter
   model: qwen/qwen3-vl-235b-a22b-thinking
   provider: alibaba/fp8
@@ -435,6 +495,12 @@ too_expensive:
   - 3.95
 - api: openrouter
   model: qwen/qwen3-vl-30b-a3b-thinking
+  provider: alibaba
+  cost:
+  - 0.2
+  - 2.4
+- api: openrouter
+  model: qwen/qwen3-vl-30b-a3b-thinking
   provider: alibaba/fp8
   cost:
   - 0.2
@@ -445,6 +511,12 @@ too_expensive:
   cost:
   - 0.29
   - 1.0
+- api: openrouter
+  model: qwen/qwen3-vl-8b-thinking
+  provider: alibaba
+  cost:
+  - 0.18
+  - 2.1
 - api: openrouter
   model: qwen/qwen3-vl-8b-thinking
   provider: alibaba/fp8
@@ -463,6 +535,12 @@ too_expensive:
   cost:
   - 0.4
   - 3.2
+- api: openrouter
+  model: qwen/qwen3.5-27b
+  provider: alibaba
+  cost:
+  - 0.195
+  - 1.56
 - api: openrouter
   model: qwen/qwen3.5-27b
   provider: alibaba/fp8
@@ -685,6 +763,12 @@ too_expensive:
   cost:
   - 1.38
   - 4.4
+- api: openrouter
+  model: z-ai/glm-5.1
+  provider: streamlake/fp8
+  cost:
+  - 0.966
+  - 3.036
 - api: openrouter
   model: z-ai/glm-5.2
   provider: alibaba/fast
@@ -1016,6 +1100,12 @@ bad_temperature:
   cost:
   - 2.7
   - 13.5
+- api: openrouter
+  model: google/gemini-3.6-flash
+  provider: google-vertex/us
+  cost:
+  - 1.65
+  - 8.25
 - api: openrouter
   model: moonshotai/kimi-k2.5
   provider: moonshotai/int4
@@ -1660,6 +1750,12 @@ bad_temperature:
   - 30.0
 - api: openrouter
   model: sakana/namazu
+  provider: sakana
+  cost:
+  - 0.95
+  - 4.0
+- api: openrouter
+  model: sakana/sakana-namazu
   provider: sakana
   cost:
   - 0.95
@@ -3143,6 +3239,16 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
-  openrouter#upstage/solar-pro-3#upstage:
+  openrouter#deepseek/deepseek-v4-flash#ambient/fp4:
     count: 1
+    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4-flash
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rate li...'
+  openrouter#google/gemma-4-31b-it#deepinfra/ultra:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"error":{"message":"Upstream
+      error from DeepInfra: {\"error\":{\"message\":\"Upstream provider is temporarily
+      unavailable\",\"type\":\"api_error\"}}","code":502...'
+  openrouter#upstage/solar-pro-3#upstage:
+    count: 2
     last_error: 'cached: hidden reasoning'
