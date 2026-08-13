@@ -128,6 +128,18 @@ too_expensive:
   - 1.68
   - 3.38
 - api: openrouter
+  model: deepseek/deepseek-v4-pro
+  provider: novita/fp8
+  cost:
+  - 1.168
+  - 2.336
+- api: openrouter
+  model: deepseek/deepseek-v4-pro
+  provider: siliconflow/fp8
+  cost:
+  - 1.50162
+  - 3.135
+- api: openrouter
   model: google/gemini-2.5-pro
   provider: google-ai-studio/priority
   cost:
@@ -211,6 +223,12 @@ too_expensive:
   cost:
   - 0.3
   - 1.2
+- api: openrouter
+  model: minimax/minimax-m3
+  provider: coreweave/fp4
+  cost:
+  - 0.23
+  - 0.96
 - api: openrouter
   model: minimax/minimax-m3
   provider: deepinfra/fp8
@@ -321,6 +339,18 @@ too_expensive:
   - 22.5
 - api: openrouter
   model: moonshotai/kimi-k3
+  provider: morph/fp4
+  cost:
+  - 2.8
+  - 14.0
+- api: openrouter
+  model: moonshotai/kimi-k3
+  provider: phala
+  cost:
+  - 3.0
+  - 15.0
+- api: openrouter
+  model: moonshotai/kimi-k3
   provider: sail-research/fp4
   cost:
   - 3.0
@@ -346,6 +376,12 @@ too_expensive:
 - api: openrouter
   model: morph/morph-v3-large
   provider: morph
+  cost:
+  - 0.9
+  - 1.9
+- api: openrouter
+  model: morph/morph-v3-large
+  provider: morph/fp8
   cost:
   - 0.9
   - 1.9
@@ -572,6 +608,18 @@ too_expensive:
   - 0.186
   - 1.11375
 - api: openrouter
+  model: qwen/qwen3.8-2.4t-a95b
+  provider: deepinfra/fp4
+  cost:
+  - 2.0
+  - 6.0
+- api: openrouter
+  model: qwen/qwen3.8-2.4t-a95b
+  provider: digitalocean
+  cost:
+  - 2.0
+  - 6.0
+- api: openrouter
   model: qwen/qwen3.8-max
   provider: alibaba
   cost:
@@ -675,6 +723,30 @@ too_expensive:
   - 6.0
 - api: openrouter
   model: x-ai/grok-4.5
+  provider: xai/zdr/priority
+  cost:
+  - 4.0
+  - 12.0
+- api: openrouter
+  model: x-ai/grok-4.6
+  provider: xai
+  cost:
+  - 2.0
+  - 6.0
+- api: openrouter
+  model: x-ai/grok-4.6
+  provider: xai/priority
+  cost:
+  - 4.0
+  - 12.0
+- api: openrouter
+  model: x-ai/grok-4.6
+  provider: xai/zdr
+  cost:
+  - 2.0
+  - 6.0
+- api: openrouter
+  model: x-ai/grok-4.6
   provider: xai/zdr/priority
   cost:
   - 4.0
@@ -3207,6 +3279,14 @@ unprobeable:
   detail: null
 - api: openrouter
   model: upstage/solar-pro-3
+  provider: upstage
+  cost:
+  - 0.15
+  - 0.6
+  reason: flaky
+  detail: 'cached: hidden reasoning'
+- api: openrouter
+  model: upstage/solar-pro-3
   provider: upstage/fp4
   cost:
   - 0.15
@@ -3240,15 +3320,12 @@ unprobeable:
   detail: null
 failure_streaks:
   openrouter#deepseek/deepseek-v4-flash#ambient/fp4:
-    count: 1
+    count: 2
     last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4-flash
       is temporarily rate-limited upstream. Please retry shortly, or add your own
       key to accumulate your rate li...'
-  openrouter#google/gemma-4-31b-it#deepinfra/ultra:
+  openrouter#minimax/minimax-m3#morph/fp4:
     count: 1
-    last_error: 'plain: 200 No usage in response; body: {"error":{"message":"Upstream
-      error from DeepInfra: {\"error\":{\"message\":\"Upstream provider is temporarily
-      unavailable\",\"type\":\"api_error\"}}","code":502...'
-  openrouter#upstage/solar-pro-3#upstage:
-    count: 2
-    last_error: 'cached: hidden reasoning'
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"minimax/minimax-m3
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rate...'

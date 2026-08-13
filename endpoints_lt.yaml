@@ -684,6 +684,12 @@ endpoints_lt:
   - 0.9
   - 1.9
 - api: openrouter
+  model: morph/morph-v3-large
+  provider: morph/fp8
+  cost:
+  - 0.9
+  - 1.9
+- api: openrouter
   model: openai/gpt-3.5-turbo-0613
   provider: azure
   cost:
@@ -936,6 +942,18 @@ endpoints_lt:
   - 2.0
   - 6.0
 - api: openrouter
+  model: x-ai/grok-4.6
+  provider: xai
+  cost:
+  - 2.0
+  - 6.0
+- api: openrouter
+  model: x-ai/grok-4.6
+  provider: xai/zdr
+  cost:
+  - 2.0
+  - 6.0
+- api: openrouter
   model: z-ai/glm-5.2
   provider: wafer/fast
   cost:
@@ -979,6 +997,18 @@ endpoints_lt:
   - 12.0
 - api: openrouter
   model: x-ai/grok-4.5
+  provider: xai/zdr/priority
+  cost:
+  - 4.0
+  - 12.0
+- api: openrouter
+  model: x-ai/grok-4.6
+  provider: xai/priority
+  cost:
+  - 4.0
+  - 12.0
+- api: openrouter
+  model: x-ai/grok-4.6
   provider: xai/zdr/priority
   cost:
   - 4.0
