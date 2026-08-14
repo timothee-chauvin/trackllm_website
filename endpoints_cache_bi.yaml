@@ -81,6 +81,12 @@ too_expensive:
   - 25.0
 - api: openrouter
   model: anthropic/claude-opus-4.6
+  provider: amazon-bedrock
+  cost:
+  - 5.0
+  - 25.0
+- api: openrouter
+  model: anthropic/claude-opus-4.6
   provider: azure/global
   cost:
   - 5.0
@@ -139,6 +145,18 @@ too_expensive:
   cost:
   - 1.50162
   - 3.135
+- api: openrouter
+  model: deepseek/deepseek-v4-pro-0813
+  provider: cloudflare
+  cost:
+  - 1.32
+  - 3.96
+- api: openrouter
+  model: deepseek/deepseek-v4-pro-0813
+  provider: gmicloud/fp8
+  cost:
+  - 1.74
+  - 3.48
 - api: openrouter
   model: google/gemini-2.5-pro
   provider: google-ai-studio/priority
@@ -237,7 +255,25 @@ too_expensive:
   - 1.2
 - api: openrouter
   model: minimax/minimax-m3
+  provider: modelrun/fp4
+  cost:
+  - 0.75
+  - 3.0
+- api: openrouter
+  model: minimax/minimax-m3
+  provider: morph/fp4
+  cost:
+  - 0.3
+  - 1.2
+- api: openrouter
+  model: minimax/minimax-m3
   provider: novita/fp8
+  cost:
+  - 0.3
+  - 1.2
+- api: openrouter
+  model: minimax/minimax-m3
+  provider: streamlake/fp8
   cost:
   - 0.3
   - 1.2
@@ -345,6 +381,12 @@ too_expensive:
   - 14.0
 - api: openrouter
   model: moonshotai/kimi-k3
+  provider: parasail/fp4
+  cost:
+  - 3.0
+  - 15.0
+- api: openrouter
+  model: moonshotai/kimi-k3
   provider: phala
   cost:
   - 3.0
@@ -403,6 +445,12 @@ too_expensive:
   cost:
   - 10.0
   - 30.0
+- api: openrouter
+  model: openai/gpt-oss-20b
+  provider: siliconflow/fp8
+  cost:
+  - 0.04
+  - 0.18
 - api: openrouter
   model: qwen/qwen-plus-2025-07-28:thinking
   provider: alibaba
@@ -609,6 +657,12 @@ too_expensive:
   - 1.11375
 - api: openrouter
   model: qwen/qwen3.8-2.4t-a95b
+  provider: alibaba
+  cost:
+  - 2.0
+  - 6.0
+- api: openrouter
+  model: qwen/qwen3.8-2.4t-a95b
   provider: deepinfra/fp4
   cost:
   - 2.0
@@ -620,11 +674,29 @@ too_expensive:
   - 2.0
   - 6.0
 - api: openrouter
+  model: qwen/qwen3.8-2.4t-a95b
+  provider: modal/nvfp4
+  cost:
+  - 2.0
+  - 6.0
+- api: openrouter
+  model: qwen/qwen3.8-2.4t-a95b
+  provider: together
+  cost:
+  - 2.5
+  - 6.25
+- api: openrouter
   model: qwen/qwen3.8-max
   provider: alibaba
   cost:
   - 2.0
   - 6.0
+- api: openrouter
+  model: thedrummer/skyfall-36b-v2
+  provider: parasail/fp8
+  cost:
+  - 0.55
+  - 0.8
 - api: openrouter
   model: writer/palmyra-x5
   provider: amazon-bedrock
@@ -849,6 +921,12 @@ too_expensive:
   - 7.26
 - api: openrouter
   model: z-ai/glm-5.2
+  provider: siliconflow/fp8
+  cost:
+  - 1.19
+  - 3.74
+- api: openrouter
+  model: z-ai/glm-5.2
   provider: wafer
   cost:
   - 1.26
@@ -959,6 +1037,12 @@ bad_temperature:
 - api: openrouter
   model: anthropic/claude-opus-4.8
   provider: amazon-bedrock/eu-west-1
+  cost:
+  - 5.5
+  - 27.5
+- api: openrouter
+  model: anthropic/claude-opus-4.8
+  provider: amazon-bedrock/us
   cost:
   - 5.5
   - 27.5
@@ -1178,6 +1262,24 @@ bad_temperature:
   cost:
   - 1.65
   - 8.25
+- api: openrouter
+  model: google/gemini-3.7-flash
+  provider: google-vertex/global
+  cost:
+  - 0.375
+  - 1.875
+- api: openrouter
+  model: google/gemini-3.7-flash
+  provider: google-vertex/global/flex
+  cost:
+  - 0.1875
+  - 0.9375
+- api: openrouter
+  model: google/gemini-3.7-flash
+  provider: google-vertex/global/priority
+  cost:
+  - 0.675
+  - 3.375
 - api: openrouter
   model: moonshotai/kimi-k2.5
   provider: moonshotai/int4
@@ -1966,6 +2068,16 @@ unprobeable:
     \"reason\":\"INVALID_REQUEST_BODY\", \"message\":\"model: deepseek/deepseek-r1-0528
     does not support endpoi...'
 - api: openrouter
+  model: deepseek/deepseek-v4-flash
+  provider: ambient/fp4
+  cost:
+  - 0.14
+  - 0.28
+  reason: flaky
+  detail: '{"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4-flash
+    is temporarily rate-limited upstream. Please retry shortly, or add your own key
+    to accumulate your rate li...'
+- api: openrouter
   model: deepseek/deepseek-v4-pro
   provider: fireworks
   cost:
@@ -2357,6 +2469,14 @@ unprobeable:
   cost:
   - 0.75
   - 3.75
+  reason: batch
+  detail: null
+- api: openrouter
+  model: google/gemini-3.7-flash:batch
+  provider: google-vertex/global
+  cost:
+  - 0.1875
+  - 0.9375
   reason: batch
   detail: null
 - api: openrouter
@@ -3319,13 +3439,20 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
-  openrouter#deepseek/deepseek-v4-flash#ambient/fp4:
-    count: 2
-    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4-flash
-      is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulate your rate li...'
-  openrouter#minimax/minimax-m3#morph/fp4:
+  openrouter#google/gemini-3.7-flash#google-ai-studio:
     count: 1
-    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"minimax/minimax-m3
-      is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulate your rate...'
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1786677634-eDRUqP8ZfLEYtiQfIUbG","object":"chat.completion","created":1786677634,"model":"google/gemini-3.7-flash","provider":"Google
+      AI Studio","syst...'
+  openrouter#google/gemini-3.7-flash#google-ai-studio/flex:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1786677634-pDcoRtRnqtCCPWDR1zW6","object":"chat.completion","created":1786677634,"model":"google/gemini-3.7-flash","provider":"Google
+      AI Studio","syst...'
+  openrouter#google/gemini-3.7-flash#google-ai-studio/priority:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1786677634-eD55iwnAKcxcQAIt4xLi","object":"chat.completion","created":1786677634,"model":"google/gemini-3.7-flash","provider":"Google
+      AI Studio","syst...'
+  openrouter#openai/gpt-oss-120b#parasail/fp4:
+    count: 1
+    last_error: 'No usage in response; body: {"error":{"message":"Upstream error from
+      Parasail: thinking_token_budget is set but reasoning_config is not configured.
+      Please set --reasoning-parser and/or --reasoning-con...'
