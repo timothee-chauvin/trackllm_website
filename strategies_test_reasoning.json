@@ -179,6 +179,7 @@
   "openrouter#deepseek/deepseek-v4-flash#ambient/fp4": null,
   "openrouter#deepseek/deepseek-v4-flash#atlas-cloud/fp4": null,
   "openrouter#deepseek/deepseek-v4-flash#atlas-cloud/fp8": null,
+  "openrouter#deepseek/deepseek-v4-flash#azure/us": null,
   "openrouter#deepseek/deepseek-v4-flash#baidu/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash#cloudflare": null,
   "openrouter#deepseek/deepseek-v4-flash#coreweave/fp8": null,
@@ -243,6 +244,7 @@
   "openrouter#deepseek/deepseek-v4-pro#alibaba": null,
   "openrouter#deepseek/deepseek-v4-pro#alibaba/fp8": null,
   "openrouter#deepseek/deepseek-v4-pro#atlas-cloud/fp8": null,
+  "openrouter#deepseek/deepseek-v4-pro#azure/us": null,
   "openrouter#deepseek/deepseek-v4-pro#baidu/fp8": null,
   "openrouter#deepseek/deepseek-v4-pro#baseten/fp4": null,
   "openrouter#deepseek/deepseek-v4-pro#cloudflare": null,
@@ -264,9 +266,13 @@
   "openrouter#deepseek/deepseek-v4-pro#together": null,
   "openrouter#deepseek/deepseek-v4-pro#venice": null,
   "openrouter#deepseek/deepseek-v4-pro#wandb/fp8": null,
+  "openrouter#deepseek/deepseek-v4-pro-0813#baseten/fp4": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-pro-0813#deepseek": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4-pro-0813#fireworks": null,
   "openrouter#essentialai/rnj-1-instruct#together": null,
   "openrouter#google/gemini-2.5-flash#google-ai-studio": null,
   "openrouter#google/gemini-2.5-flash#google-ai-studio/flex": null,
@@ -1376,6 +1382,7 @@
   "openrouter#qwen/qwen3.6-35b-a3b#akashml/fp8": null,
   "openrouter#qwen/qwen3.6-35b-a3b#atlas-cloud/fp8": null,
   "openrouter#qwen/qwen3.6-35b-a3b#coreweave/fp8": null,
+  "openrouter#qwen/qwen3.6-35b-a3b#darkbloom": null,
   "openrouter#qwen/qwen3.6-35b-a3b#deepinfra/fp8": null,
   "openrouter#qwen/qwen3.6-35b-a3b#io-net/fp8": null,
   "openrouter#qwen/qwen3.6-35b-a3b#parasail/fp8": null,
@@ -1612,6 +1619,9 @@
   "openrouter#z-ai/glm-5.2#inceptron/fp4": null,
   "openrouter#z-ai/glm-5.2#io-net/fp8": null,
   "openrouter#z-ai/glm-5.2#ionstream/fp4": null,
+  "openrouter#z-ai/glm-5.2#modelrun/fp4": {
+    "effort": "none"
+  },
   "openrouter#z-ai/glm-5.2#morph": null,
   "openrouter#z-ai/glm-5.2#morph/fp4": {
     "effort": "none"

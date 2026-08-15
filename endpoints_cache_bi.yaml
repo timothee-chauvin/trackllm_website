@@ -98,8 +98,20 @@ too_expensive:
   - 5.0
   - 25.0
 - api: openrouter
+  model: anthropic/claude-opus-4.8
+  provider: azure/us
+  cost:
+  - 5.0
+  - 25.0
+- api: openrouter
   model: anthropic/claude-opus-5
   provider: azure/global
+  cost:
+  - 5.0
+  - 25.0
+- api: openrouter
+  model: anthropic/claude-opus-5
+  provider: azure/us
   cost:
   - 5.0
   - 25.0
@@ -157,6 +169,18 @@ too_expensive:
   cost:
   - 1.74
   - 3.48
+- api: openrouter
+  model: deepseek/deepseek-v4-pro-0813
+  provider: novita/fp8
+  cost:
+  - 1.32
+  - 3.96
+- api: openrouter
+  model: deepseek/deepseek-v4-pro-0813
+  provider: siliconflow/fp8
+  cost:
+  - 1.32
+  - 3.96
 - api: openrouter
   model: google/gemini-2.5-pro
   provider: google-ai-studio/priority
@@ -681,10 +705,22 @@ too_expensive:
   - 6.0
 - api: openrouter
   model: qwen/qwen3.8-2.4t-a95b
+  provider: siliconflow/fp8
+  cost:
+  - 2.0
+  - 6.0
+- api: openrouter
+  model: qwen/qwen3.8-2.4t-a95b
   provider: together
   cost:
   - 2.5
   - 6.25
+- api: openrouter
+  model: qwen/qwen3.8-2.4t-a95b
+  provider: venice
+  cost:
+  - 2.5
+  - 7.5
 - api: openrouter
   model: qwen/qwen3.8-max
   provider: alibaba
@@ -1168,6 +1204,12 @@ bad_temperature:
   - 10.0
 - api: openrouter
   model: anthropic/claude-sonnet-5
+  provider: azure/us
+  cost:
+  - 2.0
+  - 10.0
+- api: openrouter
+  model: anthropic/claude-sonnet-5
   provider: google-vertex/europe
   cost:
   - 2.2
@@ -1528,6 +1570,12 @@ bad_temperature:
   - 16.5
 - api: openrouter
   model: openai/gpt-5.4
+  provider: azure/us
+  cost:
+  - 2.75
+  - 16.5
+- api: openrouter
+  model: openai/gpt-5.4
   provider: openai
   cost:
   - 2.5
@@ -1558,6 +1606,12 @@ bad_temperature:
   - 4.5
 - api: openrouter
   model: openai/gpt-5.4-mini
+  provider: azure/us
+  cost:
+  - 0.825
+  - 4.95
+- api: openrouter
+  model: openai/gpt-5.4-mini
   provider: openai
   cost:
   - 0.75
@@ -1580,6 +1634,12 @@ bad_temperature:
   cost:
   - 0.2
   - 1.25
+- api: openrouter
+  model: openai/gpt-5.4-nano
+  provider: azure/us
+  cost:
+  - 0.22
+  - 1.375
 - api: openrouter
   model: openai/gpt-5.4-nano
   provider: openai
@@ -1625,6 +1685,12 @@ bad_temperature:
 - api: openrouter
   model: openai/gpt-5.5
   provider: azure/eu
+  cost:
+  - 5.5
+  - 33.0
+- api: openrouter
+  model: openai/gpt-5.5
+  provider: azure/us
   cost:
   - 5.5
   - 33.0
@@ -1678,6 +1744,12 @@ bad_temperature:
   - 6.6
 - api: openrouter
   model: openai/gpt-5.6-luna
+  provider: azure/us
+  cost:
+  - 0.22
+  - 1.32
+- api: openrouter
+  model: openai/gpt-5.6-luna
   provider: openai
   cost:
   - 0.1
@@ -1739,6 +1811,12 @@ bad_temperature:
 - api: openrouter
   model: openai/gpt-5.6-sol
   provider: azure/eu
+  cost:
+  - 5.5
+  - 33.0
+- api: openrouter
+  model: openai/gpt-5.6-sol
+  provider: azure/us
   cost:
   - 5.5
   - 33.0
@@ -1808,6 +1886,12 @@ bad_temperature:
   cost:
   - 2.75
   - 16.5
+- api: openrouter
+  model: openai/gpt-5.6-terra
+  provider: azure/us
+  cost:
+  - 2.2
+  - 13.2
 - api: openrouter
   model: openai/gpt-5.6-terra
   provider: openai
@@ -3440,19 +3524,16 @@ unprobeable:
   detail: null
 failure_streaks:
   openrouter#google/gemini-3.7-flash#google-ai-studio:
-    count: 1
-    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1786677634-eDRUqP8ZfLEYtiQfIUbG","object":"chat.completion","created":1786677634,"model":"google/gemini-3.7-flash","provider":"Google
-      AI Studio","syst...'
+    count: 2
+    last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3.7-flash#google-ai-studio/flex:
-    count: 1
-    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1786677634-pDcoRtRnqtCCPWDR1zW6","object":"chat.completion","created":1786677634,"model":"google/gemini-3.7-flash","provider":"Google
-      AI Studio","syst...'
+    count: 2
+    last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3.7-flash#google-ai-studio/priority:
+    count: 2
+    last_error: 'cached: hidden reasoning'
+  openrouter#qwen/qwen3.8-27b#akashml/bf16:
     count: 1
-    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1786677634-eD55iwnAKcxcQAIt4xLi","object":"chat.completion","created":1786677634,"model":"google/gemini-3.7-flash","provider":"Google
-      AI Studio","syst...'
-  openrouter#openai/gpt-oss-120b#parasail/fp4:
-    count: 1
-    last_error: 'No usage in response; body: {"error":{"message":"Upstream error from
-      Parasail: thinking_token_budget is set but reasoning_config is not configured.
-      Please set --reasoning-parser and/or --reasoning-con...'
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"qwen/qwen3.8-27b
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rate l...'
