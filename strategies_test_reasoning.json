@@ -184,6 +184,7 @@
   "openrouter#deepseek/deepseek-v4-flash#cloudflare": null,
   "openrouter#deepseek/deepseek-v4-flash#coreweave/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash#deepinfra/fp4": null,
+  "openrouter#deepseek/deepseek-v4-flash#deepinfra/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash#deepseek": null,
   "openrouter#deepseek/deepseek-v4-flash#digitalocean": null,
   "openrouter#deepseek/deepseek-v4-flash#fireworks": null,
@@ -214,6 +215,9 @@
   "openrouter#deepseek/deepseek-v4-flash-0731#coreweave/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#decart/fp4": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#deepinfra/fp4": null,
+  "openrouter#deepseek/deepseek-v4-flash-0731#deepinfra/fp8": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-flash-0731#deepseek/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#digitalocean": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#fireworks": null,
@@ -1402,6 +1406,9 @@
   "openrouter#qwen/qwen3.7-max#alibaba/fp8": null,
   "openrouter#qwen/qwen3.7-plus#alibaba": null,
   "openrouter#qwen/qwen3.7-plus#alibaba/fp8": null,
+  "openrouter#qwen/qwen3.8-27b#akashml/bf16": {
+    "effort": "none"
+  },
   "openrouter#rekaai/reka-edge#reka/bf16": null,
   "openrouter#rekaai/reka-flash-3#reka/fp8": {
     "max_tokens": 4

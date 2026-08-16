@@ -2556,6 +2556,30 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
+  model: google/gemini-3.7-flash
+  provider: google-ai-studio
+  cost:
+  - 0.75
+  - 3.75
+  reason: flaky
+  detail: 'cached: hidden reasoning'
+- api: openrouter
+  model: google/gemini-3.7-flash
+  provider: google-ai-studio/flex
+  cost:
+  - 0.375
+  - 1.875
+  reason: flaky
+  detail: 'cached: hidden reasoning'
+- api: openrouter
+  model: google/gemini-3.7-flash
+  provider: google-ai-studio/priority
+  cost:
+  - 1.35
+  - 6.75
+  reason: flaky
+  detail: 'cached: hidden reasoning'
+- api: openrouter
   model: google/gemini-3.7-flash:batch
   provider: google-vertex/global
   cost:
@@ -3523,17 +3547,13 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
-  openrouter#google/gemini-3.7-flash#google-ai-studio:
-    count: 2
-    last_error: 'cached: hidden reasoning'
-  openrouter#google/gemini-3.7-flash#google-ai-studio/flex:
-    count: 2
-    last_error: 'cached: hidden reasoning'
-  openrouter#google/gemini-3.7-flash#google-ai-studio/priority:
-    count: 2
-    last_error: 'cached: hidden reasoning'
-  openrouter#qwen/qwen3.8-27b#akashml/bf16:
+  openrouter#deepseek/deepseek-v4-pro#deepinfra/fp8:
     count: 1
-    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"qwen/qwen3.8-27b
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4-pro
       is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulate your rate l...'
+      key to accumulate you...'
+  openrouter#moonshotai/kimi-k2.6#baseten/fp4:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"moonshotai/kimi-k2.6
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rate limits: ...'
