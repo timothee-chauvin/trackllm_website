@@ -30,6 +30,12 @@ liars:
   cost:
   - 0.6
   - 2.4
+- api: openrouter
+  model: z-ai/glm-5.2
+  provider: streamlake/fp8
+  cost:
+  - 0.3248
+  - 1.0208
 too_expensive:
 - api: openrouter
   model: aion-labs/aion-3.0
@@ -147,6 +153,12 @@ too_expensive:
   - 3.38
 - api: openrouter
   model: deepseek/deepseek-v4-pro
+  provider: deepseek
+  cost:
+  - 1.32
+  - 3.96
+- api: openrouter
+  model: deepseek/deepseek-v4-pro
   provider: novita/fp8
   cost:
   - 1.168
@@ -178,6 +190,12 @@ too_expensive:
 - api: openrouter
   model: deepseek/deepseek-v4-pro-0813
   provider: siliconflow/fp8
+  cost:
+  - 1.32
+  - 3.96
+- api: openrouter
+  model: deepseek/deepseek-v4-pro-0813
+  provider: together
   cost:
   - 1.32
   - 3.96
@@ -3548,12 +3566,17 @@ unprobeable:
   detail: null
 failure_streaks:
   openrouter#deepseek/deepseek-v4-pro#deepinfra/fp8:
-    count: 1
+    count: 2
     last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4-pro
       is temporarily rate-limited upstream. Please retry shortly, or add your own
       key to accumulate you...'
-  openrouter#moonshotai/kimi-k2.6#baseten/fp4:
+  openrouter#deepseek/deepseek-v4-pro-0813#phala:
     count: 1
+    last_error: 'plain: 404 {"message":"No allowed providers are available for the
+      selected model. Providers serving deepseek/deepseek-v4-pro-20260813: novita,
+      gmicloud, baseten, siliconflow, fireworks, together, deep...'
+  openrouter#moonshotai/kimi-k2.6#baseten/fp4:
+    count: 2
     last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"moonshotai/kimi-k2.6
       is temporarily rate-limited upstream. Please retry shortly, or add your own
       key to accumulate your rate limits: ...'
