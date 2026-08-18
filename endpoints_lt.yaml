@@ -96,12 +96,6 @@ endpoints_lt:
   - 0.1
   - 0.2
 - api: openrouter
-  model: deepseek/deepseek-v4-flash-0731
-  provider: relace/fp4
-  cost:
-  - 0.105
-  - 0.21
-- api: openrouter
   model: meta-llama/llama-3.2-3b-instruct
   provider: parasail/bf16
   cost:
@@ -153,7 +147,7 @@ endpoints_lt:
   model: google/gemma-4-26b-a4b-it
   provider: nextbit/bf16
   cost:
-  - 0.12
+  - 0.1
   - 0.4
 - api: openrouter
   model: qwen/qwen3-vl-32b-instruct
@@ -380,12 +374,6 @@ endpoints_lt:
 - api: openrouter
   model: qwen/qwen-plus-2025-07-28
   provider: alibaba
-  cost:
-  - 0.26
-  - 0.78
-- api: openrouter
-  model: qwen/qwen-plus-2025-07-28
-  provider: alibaba/fp8
   cost:
   - 0.26
   - 0.78

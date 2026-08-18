@@ -7,6 +7,12 @@ liars:
   - 0.2002
   - 0.8001
 - api: openrouter
+  model: deepseek/deepseek-v4-pro
+  provider: baidu/fp8
+  cost:
+  - 0.6929
+  - 1.3858
+- api: openrouter
   model: google/gemini-2.5-flash-image
   provider: google-vertex/global
   cost:
@@ -82,6 +88,12 @@ too_expensive:
 - api: openrouter
   model: anthropic/claude-opus-4.5
   provider: azure/global
+  cost:
+  - 5.0
+  - 25.0
+- api: openrouter
+  model: anthropic/claude-opus-4.5
+  provider: claude-on-aws
   cost:
   - 5.0
   - 25.0
@@ -171,7 +183,19 @@ too_expensive:
   - 3.135
 - api: openrouter
   model: deepseek/deepseek-v4-pro-0813
+  provider: alibaba
+  cost:
+  - 1.452
+  - 4.356
+- api: openrouter
+  model: deepseek/deepseek-v4-pro-0813
   provider: cloudflare
+  cost:
+  - 1.32
+  - 3.96
+- api: openrouter
+  model: deepseek/deepseek-v4-pro-0813
+  provider: digitalocean
   cost:
   - 1.32
   - 3.96
@@ -938,6 +962,18 @@ too_expensive:
   - 0.435
   - 0.87
 - api: openrouter
+  model: z-ai/glm-4.6
+  provider: novita/bf16
+  cost:
+  - 0.55
+  - 2.2
+- api: openrouter
+  model: z-ai/glm-4.6
+  provider: z-ai/fp4
+  cost:
+  - 0.6
+  - 2.2
+- api: openrouter
   model: z-ai/glm-4.7
   provider: novita/fp8
   cost:
@@ -1013,6 +1049,12 @@ bad_temperature:
 - api: openrouter
   model: anthropic/claude-fable-5
   provider: azure
+  cost:
+  - 10.0
+  - 50.0
+- api: openrouter
+  model: anthropic/claude-fable-5
+  provider: claude-on-aws
   cost:
   - 10.0
   - 50.0
@@ -1223,6 +1265,12 @@ bad_temperature:
 - api: openrouter
   model: anthropic/claude-sonnet-5
   provider: azure/us
+  cost:
+  - 2.0
+  - 10.0
+- api: openrouter
+  model: anthropic/claude-sonnet-5
+  provider: claude-on-aws
   cost:
   - 2.0
   - 10.0
@@ -2181,6 +2229,16 @@ unprobeable:
     to accumulate your rate li...'
 - api: openrouter
   model: deepseek/deepseek-v4-pro
+  provider: deepinfra/fp8
+  cost:
+  - 1.3
+  - 2.6
+  reason: flaky
+  detail: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4-pro
+    is temporarily rate-limited upstream. Please retry shortly, or add your own key
+    to accumulate you...'
+- api: openrouter
+  model: deepseek/deepseek-v4-pro
   provider: fireworks
   cost:
   - 1.74
@@ -2704,6 +2762,16 @@ unprobeable:
   - 0.03
   reason: flaky
   detail: 'cached: hidden reasoning'
+- api: openrouter
+  model: moonshotai/kimi-k2.6
+  provider: baseten/fp4
+  cost:
+  - 0.95
+  - 4.0
+  reason: flaky
+  detail: '{"message":"Provider returned error","code":429,"metadata":{"raw":"moonshotai/kimi-k2.6
+    is temporarily rate-limited upstream. Please retry shortly, or add your own key
+    to accumulate your rate limits: ...'
 - api: openrouter
   model: moonshotai/kimi-k2.6
   provider: fireworks
@@ -3565,18 +3633,18 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
-  openrouter#deepseek/deepseek-v4-pro#deepinfra/fp8:
-    count: 2
-    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4-pro
-      is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulate you...'
-  openrouter#deepseek/deepseek-v4-pro-0813#phala:
+  openrouter#ai21/jamba-large-1.7#ai21/fp8:
     count: 1
-    last_error: 'plain: 404 {"message":"No allowed providers are available for the
-      selected model. Providers serving deepseek/deepseek-v4-pro-20260813: novita,
-      gmicloud, baseten, siliconflow, fireworks, together, deep...'
-  openrouter#moonshotai/kimi-k2.6#baseten/fp4:
-    count: 2
-    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"moonshotai/kimi-k2.6
+    last_error: "{\"message\":\"Provider returned error\",\"code\":410,\"metadata\"\
+      :{\"raw\":\"{\\\"detail\\\":\\\"This API has been retired. The AI21 Gateway\
+      \ is available at https://app.ai21.com \u2014 see https://docs.ai21.com/august-dep..."
+  openrouter#deepseek/deepseek-v4-pro-0813#parasail/fp8:
+    count: 1
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4-pro-0813
       is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulate your rate limits: ...'
+      key to accumulat...'
+  openrouter#deepseek/deepseek-v4-pro-0813#phala:
+    count: 2
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4-pro-0813
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulat...'

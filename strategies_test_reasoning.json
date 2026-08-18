@@ -79,6 +79,7 @@
   "openrouter#anthropic/claude-sonnet-4.5#anthropic/2": null,
   "openrouter#anthropic/claude-sonnet-4.5#anthropic/claude-on-aws": null,
   "openrouter#anthropic/claude-sonnet-4.5#azure/global": null,
+  "openrouter#anthropic/claude-sonnet-4.5#claude-on-aws": null,
   "openrouter#anthropic/claude-sonnet-4.5#google-vertex/global": null,
   "openrouter#anthropic/claude-sonnet-4.5#google-vertex/us-east5": null,
   "openrouter#anthropic/claude-sonnet-4.6#amazon-bedrock/eu-west-1": null,
@@ -88,6 +89,7 @@
   "openrouter#anthropic/claude-sonnet-4.6#anthropic/2": null,
   "openrouter#anthropic/claude-sonnet-4.6#azure/global": null,
   "openrouter#anthropic/claude-sonnet-4.6#azure/us-east-2": null,
+  "openrouter#anthropic/claude-sonnet-4.6#claude-on-aws": null,
   "openrouter#anthropic/claude-sonnet-4.6#google-vertex/europe": null,
   "openrouter#anthropic/claude-sonnet-4.6#google-vertex/global": null,
   "openrouter#anthropic/claude-sonnet-4.6#google-vertex/us-east5": null,
@@ -192,6 +194,9 @@
   "openrouter#deepseek/deepseek-v4-flash#io-net/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash#ionstream/fp4": null,
   "openrouter#deepseek/deepseek-v4-flash#mancer/fp4": null,
+  "openrouter#deepseek/deepseek-v4-flash#mancer/fp8": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-flash#morph": null,
   "openrouter#deepseek/deepseek-v4-flash#novita/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash#open-inference/fp8": null,
@@ -1407,6 +1412,12 @@
   "openrouter#qwen/qwen3.7-plus#alibaba": null,
   "openrouter#qwen/qwen3.7-plus#alibaba/fp8": null,
   "openrouter#qwen/qwen3.8-27b#akashml/bf16": {
+    "effort": "none"
+  },
+  "openrouter#qwen/qwen3.8-27b#chutes/fp8": {
+    "effort": "none"
+  },
+  "openrouter#qwen/qwen3.8-27b#io-net/fp8": {
     "effort": "none"
   },
   "openrouter#rekaai/reka-edge#reka/bf16": null,
