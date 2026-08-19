@@ -110,6 +110,12 @@ too_expensive:
   - 5.0
   - 25.0
 - api: openrouter
+  model: anthropic/claude-opus-4.6
+  provider: claude-on-aws
+  cost:
+  - 5.0
+  - 25.0
+- api: openrouter
   model: anthropic/claude-opus-4.8
   provider: azure/global
   cost:
@@ -214,6 +220,12 @@ too_expensive:
 - api: openrouter
   model: deepseek/deepseek-v4-pro-0813
   provider: siliconflow/fp8
+  cost:
+  - 1.32
+  - 3.96
+- api: openrouter
+  model: deepseek/deepseek-v4-pro-0813
+  provider: streamlake
   cost:
   - 1.32
   - 3.96
@@ -1102,6 +1114,12 @@ bad_temperature:
   - 25.0
 - api: openrouter
   model: anthropic/claude-opus-4.7
+  provider: claude-on-aws
+  cost:
+  - 5.0
+  - 25.0
+- api: openrouter
+  model: anthropic/claude-opus-4.7
   provider: google-vertex/europe
   cost:
   - 5.5
@@ -1151,6 +1169,12 @@ bad_temperature:
 - api: openrouter
   model: anthropic/claude-opus-4.8
   provider: anthropic/2
+  cost:
+  - 5.0
+  - 25.0
+- api: openrouter
+  model: anthropic/claude-opus-4.8
+  provider: claude-on-aws
   cost:
   - 5.0
   - 25.0
@@ -3634,15 +3658,10 @@ unprobeable:
   detail: null
 failure_streaks:
   openrouter#ai21/jamba-large-1.7#ai21/fp8:
-    count: 1
+    count: 2
     last_error: "{\"message\":\"Provider returned error\",\"code\":410,\"metadata\"\
       :{\"raw\":\"{\\\"detail\\\":\\\"This API has been retired. The AI21 Gateway\
       \ is available at https://app.ai21.com \u2014 see https://docs.ai21.com/august-dep..."
-  openrouter#deepseek/deepseek-v4-pro-0813#parasail/fp8:
-    count: 1
-    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4-pro-0813
-      is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulat...'
   openrouter#deepseek/deepseek-v4-pro-0813#phala:
     count: 2
     last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4-pro-0813

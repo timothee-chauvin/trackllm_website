@@ -223,6 +223,9 @@
   "openrouter#deepseek/deepseek-v4-flash-0731#deepinfra/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4-flash-0731#deepseek": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-flash-0731#deepseek/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#digitalocean": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#fireworks": null,
@@ -282,6 +285,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4-pro-0813#fireworks": null,
+  "openrouter#deepseek/deepseek-v4-pro-0813#parasail/fp8": {
+    "effort": "none"
+  },
   "openrouter#essentialai/rnj-1-instruct#together": null,
   "openrouter#google/gemini-2.5-flash#google-ai-studio": null,
   "openrouter#google/gemini-2.5-flash#google-ai-studio/flex": null,
@@ -624,6 +630,9 @@
     "max_tokens": 4
   },
   "openrouter#meta/muse-glimmer-30b#fireworks": {
+    "max_tokens": 4
+  },
+  "openrouter#meta/muse-glimmer-30b#parasail/bf16": {
     "max_tokens": 4
   },
   "openrouter#meta/muse-glimmer-30b#phala": null,
@@ -1420,6 +1429,9 @@
   "openrouter#qwen/qwen3.8-27b#io-net/fp8": {
     "effort": "none"
   },
+  "openrouter#qwen/qwen3.8-27b#venice/fp8": {
+    "effort": "none"
+  },
   "openrouter#rekaai/reka-edge#reka/bf16": null,
   "openrouter#rekaai/reka-flash-3#reka/fp8": {
     "max_tokens": 4
@@ -1656,5 +1668,6 @@
   "openrouter#z-ai/glm-5.2#together": null,
   "openrouter#z-ai/glm-5.2#venice/fp8": null,
   "openrouter#z-ai/glm-5.2#z-ai/fp8": null,
+  "openrouter#z-ai/glm-5.3#z-ai/fp8": null,
   "openrouter#z-ai/glm-5v-turbo#z-ai/fp8": null
 }
