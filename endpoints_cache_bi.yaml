@@ -1,4 +1,4 @@
-last_recheck: '2026-08-05T03:54:28+00:00'
+last_recheck: '2026-08-20T02:12:05+00:00'
 liars:
 - api: openrouter
   model: deepseek/deepseek-chat
@@ -44,12 +44,6 @@ liars:
   - 1.0208
 too_expensive:
 - api: openrouter
-  model: aion-labs/aion-3.0
-  provider: aion-labs
-  cost:
-  - 3.0
-  - 6.0
-- api: openrouter
   model: amazon/nova-premier-v1
   provider: amazon-bedrock
   cost:
@@ -64,18 +58,6 @@ too_expensive:
 - api: openrouter
   model: anthropic/claude-opus-4.1
   provider: amazon-bedrock
-  cost:
-  - 15.0
-  - 75.0
-- api: openrouter
-  model: anthropic/claude-opus-4.1
-  provider: anthropic
-  cost:
-  - 15.0
-  - 75.0
-- api: openrouter
-  model: anthropic/claude-opus-4.1
-  provider: azure/global
   cost:
   - 15.0
   - 75.0
@@ -146,29 +128,11 @@ too_expensive:
   - 0.2
   - 0.9
 - api: openrouter
-  model: deepseek/deepseek-r1
-  provider: novita/fp8
-  cost:
-  - 0.7
-  - 2.5
-- api: openrouter
   model: deepseek/deepseek-r1-0528
   provider: siliconflow/fp8
   cost:
   - 0.5
   - 2.18
-- api: openrouter
-  model: deepseek/deepseek-v3.2
-  provider: gmicloud/fp8
-  cost:
-  - 0.29
-  - 0.43
-- api: openrouter
-  model: deepseek/deepseek-v4-pro
-  provider: atlas-cloud/fp4
-  cost:
-  - 1.68
-  - 3.38
 - api: openrouter
   model: deepseek/deepseek-v4-pro
   provider: deepseek
@@ -177,22 +141,22 @@ too_expensive:
   - 3.96
 - api: openrouter
   model: deepseek/deepseek-v4-pro
-  provider: novita/fp8
+  provider: gmicloud/fp8
   cost:
-  - 1.168
-  - 2.336
+  - 1.32
+  - 3.96
 - api: openrouter
   model: deepseek/deepseek-v4-pro
-  provider: siliconflow/fp8
+  provider: novita/fp8
   cost:
-  - 1.50162
-  - 3.135
+  - 1.44
+  - 2.88
 - api: openrouter
   model: deepseek/deepseek-v4-pro-0813
   provider: alibaba
   cost:
-  - 1.452
-  - 4.356
+  - 1.32
+  - 3.96
 - api: openrouter
   model: deepseek/deepseek-v4-pro-0813
   provider: cloudflare
@@ -209,8 +173,8 @@ too_expensive:
   model: deepseek/deepseek-v4-pro-0813
   provider: gmicloud/fp8
   cost:
-  - 1.74
-  - 3.48
+  - 1.188
+  - 3.564
 - api: openrouter
   model: deepseek/deepseek-v4-pro-0813
   provider: novita/fp8
@@ -226,12 +190,6 @@ too_expensive:
 - api: openrouter
   model: deepseek/deepseek-v4-pro-0813
   provider: streamlake
-  cost:
-  - 1.32
-  - 3.96
-- api: openrouter
-  model: deepseek/deepseek-v4-pro-0813
-  provider: together
   cost:
   - 1.32
   - 3.96
@@ -259,12 +217,6 @@ too_expensive:
   cost:
   - 2.25
   - 18.0
-- api: openrouter
-  model: google/gemini-3.1-flash-image
-  provider: google-ai-studio
-  cost:
-  - 0.5
-  - 3.0
 - api: openrouter
   model: kwaipilot/kat-coder-pro-v2.5
   provider: streamlake
@@ -329,8 +281,8 @@ too_expensive:
   model: minimax/minimax-m3
   provider: deepinfra/fp8
   cost:
-  - 0.3
-  - 1.2
+  - 0.28
+  - 1.1
 - api: openrouter
   model: minimax/minimax-m3
   provider: modelrun/fp4
@@ -355,12 +307,6 @@ too_expensive:
   cost:
   - 0.3
   - 1.2
-- api: openrouter
-  model: moonshotai/kimi-k2-thinking
-  provider: novita/bf16
-  cost:
-  - 0.6
-  - 2.5
 - api: openrouter
   model: moonshotai/kimi-k2.5
   provider: novita
@@ -401,8 +347,14 @@ too_expensive:
   model: moonshotai/kimi-k2.6
   provider: streamlake/fp8
   cost:
-  - 0.6745
-  - 2.84
+  - 0.5985
+  - 2.52
+- api: openrouter
+  model: moonshotai/kimi-k2.7-code
+  provider: alibaba/fp8
+  cost:
+  - 0.95
+  - 4.0
 - api: openrouter
   model: moonshotai/kimi-k3
   provider: chutes/mxfp4
@@ -411,16 +363,10 @@ too_expensive:
   - 15.0
 - api: openrouter
   model: moonshotai/kimi-k3
-  provider: deepinfra/bf16
+  provider: digitalocean
   cost:
   - 2.85
   - 14.25
-- api: openrouter
-  model: moonshotai/kimi-k3
-  provider: digitalocean
-  cost:
-  - 3.0
-  - 15.0
 - api: openrouter
   model: moonshotai/kimi-k3
   provider: fireworks
@@ -429,22 +375,10 @@ too_expensive:
   - 15.0
 - api: openrouter
   model: moonshotai/kimi-k3
-  provider: fireworks/fast
-  cost:
-  - 4.5
-  - 22.5
-- api: openrouter
-  model: moonshotai/kimi-k3
   provider: modal/mxfp4
   cost:
   - 3.0
   - 15.0
-- api: openrouter
-  model: moonshotai/kimi-k3
-  provider: morph
-  cost:
-  - 2.9
-  - 14.0
 - api: openrouter
   model: moonshotai/kimi-k3
   provider: morph/fast
@@ -459,12 +393,6 @@ too_expensive:
   - 14.0
 - api: openrouter
   model: moonshotai/kimi-k3
-  provider: parasail/fp4
-  cost:
-  - 3.0
-  - 15.0
-- api: openrouter
-  model: moonshotai/kimi-k3
   provider: phala
   cost:
   - 3.0
@@ -472,6 +400,12 @@ too_expensive:
 - api: openrouter
   model: moonshotai/kimi-k3
   provider: sail-research/fp4
+  cost:
+  - 2.6
+  - 13.0
+- api: openrouter
+  model: moonshotai/kimi-k3
+  provider: together
   cost:
   - 3.0
   - 15.0
@@ -482,23 +416,11 @@ too_expensive:
   - 3.0
   - 15.0
 - api: openrouter
-  model: moonshotai/kimi-k3
-  provider: wafer/fast
-  cost:
-  - 4.5
-  - 22.5
-- api: openrouter
   model: morph/morph-v3-fast
   provider: morph
   cost:
   - 0.8
   - 1.2
-- api: openrouter
-  model: morph/morph-v3-large
-  provider: morph
-  cost:
-  - 0.9
-  - 1.9
 - api: openrouter
   model: morph/morph-v3-large
   provider: morph/fp8
@@ -524,32 +446,14 @@ too_expensive:
   - 10.0
   - 30.0
 - api: openrouter
-  model: openai/gpt-oss-20b
-  provider: siliconflow/fp8
-  cost:
-  - 0.04
-  - 0.18
-- api: openrouter
   model: qwen/qwen-plus-2025-07-28:thinking
   provider: alibaba
   cost:
-  - 0.4
-  - 1.2
-- api: openrouter
-  model: qwen/qwen-plus-2025-07-28:thinking
-  provider: alibaba/fp8
-  cost:
-  - 0.4
-  - 1.2
+  - 0.26
+  - 0.78
 - api: openrouter
   model: qwen/qwen3-14b
   provider: alibaba
-  cost:
-  - 0.2275
-  - 0.91
-- api: openrouter
-  model: qwen/qwen3-14b
-  provider: alibaba/fp8
   cost:
   - 0.2275
   - 0.91
@@ -560,44 +464,14 @@ too_expensive:
   - 0.455
   - 1.82
 - api: openrouter
-  model: qwen/qwen3-235b-a22b
-  provider: alibaba/fp8
-  cost:
-  - 0.455
-  - 1.82
-- api: openrouter
   model: qwen/qwen3-235b-a22b-thinking-2507
   provider: alibaba
   cost:
   - 0.23
   - 2.3
 - api: openrouter
-  model: qwen/qwen3-235b-a22b-thinking-2507
-  provider: alibaba/fp8
-  cost:
-  - 0.23
-  - 2.3
-- api: openrouter
-  model: qwen/qwen3-30b-a3b
-  provider: alibaba
-  cost:
-  - 0.13
-  - 0.52
-- api: openrouter
-  model: qwen/qwen3-30b-a3b
-  provider: alibaba/fp8
-  cost:
-  - 0.13
-  - 0.52
-- api: openrouter
   model: qwen/qwen3-30b-a3b-thinking-2507
   provider: alibaba
-  cost:
-  - 0.2
-  - 2.4
-- api: openrouter
-  model: qwen/qwen3-30b-a3b-thinking-2507
-  provider: alibaba/fp8
   cost:
   - 0.2
   - 2.4
@@ -614,38 +488,14 @@ too_expensive:
   - 0.117
   - 0.455
 - api: openrouter
-  model: qwen/qwen3-8b
-  provider: alibaba/fp8
-  cost:
-  - 0.117
-  - 0.455
-- api: openrouter
-  model: qwen/qwen3-coder
-  provider: alibaba/opensource
-  cost:
-  - 0.975
-  - 4.875
-- api: openrouter
   model: qwen/qwen3-next-80b-a3b-thinking
   provider: alibaba
   cost:
   - 0.15
   - 1.2
 - api: openrouter
-  model: qwen/qwen3-next-80b-a3b-thinking
-  provider: alibaba/fp8
-  cost:
-  - 0.15
-  - 1.2
-- api: openrouter
   model: qwen/qwen3-vl-235b-a22b-thinking
   provider: alibaba
-  cost:
-  - 0.4
-  - 4.0
-- api: openrouter
-  model: qwen/qwen3-vl-235b-a22b-thinking
-  provider: alibaba/fp8
   cost:
   - 0.4
   - 4.0
@@ -663,12 +513,6 @@ too_expensive:
   - 2.4
 - api: openrouter
   model: qwen/qwen3-vl-30b-a3b-thinking
-  provider: alibaba/fp8
-  cost:
-  - 0.2
-  - 2.4
-- api: openrouter
-  model: qwen/qwen3-vl-30b-a3b-thinking
   provider: siliconflow/fp8
   cost:
   - 0.29
@@ -680,11 +524,11 @@ too_expensive:
   - 0.18
   - 2.1
 - api: openrouter
-  model: qwen/qwen3-vl-8b-thinking
-  provider: alibaba/fp8
+  model: qwen/qwen3.5-122b-a10b
+  provider: alibaba
   cost:
-  - 0.18
-  - 2.1
+  - 0.26
+  - 2.08
 - api: openrouter
   model: qwen/qwen3.5-122b-a10b
   provider: atlas-cloud/fp8
@@ -705,12 +549,6 @@ too_expensive:
   - 1.56
 - api: openrouter
   model: qwen/qwen3.5-27b
-  provider: alibaba/fp8
-  cost:
-  - 0.195
-  - 1.56
-- api: openrouter
-  model: qwen/qwen3.5-27b
   provider: atlas-cloud/fp8
   cost:
   - 0.27
@@ -723,16 +561,58 @@ too_expensive:
   - 2.4
 - api: openrouter
   model: qwen/qwen3.5-35b-a3b
+  provider: alibaba
+  cost:
+  - 0.1625
+  - 1.3
+- api: openrouter
+  model: qwen/qwen3.5-35b-a3b
   provider: atlas-cloud/fp8
   cost:
   - 0.225
   - 1.8
+- api: openrouter
+  model: qwen/qwen3.5-plus-02-15
+  provider: alibaba
+  cost:
+  - 0.26
+  - 1.56
+- api: openrouter
+  model: qwen/qwen3.5-plus-20260420
+  provider: alibaba
+  cost:
+  - 0.3
+  - 1.8
+- api: openrouter
+  model: qwen/qwen3.6-27b
+  provider: alibaba
+  cost:
+  - 0.45
+  - 2.7
 - api: openrouter
   model: qwen/qwen3.6-35b-a3b
   provider: atlas-cloud/fp8
   cost:
   - 0.186
   - 1.11375
+- api: openrouter
+  model: qwen/qwen3.6-flash
+  provider: alibaba
+  cost:
+  - 0.1875
+  - 1.125
+- api: openrouter
+  model: qwen/qwen3.6-plus
+  provider: alibaba
+  cost:
+  - 0.325
+  - 1.95
+- api: openrouter
+  model: qwen/qwen3.7-plus
+  provider: alibaba
+  cost:
+  - 0.32
+  - 1.28
 - api: openrouter
   model: qwen/qwen3.8-2.4t-a95b
   provider: alibaba
@@ -776,17 +656,17 @@ too_expensive:
   - 2.5
   - 7.5
 - api: openrouter
+  model: qwen/qwen3.8-27b
+  provider: alibaba
+  cost:
+  - 0.55
+  - 3.3
+- api: openrouter
   model: qwen/qwen3.8-max
   provider: alibaba
   cost:
   - 2.0
   - 6.0
-- api: openrouter
-  model: thedrummer/skyfall-36b-v2
-  provider: parasail/fp8
-  cost:
-  - 0.55
-  - 0.8
 - api: openrouter
   model: writer/palmyra-x5
   provider: amazon-bedrock
@@ -945,22 +825,22 @@ too_expensive:
   - 0.336
 - api: openrouter
   model: xiaomi/mimo-v2.5-pro
+  provider: deepinfra/fp8
+  cost:
+  - 1.0
+  - 3.0
+- api: openrouter
+  model: xiaomi/mimo-v2.5-pro
   provider: digitalocean
   cost:
-  - 0.8
-  - 3.0
+  - 0.4
+  - 1.5
 - api: openrouter
   model: xiaomi/mimo-v2.5-pro
   provider: gmicloud/bf16
   cost:
-  - 0.348
-  - 0.696
-- api: openrouter
-  model: xiaomi/mimo-v2.5-pro
-  provider: novita
-  cost:
-  - 0.48024
-  - 0.96048
+  - 0.3045
+  - 0.609
 - api: openrouter
   model: xiaomi/mimo-v2.5-pro
   provider: streamlake
@@ -968,23 +848,11 @@ too_expensive:
   - 0.522
   - 1.044
 - api: openrouter
-  model: xiaomi/mimo-v2.5-pro
-  provider: xiaomi/fp8
+  model: z-ai/glm-4.5-air
+  provider: siliconflow/fp8
   cost:
-  - 0.435
-  - 0.87
-- api: openrouter
-  model: z-ai/glm-4.6
-  provider: novita/bf16
-  cost:
-  - 0.55
-  - 2.2
-- api: openrouter
-  model: z-ai/glm-4.6
-  provider: z-ai/fp4
-  cost:
-  - 0.6
-  - 2.2
+  - 0.14
+  - 0.86
 - api: openrouter
   model: z-ai/glm-4.7
   provider: novita/fp8
@@ -998,23 +866,17 @@ too_expensive:
   - 0.48
   - 1.76
 - api: openrouter
-  model: z-ai/glm-5.1
-  provider: gmicloud/fp8
+  model: z-ai/glm-4.7
+  provider: z-ai/fp4
   cost:
-  - 0.98
-  - 3.08
+  - 0.6
+  - 2.2
 - api: openrouter
-  model: z-ai/glm-5.1
-  provider: novita/fp8
+  model: z-ai/glm-5-turbo
+  provider: z-ai
   cost:
-  - 1.38
-  - 4.4
-- api: openrouter
-  model: z-ai/glm-5.1
-  provider: streamlake/fp8
-  cost:
-  - 0.966
-  - 3.036
+  - 1.2
+  - 4.0
 - api: openrouter
   model: z-ai/glm-5.2
   provider: alibaba/fast
@@ -1027,28 +889,10 @@ too_expensive:
   cost:
   - 1.19
   - 3.74
-- api: openrouter
-  model: z-ai/glm-5.2
-  provider: wafer
-  cost:
-  - 1.26
-  - 3.96
-- api: openrouter
-  model: z-ai/glm-5.2
-  provider: wafer/fast
-  cost:
-  - 2.1
-  - 6.6
 bad_temperature:
 - api: openrouter
   model: anthropic/claude-fable-5
   provider: amazon-bedrock
-  cost:
-  - 10.0
-  - 50.0
-- api: openrouter
-  model: anthropic/claude-fable-5
-  provider: amazon-bedrock/claude-on-aws
   cost:
   - 10.0
   - 50.0
@@ -1097,12 +941,6 @@ bad_temperature:
 - api: openrouter
   model: anthropic/claude-opus-4.7
   provider: anthropic
-  cost:
-  - 5.0
-  - 25.0
-- api: openrouter
-  model: anthropic/claude-opus-4.7
-  provider: anthropic/2
   cost:
   - 5.0
   - 25.0
@@ -1168,12 +1006,6 @@ bad_temperature:
   - 25.0
 - api: openrouter
   model: anthropic/claude-opus-4.8
-  provider: anthropic/2
-  cost:
-  - 5.0
-  - 25.0
-- api: openrouter
-  model: anthropic/claude-opus-4.8
   provider: claude-on-aws
   cost:
   - 5.0
@@ -1205,12 +1037,6 @@ bad_temperature:
 - api: openrouter
   model: anthropic/claude-opus-5
   provider: amazon-bedrock
-  cost:
-  - 5.0
-  - 25.0
-- api: openrouter
-  model: anthropic/claude-opus-5
-  provider: amazon-bedrock/claude-on-aws
   cost:
   - 5.0
   - 25.0
@@ -1256,12 +1082,6 @@ bad_temperature:
   cost:
   - 10.0
   - 50.0
-- api: openrouter
-  model: anthropic/claude-sonnet-5
-  provider: amazon-bedrock/claude-on-aws
-  cost:
-  - 2.0
-  - 10.0
 - api: openrouter
   model: anthropic/claude-sonnet-5
   provider: amazon-bedrock/global
@@ -1317,36 +1137,6 @@ bad_temperature:
   - 2.2
   - 11.0
 - api: openrouter
-  model: google/gemini-3.1-pro-preview
-  provider: google-ai-studio
-  cost:
-  - 2.0
-  - 12.0
-- api: openrouter
-  model: google/gemini-3.1-pro-preview
-  provider: google-ai-studio/flex
-  cost:
-  - 1.0
-  - 6.0
-- api: openrouter
-  model: google/gemini-3.1-pro-preview
-  provider: google-ai-studio/priority
-  cost:
-  - 3.6
-  - 21.6
-- api: openrouter
-  model: google/gemini-3.1-pro-preview
-  provider: google-vertex/global
-  cost:
-  - 2.0
-  - 12.0
-- api: openrouter
-  model: google/gemini-3.1-pro-preview
-  provider: google-vertex/global/priority
-  cost:
-  - 3.6
-  - 21.6
-- api: openrouter
   model: google/gemini-3.5-flash-lite
   provider: google-vertex/global
   cost:
@@ -1374,26 +1164,26 @@ bad_temperature:
   model: google/gemini-3.6-flash
   provider: google-vertex/global
   cost:
-  - 1.5
-  - 7.5
-- api: openrouter
-  model: google/gemini-3.6-flash
-  provider: google-vertex/global/flex
-  cost:
   - 0.75
   - 3.75
 - api: openrouter
   model: google/gemini-3.6-flash
+  provider: google-vertex/global/flex
+  cost:
+  - 0.375
+  - 1.875
+- api: openrouter
+  model: google/gemini-3.6-flash
   provider: google-vertex/global/priority
   cost:
-  - 2.7
-  - 13.5
+  - 1.35
+  - 6.75
 - api: openrouter
   model: google/gemini-3.6-flash
   provider: google-vertex/us
   cost:
-  - 1.65
-  - 8.25
+  - 0.825
+  - 4.125
 - api: openrouter
   model: google/gemini-3.7-flash
   provider: google-vertex/global
@@ -1593,12 +1383,6 @@ bad_temperature:
   - 1.75
   - 14.0
 - api: openrouter
-  model: openai/gpt-5.2-chat
-  provider: openai
-  cost:
-  - 1.75
-  - 14.0
-- api: openrouter
   model: openai/gpt-5.2-codex
   provider: azure
   cost:
@@ -1610,18 +1394,6 @@ bad_temperature:
   cost:
   - 21.0
   - 168.0
-- api: openrouter
-  model: openai/gpt-5.3-chat
-  provider: azure
-  cost:
-  - 1.75
-  - 14.0
-- api: openrouter
-  model: openai/gpt-5.3-chat
-  provider: openai
-  cost:
-  - 1.75
-  - 14.0
 - api: openrouter
   model: openai/gpt-5.3-codex
   provider: azure
@@ -1824,14 +1596,14 @@ bad_temperature:
   model: openai/gpt-5.6-luna
   provider: azure
   cost:
-  - 1.0
-  - 6.0
+  - 0.2
+  - 1.2
 - api: openrouter
   model: openai/gpt-5.6-luna
   provider: azure/eu
   cost:
-  - 1.1
-  - 6.6
+  - 0.22
+  - 1.32
 - api: openrouter
   model: openai/gpt-5.6-luna
   provider: azure/us
@@ -1842,50 +1614,50 @@ bad_temperature:
   model: openai/gpt-5.6-luna
   provider: openai
   cost:
-  - 0.1
-  - 0.6
+  - 0.2
+  - 1.2
 - api: openrouter
   model: openai/gpt-5.6-luna
   provider: openai/flex
   cost:
-  - 0.05
-  - 0.3
+  - 0.1
+  - 0.6
 - api: openrouter
   model: openai/gpt-5.6-luna
   provider: openai/priority
   cost:
-  - 0.2
-  - 1.2
+  - 0.4
+  - 2.4
 - api: openrouter
   model: openai/gpt-5.6-luna-pro
   provider: azure
   cost:
-  - 1.0
-  - 6.0
+  - 0.2
+  - 1.2
 - api: openrouter
   model: openai/gpt-5.6-luna-pro
   provider: azure/eu
   cost:
-  - 1.1
-  - 6.6
+  - 0.22
+  - 1.32
 - api: openrouter
   model: openai/gpt-5.6-luna-pro
   provider: openai
+  cost:
+  - 0.2
+  - 1.2
+- api: openrouter
+  model: openai/gpt-5.6-luna-pro
+  provider: openai/flex
   cost:
   - 0.1
   - 0.6
 - api: openrouter
   model: openai/gpt-5.6-luna-pro
-  provider: openai/flex
-  cost:
-  - 0.05
-  - 0.3
-- api: openrouter
-  model: openai/gpt-5.6-luna-pro
   provider: openai/priority
   cost:
-  - 0.2
-  - 1.2
+  - 0.4
+  - 2.4
 - api: openrouter
   model: openai/gpt-5.6-sol
   provider: amazon-bedrock/us-east-1
@@ -1914,20 +1686,20 @@ bad_temperature:
   model: openai/gpt-5.6-sol
   provider: openai
   cost:
-  - 5.0
-  - 30.0
-- api: openrouter
-  model: openai/gpt-5.6-sol
-  provider: openai/flex
-  cost:
   - 2.5
   - 15.0
 - api: openrouter
   model: openai/gpt-5.6-sol
+  provider: openai/flex
+  cost:
+  - 1.25
+  - 7.5
+- api: openrouter
+  model: openai/gpt-5.6-sol
   provider: openai/priority
   cost:
-  - 10.0
-  - 60.0
+  - 5.0
+  - 30.0
 - api: openrouter
   model: openai/gpt-5.6-sol-pro
   provider: azure
@@ -1944,20 +1716,20 @@ bad_temperature:
   model: openai/gpt-5.6-sol-pro
   provider: openai
   cost:
-  - 5.0
-  - 30.0
-- api: openrouter
-  model: openai/gpt-5.6-sol-pro
-  provider: openai/flex
-  cost:
   - 2.5
   - 15.0
 - api: openrouter
   model: openai/gpt-5.6-sol-pro
+  provider: openai/flex
+  cost:
+  - 1.25
+  - 7.5
+- api: openrouter
+  model: openai/gpt-5.6-sol-pro
   provider: openai/priority
   cost:
-  - 10.0
-  - 60.0
+  - 5.0
+  - 30.0
 - api: openrouter
   model: openai/gpt-5.6-terra
   provider: amazon-bedrock/us-east-1
@@ -1968,14 +1740,14 @@ bad_temperature:
   model: openai/gpt-5.6-terra
   provider: azure
   cost:
-  - 2.5
-  - 15.0
+  - 2.0
+  - 12.0
 - api: openrouter
   model: openai/gpt-5.6-terra
   provider: azure/eu
   cost:
-  - 2.75
-  - 16.5
+  - 2.2
+  - 13.2
 - api: openrouter
   model: openai/gpt-5.6-terra
   provider: azure/us
@@ -1986,50 +1758,50 @@ bad_temperature:
   model: openai/gpt-5.6-terra
   provider: openai
   cost:
-  - 1.0
-  - 6.0
+  - 2.0
+  - 12.0
 - api: openrouter
   model: openai/gpt-5.6-terra
   provider: openai/flex
   cost:
-  - 0.5
-  - 3.0
+  - 1.0
+  - 6.0
 - api: openrouter
   model: openai/gpt-5.6-terra
   provider: openai/priority
   cost:
-  - 2.0
-  - 12.0
+  - 4.0
+  - 24.0
 - api: openrouter
   model: openai/gpt-5.6-terra-pro
   provider: azure
   cost:
-  - 2.5
-  - 15.0
+  - 2.0
+  - 12.0
 - api: openrouter
   model: openai/gpt-5.6-terra-pro
   provider: azure/eu
   cost:
-  - 2.75
-  - 16.5
+  - 2.2
+  - 13.2
 - api: openrouter
   model: openai/gpt-5.6-terra-pro
   provider: openai
+  cost:
+  - 2.0
+  - 12.0
+- api: openrouter
+  model: openai/gpt-5.6-terra-pro
+  provider: openai/flex
   cost:
   - 1.0
   - 6.0
 - api: openrouter
   model: openai/gpt-5.6-terra-pro
-  provider: openai/flex
-  cost:
-  - 0.5
-  - 3.0
-- api: openrouter
-  model: openai/gpt-5.6-terra-pro
   provider: openai/priority
   cost:
-  - 2.0
-  - 12.0
+  - 4.0
+  - 24.0
 - api: openrouter
   model: openai/gpt-chat-latest
   provider: openai
@@ -2096,12 +1868,6 @@ bad_temperature:
   cost:
   - 5.0
   - 30.0
-- api: openrouter
-  model: sakana/namazu
-  provider: sakana
-  cost:
-  - 0.95
-  - 4.0
 - api: openrouter
   model: sakana/sakana-namazu
   provider: sakana
@@ -2198,90 +1964,6 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
-  model: arcee-ai/virtuoso-large
-  provider: together
-  cost:
-  - 0.75
-  - 1.2
-  reason: flaky
-  detail: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"id\":
-    \"ovCHB3y-2kFHot-a2734bb81ad47a72\",\n  \"error\": {\n    \"message\": \"Unable
-    to access non-serverless mode...'
-- api: openrouter
-  model: cohere/command-a
-  provider: cohere
-  cost:
-  - 2.5
-  - 10.0
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: cohere/command-r7b-12-2024
-  provider: cohere
-  cost:
-  - 0.0375
-  - 0.15
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: deepseek/deepseek-r1
-  provider: azure
-  cost:
-  - 1.485
-  - 5.94
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: deepseek/deepseek-r1-0528
-  provider: novita/fp8
-  cost:
-  - 0.7
-  - 2.5
-  reason: flaky
-  detail: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"code\":400,
-    \"reason\":\"INVALID_REQUEST_BODY\", \"message\":\"model: deepseek/deepseek-r1-0528
-    does not support endpoi...'
-- api: openrouter
-  model: deepseek/deepseek-v4-flash
-  provider: ambient/fp4
-  cost:
-  - 0.14
-  - 0.28
-  reason: flaky
-  detail: '{"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4-flash
-    is temporarily rate-limited upstream. Please retry shortly, or add your own key
-    to accumulate your rate li...'
-- api: openrouter
-  model: deepseek/deepseek-v4-pro
-  provider: deepinfra/fp8
-  cost:
-  - 1.3
-  - 2.6
-  reason: flaky
-  detail: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4-pro
-    is temporarily rate-limited upstream. Please retry shortly, or add your own key
-    to accumulate you...'
-- api: openrouter
-  model: deepseek/deepseek-v4-pro
-  provider: fireworks
-  cost:
-  - 1.74
-  - 3.48
-  reason: flaky
-  detail: '{"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4-pro
-    is temporarily rate-limited upstream. Please retry shortly, or add your own key
-    to accumulate your rate limi...'
-- api: openrouter
-  model: google/gemini-2.5-flash-image
-  provider: google-vertex/global/flex
-  cost:
-  - 0.15
-  - 1.25
-  reason: flaky
-  detail: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
-    {\n    \"code\": 400,\n    \"message\": \"Flex API is not supported for model:
-    gemini-2.5-flash-image.\",\...'
-- api: openrouter
   model: google/gemini-2.5-flash-lite:batch
   provider: google-vertex/eu
   cost:
@@ -2298,124 +1980,6 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
-  model: google/gemini-2.5-pro
-  provider: google-vertex/eu
-  cost:
-  - 1.25
-  - 10.0
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-2.5-pro
-  provider: google-vertex/global
-  cost:
-  - 1.25
-  - 10.0
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-2.5-pro
-  provider: google-vertex/global/flex
-  cost:
-  - 0.625
-  - 5.0
-  reason: flaky
-  detail: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
-    {\n    \"code\": 400,\n    \"message\": \"Flex API is not supported for model:
-    gemini-2.5-pro.\",\n    \"s...'
-- api: openrouter
-  model: google/gemini-2.5-pro
-  provider: google-vertex/us
-  cost:
-  - 1.25
-  - 10.0
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-2.5-pro-preview
-  provider: google-vertex/eu
-  cost:
-  - 1.25
-  - 10.0
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-2.5-pro-preview
-  provider: google-vertex/global
-  cost:
-  - 1.25
-  - 10.0
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-2.5-pro-preview
-  provider: google-vertex/global/flex
-  cost:
-  - 0.625
-  - 5.0
-  reason: flaky
-  detail: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
-    {\n    \"code\": 400,\n    \"message\": \"Flex API is not supported for model:
-    gemini-2.5-pro.\",\n    \"s...'
-- api: openrouter
-  model: google/gemini-2.5-pro-preview
-  provider: google-vertex/global/priority
-  cost:
-  - 2.25
-  - 18.0
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-2.5-pro-preview
-  provider: google-vertex/us
-  cost:
-  - 1.25
-  - 10.0
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-2.5-pro-preview-05-06
-  provider: google-vertex/eu
-  cost:
-  - 1.25
-  - 10.0
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-2.5-pro-preview-05-06
-  provider: google-vertex/global
-  cost:
-  - 1.25
-  - 10.0
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-2.5-pro-preview-05-06
-  provider: google-vertex/global/flex
-  cost:
-  - 0.625
-  - 5.0
-  reason: flaky
-  detail: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
-    {\n    \"code\": 400,\n    \"message\": \"Flex API is not supported for model:
-    gemini-2.5-pro.\",\n    \"s...'
-- api: openrouter
-  model: google/gemini-2.5-pro-preview-05-06
-  provider: google-vertex/global/priority
-  cost:
-  - 2.25
-  - 18.0
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-2.5-pro-preview-05-06
-  provider: google-vertex/us
-  cost:
-  - 1.25
-  - 10.0
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
   model: google/gemini-2.5-pro:batch
   provider: google-vertex/global
   cost:
@@ -2423,54 +1987,6 @@ unprobeable:
   - 5.0
   reason: batch
   detail: null
-- api: openrouter
-  model: google/gemini-3-flash-preview
-  provider: google-ai-studio
-  cost:
-  - 0.5
-  - 3.0
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-3-flash-preview
-  provider: google-ai-studio/flex
-  cost:
-  - 0.25
-  - 1.5
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-3-flash-preview
-  provider: google-ai-studio/priority
-  cost:
-  - 0.9
-  - 5.4
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-3-flash-preview
-  provider: google-vertex/global
-  cost:
-  - 0.5
-  - 3.0
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-3-flash-preview
-  provider: google-vertex/global/flex
-  cost:
-  - 0.25
-  - 1.5
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-3-flash-preview
-  provider: google-vertex/global/priority
-  cost:
-  - 0.9
-  - 5.4
-  reason: flaky
-  detail: 'cached: hidden reasoning'
 - api: openrouter
   model: google/gemini-3-flash-preview:batch
   provider: google-vertex/global
@@ -2480,30 +1996,6 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
-  model: google/gemini-3.1-flash-image-preview
-  provider: google-ai-studio
-  cost:
-  - 0.5
-  - 3.0
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-3.1-flash-lite-image
-  provider: google-vertex/global
-  cost:
-  - 0.25
-  - 1.5
-  reason: flaky
-  detail: 'plain: 200 No usage in response; body: {"id":"gen-1786074402-AXaJFsiET4RpbTGQ1WZT","object":"chat.completion","created":1786074402,"model":"google/gemini-3.1-flash-lite-image","provider":"Google","sys...'
-- api: openrouter
-  model: google/gemini-3.1-flash-lite-preview
-  provider: google-ai-studio/flex
-  cost:
-  - 0.125
-  - 0.75
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
   model: google/gemini-3.1-flash-lite:batch
   provider: google-vertex/global
   cost:
@@ -2512,14 +2004,6 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
-  model: google/gemini-3.1-pro-preview
-  provider: google-vertex/global/flex
-  cost:
-  - 1.0
-  - 6.0
-  reason: flaky
-  detail: 'plain: 0 Timeout after 15.0s'
-- api: openrouter
   model: google/gemini-3.1-pro-preview:batch
   provider: google-vertex/global
   cost:
@@ -2527,86 +2011,6 @@ unprobeable:
   - 6.0
   reason: batch
   detail: null
-- api: openrouter
-  model: google/gemini-3.5-flash
-  provider: google-ai-studio
-  cost:
-  - 1.5
-  - 9.0
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-3.5-flash
-  provider: google-ai-studio/flex
-  cost:
-  - 0.75
-  - 4.5
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-3.5-flash
-  provider: google-ai-studio/priority
-  cost:
-  - 2.7
-  - 16.2
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-3.5-flash
-  provider: google-vertex/global
-  cost:
-  - 1.5
-  - 9.0
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-3.5-flash
-  provider: google-vertex/global/flex
-  cost:
-  - 0.75
-  - 4.5
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-3.5-flash
-  provider: google-vertex/global/priority
-  cost:
-  - 2.7
-  - 16.2
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-3.5-flash
-  provider: google-vertex/us
-  cost:
-  - 1.65
-  - 9.9
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-3.5-flash-lite
-  provider: google-ai-studio
-  cost:
-  - 0.3
-  - 2.5
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-3.5-flash-lite
-  provider: google-ai-studio/flex
-  cost:
-  - 0.15
-  - 1.25
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-3.5-flash-lite
-  provider: google-ai-studio/priority
-  cost:
-  - 0.54
-  - 4.5
-  reason: flaky
-  detail: 'cached: hidden reasoning'
 - api: openrouter
   model: google/gemini-3.5-flash-lite:batch
   provider: google-vertex/global
@@ -2624,61 +2028,13 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
-  model: google/gemini-3.6-flash
-  provider: google-ai-studio
-  cost:
-  - 1.5
-  - 7.5
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-3.6-flash
-  provider: google-ai-studio/flex
-  cost:
-  - 0.75
-  - 3.75
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-3.6-flash
-  provider: google-ai-studio/priority
-  cost:
-  - 2.7
-  - 13.5
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
   model: google/gemini-3.6-flash:batch
   provider: google-vertex/global
   cost:
-  - 0.75
-  - 3.75
-  reason: batch
-  detail: null
-- api: openrouter
-  model: google/gemini-3.7-flash
-  provider: google-ai-studio
-  cost:
-  - 0.75
-  - 3.75
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-3.7-flash
-  provider: google-ai-studio/flex
-  cost:
   - 0.375
   - 1.875
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemini-3.7-flash
-  provider: google-ai-studio/priority
-  cost:
-  - 1.35
-  - 6.75
-  reason: flaky
-  detail: 'cached: hidden reasoning'
+  reason: batch
+  detail: null
 - api: openrouter
   model: google/gemini-3.7-flash:batch
   provider: google-vertex/global
@@ -2688,166 +2044,27 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
-  model: google/gemma-2-27b-it
-  provider: nextbit/int4
-  cost:
-  - 0.65
-  - 0.65
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: google/gemma-3-27b-it
-  provider: phala
-  cost:
-  - 0.15
-  - 0.46
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: inception/mercury-2
-  provider: inception
-  cost:
-  - 0.25
-  - 0.75
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: kwaipilot/kat-coder-air-v2.5
-  provider: streamlake
-  cost:
-  - 0.15
-  - 0.6
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: mancer/weaver
-  provider: mancer/fp8
-  cost:
-  - 0.5
-  - 0.75
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: meta-llama/llama-3.1-70b-instruct
-  provider: amazon-bedrock
-  cost:
-  - 0.72
-  - 0.72
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: meta-llama/llama-4-scout
-  provider: google-vertex/us-east5
-  cost:
-  - 0.25
-  - 0.7
-  reason: flaky
-  detail: 'plain: 200 No usage in response; body: {"id":"gen-1786074402-A6cr2Eza6ZlLxOJFzkfO","object":"chat.completion","created":1786074402,"model":"meta-llama/llama-4-scout","provider":"Google","system_finger...'
-- api: openrouter
-  model: meta-llama/llama-guard-4-12b
-  provider: deepinfra/bf16
-  cost:
-  - 0.18
-  - 0.18
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: minimax/minimax-m2.7
-  provider: fireworks
-  cost:
-  - 0.3
-  - 1.2
-  reason: flaky
-  detail: '{"message":"Provider returned error","code":429,"metadata":{"raw":"minimax/minimax-m2.7
-    is temporarily rate-limited upstream. Please retry shortly, or add your own key
-    to accumulate your rate limits: ...'
-- api: openrouter
-  model: minimax/minimax-m3
-  provider: atlas-cloud/fp8
-  cost:
-  - 0.3
-  - 1.2
-  reason: flaky
-  detail: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"code\":400,\"msg\":\"invalid
-    request params\"}","provider_name":"AtlasCloud","is_byok":false}}'
-- api: openrouter
   model: minimax/minimax-m3:batch
   provider: together
   cost:
-  - 0.15
-  - 0.6
+  - 0.3
+  - 1.2
   reason: batch
   detail: null
-- api: openrouter
-  model: mistralai/mistral-nemo
-  provider: parasail/fp8
-  cost:
-  - 0.03
-  - 0.03
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: moonshotai/kimi-k2.6
-  provider: baseten/fp4
-  cost:
-  - 0.95
-  - 4.0
-  reason: flaky
-  detail: '{"message":"Provider returned error","code":429,"metadata":{"raw":"moonshotai/kimi-k2.6
-    is temporarily rate-limited upstream. Please retry shortly, or add your own key
-    to accumulate your rate limits: ...'
-- api: openrouter
-  model: moonshotai/kimi-k2.6
-  provider: fireworks
-  cost:
-  - 0.95
-  - 4.0
-  reason: flaky
-  detail: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"moonshotai/kimi-k2.6
-    is temporarily rate-limited upstream. Please retry shortly, or add your own key
-    to accumulate your ra...'
-- api: openrouter
-  model: moonshotai/kimi-k2.7-code
-  provider: siliconflow/fp8
-  cost:
-  - 0.85916
-  - 3.8
-  reason: flaky
-  detail: 'cached: hidden reasoning'
 - api: openrouter
   model: moonshotai/kimi-k2.7-code:batch
   provider: together
   cost:
-  - 0.475
-  - 2.0
+  - 0.95
+  - 4.0
   reason: batch
   detail: null
-- api: openrouter
-  model: moonshotai/kimi-k3
-  provider: baseten/fp8
-  cost:
-  - 3.0
-  - 15.0
-  reason: flaky
-  detail: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"Cannot
-    override enforced sampling params: {''top_p'': 1.0}. Required values: {''top_p'':
-    0.95}\",\"type\":\"Bad...'
-- api: openrouter
-  model: moonshotai/kimi-k3
-  provider: together
-  cost:
-  - 3.0
-  - 15.0
-  reason: flaky
-  detail: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"id\":
-    \"ovCHB2g-6pW4tv-a2734bb87c0647a6\",\n  \"error\": {\n    \"message\": \"Invalid
-    value for ''top_p'': 1. This e...'
 - api: openrouter
   model: nvidia/nemotron-3-ultra-550b-a55b:batch
   provider: together
   cost:
-  - 0.3
-  - 1.8
+  - 0.6
+  - 3.6
   reason: batch
   detail: null
 - api: openrouter
@@ -2859,16 +2076,6 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
-  model: openai/gpt-4-turbo-preview
-  provider: openai
-  cost:
-  - 10.0
-  - 30.0
-  reason: flaky
-  detail: 'plain: 404 {"message":"Provider returned error","code":404,"metadata":{"raw":"{\n    \"error\":
-    {\n        \"message\": \"The model `gpt-4-turbo-preview` does not exist or you
-    do not have access to it...'
-- api: openrouter
   model: openai/gpt-4-turbo:batch
   provider: openai
   cost:
@@ -2877,54 +2084,6 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
-  model: openai/gpt-4.1
-  provider: azure
-  cost:
-  - 2.0
-  - 8.0
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: openai/gpt-4.1
-  provider: azure/swedencentral
-  cost:
-  - 2.2
-  - 8.8
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: openai/gpt-4.1
-  provider: openai
-  cost:
-  - 2.0
-  - 8.0
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: openai/gpt-4.1-mini
-  provider: azure
-  cost:
-  - 0.4
-  - 1.6
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: openai/gpt-4.1-mini
-  provider: azure/swedencentral
-  cost:
-  - 0.44
-  - 1.76
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: openai/gpt-4.1-mini
-  provider: openai
-  cost:
-  - 0.4
-  - 1.6
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
   model: openai/gpt-4.1-mini:batch
   provider: openai
   cost:
@@ -2932,30 +2091,6 @@ unprobeable:
   - 0.8
   reason: batch
   detail: null
-- api: openrouter
-  model: openai/gpt-4.1-nano
-  provider: azure
-  cost:
-  - 0.1
-  - 0.4
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: openai/gpt-4.1-nano
-  provider: azure/swedencentral
-  cost:
-  - 0.11
-  - 0.44
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: openai/gpt-4.1-nano
-  provider: openai
-  cost:
-  - 0.1
-  - 0.4
-  reason: flaky
-  detail: 'cached: hidden reasoning'
 - api: openrouter
   model: openai/gpt-4.1-nano:batch
   provider: openai
@@ -2996,26 +2131,6 @@ unprobeable:
   - 5.0
   reason: batch
   detail: null
-- api: openrouter
-  model: openai/gpt-5-image
-  provider: openai
-  cost:
-  - 10.0
-  - 10.0
-  reason: flaky
-  detail: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
-    {\n    \"message\": \"Unsupported parameter: ''temperature'' is not supported
-    with this model.\",\n    \"type\": \"inva...'
-- api: openrouter
-  model: openai/gpt-5-image-mini
-  provider: openai
-  cost:
-  - 2.5
-  - 2.0
-  reason: flaky
-  detail: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
-    {\n    \"message\": \"Unsupported parameter: ''temperature'' is not supported
-    with this model.\",\n    \"type\": \"inva...'
 - api: openrouter
   model: openai/gpt-5-mini:batch
   provider: openai
@@ -3276,48 +2391,48 @@ unprobeable:
   model: openai/gpt-5.6-sol-pro:batch
   provider: openai
   cost:
-  - 2.5
-  - 15.0
-  reason: batch
-  detail: null
-- api: openrouter
-  model: openai/gpt-5.6-sol-pro:batch
-  provider: openai/flex
-  cost:
   - 1.25
   - 7.5
   reason: batch
   detail: null
 - api: openrouter
   model: openai/gpt-5.6-sol-pro:batch
+  provider: openai/flex
+  cost:
+  - 0.625
+  - 3.75
+  reason: batch
+  detail: null
+- api: openrouter
+  model: openai/gpt-5.6-sol-pro:batch
   provider: openai/priority
   cost:
-  - 5.0
-  - 30.0
+  - 2.5
+  - 15.0
   reason: batch
   detail: null
 - api: openrouter
   model: openai/gpt-5.6-sol:batch
   provider: openai
   cost:
-  - 2.5
-  - 15.0
-  reason: batch
-  detail: null
-- api: openrouter
-  model: openai/gpt-5.6-sol:batch
-  provider: openai/flex
-  cost:
   - 1.25
   - 7.5
   reason: batch
   detail: null
 - api: openrouter
   model: openai/gpt-5.6-sol:batch
+  provider: openai/flex
+  cost:
+  - 0.625
+  - 3.75
+  reason: batch
+  detail: null
+- api: openrouter
+  model: openai/gpt-5.6-sol:batch
   provider: openai/priority
   cost:
-  - 5.0
-  - 30.0
+  - 2.5
+  - 15.0
   reason: batch
   detail: null
 - api: openrouter
@@ -3376,88 +2491,6 @@ unprobeable:
   - 5.0
   reason: batch
   detail: null
-- api: openrouter
-  model: openai/gpt-audio
-  provider: openai
-  cost:
-  - 2.5
-  - 10.0
-  reason: flaky
-  detail: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
-    {\n    \"message\": \"This model requires that either input content or output
-    modality contain audio.\",\n...'
-- api: openrouter
-  model: openai/gpt-audio-mini
-  provider: openai
-  cost:
-  - 0.6
-  - 2.4
-  reason: flaky
-  detail: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
-    {\n    \"message\": \"This model requires that either input content or output
-    modality contain audio.\",\n...'
-- api: openrouter
-  model: openai/gpt-oss-120b
-  provider: amazon-bedrock
-  cost:
-  - 0.15
-  - 0.6
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: openai/gpt-oss-120b
-  provider: amazon-bedrock/eu-west-1
-  cost:
-  - 0.15
-  - 0.6
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: openai/gpt-oss-20b
-  provider: amazon-bedrock
-  cost:
-  - 0.07
-  - 0.15
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: openai/gpt-oss-20b
-  provider: amazon-bedrock/eu-west-1
-  cost:
-  - 0.07
-  - 0.15
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: openai/gpt-oss-20b
-  provider: fireworks
-  cost:
-  - 0.07
-  - 0.3
-  reason: flaky
-  detail: '{"message":"Provider returned error","code":429,"metadata":{"raw":"openai/gpt-oss-20b
-    is temporarily rate-limited upstream. Please retry shortly, or add your own key
-    to accumulate your rate limits: ht...'
-- api: openrouter
-  model: openai/gpt-oss-20b
-  provider: parasail/fp4
-  cost:
-  - 0.03
-  - 0.15
-  reason: flaky
-  detail: 'No usage in response; body: {"error":{"message":"Upstream error from Parasail:
-    thinking_token_budget is set but reasoning_config is not configured. Please set
-    --reasoning-parser and/or --reasoning-con...'
-- api: openrouter
-  model: openai/gpt-oss-20b
-  provider: together
-  cost:
-  - 0.05
-  - 0.2
-  reason: flaky
-  detail: '{"message":"Provider returned error","code":429,"metadata":{"raw":"openai/gpt-oss-20b
-    is temporarily rate-limited upstream. Please retry shortly, or add your own key
-    to accumulate your rate limits: ht...'
 - api: openrouter
   model: openai/o1-pro:batch
   provider: openai
@@ -3523,147 +2556,343 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
-  model: perplexity/sonar
-  provider: perplexity
-  cost:
-  - 1.0
-  - 1.0
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: perplexity/sonar-deep-research
-  provider: perplexity
-  cost:
-  - 2.0
-  - 8.0
-  reason: flaky
-  detail: Timeout after 15.0s
-- api: openrouter
-  model: perplexity/sonar-pro
-  provider: perplexity
-  cost:
-  - 3.0
-  - 15.0
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: perplexity/sonar-pro-search
-  provider: perplexity
-  cost:
-  - 3.0
-  - 15.0
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: perplexity/sonar-reasoning-pro
-  provider: perplexity
-  cost:
-  - 2.0
-  - 8.0
-  reason: flaky
-  detail: 'No usage in response; body: {"id":"gen-1786074769-swo0ht42cOEELvAMrukY","object":"chat.completion","created":1786074769,"model":"perplexity/sonar-reasoning-pro","provider":"Perplexity","system_fingerp...'
-- api: openrouter
-  model: qwen/qwen-2.5-72b-instruct
-  provider: novita/bf16
-  cost:
-  - 0.38
-  - 0.4
-  reason: flaky
-  detail: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"code\":400,
-    \"reason\":\"INVALID_REQUEST_BODY\", \"message\":\"model: qwen/qwen-2.5-72b-instruct
-    does not support endpo...'
-- api: openrouter
-  model: qwen/qwen3-32b
-  provider: alibaba/fp8
-  cost:
-  - 0.104
-  - 0.416
-  reason: flaky
-  detail: 'plain: 200 No usage in response; body: {"error":{"message":"JSON error
-    injected into SSE stream","code":502}}'
-- api: openrouter
-  model: qwen/qwen3-coder-30b-a3b-instruct
-  provider: amazon-bedrock
-  cost:
-  - 0.15
-  - 0.6
-  reason: flaky
-  detail: 'plain: 500 {"message":"Internal Server Error","code":500}'
-- api: openrouter
-  model: qwen/qwen3.5-397b-a17b
-  provider: gmicloud/fp8
-  cost:
-  - 0.6
-  - 3.6
-  reason: flaky
-  detail: '{"message":"Provider returned error","code":429,"metadata":{"raw":"qwen/qwen3.5-397b-a17b
-    is temporarily rate-limited upstream. Please retry shortly, or add your own key
-    to accumulate your rate limits...'
-- api: openrouter
-  model: rekaai/reka-flash-3
-  provider: reka/fp8
-  cost:
-  - 0.1
-  - 0.2
-  reason: flaky
-  detail: Timeout after 15.0s
-- api: openrouter
   model: thinkingmachines/inkling:batch
   provider: together
   cost:
-  - 0.5
-  - 2.025
+  - 1.0
+  - 4.05
   reason: batch
   detail: null
-- api: openrouter
-  model: upstage/solar-pro-3
-  provider: upstage
-  cost:
-  - 0.15
-  - 0.6
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: upstage/solar-pro-3
-  provider: upstage/fp4
-  cost:
-  - 0.15
-  - 0.6
-  reason: flaky
-  detail: 'cached: hidden reasoning'
-- api: openrouter
-  model: z-ai/glm-4.7
-  provider: z-ai/fp4
-  cost:
-  - 0.6
-  - 2.2
-  reason: flaky
-  detail: could not fetch generation cost
-- api: openrouter
-  model: z-ai/glm-5
-  provider: phala
-  cost:
-  - 1.2
-  - 3.5
-  reason: flaky
-  detail: '{"message":"Provider returned error","code":404,"metadata":{"raw":"{\"error\":{\"message\":\"The
-    upstream provider returned an error\",\"type\":\"not_found_error\"}}","provider_name":"Phala","is_byok"...'
 - api: openrouter
   model: z-ai/glm-5.2:batch
   provider: together
   cost:
-  - 0.7
-  - 2.2
+  - 1.4
+  - 4.4
   reason: batch
   detail: null
 failure_streaks:
-  openrouter#ai21/jamba-large-1.7#ai21/fp8:
-    count: 2
-    last_error: "{\"message\":\"Provider returned error\",\"code\":410,\"metadata\"\
-      :{\"raw\":\"{\\\"detail\\\":\\\"This API has been retired. The AI21 Gateway\
-      \ is available at https://app.ai21.com \u2014 see https://docs.ai21.com/august-dep..."
-  openrouter#deepseek/deepseek-v4-pro-0813#phala:
-    count: 2
-    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4-pro-0813
+  openrouter#arcee-ai/virtuoso-large#together:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"id\":
+      \"owu2mm9-2kFHot-a2dddf006fc89aed\",\n  \"error\": {\n    \"message\": \"Unable
+      to access non-serverless mode...'
+  openrouter#cohere/command-a#cohere:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#cohere/command-r7b-12-2024#cohere:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#deepseek/deepseek-r1-0528#novita/fp8:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"code\":400,\"reason\":\"INVALID_REQUEST_BODY\",\"message\":\"model:
+      deepseek/deepseek-r1-0528 does not support endpoint...'
+  openrouter#deepseek/deepseek-v4-pro#deepinfra/fp8:
+    count: 1
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4-pro
       is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulat...'
+      key to accumulate you...'
+  openrouter#deepseek/deepseek-v4-pro#fireworks:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4-pro
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rate limi...'
+  openrouter#google/gemini-2.5-flash-image#google-vertex/global/flex:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
+      {\n    \"code\": 400,\n    \"message\": \"Flex API is not supported for model:
+      gemini-2.5-flash-image.\",\...'
+  openrouter#google/gemini-2.5-pro#google-vertex/eu:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-2.5-pro#google-vertex/global:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-2.5-pro#google-vertex/global/flex:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
+      {\n    \"code\": 400,\n    \"message\": \"Flex API is not supported for model:
+      gemini-2.5-pro.\",\n    \"s...'
+  openrouter#google/gemini-2.5-pro#google-vertex/us:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-2.5-pro-preview#google-vertex/eu:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-2.5-pro-preview#google-vertex/global:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-2.5-pro-preview#google-vertex/global/flex:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
+      {\n    \"code\": 400,\n    \"message\": \"Flex API is not supported for model:
+      gemini-2.5-pro.\",\n    \"s...'
+  openrouter#google/gemini-2.5-pro-preview#google-vertex/global/priority:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-2.5-pro-preview#google-vertex/us:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-2.5-pro-preview-05-06#google-vertex/eu:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-2.5-pro-preview-05-06#google-vertex/global:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-2.5-pro-preview-05-06#google-vertex/global/flex:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
+      {\n    \"code\": 400,\n    \"message\": \"Flex API is not supported for model:
+      gemini-2.5-pro.\",\n    \"s...'
+  openrouter#google/gemini-2.5-pro-preview-05-06#google-vertex/global/priority:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-2.5-pro-preview-05-06#google-vertex/us:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-3-flash-preview#google-ai-studio:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-3-flash-preview#google-ai-studio/flex:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-3-flash-preview#google-ai-studio/priority:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-3-flash-preview#google-vertex/global:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-3-flash-preview#google-vertex/global/flex:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-3-flash-preview#google-vertex/global/priority:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-3.1-flash-image#google-ai-studio:
+    count: 1
+    last_error: 'No usage in response; body: {"id":"gen-1787192250-p7wK7IPK7igz0pt0S4Zv","object":"chat.completion","created":1787192250,"model":"google/gemini-3.1-flash-image","provider":"Google
+      AI Studio","system_fi...'
+  openrouter#google/gemini-3.1-flash-image-preview#google-ai-studio:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-3.1-flash-lite-image#google-vertex/global:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1787191925-eNGUPxfpLtsURR6vTcc0","object":"chat.completion","created":1787191925,"model":"google/gemini-3.1-flash-lite-image","provider":"Google","sys...'
+  openrouter#google/gemini-3.1-flash-lite-preview#google-ai-studio/flex:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-3.1-pro-preview#google-vertex/global/flex:
+    count: 1
+    last_error: 'plain: 0 Timeout after 15.0s'
+  openrouter#google/gemini-3.5-flash#google-ai-studio:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-3.5-flash#google-ai-studio/flex:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-3.5-flash#google-ai-studio/priority:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-3.5-flash#google-vertex/global:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-3.5-flash#google-vertex/global/flex:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-3.5-flash#google-vertex/global/priority:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-3.5-flash#google-vertex/us:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-3.5-flash-lite#google-ai-studio:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-3.5-flash-lite#google-ai-studio/flex:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-3.5-flash-lite#google-ai-studio/priority:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-3.6-flash#google-ai-studio:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-3.6-flash#google-ai-studio/flex:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-3.6-flash#google-ai-studio/priority:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-3.7-flash#google-ai-studio:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-3.7-flash#google-ai-studio/flex:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemini-3.7-flash#google-ai-studio/priority:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemma-2-27b-it#nextbit/int4:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#google/gemma-3-27b-it#phala:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#inception/mercury-2#inception:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#kwaipilot/kat-coder-air-v2.5#streamlake:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#meta-llama/llama-3.1-70b-instruct#amazon-bedrock:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#meta-llama/llama-4-scout#google-vertex/us-east5:
+    count: 1
+    last_error: 'plain: 200 No usage in response; body: {"id":"gen-1787191925-UGdZX7GJo7aJkWFmSquH","object":"chat.completion","created":1787191925,"model":"meta-llama/llama-4-scout","provider":"Google","system_finger...'
+  openrouter#meta-llama/llama-guard-4-12b#deepinfra/bf16:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#minimax/minimax-m2.7#fireworks:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"minimax/minimax-m2.7
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rate limits: ...'
+  openrouter#minimax/minimax-m3#atlas-cloud/fp8:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"code\":400,\"msg\":\"invalid
+      request params\"}","provider_name":"AtlasCloud","is_byok":false}}'
+  openrouter#mistralai/mistral-nemo#parasail/fp8:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#mistralai/mistral-small-2603#mistral/zdr:
+    count: 1
+    last_error: 'plain: 401 {"message":"Provider returned error","code":401,"metadata":{"raw":"{\"detail\":\"Invalid
+      API Key\"}\n","provider_name":"Mistral","is_byok":false}}'
+  openrouter#moonshotai/kimi-k2.6#baseten/fp4:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"moonshotai/kimi-k2.6
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rate limits: ...'
+  openrouter#moonshotai/kimi-k2.6#fireworks:
+    count: 1
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"moonshotai/kimi-k2.6
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your ra...'
+  openrouter#moonshotai/kimi-k2.7-code#siliconflow/fp8:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#moonshotai/kimi-k3#baseten/fp8:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"Cannot
+      override enforced sampling params: {''top_p'': 1.0}. Required values: {''top_p'':
+      0.95}\",\"type\":\"Bad...'
+  openrouter#moonshotai/kimi-k3#deepinfra/bf16:
+    count: 1
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"moonshotai/kimi-k3
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rate...'
+  openrouter#openai/gpt-4-turbo-preview#openai:
+    count: 1
+    last_error: 'plain: 404 {"message":"Provider returned error","code":404,"metadata":{"raw":"{\n    \"error\":
+      {\n        \"message\": \"The model `gpt-4-turbo-preview` does not exist or
+      you do not have access to it...'
+  openrouter#openai/gpt-4.1#azure:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#openai/gpt-4.1#azure/swedencentral:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#openai/gpt-4.1#openai:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#openai/gpt-4.1-mini#azure:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#openai/gpt-4.1-mini#azure/swedencentral:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#openai/gpt-4.1-mini#openai:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#openai/gpt-4.1-nano#azure:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#openai/gpt-4.1-nano#azure/swedencentral:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#openai/gpt-4.1-nano#openai:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#openai/gpt-5-image#openai:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
+      {\n    \"message\": \"Unsupported parameter: ''temperature'' is not supported
+      with this model.\",\n    \"type\": \"inva...'
+  openrouter#openai/gpt-5-image-mini#openai:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
+      {\n    \"message\": \"Unsupported parameter: ''temperature'' is not supported
+      with this model.\",\n    \"type\": \"inva...'
+  openrouter#openai/gpt-audio#openai:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
+      {\n    \"message\": \"This model requires that either input content or output
+      modality contain audio.\",\n...'
+  openrouter#openai/gpt-audio-mini#openai:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
+      {\n    \"message\": \"This model requires that either input content or output
+      modality contain audio.\",\n...'
+  openrouter#openai/gpt-oss-120b#amazon-bedrock:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#openai/gpt-oss-120b#amazon-bedrock/eu-west-1:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#openai/gpt-oss-20b#amazon-bedrock:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#openai/gpt-oss-20b#amazon-bedrock/eu-west-1:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#openai/gpt-oss-20b#together:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"openai/gpt-oss-20b
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rate limits: ht...'
+  openrouter#perplexity/sonar#perplexity:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#perplexity/sonar-deep-research#perplexity:
+    count: 1
+    last_error: Timeout after 15.0s
+  openrouter#perplexity/sonar-pro#perplexity:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#perplexity/sonar-pro-search#perplexity:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#perplexity/sonar-reasoning-pro#perplexity:
+    count: 1
+    last_error: 'No usage in response; body: {"id":"gen-1787192306-EOTJmIkdAwbVr3QkNARO","object":"chat.completion","created":1787192306,"model":"perplexity/sonar-reasoning-pro","provider":"Perplexity","system_fingerp...'
+  openrouter#qwen/qwen-2.5-72b-instruct#novita/bf16:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"code\":400,\"reason\":\"INVALID_REQUEST_BODY\",\"message\":\"model:
+      qwen/qwen-2.5-72b-instruct does not support endpoin...'
+  openrouter#qwen/qwen3-coder-30b-a3b-instruct#amazon-bedrock:
+    count: 1
+    last_error: 'plain: 500 {"message":"Internal Server Error","code":500}'
+  openrouter#qwen/qwen3.5-397b-a17b#gmicloud/fp8:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"qwen/qwen3.5-397b-a17b
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rate limits...'
+  openrouter#upstage/solar-pro-3#upstage:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#z-ai/glm-5.2#wafer:
+    count: 1
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"z-ai/glm-5.2
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rate limit...'
