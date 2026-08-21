@@ -212,6 +212,9 @@
   "openrouter#deepseek/deepseek-v4-flash#wafer/fp4": null,
   "openrouter#deepseek/deepseek-v4-flash#wandb/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#akashml/fp8": null,
+  "openrouter#deepseek/deepseek-v4-flash-0731#alibaba": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-flash-0731#ambient/fp4": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#atlas-cloud/fp4": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#atlas-cloud/fp8": null,
@@ -245,6 +248,9 @@
   "openrouter#deepseek/deepseek-v4-flash-0731#open-inference/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#parasail/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#phala": null,
+  "openrouter#deepseek/deepseek-v4-flash-0731#reka/fp4": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-flash-0731#relace/fp4": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#sail-research/fp4": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#siliconflow/fp8": null,
@@ -533,6 +539,7 @@
   "openrouter#google/gemma-3-4b-it#deepinfra/bf16": null,
   "openrouter#google/gemma-3n-e4b-it#together": null,
   "openrouter#google/gemma-4-26b-a4b-it#cloudflare": null,
+  "openrouter#google/gemma-4-26b-a4b-it#darkbloom": null,
   "openrouter#google/gemma-4-26b-a4b-it#deepinfra/fp8": null,
   "openrouter#google/gemma-4-26b-a4b-it#dekallm/bf16": null,
   "openrouter#google/gemma-4-26b-a4b-it#google-vertex/global": null,
@@ -1417,6 +1424,9 @@
   "openrouter#qwen/qwen3.6-35b-a3b#atlas-cloud/fp8": null,
   "openrouter#qwen/qwen3.6-35b-a3b#coreweave/fp8": null,
   "openrouter#qwen/qwen3.6-35b-a3b#darkbloom": null,
+  "openrouter#qwen/qwen3.6-35b-a3b#darkbloom/fp4": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.6-35b-a3b#deepinfra/fp8": null,
   "openrouter#qwen/qwen3.6-35b-a3b#io-net/fp8": null,
   "openrouter#qwen/qwen3.6-35b-a3b#parasail/fp8": null,
@@ -1476,6 +1486,10 @@
   "openrouter#tencent/hunyuan-a13b-instruct#siliconflow/fp8": {
     "max_tokens": 1
   },
+  "openrouter#tencent/hy-mt2-1.8b#tencent/fp8": null,
+  "openrouter#tencent/hy-mt2-30b-a3b#tencent/fp8": {
+    "skip": "hidden reasoning"
+  },
   "openrouter#tencent/hy3#atlas-cloud/fp8": null,
   "openrouter#tencent/hy3#baidu/fp8": null,
   "openrouter#tencent/hy3#deepinfra/fp8": null,
@@ -1499,6 +1513,9 @@
   },
   "openrouter#thinkingmachines/inkling#together": {
     "max_tokens": 1
+  },
+  "openrouter#thinkingmachines/inkling-small#baseten/fp8": {
+    "max_tokens": 2
   },
   "openrouter#thinkingmachines/inkling-small#deepinfra/fp8": {
     "max_tokens": 1
@@ -1666,6 +1683,9 @@
   "openrouter#z-ai/glm-5.2#digitalocean": null,
   "openrouter#z-ai/glm-5.2#fireworks": null,
   "openrouter#z-ai/glm-5.2#fireworks/fast": null,
+  "openrouter#z-ai/glm-5.2#fireworks/fast-us": {
+    "effort": "none"
+  },
   "openrouter#z-ai/glm-5.2#friendli": null,
   "openrouter#z-ai/glm-5.2#gmicloud/fp8": null,
   "openrouter#z-ai/glm-5.2#inceptron/fp4": null,
