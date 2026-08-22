@@ -205,12 +205,6 @@ endpoints_lt:
   - 0.4
 - api: openrouter
   model: google/gemma-4-31b-it
-  provider: morph/fp4
-  cost:
-  - 0.14
-  - 0.4
-- api: openrouter
-  model: google/gemma-4-31b-it
   provider: novita/bf16
   cost:
   - 0.14
@@ -293,12 +287,6 @@ endpoints_lt:
   cost:
   - 0.15
   - 0.6
-- api: openrouter
-  model: thedrummer/rocinante-12b
-  provider: parasail/bf16
-  cost:
-  - 0.25
-  - 0.5
 - api: openrouter
   model: thedrummer/cydonia-24b-v4.1
   provider: parasail/bf16
@@ -732,12 +720,6 @@ endpoints_lt:
   - 1.25
   - 2.5
 - api: openrouter
-  model: z-ai/glm-5.1
-  provider: gmicloud/fp8
-  cost:
-  - 0.91
-  - 2.86
-- api: openrouter
   model: qwen/qwen3-coder-plus
   provider: alibaba
   cost:
@@ -778,6 +760,12 @@ endpoints_lt:
   provider: wafer
   cost:
   - 1.26
+  - 3.96
+- api: openrouter
+  model: deepseek/deepseek-v4-pro-0813
+  provider: digitalocean
+  cost:
+  - 1.32
   - 3.96
 - api: openrouter
   model: z-ai/glm-5.1

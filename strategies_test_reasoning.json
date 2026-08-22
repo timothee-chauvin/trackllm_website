@@ -241,6 +241,9 @@
   "openrouter#deepseek/deepseek-v4-flash-0731#mancer/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#morph": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#morph/bf16": null,
+  "openrouter#deepseek/deepseek-v4-flash-0731#nebius/fp8": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-flash-0731#novita/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#open-inference/fp4": {
     "effort": "none"
@@ -299,6 +302,7 @@
   "openrouter#deepseek/deepseek-v4-pro-0813#parasail/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4-pro-0813#sail-research/fp4": null,
   "openrouter#deepseek/deepseek-v4-pro-0813#together": {
     "effort": "none"
   },
@@ -1452,6 +1456,7 @@
   "openrouter#qwen/qwen3.8-27b#chutes/fp8": {
     "effort": "none"
   },
+  "openrouter#qwen/qwen3.8-27b#coreweave/fp8": null,
   "openrouter#qwen/qwen3.8-27b#io-net/fp8": {
     "effort": "none"
   },
@@ -1495,6 +1500,9 @@
   "openrouter#tencent/hy3#deepinfra/fp8": null,
   "openrouter#tencent/hy3#gmicloud/bf16": null,
   "openrouter#tencent/hy3#novita": null,
+  "openrouter#tencent/hy3#phala": {
+    "effort": "none"
+  },
   "openrouter#tencent/hy3#tencent/fp8": null,
   "openrouter#tencent/hy3-preview#gmicloud/bf16": null,
   "openrouter#tencent/hy3-preview#siliconflow": null,
@@ -1691,6 +1699,9 @@
   "openrouter#z-ai/glm-5.2#inceptron/fp4": null,
   "openrouter#z-ai/glm-5.2#io-net/fp8": null,
   "openrouter#z-ai/glm-5.2#ionstream/fp4": null,
+  "openrouter#z-ai/glm-5.2#mistral": {
+    "effort": "none"
+  },
   "openrouter#z-ai/glm-5.2#modelrun/fp4": {
     "effort": "none"
   },
