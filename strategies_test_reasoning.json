@@ -1495,6 +1495,7 @@
   "openrouter#tencent/hy-mt2-30b-a3b#tencent/fp8": {
     "skip": "hidden reasoning"
   },
+  "openrouter#tencent/hy-mt2-7b#tencent/fp8": null,
   "openrouter#tencent/hy3#atlas-cloud/fp8": null,
   "openrouter#tencent/hy3#baidu/fp8": null,
   "openrouter#tencent/hy3#deepinfra/fp8": null,

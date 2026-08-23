@@ -2521,6 +2521,14 @@ unprobeable:
   reason: flaky
   detail: 'cached: hidden reasoning'
 - api: openrouter
+  model: mancer/weaver
+  provider: mancer/fp8
+  cost:
+  - 0.5
+  - 0.75
+  reason: flaky
+  detail: 'cached: hidden reasoning'
+- api: openrouter
   model: meta-llama/llama-3.1-70b-instruct
   provider: amazon-bedrock
   cost:
@@ -2561,6 +2569,15 @@ unprobeable:
   - 1.2
   reason: batch
   detail: null
+- api: openrouter
+  model: mistralai/ministral-8b
+  provider: mistral/zdr
+  cost:
+  - 0.11
+  - 0.11
+  reason: flaky
+  detail: 'plain: 401 {"message":"Provider returned error","code":401,"metadata":{"raw":"{\"detail\":\"Invalid
+    API Key\"}\n","provider_name":"Mistral","is_byok":false}}'
 - api: openrouter
   model: mistralai/mistral-nemo
   provider: parasail/fp8
@@ -3343,6 +3360,14 @@ unprobeable:
     is temporarily rate-limited upstream. Please retry shortly, or add your own key
     to accumulate your rate limits...'
 - api: openrouter
+  model: tencent/hy-mt2-30b-a3b
+  provider: tencent/fp8
+  cost:
+  - 0.074
+  - 0.295
+  reason: flaky
+  detail: 'cached: hidden reasoning'
+- api: openrouter
   model: thinkingmachines/inkling:batch
   provider: together
   cost:
@@ -3368,25 +3393,15 @@ unprobeable:
   detail: null
 failure_streaks:
   openrouter#deepseek/deepseek-v4-flash-vision-exp#deepseek:
-    count: 1
+    count: 2
     last_error: 'plain: 404 {"message":"No endpoints available matching your guardrail
       restrictions and data policy. Configure: https://openrouter.ai/settings/privacy","code":404}'
-  openrouter#mancer/weaver#mancer/fp8:
-    count: 2
-    last_error: 'cached: hidden reasoning'
   openrouter#meta/muse-spark-1.2-contributor#meta:
-    count: 1
+    count: 2
     last_error: 'plain: 404 {"message":"No endpoints available matching your guardrail
       restrictions and data policy. Configure: https://openrouter.ai/settings/privacy","code":404}'
-  openrouter#mistralai/ministral-8b#mistral/zdr:
-    count: 2
-    last_error: 'plain: 401 {"message":"Provider returned error","code":401,"metadata":{"raw":"{\"detail\":\"Invalid
-      API Key\"}\n","provider_name":"Mistral","is_byok":false}}'
   openrouter#moonshotai/kimi-k3#alibaba:
-    count: 1
+    count: 2
     last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"data:
       {\"error\":{\"code\":\"invalid_parameter_error\",\"param\":null,\"message\":\"Parameter
       ''top_p''=1.0 is not supported...'
-  openrouter#tencent/hy-mt2-30b-a3b#tencent/fp8:
-    count: 2
-    last_error: 'cached: hidden reasoning'
