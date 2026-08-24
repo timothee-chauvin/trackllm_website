@@ -42,12 +42,6 @@ endpoints_lt:
   - 0.05
   - 0.1
 - api: openrouter
-  model: qwen/qwen3.7-flash
-  provider: alibaba
-  cost:
-  - 0.03
-  - 0.13
-- api: openrouter
   model: openai/gpt-oss-20b
   provider: parasail/fp4
   cost:
@@ -480,12 +474,6 @@ endpoints_lt:
   - 0.8
   - 0.8
 - api: openrouter
-  model: qwen/qwen3.7-plus
-  provider: alibaba
-  cost:
-  - 0.32
-  - 1.28
-- api: openrouter
   model: qwen/qwen3-next-80b-a3b-instruct
   provider: novita/bf16
   cost:
@@ -516,12 +504,6 @@ endpoints_lt:
   - 0.8
   - 1.0
 - api: openrouter
-  model: qwen/qwen3.5-plus-02-15
-  provider: alibaba
-  cost:
-  - 0.26
-  - 1.56
-- api: openrouter
   model: openai/gpt-3.5-turbo
   provider: openai
   cost:
@@ -532,12 +514,6 @@ endpoints_lt:
   provider: google-vertex/us-south1
   cost:
   - 0.22
-  - 1.8
-- api: openrouter
-  model: qwen/qwen3.5-plus-20260420
-  provider: alibaba
-  cost:
-  - 0.3
   - 1.8
 - api: openrouter
   model: qwen/qwen3-vl-235b-a22b-instruct
@@ -557,12 +533,6 @@ endpoints_lt:
   cost:
   - 0.56
   - 1.68
-- api: openrouter
-  model: qwen/qwen3.6-plus
-  provider: alibaba
-  cost:
-  - 0.325
-  - 1.95
 - api: openrouter
   model: deepseek/deepseek-chat-v3.1
   provider: google-vertex/us-west2
@@ -738,12 +708,6 @@ endpoints_lt:
   - 1.32
   - 3.96
 - api: openrouter
-  model: z-ai/glm-5.1
-  provider: alibaba/fp8
-  cost:
-  - 1.33
-  - 4.18
-- api: openrouter
   model: z-ai/glm-5.2
   provider: gmicloud/fp8
   cost:
@@ -824,12 +788,6 @@ endpoints_lt:
 - api: openrouter
   model: qwen/qwen3.8-2.4t-a95b
   provider: alibaba
-  cost:
-  - 2.0
-  - 6.0
-- api: openrouter
-  model: qwen/qwen3.8-2.4t-a95b
-  provider: digitalocean
   cost:
   - 2.0
   - 6.0

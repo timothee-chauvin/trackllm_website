@@ -128,6 +128,12 @@ too_expensive:
   - 0.2
   - 0.9
 - api: openrouter
+  model: deepseek/deepseek-r1
+  provider: novita/fp8
+  cost:
+  - 0.7
+  - 2.5
+- api: openrouter
   model: deepseek/deepseek-r1-0528
   provider: siliconflow/fp8
   cost:
@@ -2054,6 +2060,15 @@ unprobeable:
     \"reason\":\"INVALID_REQUEST_BODY\", \"message\":\"model: deepseek/deepseek-r1-0528
     does not support endpoi...'
 - api: openrouter
+  model: deepseek/deepseek-v4-flash-vision-exp
+  provider: deepseek
+  cost:
+  - 0.22
+  - 0.66
+  reason: flaky
+  detail: 'plain: 404 {"message":"No endpoints available matching your guardrail restrictions
+    and data policy. Configure: https://openrouter.ai/settings/privacy","code":404}'
+- api: openrouter
   model: deepseek/deepseek-v4-pro
   provider: deepinfra/fp8
   cost:
@@ -2553,6 +2568,15 @@ unprobeable:
   reason: flaky
   detail: 'cached: hidden reasoning'
 - api: openrouter
+  model: meta/muse-spark-1.2-contributor
+  provider: meta
+  cost:
+  - 0.1
+  - 0.2
+  reason: flaky
+  detail: 'plain: 404 {"message":"No endpoints available matching your guardrail restrictions
+    and data policy. Configure: https://openrouter.ai/settings/privacy","code":404}'
+- api: openrouter
   model: minimax/minimax-m3
   provider: atlas-cloud/fp8
   cost:
@@ -2631,6 +2655,16 @@ unprobeable:
   - 4.0
   reason: batch
   detail: null
+- api: openrouter
+  model: moonshotai/kimi-k3
+  provider: alibaba
+  cost:
+  - 3.45
+  - 17.25
+  reason: flaky
+  detail: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"data:
+    {\"error\":{\"code\":\"invalid_parameter_error\",\"param\":null,\"message\":\"Parameter
+    ''top_p''=1.0 is not supported...'
 - api: openrouter
   model: moonshotai/kimi-k3
   provider: baseten/fp8
@@ -3391,17 +3425,4 @@ unprobeable:
   - 4.4
   reason: batch
   detail: null
-failure_streaks:
-  openrouter#deepseek/deepseek-v4-flash-vision-exp#deepseek:
-    count: 2
-    last_error: 'plain: 404 {"message":"No endpoints available matching your guardrail
-      restrictions and data policy. Configure: https://openrouter.ai/settings/privacy","code":404}'
-  openrouter#meta/muse-spark-1.2-contributor#meta:
-    count: 2
-    last_error: 'plain: 404 {"message":"No endpoints available matching your guardrail
-      restrictions and data policy. Configure: https://openrouter.ai/settings/privacy","code":404}'
-  openrouter#moonshotai/kimi-k3#alibaba:
-    count: 2
-    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"data:
-      {\"error\":{\"code\":\"invalid_parameter_error\",\"param\":null,\"message\":\"Parameter
-      ''top_p''=1.0 is not supported...'
+failure_streaks: {}

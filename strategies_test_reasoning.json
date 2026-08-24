@@ -295,6 +295,7 @@
   "openrouter#deepseek/deepseek-v4-pro-0813#baseten/fp4": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4-pro-0813#deepinfra/fp8": null,
   "openrouter#deepseek/deepseek-v4-pro-0813#deepseek": {
     "effort": "none"
   },
@@ -1714,6 +1715,12 @@
   "openrouter#z-ai/glm-5.2#parasail/fp4": null,
   "openrouter#z-ai/glm-5.2#phala": null,
   "openrouter#z-ai/glm-5.2#phala/fp8": {
+    "effort": "none"
+  },
+  "openrouter#z-ai/glm-5.2#reka/fp8": {
+    "effort": "none"
+  },
+  "openrouter#z-ai/glm-5.2#relace/fp8": {
     "effort": "none"
   },
   "openrouter#z-ai/glm-5.2#sail-research/fp8": null,
