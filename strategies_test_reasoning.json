@@ -234,6 +234,9 @@
   "openrouter#deepseek/deepseek-v4-flash-0731#deepseek/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#digitalocean": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#fireworks": null,
+  "openrouter#deepseek/deepseek-v4-flash-0731#gmicloud/fp4": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-flash-0731#gmicloud/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#inceptron/fp4": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#io-net/fp8": null,
@@ -557,6 +560,7 @@
   "openrouter#google/gemma-4-31b-it#cerebras/fp16": null,
   "openrouter#google/gemma-4-31b-it#chutes/fp4": null,
   "openrouter#google/gemma-4-31b-it#coreweave/bf16": null,
+  "openrouter#google/gemma-4-31b-it#coreweave/fp4": null,
   "openrouter#google/gemma-4-31b-it#crusoe": null,
   "openrouter#google/gemma-4-31b-it#deepinfra/fp8": null,
   "openrouter#google/gemma-4-31b-it#deepinfra/turbo": null,
@@ -741,23 +745,41 @@
   },
   "openrouter#minimax/minimax-m3#venice/fp8": null,
   "openrouter#mistralai/codestral-2508#mistral": null,
+  "openrouter#mistralai/codestral-2508#mistral/eu": null,
   "openrouter#mistralai/devstral-2512#mistral": null,
+  "openrouter#mistralai/devstral-2512#mistral/eu": null,
   "openrouter#mistralai/ministral-14b-2512#mistral": null,
+  "openrouter#mistralai/ministral-14b-2512#mistral/eu": null,
+  "openrouter#mistralai/ministral-14b-2512#mistral/zdr": null,
   "openrouter#mistralai/ministral-14b-2512#nextbit/fp8": null,
   "openrouter#mistralai/ministral-3b-2512#mistral": null,
+  "openrouter#mistralai/ministral-3b-2512#mistral/eu": null,
+  "openrouter#mistralai/ministral-3b-2512#mistral/zdr": null,
   "openrouter#mistralai/ministral-3b-2512#nextbit/fp8": null,
+  "openrouter#mistralai/ministral-8b#mistral/us": null,
   "openrouter#mistralai/ministral-8b-2512#mistral": null,
+  "openrouter#mistralai/ministral-8b-2512#mistral/eu": null,
+  "openrouter#mistralai/ministral-8b-2512#mistral/zdr": null,
   "openrouter#mistralai/ministral-8b-2512#nextbit/fp8": null,
   "openrouter#mistralai/mistral-large#mistral": null,
   "openrouter#mistralai/mistral-large-2407#mistral": null,
   "openrouter#mistralai/mistral-large-2512#mistral": null,
+  "openrouter#mistralai/mistral-large-2512#mistral/eu": null,
+  "openrouter#mistralai/mistral-large-2512#mistral/zdr": null,
   "openrouter#mistralai/mistral-medium-3#mistral": null,
+  "openrouter#mistralai/mistral-medium-3#mistral/eu": null,
+  "openrouter#mistralai/mistral-medium-3#mistral/zdr": null,
   "openrouter#mistralai/mistral-medium-3-5#mistral": null,
+  "openrouter#mistralai/mistral-medium-3-5#mistral/eu": null,
+  "openrouter#mistralai/mistral-medium-3-5#mistral/zdr": null,
   "openrouter#mistralai/mistral-medium-3.1#mistral": null,
+  "openrouter#mistralai/mistral-medium-3.1#mistral/eu": null,
+  "openrouter#mistralai/mistral-medium-3.1#mistral/zdr": null,
   "openrouter#mistralai/mistral-nemo#deepinfra/fp8": null,
   "openrouter#mistralai/mistral-nemo#dekallm/fp8": null,
   "openrouter#mistralai/mistral-nemo#io-net/fp16": null,
   "openrouter#mistralai/mistral-nemo#mistral": null,
+  "openrouter#mistralai/mistral-nemo#mistral/eu": null,
   "openrouter#mistralai/mistral-nemo#novita/fp8": null,
   "openrouter#mistralai/mistral-nemo#parasail/fp8": {
     "skip": "hidden reasoning"
@@ -765,10 +787,13 @@
   "openrouter#mistralai/mistral-saba#mistral": null,
   "openrouter#mistralai/mistral-small-24b-instruct-2501#deepinfra/fp8": null,
   "openrouter#mistralai/mistral-small-2603#mistral": null,
+  "openrouter#mistralai/mistral-small-2603#mistral/eu": null,
+  "openrouter#mistralai/mistral-small-2603#mistral/us": null,
   "openrouter#mistralai/mistral-small-2603#venice/fp8": null,
   "openrouter#mistralai/mistral-small-3.1-24b-instruct#cloudflare": null,
   "openrouter#mistralai/mistral-small-3.2-24b-instruct#deepinfra/fp8": null,
   "openrouter#mistralai/mistral-small-3.2-24b-instruct#mistral": null,
+  "openrouter#mistralai/mistral-small-3.2-24b-instruct#mistral/eu": null,
   "openrouter#mistralai/mistral-small-3.2-24b-instruct#parasail/bf16": null,
   "openrouter#mistralai/mistral-small-3.2-24b-instruct#venice/fp8": null,
   "openrouter#mistralai/mixtral-8x22b-instruct#mistral": null,
@@ -804,6 +829,9 @@
   "openrouter#moonshotai/kimi-k2.6#decart/fp4": null,
   "openrouter#moonshotai/kimi-k2.6#deepinfra/fp4": null,
   "openrouter#moonshotai/kimi-k2.6#digitalocean": null,
+  "openrouter#moonshotai/kimi-k2.6#gmicloud/fp8": {
+    "effort": "none"
+  },
   "openrouter#moonshotai/kimi-k2.6#inceptron/int4": null,
   "openrouter#moonshotai/kimi-k2.6#io-net/int4": null,
   "openrouter#moonshotai/kimi-k2.6#moonshotai/int4": null,
@@ -1457,6 +1485,9 @@
   "openrouter#qwen/qwen3.8-27b#chutes/fp8": {
     "effort": "none"
   },
+  "openrouter#qwen/qwen3.8-27b#cloudflare": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.8-27b#coreweave/fp8": null,
   "openrouter#qwen/qwen3.8-27b#io-net/fp8": {
     "effort": "none"
@@ -1702,6 +1733,12 @@
   "openrouter#z-ai/glm-5.2#io-net/fp8": null,
   "openrouter#z-ai/glm-5.2#ionstream/fp4": null,
   "openrouter#z-ai/glm-5.2#mistral": {
+    "effort": "none"
+  },
+  "openrouter#z-ai/glm-5.2#mistral/eu": {
+    "effort": "none"
+  },
+  "openrouter#z-ai/glm-5.2#mistral/zdr": {
     "effort": "none"
   },
   "openrouter#z-ai/glm-5.2#modelrun/fp4": {

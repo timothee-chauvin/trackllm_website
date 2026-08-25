@@ -151,6 +151,12 @@ endpoints_lt:
   - 0.34
 - api: openrouter
   model: google/gemma-4-31b-it
+  provider: coreweave/fp4
+  cost:
+  - 0.1
+  - 0.34
+- api: openrouter
+  model: google/gemma-4-31b-it
   provider: venice/bf16
   cost:
   - 0.12
@@ -576,6 +582,12 @@ endpoints_lt:
   - 0.9
   - 1.9
 - api: openrouter
+  model: qwen/qwen3.8-27b
+  provider: alibaba
+  cost:
+  - 0.425
+  - 2.55
+- api: openrouter
   model: openai/gpt-3.5-turbo-0613
   provider: azure
   cost:
@@ -630,12 +642,6 @@ endpoints_lt:
   - 1.131
   - 2.262
 - api: openrouter
-  model: qwen/qwen3.8-27b
-  provider: alibaba
-  cost:
-  - 0.5
-  - 3.0
-- api: openrouter
   model: deepseek/deepseek-v4-pro
   provider: coreweave/fp8
   cost:
@@ -672,6 +678,12 @@ endpoints_lt:
   - 0.65
   - 3.25
 - api: openrouter
+  model: z-ai/glm-5.2
+  provider: gmicloud/fp8
+  cost:
+  - 1.05
+  - 3.3
+- api: openrouter
   model: moonshotai/kimi-k2.6
   provider: streamlake
   cost:
@@ -707,12 +719,6 @@ endpoints_lt:
   cost:
   - 1.32
   - 3.96
-- api: openrouter
-  model: z-ai/glm-5.2
-  provider: gmicloud/fp8
-  cost:
-  - 1.4
-  - 4.4
 - api: openrouter
   model: qwen/qwen3-coder
   provider: alibaba/opensource

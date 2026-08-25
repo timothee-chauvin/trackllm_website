@@ -405,6 +405,12 @@ too_expensive:
   - 15.0
 - api: openrouter
   model: moonshotai/kimi-k3
+  provider: fireworks/fast
+  cost:
+  - 4.5
+  - 22.5
+- api: openrouter
+  model: moonshotai/kimi-k3
   provider: fireworks/us
   cost:
   - 3.3
@@ -697,6 +703,12 @@ too_expensive:
   cost:
   - 0.55
   - 3.3
+- api: openrouter
+  model: qwen/qwen3.8-27b
+  provider: phala
+  cost:
+  - 0.4
+  - 3.0
 - api: openrouter
   model: qwen/qwen3.8-max
   provider: alibaba
@@ -1426,6 +1438,12 @@ bad_temperature:
   - 14.0
 - api: openrouter
   model: openai/gpt-5.2
+  provider: openai/fast
+  cost:
+  - 3.5
+  - 28.0
+- api: openrouter
+  model: openai/gpt-5.2
   provider: openai/flex
   cost:
   - 0.875
@@ -1466,6 +1484,12 @@ bad_temperature:
   cost:
   - 1.75
   - 14.0
+- api: openrouter
+  model: openai/gpt-5.3-codex
+  provider: openai/fast
+  cost:
+  - 3.5
+  - 28.0
 - api: openrouter
   model: openai/gpt-5.3-codex
   provider: openai/priority
@@ -1622,6 +1646,12 @@ bad_temperature:
   cost:
   - 5.0
   - 30.0
+- api: openrouter
+  model: openai/gpt-5.5
+  provider: openai/fast
+  cost:
+  - 12.5
+  - 75.0
 - api: openrouter
   model: openai/gpt-5.5
   provider: openai/flex
