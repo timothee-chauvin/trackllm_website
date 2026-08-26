@@ -380,6 +380,12 @@ too_expensive:
   - 0.95
   - 4.0
 - api: openrouter
+  model: moonshotai/kimi-k2.7-code
+  provider: gmicloud/fp8
+  cost:
+  - 0.95
+  - 4.0
+- api: openrouter
   model: moonshotai/kimi-k3
   provider: chutes/mxfp4
   cost:
@@ -415,6 +421,12 @@ too_expensive:
   cost:
   - 3.3
   - 16.5
+- api: openrouter
+  model: moonshotai/kimi-k3
+  provider: makora
+  cost:
+  - 2.55
+  - 12.75
 - api: openrouter
   model: moonshotai/kimi-k3
   provider: modal/mxfp4
@@ -817,6 +829,12 @@ too_expensive:
   cost:
   - 4.0
   - 12.0
+- api: openrouter
+  model: x-ai/grok-4.6
+  provider: amazon-bedrock/us-west-2
+  cost:
+  - 2.2
+  - 6.6
 - api: openrouter
   model: x-ai/grok-4.6
   provider: xai
@@ -1390,6 +1408,12 @@ bad_temperature:
   - 11.0
 - api: openrouter
   model: openai/gpt-5.1
+  provider: openai
+  cost:
+  - 1.25
+  - 10.0
+- api: openrouter
+  model: openai/gpt-5.1
   provider: openai/default
   cost:
   - 1.25
@@ -1406,6 +1430,18 @@ bad_temperature:
   cost:
   - 2.5
   - 20.0
+- api: openrouter
+  model: openai/gpt-5.1
+  provider: openai/fast
+  cost:
+  - 2.5
+  - 20.0
+- api: openrouter
+  model: openai/gpt-5.1
+  provider: openai/flex
+  cost:
+  - 0.625
+  - 5.0
 - api: openrouter
   model: openai/gpt-5.1-codex
   provider: azure
@@ -1528,6 +1564,12 @@ bad_temperature:
   - 15.0
 - api: openrouter
   model: openai/gpt-5.4
+  provider: openai/fast
+  cost:
+  - 5.0
+  - 30.0
+- api: openrouter
+  model: openai/gpt-5.4
   provider: openai/flex
   cost:
   - 1.25
@@ -1562,6 +1604,12 @@ bad_temperature:
   cost:
   - 0.75
   - 4.5
+- api: openrouter
+  model: openai/gpt-5.4-mini
+  provider: openai/fast
+  cost:
+  - 1.5
+  - 9.0
 - api: openrouter
   model: openai/gpt-5.4-mini
   provider: openai/flex
@@ -3455,4 +3503,8 @@ unprobeable:
   - 4.4
   reason: batch
   detail: null
-failure_streaks: {}
+failure_streaks:
+  openrouter#moonshotai/kimi-k2.6#phala:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"The
+      request was rejected as invalid\",\"type\":\"invalid_request_error\",\"code\":null,\"param\":null}}","p...'
