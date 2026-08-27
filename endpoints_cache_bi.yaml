@@ -326,6 +326,12 @@ too_expensive:
   - 0.3
   - 1.2
 - api: openrouter
+  model: mistralai/mixtral-8x22b-instruct
+  provider: mistral/eu
+  cost:
+  - 2.2
+  - 6.6
+- api: openrouter
   model: moonshotai/kimi-k2-thinking
   provider: novita/bf16
   cost:
@@ -447,6 +453,12 @@ too_expensive:
   - 14.0
 - api: openrouter
   model: moonshotai/kimi-k3
+  provider: parasail/fp4
+  cost:
+  - 3.0
+  - 15.0
+- api: openrouter
+  model: moonshotai/kimi-k3
   provider: phala
   cost:
   - 3.0
@@ -499,6 +511,12 @@ too_expensive:
   cost:
   - 10.0
   - 30.0
+- api: openrouter
+  model: openai/gpt-oss-20b
+  provider: siliconflow/fp8
+  cost:
+  - 0.04
+  - 0.18
 - api: openrouter
   model: qwen/qwen-plus-2025-07-28:thinking
   provider: alibaba
@@ -890,6 +908,12 @@ too_expensive:
   - 0.168
   - 0.336
 - api: openrouter
+  model: xiaomi/mimo-v2.5
+  provider: streamlake
+  cost:
+  - 0.168
+  - 0.336
+- api: openrouter
   model: xiaomi/mimo-v2.5-pro
   provider: deepinfra/fp8
   cost:
@@ -967,6 +991,12 @@ too_expensive:
   cost:
   - 2.31
   - 7.26
+- api: openrouter
+  model: z-ai/glm-5.2
+  provider: novita/fp8
+  cost:
+  - 0.742
+  - 2.332
 - api: openrouter
   model: z-ai/glm-5.2
   provider: siliconflow/fp8
@@ -1226,6 +1256,12 @@ bad_temperature:
   cost:
   - 2.2
   - 11.0
+- api: openrouter
+  model: google/gemini-3.5-flash-lite
+  provider: google-vertex/eu
+  cost:
+  - 0.33
+  - 2.75
 - api: openrouter
   model: google/gemini-3.5-flash-lite
   provider: google-vertex/global
@@ -3505,6 +3541,15 @@ unprobeable:
   detail: null
 failure_streaks:
   openrouter#moonshotai/kimi-k2.6#phala:
-    count: 1
+    count: 2
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"The
       request was rejected as invalid\",\"type\":\"invalid_request_error\",\"code\":null,\"param\":null}}","p...'
+  openrouter#qwen/qwen3.8-flash#alibaba:
+    count: 1
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"qwen/qwen3.8-flash
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rate...'
+  openrouter#thedrummer/rocinante-12b#parasail/bf16:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":404,"metadata":{"raw":"{\"error\":{\"message\":\"Deployment
+      parasail-rocinante-12b doesn''t exist or isn''t accessible.\",\"type\":\"invalid_request_error\",\...'
