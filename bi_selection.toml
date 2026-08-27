@@ -20,6 +20,8 @@
 # x-ai/grok-4.5 (~$3.6/mo) and moonshotai/kimi-k3 (~$9/mo, unmeasured — vet
 # manually first). qwen3.6-max-preview is too_expensive-cached until the next
 # recheck clears it; the flagship ceiling exemption then admits it.
+# 2026-08-27: z-ai/glm-5 widened to glm-5* (5, 5.1, 5.2, 5.3, 5v-turbo), cheapest
+# provider each: est. ~$0.3/mo, ~$1 one-time onboarding.
 
 budget_per_month = 15.0
 max_endpoint_cost = 0.50
@@ -45,7 +47,7 @@ patterns = [
     "qwen/qwen3-max-thinking",
     "qwen/qwen3.5-397b-a17b",
     "qwen/qwen3.6-max-preview",
-    "z-ai/glm-5",
+    "z-ai/glm-5*",
 ]
 providers_per_model = 1
 flagship = true              # exempt from budget_per_month and max_endpoint_cost
