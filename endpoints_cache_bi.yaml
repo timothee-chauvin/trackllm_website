@@ -339,6 +339,12 @@ too_expensive:
   - 2.5
 - api: openrouter
   model: moonshotai/kimi-k2.5
+  provider: atlas-cloud/int4
+  cost:
+  - 0.49
+  - 2.5
+- api: openrouter
+  model: moonshotai/kimi-k2.5
   provider: novita
   cost:
   - 0.57
@@ -711,6 +717,12 @@ too_expensive:
   - 6.0
 - api: openrouter
   model: qwen/qwen3.8-2.4t-a95b
+  provider: novita
+  cost:
+  - 2.0
+  - 6.0
+- api: openrouter
+  model: qwen/qwen3.8-2.4t-a95b
   provider: siliconflow/fp8
   cost:
   - 2.0
@@ -733,6 +745,12 @@ too_expensive:
   cost:
   - 0.55
   - 3.3
+- api: openrouter
+  model: qwen/qwen3.8-27b
+  provider: novita
+  cost:
+  - 0.42
+  - 3.0
 - api: openrouter
   model: qwen/qwen3.8-27b
   provider: phala
@@ -955,6 +973,18 @@ too_expensive:
   cost:
   - 0.14
   - 0.86
+- api: openrouter
+  model: z-ai/glm-4.6
+  provider: atlas-cloud/fp8
+  cost:
+  - 0.6
+  - 2.2
+- api: openrouter
+  model: z-ai/glm-4.7
+  provider: atlas-cloud/fp8
+  cost:
+  - 0.52
+  - 1.85
 - api: openrouter
   model: z-ai/glm-4.7
   provider: novita/fp8
@@ -2708,6 +2738,14 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
+  model: mistralai/codestral-2508:batch
+  provider: mistral
+  cost:
+  - 0.3
+  - 0.9
+  reason: batch
+  detail: null
+- api: openrouter
   model: mistralai/ministral-8b
   provider: mistral/zdr
   cost:
@@ -2716,6 +2754,38 @@ unprobeable:
   reason: flaky
   detail: 'plain: 401 {"message":"Provider returned error","code":401,"metadata":{"raw":"{\"detail\":\"Invalid
     API Key\"}\n","provider_name":"Mistral","is_byok":false}}'
+- api: openrouter
+  model: mistralai/ministral-8b-2512:batch
+  provider: mistral
+  cost:
+  - 0.15
+  - 0.15
+  reason: batch
+  detail: null
+- api: openrouter
+  model: mistralai/mistral-large-2512:batch
+  provider: mistral
+  cost:
+  - 0.5
+  - 1.5
+  reason: batch
+  detail: null
+- api: openrouter
+  model: mistralai/mistral-medium-3-5:batch
+  provider: mistral
+  cost:
+  - 0.75
+  - 3.75
+  reason: batch
+  detail: null
+- api: openrouter
+  model: mistralai/mistral-medium-3.1:batch
+  provider: mistral
+  cost:
+  - 0.4
+  - 2.0
+  reason: batch
+  detail: null
 - api: openrouter
   model: mistralai/mistral-nemo
   provider: parasail/fp8
@@ -2733,6 +2803,14 @@ unprobeable:
   reason: flaky
   detail: 'plain: 401 {"message":"Provider returned error","code":401,"metadata":{"raw":"{\"detail\":\"Invalid
     API Key\"}\n","provider_name":"Mistral","is_byok":false}}'
+- api: openrouter
+  model: mistralai/mistral-small-2603:batch
+  provider: mistral
+  cost:
+  - 0.15
+  - 0.6
+  reason: batch
+  detail: null
 - api: openrouter
   model: moonshotai/kimi-k2.6
   provider: baseten/fp4
@@ -2753,6 +2831,15 @@ unprobeable:
   detail: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"moonshotai/kimi-k2.6
     is temporarily rate-limited upstream. Please retry shortly, or add your own key
     to accumulate your ra...'
+- api: openrouter
+  model: moonshotai/kimi-k2.6
+  provider: phala
+  cost:
+  - 1.09
+  - 4.6
+  reason: flaky
+  detail: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"The
+    request was rejected as invalid\",\"type\":\"invalid_request_error\",\"code\":null,\"param\":null}}","p...'
 - api: openrouter
   model: moonshotai/kimi-k2.7-code
   provider: siliconflow/fp8
@@ -3540,15 +3627,14 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
-  openrouter#moonshotai/kimi-k2.6#phala:
-    count: 2
-    last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"The
-      request was rejected as invalid\",\"type\":\"invalid_request_error\",\"code\":null,\"param\":null}}","p...'
-  openrouter#qwen/qwen3.8-flash#alibaba:
+  openrouter#deepseek/deepseek-v4-flash-0731#deepseek:
     count: 1
-    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"qwen/qwen3.8-flash
-      is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulate your rate...'
+    last_error: '{"message":"No endpoints available matching your guardrail restrictions
+      and data policy. Configure: https://openrouter.ai/settings/privacy","code":404}'
+  openrouter#deepseek/deepseek-v4-pro-0813#deepseek:
+    count: 1
+    last_error: '{"message":"No endpoints available matching your guardrail restrictions
+      and data policy. Configure: https://openrouter.ai/settings/privacy","code":404}'
   openrouter#thedrummer/rocinante-12b#parasail/bf16:
     count: 1
     last_error: '{"message":"Provider returned error","code":404,"metadata":{"raw":"{\"error\":{\"message\":\"Deployment

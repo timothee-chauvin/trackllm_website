@@ -200,6 +200,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4-flash#morph": null,
+  "openrouter#deepseek/deepseek-v4-flash#nextbit/fp8": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-flash#novita/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash#open-inference/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash#parasail/fp8": null,
@@ -611,6 +614,9 @@
   },
   "openrouter#kwaipilot/kat-coder-pro-v2#atlas-cloud/fp8": null,
   "openrouter#kwaipilot/kat-coder-pro-v2#streamlake": null,
+  "openrouter#kwaipilot/kat-coder-pro-v2.5#atlas-cloud/fp8": {
+    "effort": "none"
+  },
   "openrouter#liquid/lfm-2-24b-a2b#together": null,
   "openrouter#mancer/weaver#mancer/fp8": {
     "skip": "hidden reasoning"
@@ -1520,6 +1526,9 @@
   "openrouter#qwen/qwen3.8-27b#venice/fp8": {
     "effort": "none"
   },
+  "openrouter#qwen/qwen3.8-flash#alibaba": {
+    "effort": "none"
+  },
   "openrouter#rekaai/reka-edge#reka/bf16": null,
   "openrouter#rekaai/reka-flash-3#reka/fp8": {
     "max_tokens": 4
@@ -1558,6 +1567,9 @@
   "openrouter#tencent/hy3#tencent/fp8": null,
   "openrouter#tencent/hy3-preview#gmicloud/bf16": null,
   "openrouter#tencent/hy3-preview#siliconflow": null,
+  "openrouter#tencent/hy4-preview#tencent/fp8": {
+    "effort": "none"
+  },
   "openrouter#thedrummer/cydonia-24b-v4.1#parasail/bf16": null,
   "openrouter#thedrummer/rocinante-12b#infermatic/bf16": null,
   "openrouter#thedrummer/rocinante-12b#nextbit/bf16": null,
@@ -1802,14 +1814,17 @@
   "openrouter#z-ai/glm-5.3-flash#baseten/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#cloudflare": null,
   "openrouter#z-ai/glm-5.3-flash#deepinfra/fp8": null,
+  "openrouter#z-ai/glm-5.3-flash#digitalocean": null,
   "openrouter#z-ai/glm-5.3-flash#gmicloud/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#io-net/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#modal/fp8": null,
+  "openrouter#z-ai/glm-5.3-flash#morph/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#novita/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#parasail/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#reka/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#together": null,
   "openrouter#z-ai/glm-5.3-flash#venice": null,
+  "openrouter#z-ai/glm-5.3-flash#wafer": null,
   "openrouter#z-ai/glm-5.3-flash#z-ai/fp8": null,
   "openrouter#z-ai/glm-5v-turbo#z-ai/fp8": null
 }
