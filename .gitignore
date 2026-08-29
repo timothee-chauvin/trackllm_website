@@ -6,6 +6,8 @@ __pycache__
 /website/changes.html
 /website/methodology.html
 /website/about.html
+/website/*.md
+/website/feeds/
 /website/endpoints/
 /website/node_modules/
 reports/

@@ -14,6 +14,9 @@
     </script>
     <link rel="icon" href="{{ nav_prefix }}favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="{{ css_path }}">
+    {# machine access (machine.py): the md twin and the feed of this page #}
+    <link rel="alternate" type="text/markdown" href="{{ nav_prefix }}{{ machine.md }}">
+    {% if machine.feed %}<link rel="alternate" type="application/atom+xml" title="TrackLLM changes" href="{{ nav_prefix }}{{ machine.feed }}">{% endif %}
 </head>
 <body class="{{ body_class }}">
     <nav class="nav">
@@ -42,6 +45,12 @@
             <span>Data collected via the OpenRouter API.</span>
             <span><a href="{{ nav_prefix }}methodology.html">Methodology</a> · <a href="https://github.com/timothee-chauvin/trackllm_website">GitHub</a> · <a href="{{ nav_prefix }}about.html">About</a></span>
             {% endblock %}
+            {# data-goatcounter-click: count.js counts the click as an event, so
+               per-scope subscribe interest is measurable without storing anything #}
+            <span class="machine">Machine access:
+              {% if machine.feed %}<a href="{{ nav_prefix }}{{ machine.feed }}" type="application/atom+xml" data-goatcounter-click="subscribe/{{ machine.scope }}">Subscribe (Atom)</a> · {% endif %}
+              <a href="{{ nav_prefix }}{{ machine.md }}">Markdown</a>{% for j in machine.json %} · <a href="{{ nav_prefix }}{{ j }}">JSON{{ "" if loop.length == 1 else " " ~ loop.index }}</a>{% endfor %}
+              · <a href="{{ nav_prefix }}index.html#machine">about</a></span>
         </footer>
     </div>
     {{ cite_dialog() }}

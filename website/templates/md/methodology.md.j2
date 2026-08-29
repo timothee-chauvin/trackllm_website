@@ -1,0 +1,27 @@
+{% import "_base.md.j2" as b %}
+{{ b.header("Methodology — how we detect changes", machine, nav_prefix) }}
+{{ b.crumb([("Home", "index.md"), ("Methodology", "")]) }}
+LLM APIs are opaque black boxes, even for open-weight models. Can we continuously monitor them for changes? LLM API stability is important for the reliability of downstream applications, for the reproducibility of research and for initial audits to remain relevant. TrackLLM uses two methods, depending on what the API gives us back.
+
+## LT — Logprob tracking
+
+Used wherever the provider returns logprobs. Paper: [Log Probability Tracking of LLM APIs](https://arxiv.org/abs/2512.03816) (ICLR 2026 · arXiv:2512.03816).
+
+When logprobs are returned by the API provider, we can use this for extremely sensitive and cost-effective change detection. LT is a simple statistical test on the average value of each token logprob, requesting only a single token of output.
+
+Logprobs are non-deterministic, because inference on GPUs is non-deterministic, but we can still basically track logprob averages and this works great. The test detects changes as small as one step of fine-tuning, and is more sensitive than existing methods while being 1,000x cheaper — logprobs can be used to monitor for changes at extremely low cost, e.g. $0.14/year for hourly sampling of GPT-4.1.
+
+## B3IT — Black-box border input tracking
+
+Used where logprobs aren't exposed. Paper: [Token-Efficient Change Detection in LLM APIs](https://arxiv.org/abs/2602.11083) (ICML 2026 · arXiv:2602.11083).
+
+Where logprobs aren't exposed, we operate in a strict black box, observing only output tokens. The first phase identifies border inputs: inputs for which sampling at T=0 doesn't always give the same output, i.e. for which there exists more than one output top token. They can easily be found just from black-box sampling, trying thousands of short inputs and keeping the border inputs. These inputs are then sampled repeatedly, to check whether the endpoint has moved away from its borders.
+
+Optimal change detection depends on the model's Jacobian and the Fisher information of the output distribution; analyzing these in low-temperature regimes shows that border inputs enable powerful change detection tests. B3IT performs on par with the best available gray-box approaches while reducing costs by 30x.
+
+## Read more
+
+- [Change detection in LLM APIs](https://tchauvin.com/change-detection-llm-apis) — blog post, the short version of both methods.
+- [Log Probability Tracking of LLM APIs](https://arxiv.org/abs/2512.03816) — ICLR 2026 · arXiv:2512.03816 — the LT test, and the TinyChange benchmark.
+- [Token-Efficient Change Detection in LLM APIs](https://arxiv.org/abs/2602.11083) — ICML 2026 · arXiv:2602.11083 — border inputs and B3IT.
+{{ b.footer(nav_prefix) }}

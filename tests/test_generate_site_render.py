@@ -38,9 +38,7 @@ def _lt_endpoint(website: Path, slug: str, model: str, provider: str):
 def _scaffold(website: Path):
     # copy real templates + style so rendering matches production
     src = Path("website")
-    (website / "templates").mkdir(parents=True)
-    for t in (src / "templates").glob("*.j2"):
-        shutil.copy(t, website / "templates" / t.name)
+    shutil.copytree(src / "templates", website / "templates")
     (website / "style.css").write_text((src / "style.css").read_text())
     # a series, not just a directory: an endpoint with no observations is not
     # rendered at all (tracked.py)

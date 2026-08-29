@@ -1,0 +1,57 @@
+{% import "_base.md.j2" as b %}
+{{ b.header(model_name ~ " @ " ~ provider, machine, nav_prefix) }}
+{{ b.crumb([("Home", nav_prefix ~ "index.md"), (org, nav_prefix ~ "orgs/" ~ org_slug ~ ".md"), (model_name, nav_prefix ~ "models/" ~ model_slug ~ ".md" if model_slug else ""), ("@ " ~ provider, "")]) }}
+Model: {{ b.model_link(nav_prefix, model_slug, model) }} · Provider: {{ b.provider_link(nav_prefix, provider_slug if provider_has_page else "", provider) }} · Organization: {{ b.org_link(nav_prefix, org) }} · Methods: {{ b.methods(methods) if methods else "none (" ~ status.headline ~ ")" }}
+{% if model_slug and n_providers > 0 %}
+
+{{ model_name }} is served by {{ n_providers }} provider{{ "s" if n_providers != 1 }} (see the model page).
+{% endif %}
+{% if provider_has_page %}
+{{ provider_base }} serves {{ n_models }} model{{ "s" if n_models != 1 }} (see the provider page).
+{% endif %}
+
+## Tracking status
+
+- **LT** — {{ status.lt | replace("_", " ") | replace(":", " · ") }}: {{ status.ltCopy }}{% if status.ltDetail %} ({{ status.ltDetail }}){% endif %}
+
+- **B3IT** — {{ status.bi | replace("_", " ") | replace(":", " · ") }}: {{ status.biCopy }}{% if status.biDetail %} ({{ status.biDetail }}){% endif %}
+
+{% if methods %}
+
+## Drift from baseline
+
+Both signals measure how far this endpoint's behavior has moved from its reference period (its first two weeks). LT tracks the average change in the returned tokens' log-probabilities (nats); B3IT tracks the total-variation distance of the border-input votes (0–1). Both read 0 when the endpoint matches its baseline and rise — staying elevated — after a real change.
+
+{% for j in machine.json %}
+Full series: [{{ j }}]({{ nav_prefix }}{{ j }}){{ "" if loop.last }}
+
+{% endfor %}
+## Detected changes
+
+{% set rows = [] %}
+{% for c in manifest.changes.lt %}{% do rows.append((c.date, "LT", c.drift ~ " nats", c.sigma)) %}{% endfor %}
+{% for c in manifest.changes.b3it %}{% do rows.append((c.date, "B3IT", "TV " ~ c.peakTV, "")) %}{% endfor %}
+{% if rows %}
+{{ b.table(["Date", "Method", "Drift reached", "σ"], rows | sort(reverse=true)) }}
+{% else %}
+No change detected so far.
+{% endif %}
+{% elif meta %}
+
+## Endpoint details
+
+From the OpenRouter catalog snapshot.
+
+{{ b.table(["Field", "Value"], [
+  ("Pricing (per Mtok)", "Free" if meta.free else "$" ~ (meta.cost[0] | fmt_price) ~ " in · $" ~ (meta.cost[1] | fmt_price) ~ " out"),
+  ("Listed since", meta.created[:10] if meta.created else "—"),
+  ("Claims temperature", "unknown" if meta.supports_temperature is none else ("yes" if meta.supports_temperature else "no")),
+  ("Claims logprobs", "unknown" if meta.supports_logprobs is none else ("yes" if meta.supports_logprobs else "no")),
+]) }}
+{% endif %}
+
+## Methods
+
+- **LT — logprob tracking.** Primary signal where the provider returns logprobs. The drift is the mean absolute change in the returned tokens' log-probabilities versus the reference period (nats). The detector also reports σ, one of the metrics feeding its change-detection criterion, which can be high even when the drift is small.
+- **B3IT — border inputs.** Black-box fallback for endpoints that hide logprobs. Tracks how far the top-token votes on a ranked set of near-tie prompts have moved from the reference distribution (total variation, 0–1).
+{{ b.footer(nav_prefix) }}

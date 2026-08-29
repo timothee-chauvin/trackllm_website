@@ -1,0 +1,20 @@
+{% import "_base.md.j2" as b %}
+{% set S = changes_page.stats %}
+{{ b.header("Change log — every change we have detected", machine, nav_prefix) }}
+{{ b.crumb([("Home", "index.md"), ("Changes", "")]) }}
+The complete log: {{ S.total }} detected change{{ "s" if S.total != 1 }} across {{ S.endpoints_affected }} endpoint{{ "s" if S.endpoints_affected != 1 }}{% if S.since %} since {{ S.since }}{% endif %} — {{ S.lt }} from logprob tracking (LT), {{ S.b3it }} from border inputs (B3IT). Each entry records that an endpoint's outputs moved away from its own baseline on that date.
+
+{{ b.table(["Stat", "Value"], [
+  ("Changes", S.total), ("Endpoints affected", S.endpoints_affected), ("Providers involved", S.providers_involved),
+  ("Last 30 days", S.changes_30d), ("Largest LT drift (nats)", S.largest_lt_drift), ("As of", S.now),
+]) }}
+## Timeline
+
+{{ b.table(["Month", "LT", "B3IT"], changes_page.months | map("month_row") | list) }}
+## Most-changed endpoints
+
+{{ b.table(["Endpoint", "Changes", "Last change"], changes_page.top_endpoints | map("top_row", nav_prefix) | list) }}
+## Log
+
+{{ b.table(["Date", "Endpoint", "Method", "Magnitude", "Description"], changes_page["items"] | map("change_row", nav_prefix) | list) }}
+{{ b.footer(nav_prefix) }}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>{{ title }}</title>
+  <id>{{ self_url }}</id>
+  <link rel="self" type="application/atom+xml" href="{{ self_url }}"/>
+  <link rel="alternate" type="text/html" href="{{ site_url }}/"/>
+  <updated>{{ updated }}</updated>
+  <author><name>TrackLLM</name></author>
+{% for e in entries %}
+  <entry>
+    <id>{{ e.id }}</id>
+    <title>{{ e.title }}</title>
+    <link rel="alternate" type="text/html" href="{{ e.url }}"/>
+    <link rel="alternate" type="text/markdown" href="{{ e.md_url }}"/>
+    <link rel="alternate" type="application/json" href="{{ e.json_url }}"/>
+    <updated>{{ e.updated }}</updated>
+    <content type="text">{{ e.desc }} Endpoint page: {{ e.url }} (markdown: {{ e.md_url }}); full series: {{ e.json_url }}</content>
+  </entry>
+{% endfor %}
+</feed>

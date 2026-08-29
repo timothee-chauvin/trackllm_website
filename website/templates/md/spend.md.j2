@@ -1,0 +1,23 @@
+{% import "_base.md.j2" as b %}
+{{ b.header("API Spend", machine, nav_prefix) }}
+{{ b.crumb([("Home", "index.md"), ("Spend", "")]) }}
+## Cumulative by group
+
+{% if spend.cumulative %}
+{{ b.table(["Group", "Cost (USD)"], spend.cumulative.items() | map("spend_group_row", spend.group_label) | list) }}
+{% else %}
+No spend data yet.
+{% endif %}
+## Daily spend
+
+Full series: [data/spend.json](data/spend.json) (`daily`: one row per day, cost per group).
+
+## By endpoint
+
+{% if spend.by_endpoint %}
+{{ b.table(["Endpoint"] + (spend.group_order | map("label", spend.group_label) | list) + ["Total"],
+  spend.by_endpoint | map("spend_endpoint_row", spend.group_order, tracked) | list) }}
+{% else %}
+No spend data yet.
+{% endif %}
+{{ b.footer(nav_prefix) }}

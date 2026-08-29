@@ -1,0 +1,43 @@
+{% import "_base.md.j2" as b %}
+{% set S = overview.stats %}
+{{ b.header("TrackLLM — LLM API outputs are unstable over time", machine, nav_prefix) }}
+LLM APIs are opaque black boxes, even for open-weight models. TrackLLM continuously monitors them for undisclosed changes — cheaply — with logprob tracking (LT) where logprobs are exposed, and black-box border input tracking (B3IT) where they aren't. Small changes are fine, but they should be disclosed.
+
+{{ b.table(["Stat", "Value"], [
+  ("Endpoints in the catalog", S.endpoints), ("Active (tracked) endpoints", S.active),
+  ("LT endpoints", S.lt_endpoints), ("B3IT endpoints", S.b3it_endpoints), ("B3IT under monitoring", S.b3it_monitoring),
+  ("Providers / companies", S.providers ~ " / " ~ S.provider_companies), ("Models / organizations", S.models ~ " / " ~ S.orgs),
+  ("Changes detected (LT / B3IT)", S.changes_total ~ " (" ~ S.changes_lt ~ " / " ~ S.changes_b3it ~ ")"),
+  ("Endpoints with a change", S.changed_endpoints), ("Changes in the last 30 days", S.changes_30d),
+  ("Queries since " ~ S.since, S.queries), ("Last LT query", S.last_query_lt), ("Last B3IT query", S.last_query_b3it),
+  ("Cumulative spend (USD)", S.spend_cumulative), ("As of", S.now),
+]) }}
+## Machine access
+
+Everything on this site is available without a browser:
+
+- **Markdown mirror** — every `X.html` has an `X.md` twin at the same path, with the same sections and the same links (to other `.md` pages). You are reading one. Charts are replaced by a link to the JSON series they draw.
+- **Atom feeds** — one entry per detected change: [feeds/all.xml](feeds/all.xml) (latest {{ FEED_CAP }}), and one per endpoint, model, provider and organization at `feeds/<kind>/<slug>.xml`, linked from each page. Subscribe in any feed reader, or point an RSS-to-email service at one.
+- **JSON** — the same files the HTML pages fetch: [data/overview.json](data/overview.json) (stats, hero, latest changes, every endpoint row, provider rows), [data/changes.json](data/changes.json) (every detected change, newest first), [data/changes_page.json](data/changes_page.json) (the change log with descriptions and month histogram), [data/spend.json](data/spend.json), `data/models/<slug>.json` (per-model: every endpoint's full drift / TV series and changes), `data/providers/<slug>.json` (per-provider rates, variants, endpoints), `data/b3it/<slug>/b3it.json` (per-endpoint border-input state). Each page's header names the JSON it was rendered from.
+- **Raw data** — every collected response, committed hourly: {{ DATA_REPO_URL }}. The generator that turns it into this site: https://github.com/timothee-chauvin/trackllm_website.
+
+Slugs are stable: an endpoint's slug is `<model>@<provider>` with `/` → `2f` and `@` → `23`, and its page is `endpoints/<slug>.md`.
+
+## Latest detected changes
+
+[Full changelog](changes.md) · [Feed](feeds/all.xml)
+
+{{ b.table(["Date", "Endpoint", "Method", "Magnitude", "Description"], overview.feed | map("change_row", nav_prefix) | list) }}
+## Providers
+
+Detected changes per endpoint-year of monitoring — normalized for fleet size & monitoring length — with a 95% Poisson interval. Providers are grouped by company; their serving variants are compared on the provider page.
+
+{{ b.table(["Provider", "Endpoints", "Models", "Variants", "LT endpoint-years", "LT changes", "LT rate", "LT 95% interval", "B3IT endpoints", "B3IT endpoint-years", "Last change"],
+  overview.providers | map("provider_row", nav_prefix) | list) }}
+## Endpoints
+
+{{ overview.endpoints | length }} endpoints in the catalog; `Status` says whether and why each is tracked. Sorted as the HTML directory: most changes first.
+
+{{ b.table(["Model", "Provider", "Org", "Status", "Changes", "Methods", "Stable for (days)"],
+  overview.endpoints | map("dir_row", nav_prefix) | list) }}
+{{ b.footer(nav_prefix) }}
