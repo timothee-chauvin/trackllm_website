@@ -66,6 +66,12 @@ endpoints_lt:
   - 0.04
   - 0.17
 - api: openrouter
+  model: deepseek/deepseek-v4-flash
+  provider: digitalocean
+  cost:
+  - 0.0679
+  - 0.168
+- api: openrouter
   model: qwen/qwen3-30b-a3b-instruct-2507
   provider: streamlake
   cost:
@@ -122,12 +128,6 @@ endpoints_lt:
 - api: openrouter
   model: deepseek/deepseek-v4-flash
   provider: coreweave/fp8
-  cost:
-  - 0.14
-  - 0.28
-- api: openrouter
-  model: deepseek/deepseek-v4-flash
-  provider: digitalocean
   cost:
   - 0.14
   - 0.28
@@ -294,6 +294,12 @@ endpoints_lt:
   - 0.0975
   - 0.78
 - api: openrouter
+  model: meta-llama/llama-4-maverick
+  provider: digitalocean
+  cost:
+  - 0.2
+  - 0.696
+- api: openrouter
   model: openai/gpt-oss-120b
   provider: mara
   cost:
@@ -348,6 +354,12 @@ endpoints_lt:
   - 0.26
   - 0.78
 - api: openrouter
+  model: deepseek/deepseek-v3.2
+  provider: digitalocean
+  cost:
+  - 0.25
+  - 0.8
+- api: openrouter
   model: qwen/qwen3-235b-a22b-2507
   provider: streamlake
   cost:
@@ -371,12 +383,6 @@ endpoints_lt:
   cost:
   - 0.45
   - 0.65
-- api: openrouter
-  model: meta-llama/llama-4-maverick
-  provider: digitalocean
-  cost:
-  - 0.25
-  - 0.87
 - api: openrouter
   model: qwen/qwen3-coder-flash
   provider: alibaba
@@ -498,12 +504,6 @@ endpoints_lt:
   - 0.22
   - 1.8
 - api: openrouter
-  model: deepseek/deepseek-v3.2
-  provider: digitalocean
-  cost:
-  - 0.5
-  - 1.6
-- api: openrouter
   model: qwen/qwen3-vl-235b-a22b-instruct
   provider: parasail/fp8
   cost:
@@ -539,6 +539,12 @@ endpoints_lt:
   cost:
   - 0.26
   - 2.08
+- api: openrouter
+  model: deepseek/deepseek-v4-pro
+  provider: digitalocean
+  cost:
+  - 0.87
+  - 1.74
 - api: openrouter
   model: qwen/qwen3.5-397b-a17b
   provider: alibaba
@@ -683,12 +689,6 @@ endpoints_lt:
   cost:
   - 0.95
   - 4.0
-- api: openrouter
-  model: deepseek/deepseek-v4-pro
-  provider: digitalocean
-  cost:
-  - 1.74
-  - 3.48
 - api: openrouter
   model: z-ai/glm-5.2
   provider: wafer

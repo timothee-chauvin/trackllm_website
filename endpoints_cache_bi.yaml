@@ -171,6 +171,12 @@ too_expensive:
   - 3.96
 - api: openrouter
   model: deepseek/deepseek-v4-pro-0813
+  provider: coreweave/fp8
+  cost:
+  - 1.31
+  - 3.96
+- api: openrouter
+  model: deepseek/deepseek-v4-pro-0813
   provider: digitalocean
   cost:
   - 1.32
@@ -706,6 +712,12 @@ too_expensive:
 - api: openrouter
   model: qwen/qwen3.8-2.4t-a95b
   provider: digitalocean
+  cost:
+  - 2.0
+  - 6.0
+- api: openrouter
+  model: qwen/qwen3.8-2.4t-a95b
+  provider: modal
   cost:
   - 2.0
   - 6.0
@@ -2204,6 +2216,14 @@ unprobeable:
     \"reason\":\"INVALID_REQUEST_BODY\", \"message\":\"model: deepseek/deepseek-r1-0528
     does not support endpoi...'
 - api: openrouter
+  model: deepseek/deepseek-v4-flash-0731:batch
+  provider: together
+  cost:
+  - 0.14
+  - 0.28
+  reason: batch
+  detail: null
+- api: openrouter
   model: deepseek/deepseek-v4-flash-vision-exp
   provider: deepseek
   cost:
@@ -2222,6 +2242,14 @@ unprobeable:
   detail: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4-pro
     is temporarily rate-limited upstream. Please retry shortly, or add your own key
     to accumulate you...'
+- api: openrouter
+  model: deepseek/deepseek-v4-pro-0813:batch
+  provider: together
+  cost:
+  - 1.32
+  - 3.96
+  reason: batch
+  detail: null
 - api: openrouter
   model: google/gemini-2.5-flash-image
   provider: google-vertex/global/flex
@@ -2664,6 +2692,14 @@ unprobeable:
   reason: flaky
   detail: 'cached: hidden reasoning'
 - api: openrouter
+  model: google/gemma-4-31b-it:batch
+  provider: together
+  cost:
+  - 0.39
+  - 0.97
+  reason: batch
+  detail: null
+- api: openrouter
   model: inception/mercury-2
   provider: inception
   cost:
@@ -2711,6 +2747,14 @@ unprobeable:
   - 0.18
   reason: flaky
   detail: 'cached: hidden reasoning'
+- api: openrouter
+  model: meta/muse-glimmer-30b:batch
+  provider: together
+  cost:
+  - 0.35
+  - 1.5
+  reason: batch
+  detail: null
 - api: openrouter
   model: meta/muse-spark-1.2-contributor
   provider: meta
@@ -2876,6 +2920,14 @@ unprobeable:
   detail: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"Cannot
     override enforced sampling params: {''top_p'': 1.0}. Required values: {''top_p'':
     0.95}\",\"type\":\"Bad...'
+- api: openrouter
+  model: moonshotai/kimi-k3:batch
+  provider: together
+  cost:
+  - 3.0
+  - 15.0
+  reason: batch
+  detail: null
 - api: openrouter
   model: nvidia/nemotron-3-ultra-550b-a55b:batch
   provider: together
@@ -3447,6 +3499,14 @@ unprobeable:
   reason: flaky
   detail: 'cached: hidden reasoning'
 - api: openrouter
+  model: openai/gpt-oss-120b:batch
+  provider: together
+  cost:
+  - 0.15
+  - 0.6
+  reason: batch
+  detail: null
+- api: openrouter
   model: openai/gpt-oss-20b
   provider: amazon-bedrock
   cost:
@@ -3462,6 +3522,14 @@ unprobeable:
   - 0.15
   reason: flaky
   detail: 'cached: hidden reasoning'
+- api: openrouter
+  model: openai/gpt-oss-20b:batch
+  provider: together
+  cost:
+  - 0.05
+  - 0.2
+  reason: batch
+  detail: null
 - api: openrouter
   model: openai/o1-pro:batch
   provider: openai
@@ -3595,6 +3663,22 @@ unprobeable:
     is temporarily rate-limited upstream. Please retry shortly, or add your own key
     to accumulate your rate limits...'
 - api: openrouter
+  model: qwen/qwen3.5-9b:batch
+  provider: together
+  cost:
+  - 0.17
+  - 0.25
+  reason: batch
+  detail: null
+- api: openrouter
+  model: qwen/qwen3.8-2.4t-a95b:batch
+  provider: together
+  cost:
+  - 2.5
+  - 6.25
+  reason: batch
+  detail: null
+- api: openrouter
   model: tencent/hy-mt2-30b-a3b
   provider: tencent/fp8
   cost:
@@ -3602,6 +3686,14 @@ unprobeable:
   - 0.295
   reason: flaky
   detail: 'cached: hidden reasoning'
+- api: openrouter
+  model: thinkingmachines/inkling-small:batch
+  provider: together
+  cost:
+  - 0.5
+  - 1.2
+  reason: batch
+  detail: null
 - api: openrouter
   model: thinkingmachines/inkling:batch
   provider: together
@@ -3626,16 +3718,37 @@ unprobeable:
   - 4.4
   reason: batch
   detail: null
+- api: openrouter
+  model: z-ai/glm-5.3-flash:batch
+  provider: together
+  cost:
+  - 0.15
+  - 0.5
+  reason: batch
+  detail: null
 failure_streaks:
   openrouter#deepseek/deepseek-v4-flash-0731#deepseek:
-    count: 1
+    count: 2
     last_error: '{"message":"No endpoints available matching your guardrail restrictions
       and data policy. Configure: https://openrouter.ai/settings/privacy","code":404}'
+  openrouter#deepseek/deepseek-v4-pro#fireworks:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":404,"metadata":{"raw":"{\"error\":{\"message\":\"Model
+      not found, inaccessible, and/or not deployed\",\"param\":\"model\",\"code\":\"NOT_FOUND\",\"type\":\"...'
   openrouter#deepseek/deepseek-v4-pro-0813#deepseek:
-    count: 1
+    count: 2
     last_error: '{"message":"No endpoints available matching your guardrail restrictions
       and data policy. Configure: https://openrouter.ai/settings/privacy","code":404}'
+  openrouter#minimax/minimax-m2.7#fireworks:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":404,"metadata":{"raw":"{\"error\":{\"message\":\"Model
+      not found, inaccessible, and/or not deployed\",\"param\":\"model\",\"code\":\"NOT_FOUND\",\"type\":\"...'
   openrouter#thedrummer/rocinante-12b#parasail/bf16:
     count: 1
     last_error: '{"message":"Provider returned error","code":404,"metadata":{"raw":"{\"error\":{\"message\":\"Deployment
       parasail-rocinante-12b doesn''t exist or isn''t accessible.\",\"type\":\"invalid_request_error\",\...'
+  openrouter#z-ai/glm-5.3-flash#siliconflow/fp8:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"z-ai/glm-5.3-flash
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rate limits: ht...'

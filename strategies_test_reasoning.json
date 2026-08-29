@@ -817,6 +817,8 @@
   "openrouter#mistralai/mistral-small-3.2-24b-instruct#venice/fp8": null,
   "openrouter#mistralai/mixtral-8x22b-instruct#mistral": null,
   "openrouter#mistralai/voxtral-small-24b-2507#mistral": null,
+  "openrouter#mistralai/voxtral-small-24b-2507#mistral/eu": null,
+  "openrouter#mistralai/voxtral-small-24b-2507#mistral/zdr": null,
   "openrouter#moonshotai/kimi-k2#novita/fp8": null,
   "openrouter#moonshotai/kimi-k2-0905#atlas-cloud/fp8": null,
   "openrouter#moonshotai/kimi-k2-0905#groq": null,
@@ -1507,6 +1509,9 @@
   "openrouter#qwen/qwen3.8-27b#akashml/bf16": {
     "effort": "none"
   },
+  "openrouter#qwen/qwen3.8-27b#akashml/fp8": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.8-27b#chutes/fp8": {
     "effort": "none"
   },
@@ -1810,18 +1815,43 @@
   "openrouter#z-ai/glm-5.2#together": null,
   "openrouter#z-ai/glm-5.2#venice/fp8": null,
   "openrouter#z-ai/glm-5.2#z-ai/fp8": null,
+  "openrouter#z-ai/glm-5.3#akashml/fp8": null,
+  "openrouter#z-ai/glm-5.3#atlas-cloud/fp8": null,
+  "openrouter#z-ai/glm-5.3#baseten/fp4": null,
+  "openrouter#z-ai/glm-5.3#cloudflare": null,
+  "openrouter#z-ai/glm-5.3#deepinfra/fp8": null,
+  "openrouter#z-ai/glm-5.3#digitalocean": null,
+  "openrouter#z-ai/glm-5.3#fireworks": null,
+  "openrouter#z-ai/glm-5.3#friendli": null,
+  "openrouter#z-ai/glm-5.3#gmicloud/fp8": null,
+  "openrouter#z-ai/glm-5.3#io-net/fp8": null,
+  "openrouter#z-ai/glm-5.3#modal": null,
+  "openrouter#z-ai/glm-5.3#morph/fp4": null,
+  "openrouter#z-ai/glm-5.3#novita/fp8": null,
+  "openrouter#z-ai/glm-5.3#parasail/fp8": {
+    "max_tokens": 1
+  },
+  "openrouter#z-ai/glm-5.3#together": {
+    "max_tokens": 1
+  },
   "openrouter#z-ai/glm-5.3#z-ai/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#baseten/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#cloudflare": null,
   "openrouter#z-ai/glm-5.3-flash#deepinfra/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#digitalocean": null,
+  "openrouter#z-ai/glm-5.3-flash#fireworks": null,
+  "openrouter#z-ai/glm-5.3-flash#friendli": null,
   "openrouter#z-ai/glm-5.3-flash#gmicloud/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#io-net/fp8": null,
+  "openrouter#z-ai/glm-5.3-flash#makora": null,
   "openrouter#z-ai/glm-5.3-flash#modal/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#morph/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#novita/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#parasail/fp8": null,
+  "openrouter#z-ai/glm-5.3-flash#phala/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#reka/fp8": null,
+  "openrouter#z-ai/glm-5.3-flash#relace/fp8": null,
+  "openrouter#z-ai/glm-5.3-flash#siliconflow/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#together": null,
   "openrouter#z-ai/glm-5.3-flash#venice": null,
   "openrouter#z-ai/glm-5.3-flash#wafer": null,
