@@ -93,6 +93,9 @@ def test_html_declares_its_twins(site: Path):
     assert 'rel="alternate" type="text/markdown" href="../endpoints/m2fa23p.md"' in html
     assert 'href="../feeds/endpoints/m2fa23p.xml"' in html
     assert 'data-goatcounter-click="subscribe/endpoint/m2fa23p"' in html
+    # visible text, not just attributes: what an HTML-to-text agent fetcher keeps
+    assert "read <a href=\"../endpoints/m2fa23p.md\">endpoints/m2fa23p.md</a>" in html
+    assert 'data-src="../endpoints/m2fa23p.md"' in html
     index = (site / "index.html").read_text()
     assert 'id="machine"' in index
     assert 'href="feeds/all.xml"' in index

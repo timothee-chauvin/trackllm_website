@@ -38,6 +38,20 @@
         </div>
     </nav>
     <div class="container">
+        {# Machine access bar (machine.py). The links are visible text on purpose:
+           HTML-to-text converters -- what agents read -- drop attributes, so a
+           <link rel=alternate> alone never reaches them. #}
+        <div class="wrap machine-bar">
+            <button class="copy-pill" type="button" aria-label="Copy this page as Markdown for an LLM"
+                data-src="{{ nav_prefix }}{{ machine.md }}" data-goatcounter-click="copy/{{ machine.md }}">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                <span class="copy-pill-label">Copy for LLM</span>
+            </button>
+            <span class="machine-links">AI agents: read <a href="{{ nav_prefix }}{{ machine.md }}">{{ machine.md }}</a> instead of this page
+              {% if machine.feed %}· <a href="{{ nav_prefix }}{{ machine.feed }}" type="application/atom+xml" data-goatcounter-click="subscribe/{{ machine.scope }}">Subscribe (Atom)</a>{% endif %}
+              {% for j in machine.json %} · <a href="{{ nav_prefix }}{{ j }}">JSON{{ "" if loop.length == 1 else " " ~ loop.index }}</a>{% endfor %}
+              · <a href="{{ nav_prefix }}index.html#machine">about</a></span>
+        </div>
         {% block content %}{% endblock %}
 
         <footer class="site">
@@ -45,16 +59,11 @@
             <span>Data collected via the OpenRouter API.</span>
             <span><a href="{{ nav_prefix }}methodology.html">Methodology</a> · <a href="https://github.com/timothee-chauvin/trackllm_website">GitHub</a> · <a href="{{ nav_prefix }}about.html">About</a></span>
             {% endblock %}
-            {# data-goatcounter-click: count.js counts the click as an event, so
-               per-scope subscribe interest is measurable without storing anything #}
-            <span class="machine">Machine access:
-              {% if machine.feed %}<a href="{{ nav_prefix }}{{ machine.feed }}" type="application/atom+xml" data-goatcounter-click="subscribe/{{ machine.scope }}">Subscribe (Atom)</a> · {% endif %}
-              <a href="{{ nav_prefix }}{{ machine.md }}">Markdown</a>{% for j in machine.json %} · <a href="{{ nav_prefix }}{{ j }}">JSON{{ "" if loop.length == 1 else " " ~ loop.index }}</a>{% endfor %}
-              · <a href="{{ nav_prefix }}index.html#machine">about</a></span>
         </footer>
     </div>
     {{ cite_dialog() }}
     {% block scripts %}{% endblock %}
+    <script type="module" src="{{ nav_prefix }}js/copy_llm.js"></script>
     <script>
     (function () {
         var root = document.documentElement;

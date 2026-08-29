@@ -152,7 +152,15 @@ footer.site { max-width: var(--maxw); margin: 2rem auto 0; border-top: 1px solid
   padding: 1.1rem clamp(1rem, 4vw, 2rem); color: var(--text-dim); font-size: 0.8rem;
   display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 footer.site a { color: var(--text-muted); } footer.site a:hover { color: var(--accent); }
-footer.site .machine { flex-basis: 100%; }
+/* machine access bar (base.html.j2): the copy pill + visible links to the md twin */
+.machine-bar { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; padding-top: 0.9rem;
+  font-family: var(--mono); font-size: 0.76rem; color: var(--text-dim); }
+.machine-bar .machine-links a { color: var(--text-muted); text-decoration: underline; text-underline-offset: 0.2em; }
+.machine-bar .machine-links a:hover { color: var(--accent); }
+.copy-pill { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.7rem; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font: inherit; cursor: pointer; }
+.copy-pill:hover { border-color: var(--accent); color: var(--accent); }
+.copy-pill.is-error { border-color: var(--changed); color: var(--changed); }
 .machine-list { padding-left: 1.2rem; } .machine-list li { margin: 0.4rem 0; }
 
 .hero { position: relative; padding: clamp(2.4rem, 6vw, 4rem) 0 1.4rem; overflow: hidden; }
