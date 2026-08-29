@@ -12,7 +12,7 @@ build: install
 .PHONY: serve
 # Serve the website locally
 serve: build
-	cd website && python -m http.server 8000
+	uv run python scripts/serve.py 8000
 
 .PHONY: watch
 # Watch TypeScript for changes (run in separate terminal)
