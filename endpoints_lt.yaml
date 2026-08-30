@@ -156,6 +156,12 @@ endpoints_lt:
   - 0.12
   - 0.36
 - api: openrouter
+  model: qwen/qwen3-vl-30b-a3b-instruct
+  provider: darkbloom/fp4
+  cost:
+  - 0.09
+  - 0.4
+- api: openrouter
   model: google/gemma-4-26b-a4b-it
   provider: nextbit/bf16
   cost:
@@ -207,7 +213,7 @@ endpoints_lt:
   model: openai/gpt-oss-120b
   provider: mancer/fp8
   cost:
-  - 0.085
+  - 0.06
   - 0.5
 - api: openrouter
   model: qwen/qwen3-30b-a3b-instruct-2507

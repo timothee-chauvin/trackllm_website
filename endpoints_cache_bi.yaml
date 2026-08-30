@@ -1834,6 +1834,12 @@ bad_temperature:
   - 1.2
 - api: openrouter
   model: openai/gpt-5.6-luna
+  provider: openai/fast
+  cost:
+  - 0.4
+  - 2.4
+- api: openrouter
+  model: openai/gpt-5.6-luna
   provider: openai/flex
   cost:
   - 0.1
@@ -1862,6 +1868,12 @@ bad_temperature:
   cost:
   - 0.2
   - 1.2
+- api: openrouter
+  model: openai/gpt-5.6-luna-pro
+  provider: openai/fast
+  cost:
+  - 0.4
+  - 2.4
 - api: openrouter
   model: openai/gpt-5.6-luna-pro
   provider: openai/flex
@@ -2216,6 +2228,15 @@ unprobeable:
     \"reason\":\"INVALID_REQUEST_BODY\", \"message\":\"model: deepseek/deepseek-r1-0528
     does not support endpoi...'
 - api: openrouter
+  model: deepseek/deepseek-v4-flash-0731
+  provider: deepseek
+  cost:
+  - 0.22
+  - 0.66
+  reason: flaky
+  detail: '{"message":"No endpoints available matching your guardrail restrictions
+    and data policy. Configure: https://openrouter.ai/settings/privacy","code":404}'
+- api: openrouter
   model: deepseek/deepseek-v4-flash-0731:batch
   provider: together
   cost:
@@ -2242,6 +2263,15 @@ unprobeable:
   detail: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4-pro
     is temporarily rate-limited upstream. Please retry shortly, or add your own key
     to accumulate you...'
+- api: openrouter
+  model: deepseek/deepseek-v4-pro-0813
+  provider: deepseek
+  cost:
+  - 0.66
+  - 1.98
+  reason: flaky
+  detail: '{"message":"No endpoints available matching your guardrail restrictions
+    and data policy. Configure: https://openrouter.ai/settings/privacy","code":404}'
 - api: openrouter
   model: deepseek/deepseek-v4-pro-0813:batch
   provider: together
@@ -3727,28 +3757,26 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
-  openrouter#deepseek/deepseek-v4-flash-0731#deepseek:
-    count: 2
-    last_error: '{"message":"No endpoints available matching your guardrail restrictions
-      and data policy. Configure: https://openrouter.ai/settings/privacy","code":404}'
   openrouter#deepseek/deepseek-v4-pro#fireworks:
-    count: 1
-    last_error: '{"message":"Provider returned error","code":404,"metadata":{"raw":"{\"error\":{\"message\":\"Model
-      not found, inaccessible, and/or not deployed\",\"param\":\"model\",\"code\":\"NOT_FOUND\",\"type\":\"...'
-  openrouter#deepseek/deepseek-v4-pro-0813#deepseek:
     count: 2
-    last_error: '{"message":"No endpoints available matching your guardrail restrictions
-      and data policy. Configure: https://openrouter.ai/settings/privacy","code":404}'
+    last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":\"[{''type'':
+      ''extra_forbidden'', ''loc'': (''body'', ''prompt_cache_key''), ''msg'': ''Extra
+      inputs are not permitted'', ''input'': ''b80...'
   openrouter#minimax/minimax-m2.7#fireworks:
     count: 1
     last_error: '{"message":"Provider returned error","code":404,"metadata":{"raw":"{\"error\":{\"message\":\"Model
       not found, inaccessible, and/or not deployed\",\"param\":\"model\",\"code\":\"NOT_FOUND\",\"type\":\"...'
+  openrouter#openai/gpt-oss-20b#together:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"openai/gpt-oss-20b
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rate limits: ht...'
   openrouter#thedrummer/rocinante-12b#parasail/bf16:
     count: 1
     last_error: '{"message":"Provider returned error","code":404,"metadata":{"raw":"{\"error\":{\"message\":\"Deployment
       parasail-rocinante-12b doesn''t exist or isn''t accessible.\",\"type\":\"invalid_request_error\",\...'
   openrouter#z-ai/glm-5.3-flash#siliconflow/fp8:
-    count: 1
+    count: 2
     last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"z-ai/glm-5.3-flash
       is temporarily rate-limited upstream. Please retry shortly, or add your own
       key to accumulate your rate limits: ht...'
