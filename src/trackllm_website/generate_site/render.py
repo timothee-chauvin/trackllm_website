@@ -70,6 +70,7 @@ def render_site(
     # STATUS_COPY (status.py) stays the one place that copy is written.
     env.globals["STATUS_COPY"] = STATUS_COPY
     env.globals["PAPERS"] = PAPERS
+    env.globals["SITE_URL"] = machine_mod.SITE_URL
     env.filters["fmt_cost"] = format_cost
     env.filters["fmt_price"] = format_price
     index_template = env.get_template("index.html.j2")

@@ -47,10 +47,14 @@
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                 <span class="copy-pill-label">Copy for LLM</span>
             </button>
+            <button class="copy-pill" type="button" aria-label="Copy the URL of this page's markdown twin for an LLM"
+                data-copy-text="{{ SITE_URL }}/{{ machine.md }}" data-goatcounter-click="copylink/{{ machine.md }}">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                <span class="copy-pill-label">Copy .md link for LLM</span>
+            </button>
             <span class="machine-links">AI agents: read <a href="{{ nav_prefix }}{{ machine.md }}">{{ machine.md }}</a> instead of this page
               {% if machine.feed %}· <a href="{{ nav_prefix }}{{ machine.feed }}" type="application/atom+xml" data-goatcounter-click="subscribe/{{ machine.scope }}">Subscribe (Atom)</a>{% endif %}
-              {% for j in machine.json %} · <a href="{{ nav_prefix }}{{ j }}">JSON{{ "" if loop.length == 1 else " " ~ loop.index }}</a>{% endfor %}
-              · <a href="{{ nav_prefix }}index.html#machine">about</a></span>
+              {% for j in machine.json %} · <a href="{{ nav_prefix }}{{ j }}">JSON{{ "" if loop.length == 1 else " " ~ loop.index }}</a>{% endfor %}</span>
         </div>
         {% block content %}{% endblock %}
 

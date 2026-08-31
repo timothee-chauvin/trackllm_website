@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 from conftest import empty_status_inputs, write_lt_endpoint
-from trackllm_website.generate_site.machine import links
+from trackllm_website.generate_site.machine import SITE_URL, links
 from trackllm_website.generate_site.render import render_site
 
 ATOM = "{http://www.w3.org/2005/Atom}"
@@ -53,11 +53,7 @@ def site(tmp_path_factory) -> Path:
 
 
 def _md_links(text: str) -> list[str]:
-    return [
-        h
-        for h in re.findall(r"\]\(([^)\s]+)\)", text)
-        if not h.startswith(("http://", "https://", "#"))
-    ]
+    return re.findall(r"\]\(([^)\s]+)\)", text)
 
 
 def test_every_html_page_has_a_markdown_twin(site: Path):
@@ -67,20 +63,25 @@ def test_every_html_page_has_a_markdown_twin(site: Path):
         assert html.with_suffix(".md").exists(), html
 
 
-def test_every_markdown_link_resolves(site: Path):
+def test_every_markdown_site_link_is_absolute_and_resolves(site: Path):
+    # Absolute on purpose: the md is made to be copied into an LLM context,
+    # where a relative link points nowhere.
     for md in site.rglob("*.md"):
         if "templates" in md.parts or "data" in md.parts:
             continue
         for href in _md_links(md.read_text()):
-            target = (md.parent / href.split("#")[0]).resolve()
+            assert not href.startswith((".", "/")), f"{md.relative_to(site)}: {href}"
+            if not href.startswith(f"{SITE_URL}/"):
+                continue
+            target = site / href.removeprefix(f"{SITE_URL}/").split("#")[0]
             assert target.exists(), f"{md.relative_to(site)}: {href}"
 
 
 def test_markdown_header_names_html_feed_and_json(site: Path):
     md = (site / "endpoints" / "m2fa23p.md").read_text()
     assert "https://www.trackllm.net/endpoints/m2fa23p.html" in md
-    assert "../feeds/endpoints/m2fa23p.xml" in md
-    assert "../data/models/m2fa.json" in md
+    assert "https://www.trackllm.net/feeds/endpoints/m2fa23p.xml" in md
+    assert "https://www.trackllm.net/data/models/m2fa.json" in md
     assert "trackllm_data" in md
     # the chart is a link to its series, not a table
     assert "Full series:" in md
@@ -96,9 +97,7 @@ def test_html_declares_its_twins(site: Path):
     # visible text, not just attributes: what an HTML-to-text agent fetcher keeps
     assert "read <a href=\"../endpoints/m2fa23p.md\">endpoints/m2fa23p.md</a>" in html
     assert 'data-src="../endpoints/m2fa23p.md"' in html
-    index = (site / "index.html").read_text()
-    assert 'id="machine"' in index
-    assert 'href="feeds/all.xml"' in index
+    assert 'data-copy-text="https://www.trackllm.net/endpoints/m2fa23p.md"' in html
 
 
 def _entries(site: Path, path: str) -> list[ET.Element]:

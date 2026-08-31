@@ -21,7 +21,10 @@ async function copyText(text: string): Promise<void> {
 }
 
 export function bindCopyPills(root: ParentNode): void {
-  for (const btn of root.querySelectorAll<HTMLButtonElement>("button.copy-pill[data-src]")) {
+  for (const btn of root.querySelectorAll<HTMLButtonElement>("button.copy-pill")) {
+    // The flash labels are shorter than the resting one; without a locked width
+    // the pill shrinks on click and everything after it reflows.
+    btn.style.width = `${btn.offsetWidth}px`;
     const label = btn.querySelector<HTMLElement>(".copy-pill-label")!;
     const original = label.textContent;
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -36,9 +39,13 @@ export function bindCopyPills(root: ParentNode): void {
     };
     btn.addEventListener("click", async () => {
       try {
-        const res = await fetch(btn.dataset.src!);
-        if (!res.ok) throw new Error(`${btn.dataset.src}: HTTP ${res.status}`);
-        await copyText(await res.text());
+        let text = btn.dataset.copyText;
+        if (text === undefined) {
+          const res = await fetch(btn.dataset.src!);
+          if (!res.ok) throw new Error(`${btn.dataset.src}: HTTP ${res.status}`);
+          text = await res.text();
+        }
+        await copyText(text);
         flash(DONE, false);
       } catch (err) {
         console.error("copy-llm:", err);

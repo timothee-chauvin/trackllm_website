@@ -17,15 +17,15 @@ LLM APIs are opaque black boxes, even for open-weight models. TrackLLM continuou
 Everything on this site is available without a browser:
 
 - **Markdown mirror** — every `X.html` has an `X.md` twin at the same path, with the same sections and the same links (to other `.md` pages). You are reading one. Charts are replaced by a link to the JSON series they draw.
-- **Atom feeds** — one entry per detected change: [feeds/all.xml](feeds/all.xml) (latest {{ FEED_CAP }}), and one per endpoint, model, provider and organization at `feeds/<kind>/<slug>.xml`, linked from each page. Subscribe in any feed reader, or point an RSS-to-email service at one.
-- **JSON** — the same files the HTML pages fetch: [data/overview.json](data/overview.json) (stats, hero, latest changes, every endpoint row, provider rows), [data/changes.json](data/changes.json) (every detected change, newest first), [data/changes_page.json](data/changes_page.json) (the change log with descriptions and month histogram), [data/spend.json](data/spend.json), `data/models/<slug>.json` (per-model: every endpoint's full drift / TV series and changes), `data/providers/<slug>.json` (per-provider rates, variants, endpoints), `data/b3it/<slug>/b3it.json` (per-endpoint border-input state). Each page's header names the JSON it was rendered from.
+- **Atom feeds** — one entry per detected change: [feeds/all.xml]({{ nav_prefix }}feeds/all.xml) (latest {{ FEED_CAP }}), and one per endpoint, model, provider and organization at `feeds/<kind>/<slug>.xml`, linked from each page. Subscribe in any feed reader, or point an RSS-to-email service at one.
+- **JSON** — the same files the HTML pages fetch: [data/overview.json]({{ nav_prefix }}data/overview.json) (stats, hero, latest changes, every endpoint row, provider rows), [data/changes.json]({{ nav_prefix }}data/changes.json) (every detected change, newest first), [data/changes_page.json]({{ nav_prefix }}data/changes_page.json) (the change log with descriptions and month histogram), [data/spend.json]({{ nav_prefix }}data/spend.json), `data/models/<slug>.json` (per-model: every endpoint's full drift / TV series and changes), `data/providers/<slug>.json` (per-provider rates, variants, endpoints), `data/b3it/<slug>/b3it.json` (per-endpoint border-input state). Each page's header names the JSON it was rendered from.
 - **Raw data** — every collected response, committed hourly: {{ DATA_REPO_URL }}. The generator that turns it into this site: https://github.com/timothee-chauvin/trackllm_website.
 
 Slugs are stable: an endpoint's slug is `<model>@<provider>` with `/` → `2f` and `@` → `23`, and its page is `endpoints/<slug>.md`.
 
 ## Latest detected changes
 
-[Full changelog](changes.md) · [Feed](feeds/all.xml)
+[Full changelog]({{ nav_prefix }}changes.md) · [Feed]({{ nav_prefix }}feeds/all.xml)
 
 {{ b.table(["Date", "Endpoint", "Method", "Magnitude", "Description"], overview.feed | map("change_row", nav_prefix) | list) }}
 ## Providers

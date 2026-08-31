@@ -99,20 +99,6 @@
     </div>
   </section>
 
-  <section class="block" id="machine">
-    <div class="sec-head">
-      <h2>Machine access</h2>
-      <span class="hint">for agents, scripts and feed readers — no browser needed</span>
-    </div>
-    <div class="panel">
-      <ul class="prose machine-list">
-        <li><b>Markdown mirror</b> — every page has a <code>.md</code> twin at the same path (this one: <a href="index.md">index.md</a>), with the same sections and links to the other <code>.md</code> pages; charts become a link to the JSON they draw. Look for <em>Markdown</em> in any page's footer.</li>
-        <li><b>Atom feeds</b> — one entry per detected change: <a href="feeds/all.xml" data-goatcounter-click="subscribe/all">all changes</a>, plus a feed per endpoint, model, provider and organization (<em>Subscribe</em> in that page's footer). Any feed reader works; for email, point an RSS-to-email service at a feed.</li>
-        <li><b>JSON</b> — the files these pages are built from: <a href="data/overview.json">overview.json</a>, <a href="data/changes.json">changes.json</a>, <a href="data/changes_page.json">changes_page.json</a>, <a href="data/spend.json">spend.json</a>, <code>data/models/&lt;slug&gt;.json</code>, <code>data/providers/&lt;slug&gt;.json</code>, <code>data/b3it/&lt;slug&gt;/b3it.json</code>; each page's footer links its own.</li>
-        <li><b>Raw data</b> — every collected response, committed hourly: <a href="https://github.com/timothee-chauvin/trackllm_data">trackllm_data</a>. The generator: <a href="https://github.com/timothee-chauvin/trackllm_website">trackllm_website</a>.</li>
-      </ul>
-    </div>
-  </section>
 </main>
 {% endblock %}
 

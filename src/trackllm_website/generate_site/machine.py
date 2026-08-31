@@ -20,6 +20,9 @@ from trackllm_website.util import format_cost, format_price, slugify
 SITE_URL = "https://www.trackllm.net"
 DATA_REPO_URL = "https://github.com/timothee-chauvin/trackllm_data"
 GLOBAL_FEED_CAP = 200
+# Links in the .md twins are absolute: the pages are made to be copied into an
+# LLM context, where a relative link points nowhere.
+_BASE = f"{SITE_URL}/"
 
 # scope kind -> (page directory, feed directory); "" = a top-level page
 _PAGE_DIRS = {
@@ -193,7 +196,7 @@ def _spend_group_row(item: tuple, labels: dict) -> tuple:
 
 
 def _spend_endpoint_row(ep: dict, order: list[str], tracked: set[str]) -> tuple:
-    name = _ep("", ep["slug"], ep["name"]) if ep["slug"] in tracked else ep["name"]
+    name = _ep(_BASE, ep["slug"], ep["name"]) if ep["slug"] in tracked else ep["name"]
     costs = tuple(
         f"${format_cost(ep['groups'][g])}" if g in ep["groups"] else None for g in order
     )
@@ -261,7 +264,9 @@ def render_markdown(
         template = env.get_template(f"{kind}.md.j2")
         for ctx in contexts:
             out = website_dir / ctx["machine"]["md"]
-            by_dir.setdefault(out.parent, {})[out.stem] = template.render(**ctx)
+            by_dir.setdefault(out.parent, {})[out.stem] = template.render(
+                {**ctx, "nav_prefix": _BASE}
+            )
     for directory, files in by_dir.items():
         _write_dir(directory, ".md", files)
     print(f"Generated {sum(len(f) for f in by_dir.values())} markdown pages")
