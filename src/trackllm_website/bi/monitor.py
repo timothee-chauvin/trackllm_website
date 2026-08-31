@@ -21,6 +21,7 @@ from trackllm_website.bi.phase_2 import (
     load_existing_results,
     save_results,
 )
+from trackllm_website.bi.budget import projected_month_end
 from trackllm_website.bi.reinit import cleanup_onboarding_progress, reinit
 from trackllm_website.bi.scan import changepoint_scan
 from trackllm_website.bi.sampling import sample_prompts
@@ -133,6 +134,7 @@ async def run_endpoint(
     now: datetime,
     probe_spend: dict[str, Spend] | None = None,
     event_rows: list[MonitorRow] | None = None,
+    skip_reinit: bool = False,
 ) -> None:
     epoch = state.current_epoch
     assert epoch is not None
@@ -209,6 +211,26 @@ async def run_endpoint(
         change_date_str = (
             decision.change_date.date().isoformat() if decision.change_date else None
         )
+
+        if skip_reinit:
+            # Budget killer: the epoch stays open, so the change is re-detected
+            # and the re-init retried once the projection is back under cap.
+            logger.warning(
+                f"{state.endpoint}: re-init skipped (projected month-end spend over cap)"
+            )
+            if event_rows is not None:
+                event_rows.append(
+                    MonitorRow(
+                        state.endpoint.model,
+                        state.endpoint.provider,
+                        "reinit_skipped_budget",
+                        change_date_str,
+                        None,
+                        0.0,
+                    )
+                )
+            state.save(config.bi.state_dir)
+            return
 
         # The epoch is closed only once the re-init's outcome is known, so that the
         # timeout path can persist the streak below without also persisting a
@@ -327,6 +349,18 @@ async def monitor() -> MonitorReport:
     logger.info(f"Monitoring {len(monitoring)} endpoints")
     now = datetime.now(tz=timezone.utc).replace(microsecond=0)
 
+    # Computed once per run: daily sampling always proceeds (it is the cheap,
+    # continuity-preserving part), but no re-init may start in an over-cap month.
+    over_budget = (
+        projected_month_end(config.spend_dir, now, config.budget.projection_window_days)
+        > config.budget.hard_cap_per_month
+    )
+    if over_budget:
+        logger.warning(
+            "projected month-end spend over hard cap "
+            f"(${config.budget.hard_cap_per_month:.2f}); re-inits suspended"
+        )
+
     probe_spend: dict[str, Spend] = {}
     async with OpenRouterClient(timeout=60.0) as probe_client:
         strategies, failed = await resolve_strategies(
@@ -432,6 +466,7 @@ async def monitor() -> MonitorReport:
                         now,
                         probe_spend,
                         event_rows=event_rows,
+                        skip_reinit=over_budget,
                     )
                 except Exception:
                     logger.exception(f"Monitor run failed for {state.endpoint}")

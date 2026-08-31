@@ -221,7 +221,7 @@ def test_monitor_returns_report_with_n_endpoints(monkeypatch, tmp_path):
         return {str(state.endpoint): PlainStrategy()}, []
 
     async def fake_run_endpoint(
-        client, strategy, s, now, probe_spend=None, event_rows=None
+        client, strategy, s, now, probe_spend=None, event_rows=None, skip_reinit=False
     ):
         pass  # no events → empty rows
 

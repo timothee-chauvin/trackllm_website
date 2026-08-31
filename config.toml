@@ -124,6 +124,15 @@ job_deadline_seconds = 16200  # 270 min
 [bi.popularity]
 top_n = 5
 
+[budget]
+# Month-end projection guard over ALL spend kinds (lt included), from the spend
+# ledgers. Enforcement (dropping pending onboards/reinits, then retiring the
+# hungriest endpoints) fires only when the projection exceeds hard_cap_per_month;
+# target_per_month just turns the digest header amber between the two.
+target_per_month = 60.0
+hard_cap_per_month = 80.0
+projection_window_days = 7  # trailing days the daily rate is averaged over
+
 # The Overview hero curve: deepseek-chat-v3-0324 @ crusoe/fp8, 43 days either side
 # of its 2026-01-11 changepoint (99 sigma). Vetted by eye; see generate_site/hero.py.
 [hero]
