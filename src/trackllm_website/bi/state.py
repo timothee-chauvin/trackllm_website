@@ -22,9 +22,10 @@ class Epoch(BaseModel):
     border_inputs: list[str]
     reference: ReferenceSamples
     end: datetime | None = None
-    end_reason: Literal["change_detected", "stalled", "gap", "unreachable"] | None = (
-        None
-    )
+    end_reason: (
+        Literal["change_detected", "stalled", "gap", "unreachable", "too_expensive"]
+        | None
+    ) = None
     change_date: datetime | None = None
     params: dict | None = None  # detection params in force when the epoch closed
 
@@ -52,7 +53,14 @@ class Epoch(BaseModel):
 
 
 class RetiredInfo(BaseModel):
-    reason: Literal["stalled", "no_bis", "delisted", "unreachable", "reinit_timeout"]
+    reason: Literal[
+        "stalled",
+        "no_bis",
+        "delisted",
+        "unreachable",
+        "reinit_timeout",
+        "too_expensive",
+    ]
     since: datetime
     last_recheck: datetime
 

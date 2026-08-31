@@ -5,6 +5,7 @@ log_level = "INFO"
 [api]
 max_retries = 8
 max_cost_mtok = 30
+max_cost_per_query = 0.0001  # billed $/query; any successful query above this raises QueryTooExpensive
 temperature = 1.0
 max_workers = 80
 top_logprobs_openrouter_default = 20

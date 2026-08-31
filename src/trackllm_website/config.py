@@ -206,6 +206,7 @@ class ApiConfig(BaseModel):
     temperature: float
     max_retries: int
     max_cost_mtok: float
+    max_cost_per_query: float
     max_workers: int
     timeout: float
     abandon_after: int

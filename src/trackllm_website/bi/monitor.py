@@ -7,9 +7,10 @@ from typing import Literal
 import fire
 from pydantic import BaseModel
 
-from trackllm_website.api import OpenRouterClient
+from trackllm_website.api import OpenRouterClient, QueryTooExpensive
 from trackllm_website.bi.results import load_phase2_results
 from trackllm_website.bi.common import (
+    TOO_EXPENSIVE,
     QueryStrategy,
     probe_errors_unreachable,
     resolve_strategies,
@@ -20,7 +21,7 @@ from trackllm_website.bi.phase_2 import (
     load_existing_results,
     save_results,
 )
-from trackllm_website.bi.reinit import reinit
+from trackllm_website.bi.reinit import cleanup_onboarding_progress, reinit
 from trackllm_website.bi.scan import changepoint_scan
 from trackllm_website.bi.sampling import sample_prompts
 from trackllm_website.bi.state import EndpointBIState, RetiredInfo, load_all_states
@@ -38,6 +39,40 @@ class Decision(BaseModel):
     action: Literal["none", "reinit", "retire_stalled"]
     change_date: datetime | None = None
     detector: Literal["adaptive", "scan"] | None = None
+
+
+def _retire_too_expensive(
+    state: EndpointBIState,
+    detail: str,
+    spent: float,
+    now: datetime,
+    event_rows: list[MonitorRow] | None,
+) -> None:
+    """Immediate retirement on a guard trip: no grace, no streak (see
+    QueryTooExpensive). The recheck schedule re-vets it; vetting's own guard
+    keeps it out until the price actually drops."""
+    epoch = state.current_epoch
+    if epoch is not None:
+        epoch.end = now
+        epoch.end_reason = "too_expensive"
+    state.status = "retired"
+    state.retired = RetiredInfo(reason="too_expensive", since=now, last_recheck=now)
+    state.save(config.bi.state_dir)
+    # A guard trip mid-discovery leaves resumable phase-1 scratch that would
+    # otherwise be committed daily; the endpoint is retired, so drop it.
+    cleanup_onboarding_progress(state.endpoint)
+    logger.warning(f"{state.endpoint}: retired (too expensive: {detail})")
+    if event_rows is not None:
+        event_rows.append(
+            MonitorRow(
+                state.endpoint.model,
+                state.endpoint.provider,
+                "retired_too_expensive",
+                None,
+                None,
+                spent,
+            )
+        )
 
 
 def _day_has_samples(results: dict, day: str) -> bool | None:
@@ -102,24 +137,33 @@ async def run_endpoint(
     epoch = state.current_epoch
     assert epoch is not None
 
+    guard_exc: QueryTooExpensive | None = None
     with track() as monitor_spend:
-        samples, n_errors = await sample_prompts(
-            client,
-            state.endpoint,
-            strategy,
-            epoch.border_inputs,
-            config.bi.phase_2.queries_per_token,
-            temperature=0.0,
-        )
-        path = get_output_path(state.endpoint, now.strftime("%Y-%m"))
-        existing = load_existing_results(path)
-        batch_key = now.replace(microsecond=0).isoformat()
-        for prompt, prompt_samples in samples.items():
-            existing.setdefault(prompt, {})[batch_key] = prompt_samples
-        save_results(path, existing)
+        try:
+            samples, n_errors = await sample_prompts(
+                client,
+                state.endpoint,
+                strategy,
+                epoch.border_inputs,
+                config.bi.phase_2.queries_per_token,
+                temperature=0.0,
+            )
+            path = get_output_path(state.endpoint, now.strftime("%Y-%m"))
+            existing = load_existing_results(path)
+            batch_key = now.replace(microsecond=0).isoformat()
+            for prompt, prompt_samples in samples.items():
+                existing.setdefault(prompt, {})[batch_key] = prompt_samples
+            save_results(path, existing)
+        except QueryTooExpensive as e:
+            guard_exc = e
     if probe_spend is not None:
         monitor_spend.merge(probe_spend.get(str(state.endpoint), Spend()))
     append_entry(config.spend_dir, state.slug, "monitor", monitor_spend, now)
+    if guard_exc is not None:
+        _retire_too_expensive(
+            state, str(guard_exc), monitor_spend.cost, now, event_rows
+        )
+        return
 
     # A batch where every query errored must show up in the digest on day 1, not
     # only as a "retired (stalled)" surprise stall_days later.
@@ -191,7 +235,14 @@ async def run_endpoint(
                 )
             except asyncio.TimeoutError:
                 timed_out = True
+            except QueryTooExpensive as e:
+                guard_exc = e
         append_entry(config.spend_dir, state.slug, "reinit", reinit_spend, now)
+        if guard_exc is not None:
+            _retire_too_expensive(
+                state, str(guard_exc), reinit_spend.cost, now, event_rows
+            )
+            return
         if timed_out:
             state.reinit_timeout_streak += 1
             if state.reinit_timeout_streak >= config.bi.monitor.max_reinit_timeouts:
@@ -292,6 +343,16 @@ async def monitor() -> MonitorReport:
     for state in monitoring:
         key = str(state.endpoint)
         if key in strategies:
+            continue
+        # A probe that tripped the cost guard would otherwise be re-probed (and
+        # re-billed) daily forever: retire now, like any other guard trip.
+        errors = failed.get(key, [])
+        if errors and errors[0] == TOO_EXPENSIVE:
+            spend = probe_spend.get(key, Spend())
+            append_entry(config.spend_dir, state.slug, "monitor", spend, now)
+            _retire_too_expensive(
+                state, "; ".join(errors[1:]) or errors[0], spend.cost, now, event_rows
+            )
             continue
         # All probes 404'd and the catalog already dropped the endpoint: the
         # provider is gone from OpenRouter's routing, so retire it now rather

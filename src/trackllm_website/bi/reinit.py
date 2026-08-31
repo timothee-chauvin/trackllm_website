@@ -82,7 +82,7 @@ def onboarding_progress_dir(endpoint: Endpoint) -> Path:
     return config.bi.data_dir / "onboarding_progress" / slug
 
 
-def _cleanup_onboarding_progress(endpoint: Endpoint) -> None:
+def cleanup_onboarding_progress(endpoint: Endpoint) -> None:
     shutil.rmtree(onboarding_progress_dir(endpoint), ignore_errors=True)
 
 
@@ -187,7 +187,7 @@ async def reinit(
     """
     result = await _reinit(client, strategy, endpoint, old_bis, now)
     if result.reason != "gate_inconclusive":
-        _cleanup_onboarding_progress(endpoint)
+        cleanup_onboarding_progress(endpoint)
     return result
 
 

@@ -12,7 +12,7 @@ from aiolimiter import AsyncLimiter
 from beartype.typing import Callable
 from tqdm import tqdm
 
-from trackllm_website.api import OpenRouterClient
+from trackllm_website.api import OpenRouterClient, QueryTooExpensive
 from trackllm_website.bi.download_tokenizers import (
     get_best_single_token_strings,
     load_existing_index,
@@ -283,12 +283,24 @@ async def resolve_strategies(
         ep: Endpoint,
     ) -> tuple[str, QueryStrategy | None, list[str] | None]:
         key = str(ep)
-        if probe_spend is not None:
-            with track() as s:
+        try:
+            if probe_spend is not None:
+                # finally: the guard raising mid-probe must not drop the spend
+                # of exactly the endpoint that overspent.
+                with track() as s:
+                    try:
+                        strategy, errors = await discover_strategy(
+                            client, ep, policy=policy
+                        )
+                    finally:
+                        probe_spend[key] = s
+            else:
                 strategy, errors = await discover_strategy(client, ep, policy=policy)
-            probe_spend[key] = s
-        else:
-            strategy, errors = await discover_strategy(client, ep, policy=policy)
+        except QueryTooExpensive as e:
+            strategy, errors = (
+                None,
+                [TOO_EXPENSIVE, f"probe billed ${e.cost:.6f}/query"],
+            )
         if strategy is None:
             logger.warning(f"Skipping {ep} — probe errors: {errors}")
             return key, None, errors

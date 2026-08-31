@@ -30,6 +30,8 @@ OUTCOME = {
     "retired_unreachable": ("retired (provider gone)", "#6e7781"),
     "retired_reinit_timeout": ("retired (re-init kept timing out)", "#6e7781"),
     "all_errors": ("all queries errored", "#cf222e"),
+    "too_expensive": ("too expensive (guard tripped, cached)", "#cf222e"),
+    "retired_too_expensive": ("retired (too expensive)", "#cf222e"),
 }
 
 
