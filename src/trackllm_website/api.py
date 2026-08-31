@@ -18,6 +18,25 @@ from trackllm_website.storage import (
 from trackllm_website.util import trim_to_length
 
 
+class QueryTooExpensive(Exception):
+    """A successful query whose token-math cost (compute_cost: advertised price x
+    reported usage, reasoning included — the same number the spend ledgers record)
+    exceeds api.max_cost_per_query. Almost always hidden reasoning tokens (Aug
+    2026: 10-300x normal); providers that under-report usage are the liar case,
+    caught by vetting's billed-cost check instead. Callers must retire the
+    endpoint, never swallow this. Carries the Response so callers can still
+    store/ledger the query that tripped it."""
+
+    def __init__(self, endpoint: Endpoint, cost: float, response: "Response"):
+        super().__init__(
+            f"{endpoint}: ${cost:.6f}/query > "
+            f"${config.api.max_cost_per_query}/query guard"
+        )
+        self.endpoint = endpoint
+        self.cost = cost
+        self.response = response
+
+
 class OpenRouterClient:
     def __init__(self, timeout: float | None = None):
         self.connector = aiohttp.TCPConnector(limit=600)
@@ -265,6 +284,10 @@ class OpenRouterClient:
                 error=ResponseError(http_code=http_code, message=message),
             )
         record_query(response.cost, response.error is not None)
+        # Billed-but-errored responses ("No logprobs returned") carry real cost
+        # and must trip too; true network/HTTP errors have cost 0.0 and never do.
+        if response.cost > config.api.max_cost_per_query:
+            raise QueryTooExpensive(endpoint, response.cost, response)
         return response
 
 

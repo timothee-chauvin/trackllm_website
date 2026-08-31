@@ -14,8 +14,9 @@ from typing import Literal
 import yaml
 from pydantic import BaseModel
 
+from trackllm_website.api import QueryTooExpensive
 from trackllm_website.bi.common import QueryStrategy, strategy_to_query_args
-from trackllm_website.config import Endpoint, logger
+from trackllm_website.config import Endpoint, config, logger
 from trackllm_website.util import atomic_write_bytes, trim_to_length
 
 PRICE_TOLERANCE = 0.01
@@ -57,13 +58,17 @@ async def vet_endpoint(
     the token math implies. A transient error (network / 5xx) or an un-priceable
     response returns bucket="transient" so the caller does NOT cache it.
     """
-    response = await client.query(
-        endpoint,
-        "a",
-        temperature=0.0,
-        logprobs=False,
-        **strategy_to_query_args(strategy),
-    )
+    try:
+        response = await client.query(
+            endpoint,
+            "a",
+            temperature=0.0,
+            logprobs=False,
+            **strategy_to_query_args(strategy),
+        )
+    except QueryTooExpensive as e:
+        logger.info(f"{endpoint} vet: {e}")
+        return VetResult(bucket="too_expensive")
     if response.error:
         logger.info(f"{endpoint} vet: transient error {response.error.message[:80]}")
         return VetResult(bucket="transient", detail=response.error.message)
@@ -82,6 +87,11 @@ async def vet_endpoint(
             f"{endpoint} vet: liar (billed {actual:.8f} vs expected {expected:.8f})"
         )
         return VetResult(bucket="liar")
+    # After the liar check (a liar is permanent, this bucket is rechecked): the
+    # billed backstop for endpoints whose advertised token math is 0 or stale.
+    if actual > config.api.max_cost_per_query:
+        logger.info(f"{endpoint} vet: billed ${actual:.6f}/query, over the guard")
+        return VetResult(bucket="too_expensive")
     return VetResult(bucket="candidate", cost_per_request=actual)
 
 

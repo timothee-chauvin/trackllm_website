@@ -11,7 +11,8 @@ import asyncio
 
 from beartype.typing import Awaitable, Callable
 
-from trackllm_website.config import Endpoint, config
+from trackllm_website.api import QueryTooExpensive
+from trackllm_website.config import Endpoint, config, logger
 from trackllm_website.storage import Response
 
 LOGPROB_LADDER = (20, 10, 8, 5, 3, 2, 1)
@@ -45,8 +46,34 @@ async def query_endpoint(
     query: QueryFn, endpoint: Endpoint, prompts: list[str]
 ) -> list[Response]:
     """Query all prompts for one endpoint, first one alone to discover the
-    top_logprobs cap before the others run concurrently."""
+    top_logprobs cap before the others run concurrently.
+
+    A QueryTooExpensive keeps the tripped query's Response (its cost must reach
+    the spend ledger: the daily update prunes the fleet from that ledger) and
+    completed siblings; the endpoint is logged and dropped for this run."""
+    responses: list[Response] = []
+    tripped = False
+
+    def keep(result: Response | BaseException) -> None:
+        nonlocal tripped
+        if isinstance(result, Response):
+            responses.append(result)
+        elif isinstance(result, QueryTooExpensive):
+            responses.append(result.response)
+            tripped = True
+        else:
+            raise result
+
     first, *rest = prompts
-    responses = [await query_discovering_max_logprobs(query, endpoint, first)]
-    responses.extend(await asyncio.gather(*(query(endpoint, p) for p in rest)))
+    try:
+        keep(await query_discovering_max_logprobs(query, endpoint, first))
+    except QueryTooExpensive as e:
+        keep(e)
+    if not tripped:
+        for result in await asyncio.gather(
+            *(query(endpoint, p) for p in rest), return_exceptions=True
+        ):
+            keep(result)
+    if tripped:
+        logger.error(f"{endpoint}: query over the cost guard, dropped for this run")
     return responses

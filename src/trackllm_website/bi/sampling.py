@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 
 from aiolimiter import AsyncLimiter
 
+from trackllm_website.api import QueryTooExpensive
 from trackllm_website.bi.common import (
     QueryStrategy,
     extract_first_token,
@@ -31,20 +32,31 @@ async def sample_prompts(
     semaphore = asyncio.Semaphore(cfg.max_concurrent_requests_per_endpoint)
     samples: dict[str, list[tuple[str, str]]] = {p: [] for p in prompts}
     n_errors = 0
+    # One guard trip means every further query is the same waste; sibling tasks
+    # must stop issuing new ones while the exception unwinds the gather.
+    stop = asyncio.Event()
 
     async def one(prompt: str) -> None:
         nonlocal n_errors
         for i in range(n_per_prompt):
+            if stop.is_set():
+                return
             async with semaphore:
                 await limiter.acquire()
                 ts = datetime.now(tz=timezone.utc).replace(microsecond=0).isoformat()
-                response = await client.query(
-                    endpoint,
-                    prompt,
-                    temperature=temperature,
-                    logprobs=False,
-                    **strategy_to_query_args(strategy),
-                )
+                try:
+                    response = await client.query(
+                        endpoint,
+                        prompt,
+                        temperature=temperature,
+                        logprobs=False,
+                        **strategy_to_query_args(strategy),
+                    )
+                except QueryTooExpensive:
+                    if stop.is_set():
+                        return  # a sibling already carries the exception out
+                    stop.set()
+                    raise
             if response.error:
                 logger.warning(
                     f"Error for {endpoint}: {prompt!r}: {response.error.message}"

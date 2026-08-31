@@ -5,11 +5,12 @@ from decimal import Decimal
 from pathlib import Path
 
 import aiohttp
+import orjson
 import requests
 import yaml
 from pydantic import BaseModel
 
-from trackllm_website.api import OpenRouterClient
+from trackllm_website.api import OpenRouterClient, QueryTooExpensive
 from trackllm_website.bi.common import (
     TOO_EXPENSIVE,
     probe_errors_unreachable,
@@ -21,7 +22,7 @@ from trackllm_website.bi.digest import (
     send_onboarding_digest,
 )
 from trackllm_website.bi.popularity import fetch_popular_models_safe
-from trackllm_website.bi.reinit import reinit
+from trackllm_website.bi.reinit import cleanup_onboarding_progress, reinit
 from trackllm_website.bi.selection import (
     SelectionPolicy,
     exceeds_ceiling,
@@ -102,6 +103,9 @@ def route_vet_result(
             )
         return None
     cache.record_success(endpoint)  # any definitive verdict ends the streak
+    if res.bucket == "too_expensive":
+        cache.add_too_expensive(endpoint)
+        return None
     if res.bucket == "candidate":
         endpoint.cost_per_request = res.cost_per_request
         if exceeds_ceiling(
@@ -225,6 +229,53 @@ class LTFailureCache(BaseModel):
         with open(path) as f:
             data = yaml.safe_load(f) or {}
         return cls(failures=data.get("failures") or [])
+
+
+# Below this many successful ledger queries a per-query cost is too noisy to act on.
+LT_PRUNE_MIN_QUERIES = 20
+
+
+def lt_cost_per_query(spend_dir: Path, slug: str, now: datetime) -> float | None:
+    """Measured $/successful-query from the endpoint's lt ledger lines over the
+    current and previous month; None below LT_PRUNE_MIN_QUERIES."""
+    prev = (now.replace(day=1) - timedelta(days=1)).strftime("%Y-%m")
+    total_cost, total_q = 0.0, 0
+    for month in (prev, now.strftime("%Y-%m")):
+        path = spend_dir / slug / f"{month}.jsonl"
+        if not path.exists():
+            continue
+        for line in path.read_bytes().splitlines():
+            if not line.strip():
+                continue
+            rec = orjson.loads(line)
+            if rec["kind"] != "lt":
+                continue
+            total_cost += rec["cost"]
+            total_q += rec["n_queries"] - rec["n_errors"]
+    if total_q < LT_PRUNE_MIN_QUERIES:
+        return None
+    return total_cost / total_q
+
+
+def prune_expensive_lt(
+    endpoints: list[Endpoint], spend_dir: Path, now: datetime
+) -> tuple[list[Endpoint], dict[Endpoint, str]]:
+    """Split the LT fleet on measured ledger cost vs api.max_cost_per_query.
+
+    The durable half of the per-query guard: main.py only abandons an endpoint
+    for one run (run-main.yml commits nothing outside website/data), so the
+    daily update must be the one to drop it from endpoints_lt.yaml.
+    """
+    kept: list[Endpoint] = []
+    failures: dict[Endpoint, str] = {}
+    for e in endpoints:
+        cost = lt_cost_per_query(spend_dir, slugify(f"{e.model}#{e.provider}"), now)
+        if cost is not None and cost > config.api.max_cost_per_query:
+            failures[e] = f"too_expensive: ${cost:.6f}/query"
+            logger.warning(f"LT prune: {e} billed {failures[e]}")
+        else:
+            kept.append(e)
+    return kept, failures
 
 
 def update_lt_failure_cache(
@@ -501,11 +552,20 @@ async def update_endpoints_lt():
 
     lt_cache = LTFailureCache.load(ENDPOINTS_CACHE_LT_PATH)
     now = datetime.now(tz=timezone.utc).replace(microsecond=0)
+    kept, expensive = prune_expensive_lt(
+        sorted(endpoints_to_keep | set(valid_endpoints), key=str),
+        config.spend_dir,
+        now,
+    )
     update_lt_failure_cache(
-        lt_cache, valid_endpoints, failures, endpoints_claiming_logprobs, now
+        lt_cache,
+        [e for e in valid_endpoints if e not in expensive],
+        failures | expensive,
+        endpoints_claiming_logprobs,
+        now,
     )
     lt_cache.save(ENDPOINTS_CACHE_LT_PATH)
-    final_endpoints = endpoints_to_keep | set(valid_endpoints)
+    final_endpoints = set(kept)
     # Sort endpoints by total cost, then api, model and provider
     sorted_endpoints = sorted(
         final_endpoints, key=lambda e: (sum(e.cost), e.api, e.model, e.provider)
@@ -867,6 +927,19 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]) -> Onboardin
                     f"{endpoint} onboarding exceeded {hours:.0f}h, will resume next run"
                 )
                 outcome = "timeout"
+            except QueryTooExpensive as e:
+                cache.add_too_expensive(endpoint)
+                state = states.get(slug) or EndpointBIState(
+                    endpoint=endpoint, status="retired", epochs=[]
+                )
+                state.status = "retired"
+                state.retired = RetiredInfo(
+                    reason="too_expensive", since=now, last_recheck=now
+                )
+                state.save(config.bi.state_dir)
+                cleanup_onboarding_progress(endpoint)
+                logger.warning(f"{endpoint}: onboarding stopped, too expensive ({e})")
+                outcome = "too_expensive"
             except Exception:
                 logger.exception(f"BI onboarding failed for {endpoint}")
             finally:

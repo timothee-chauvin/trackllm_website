@@ -31,9 +31,9 @@ def _resp(cost, error=None):
 
 def test_query_records_cost_and_errors_into_bucket(monkeypatch):
     seq = [
-        _resp(0.10),
+        _resp(1e-5),
         _resp(0.0, ResponseError(http_code=500, message="boom")),
-        _resp(0.20),
+        _resp(2e-5),
     ]
 
     async def fake_make_request(self, *a, **k):
@@ -57,12 +57,12 @@ def test_query_records_cost_and_errors_into_bucket(monkeypatch):
     s = asyncio.run(run())
     assert s.n_queries == 3
     assert s.n_errors == 1
-    assert abs(s.cost - 0.30) < 1e-9
+    assert abs(s.cost - 3e-5) < 1e-12
 
 
 def test_query_noop_without_bucket(monkeypatch):
     async def fake_make_request(self, *a, **k):
-        return _resp(0.10)
+        return _resp(1e-5)
 
     monkeypatch.setattr(OpenRouterClient, "_make_request", fake_make_request)
 
@@ -73,4 +73,4 @@ def test_query_noop_without_bucket(monkeypatch):
         finally:
             await client.close()
 
-    assert asyncio.run(run()).cost == 0.10
+    assert asyncio.run(run()).cost == 1e-5
