@@ -227,7 +227,7 @@ def _patch_lifecycle(monkeypatch, tmp_path, reinit):
     )
     monkeypatch.setattr(
         "trackllm_website.update_endpoints.select_monitoring_targets",
-        lambda candidates, policy, popular: (candidates, {e: "r" for e in candidates}),
+        lambda candidates, policy, popular: (candidates, {e: "r" for e in candidates}, []),
     )
     monkeypatch.setattr("trackllm_website.update_endpoints.reinit", reinit)
     monkeypatch.setattr(

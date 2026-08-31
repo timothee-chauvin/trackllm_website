@@ -232,6 +232,12 @@ class PlottingConfig(BaseModel):
     font_family: str
 
 
+class BudgetConfig(BaseModel):
+    target_per_month: float
+    hard_cap_per_month: float
+    projection_window_days: int
+
+
 class Config(BaseSettings):
     endpoints_yaml_path_lt: Path = root / "endpoints_lt.yaml"
     endpoints_yaml_path_bi: Path = root / "endpoints_bi.yaml"
@@ -254,6 +260,7 @@ class Config(BaseSettings):
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
     plotting: PlottingConfig
     hero: HeroConfig
+    budget: BudgetConfig
 
     # read from endpoints_....yaml
     endpoints_lt: list[Endpoint] = []

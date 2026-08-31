@@ -61,6 +61,10 @@ def _matches_any(endpoint: Endpoint, patterns: list[str]) -> bool:
     return any(fnmatch.fnmatch(t, p) for t in targets for p in patterns)
 
 
+def is_flagship(endpoint: Endpoint, policy: SelectionPolicy) -> bool:
+    return _matches_any(endpoint, policy.flagship_patterns())
+
+
 def exceeds_ceiling(
     cost_per_request: float, model: str, provider: str, policy: SelectionPolicy
 ) -> bool:

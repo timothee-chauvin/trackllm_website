@@ -23,9 +23,17 @@ from trackllm_website.bi.digest import (
 )
 from trackllm_website.bi.popularity import fetch_popular_models_safe
 from trackllm_website.bi.reinit import cleanup_onboarding_progress, reinit
+from trackllm_website.bi.budget import (
+    daily_rates_by_slug,
+    expected_reinit_cost,
+    plan_kills,
+    projected_month_end,
+    remaining_days_in_month,
+)
 from trackllm_website.bi.selection import (
     SelectionPolicy,
     exceeds_ceiling,
+    is_flagship,
     load_policy,
     select_monitoring_targets,
 )
@@ -834,8 +842,53 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]) -> Onboardin
     onboards = [(e, False) for e in actions.onboard]
     rechecks = [(s.endpoint, True) for s in actions.recheck]
     to_init = onboards + rechecks
+    # Budget killer: bring the projected month-end spend (trailing rate plus what
+    # this run is about to commit to) back under the hard cap before spending.
+    projected = projected_month_end(
+        config.spend_dir, now, config.budget.projection_window_days
+    )
+    pending = [(str(e), expected_reinit_cost(e)) for e, _ in to_init]
+    overshoot = (
+        projected + sum(c for _, c in pending) - config.budget.hard_cap_per_month
+    )
+    if overshoot > 0:
+        monitoring_states = [s for s in states.values() if s.status == "monitoring"]
+        rates = daily_rates_by_slug(
+            config.spend_dir, now, config.budget.projection_window_days
+        )
+        monitored = [
+            (s.slug, rates.get(s.slug, 0.0), is_flagship(s.endpoint, policy))
+            for s in monitoring_states
+        ]
+        plan = plan_kills(overshoot, pending, monitored, remaining_days_in_month(now))
+        dropped = set(plan.dropped_pending)
+        for e, _ in to_init:
+            if str(e) in dropped:
+                logger.error(f"{e}: onboarding skipped (budget projection over cap)")
+                report_rows.append(
+                    OnboardRow(e.model, e.provider, "skipped_budget", None, 0.0)
+                )
+        to_init = [(e, r) for e, r in to_init if str(e) not in dropped]
+        by_slug = {s.slug: s for s in monitoring_states}
+        for slug in plan.retired:
+            s = by_slug[slug]
+            epoch = s.current_epoch
+            if epoch is not None:
+                epoch.end = now
+                epoch.end_reason = "budget"
+            s.status = "retired"
+            s.retired = RetiredInfo(reason="budget", since=now, last_recheck=now)
+            s.save(config.bi.state_dir)
+            logger.error(f"{s.endpoint}: retired (budget killer)")
+            report_rows.append(
+                OnboardRow(
+                    s.endpoint.model, s.endpoint.provider, "retired_budget", None, 0.0
+                )
+            )
+
     if not to_init:
         return OnboardingReport(now.date().isoformat(), report_rows)
+
     probe_spend: dict[str, Spend] = {}
     async with OpenRouterClient(timeout=60.0) as probe_client:
         strategies, failed = await resolve_strategies(

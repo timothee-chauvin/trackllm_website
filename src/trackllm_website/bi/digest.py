@@ -1,10 +1,12 @@
 """Render and send the two daily B3IT digest emails (onboarding, monitoring)."""
 
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from html import escape
 
 from trackllm_website import notify
-from trackllm_website.config import logger
+from trackllm_website.bi.budget import month_to_date, projected_month_end
+from trackllm_website.config import config, logger
 from trackllm_website.spend import cumulative_by_kind, today_by_kind
 from trackllm_website.util import slugify
 
@@ -33,6 +35,9 @@ OUTCOME = {
     "all_errors": ("all queries errored", "#cf222e"),
     "too_expensive": ("too expensive (guard tripped, cached)", "#cf222e"),
     "retired_too_expensive": ("retired (too expensive)", "#cf222e"),
+    "skipped_budget": ("skipped (budget projection over cap)", "#cf222e"),
+    "retired_budget": ("retired (budget)", "#cf222e"),
+    "reinit_skipped_budget": ("re-init skipped (budget)", "#cf222e"),
 }
 
 
@@ -149,9 +154,37 @@ def _plain_table(headers, rows, widths):
     )
 
 
+def _budget_header(spend_dir, date):
+    """(plain, html) month-end projection line for both digests: normal under
+    target, amber between target and cap, red over cap."""
+    now = datetime.fromisoformat(date).replace(tzinfo=timezone.utc)
+    mtd = month_to_date(spend_dir, now)
+    projected = projected_month_end(
+        spend_dir, now, config.budget.projection_window_days
+    )
+    target = config.budget.target_per_month
+    cap = config.budget.hard_cap_per_month
+    base = (
+        f"month-to-date {_money2(mtd)} · projected {_money2(projected)} "
+        f"· target {_money2(target)} · cap {_money2(cap)}"
+    )
+    if projected > cap:
+        status, color = "over cap", "#cf222e"
+    elif projected > target:
+        status, color = f"over target {_money2(target)}", "#bf8700"
+    else:
+        return f"Budget — {base}", f"<b>Budget</b> — {base}"
+    return (
+        f"Budget — {base} — {status}",
+        f"<b>Budget</b> — {base} — "
+        f'<span style="color:{color};font-weight:600">{status}</span>',
+    )
+
+
 def build_onboarding_email(report, spend_dir):
     tk = today_by_kind(spend_dir, report.date)
     ck = cumulative_by_kind(spend_dir)
+    budget_plain, budget_html = _budget_header(spend_dir, report.date)
     onb_today = tk.get("onboard", 0) + tk.get("recheck", 0) + tk.get("vetting", 0)
     onb_cum = ck.get("onboard", 0) + ck.get("recheck", 0) + ck.get("vetting", 0)
 
@@ -161,6 +194,10 @@ def build_onboarding_email(report, spend_dir):
     # Budget skips must reach the headline: on a skip-only day, an all-zero
     # subject would bury the only red rows in the email.
     budget_note = f" · {n} over budget" if (n := c("not_selected_budget")) else ""
+    # Projection-killer actions (skipped onboards + retired endpoints) are a
+    # different signal from selection skips: count them separately.
+    if killed := c("skipped_budget") + c("retired_budget"):
+        budget_note += f" · {killed} budget-killed"
     summary = f"{c('onboarded')} onboarded · {c('timeout')} timed out · {c('no_bis')} not enough BIs{budget_note}"
     subject = f"[trackllm] {_money2(onb_today)} − B3IT onboarding: {c('onboarded')} onboarded, {c('timeout')} timed out, {c('no_bis')} no-BIs{budget_note}"
     hrows = [
@@ -177,7 +214,8 @@ def build_onboarding_email(report, spend_dir):
         summary,
         _table_html(["Endpoint", "Outcome", "BIs", "Spent today"], hrows),
         f"<b>Onboarding-run spend</b> — today <b>{_money2(onb_today)}</b> · cumulative {_money(onb_cum)}<br>"
-        f'<span style="color:#57606a">onboard {_money(tk.get("onboard", 0))} · rechecks {_money(tk.get("recheck", 0))} · vetting {_money(tk.get("vetting", 0))} (today)</span>',
+        f'<span style="color:#57606a">onboard {_money(tk.get("onboard", 0))} · rechecks {_money(tk.get("recheck", 0))} · vetting {_money(tk.get("vetting", 0))} (today)</span><br>'
+        f"{budget_html}",
     )
     prows = [
         (
@@ -194,6 +232,7 @@ def build_onboarding_email(report, spend_dir):
             ["Endpoint", "Outcome", "BIs", "Spent today"], prows, [46, 30, 4, 10]
         )
         + f"\n\nOnboarding-run spend — today {_money2(onb_today)} · cumulative {_money(onb_cum)}\n"
+        + f"{budget_plain}\n"
     )
     return subject, plain, html
 
@@ -201,6 +240,7 @@ def build_onboarding_email(report, spend_dir):
 def build_monitoring_email(report, spend_dir):
     tk = today_by_kind(spend_dir, report.date)
     ck = cumulative_by_kind(spend_dir)
+    budget_plain, budget_html = _budget_header(spend_dir, report.date)
     mon_today = tk.get("monitor", 0) + tk.get("reinit", 0)
     mon_cum = ck.get("monitor", 0) + ck.get("reinit", 0)
     n_changes = sum(
@@ -228,7 +268,8 @@ def build_monitoring_email(report, spend_dir):
         ),
         f"<b>Monitoring-run spend</b> — today <b>{_money2(mon_today)}</b> · cumulative {_money(mon_cum)}<br>"
         f'<span style="color:#57606a">monitoring {_money(tk.get("monitor", 0))} across {report.n_endpoints} endpoints'
-        f" · re-init {_money(tk.get('reinit', 0))} (today)</span>",
+        f" · re-init {_money(tk.get('reinit', 0))} (today)</span><br>"
+        f"{budget_html}",
     )
     prows = [
         (
@@ -248,6 +289,7 @@ def build_monitoring_email(report, spend_dir):
             [46, 20, 12, 9, 10],
         )
         + f"\n\nMonitoring-run spend — today {_money2(mon_today)} · cumulative {_money(mon_cum)}\n"
+        + f"{budget_plain}\n"
     )
     return subject, plain, html
 

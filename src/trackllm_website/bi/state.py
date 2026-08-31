@@ -23,7 +23,9 @@ class Epoch(BaseModel):
     reference: ReferenceSamples
     end: datetime | None = None
     end_reason: (
-        Literal["change_detected", "stalled", "gap", "unreachable", "too_expensive"]
+        Literal[
+            "change_detected", "stalled", "gap", "unreachable", "too_expensive", "budget"
+        ]
         | None
     ) = None
     change_date: datetime | None = None
@@ -60,6 +62,7 @@ class RetiredInfo(BaseModel):
         "unreachable",
         "reinit_timeout",
         "too_expensive",
+        "budget",
     ]
     since: datetime
     last_recheck: datetime
