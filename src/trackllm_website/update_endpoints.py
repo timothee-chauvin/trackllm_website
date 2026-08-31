@@ -13,6 +13,7 @@ from pydantic import BaseModel
 from trackllm_website.api import OpenRouterClient, QueryTooExpensive
 from trackllm_website.bi.common import (
     TOO_EXPENSIVE,
+    lt_query_args,
     probe_errors_unreachable,
     resolve_strategies,
 )
@@ -245,7 +246,13 @@ LT_PRUNE_MIN_QUERIES = 20
 
 def lt_cost_per_query(spend_dir: Path, slug: str, now: datetime) -> float | None:
     """Measured $/successful-query from the endpoint's lt ledger lines over the
-    current and previous month; None below LT_PRUNE_MIN_QUERIES."""
+    trailing api.lt_prune_window_days; None below LT_PRUNE_MIN_QUERIES.
+
+    A short trailing window makes the prune responsive in both directions: an
+    endpoint rescued by a reasoning strategy returns within days instead of
+    waiting out months of expensive history, and a price jump prunes just as
+    fast regardless of how much cheap history precedes it."""
+    cutoff = now - timedelta(days=config.api.lt_prune_window_days)
     prev = (now.replace(day=1) - timedelta(days=1)).strftime("%Y-%m")
     total_cost, total_q = 0.0, 0
     for month in (prev, now.strftime("%Y-%m")):
@@ -257,6 +264,8 @@ def lt_cost_per_query(spend_dir: Path, slug: str, now: datetime) -> float | None
                 continue
             rec = orjson.loads(line)
             if rec["kind"] != "lt":
+                continue
+            if datetime.fromisoformat(rec["timestamp"]) < cutoff:
                 continue
             total_cost += rec["cost"]
             total_q += rec["n_queries"] - rec["n_errors"]
@@ -493,12 +502,26 @@ async def get_endpoints(
     return filtered_endpoints
 
 
-async def test_endpoint_logprobs(endpoint: Endpoint) -> str | None:
-    """Query an endpoint with 'x'; return None if it actually returns logprobs,
-    else the failure reason."""
+def exclude_provider_segments(
+    endpoints: list[Endpoint], segments: list[str]
+) -> list[Endpoint]:
+    """Drop endpoints whose provider path contains any of the given segments
+    (exact segment match: "xai/priority" and "xai/zdr/priority" match "priority",
+    "priorityai" does not)."""
+    excluded = set(segments)
+    return [e for e in endpoints if not excluded & set(e.provider.split("/"))]
+
+
+async def test_endpoint_logprobs(endpoint: Endpoint, extra_args: dict) -> str | None:
+    """Query an endpoint with 'x' under the same query shape main.py will use;
+    return None if it actually returns logprobs, else the failure reason.
+
+    A provider that rejects the reasoning args together with top_logprobs fails
+    here and stays out of the fleet — correct, since admission must match the
+    monitoring query shape."""
     async with OpenRouterClient() as client:
         try:
-            response = await client.query(endpoint, "x")
+            response = await client.query(endpoint, "x", **extra_args)
             if response.error:
                 reason = f"error: {response.error.message}"
             elif (n := len(response.logprobs.logprobs)) != (
@@ -516,12 +539,14 @@ async def test_endpoint_logprobs(endpoint: Endpoint) -> str | None:
 
 
 async def test_endpoints_logprobs(
-    endpoints: Iterable[Endpoint],
+    endpoints: Iterable[Endpoint], query_args: dict[str, dict]
 ) -> tuple[list[Endpoint], dict[Endpoint, str]]:
-    """Split endpoints into (passing, {failing: reason}) by probing each with 'x'."""
+    """Split endpoints into (passing, {failing: reason}) by probing each with 'x',
+    applying each endpoint's LT query args (see lt_query_args)."""
     endpoints = list(endpoints)
     reasons = await gather_with_concurrency(
-        config.api.max_workers, *(test_endpoint_logprobs(e) for e in endpoints)
+        config.api.max_workers,
+        *(test_endpoint_logprobs(e, query_args.get(str(e), {})) for e in endpoints),
     )
     valid = [e for e, reason in zip(endpoints, reasons) if reason is None]
     failures = {
@@ -533,13 +558,22 @@ async def test_endpoints_logprobs(
 async def update_endpoints_lt():
     """Update the LT endpoints by removing stalled endpoints and adding new ones."""
     storage = ResultsStorage(config.lt_dir)
-    current_endpoints = config.endpoints_lt
+    # Applied to kept endpoints too, so a segment added to the config empties
+    # existing variants out of endpoints_lt.yaml on the next run.
+    current_endpoints = exclude_provider_segments(
+        config.endpoints_lt, config.api.lt_exclude_provider_segments
+    )
     endpoints_to_keep = set([e for e in current_endpoints if not storage.is_stalled(e)])
     logger.info(
         f"Keeping {len(endpoints_to_keep)}/{len(current_endpoints)} non-stalled endpoints"
     )
-    endpoints_claiming_logprobs = await get_endpoints(
-        logprob_filter=True, max_cost_mtok=config.api.max_cost_mtok, catalog_path=None
+    endpoints_claiming_logprobs = exclude_provider_segments(
+        await get_endpoints(
+            logprob_filter=True,
+            max_cost_mtok=config.api.max_cost_mtok,
+            catalog_path=None,
+        ),
+        config.api.lt_exclude_provider_segments,
     )
 
     # Update costs with latest values
@@ -555,7 +589,19 @@ async def update_endpoints_lt():
                 endpoint.cost = updated_endpoint.cost
 
     endpoints_to_test = set(endpoints_claiming_logprobs) - endpoints_to_keep
-    valid_endpoints, failures = await test_endpoints_logprobs(endpoints_to_test)
+    # Resolve reasoning strategies for the whole fleet: probes only cache misses
+    # and persists them (this workflow commits the strategy cache; run-main.yml
+    # doesn't, which is why main.py is a read-only consumer). Probe failures are
+    # absent from `strategies` and stay plain — the per-query guard is their
+    # backstop.
+    async with OpenRouterClient(timeout=60.0) as probe_client:
+        strategies, _failed = await resolve_strategies(
+            probe_client, sorted(endpoints_to_keep | endpoints_to_test, key=str)
+        )
+    query_args = lt_query_args(strategies)
+    valid_endpoints, failures = await test_endpoints_logprobs(
+        endpoints_to_test, query_args
+    )
     logger.info(f"Found {len(valid_endpoints)} valid new endpoints")
 
     lt_cache = LTFailureCache.load(ENDPOINTS_CACHE_LT_PATH)

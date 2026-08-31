@@ -126,6 +126,29 @@ def _strategy_to_raw(strategy: QueryStrategy) -> dict | None:
         return {"max_tokens": strategy.budget // 2}
 
 
+def lt_query_args(strategies: dict[str, "QueryStrategy"]) -> dict[str, dict]:
+    """LT applies only reasoning-disabling strategies: a budget strategy raises
+    output_tokens above 1, changing both the billing and which token the
+    logprobs describe, so those endpoints stay plain and the per-query guard
+    remains their backstop."""
+    return {
+        key: strategy_to_query_args(s)
+        for key, s in strategies.items()
+        if isinstance(s, ReasoningDisabledStrategy)
+    }
+
+
+def cached_lt_query_args() -> dict[str, dict]:
+    """str(endpoint) -> extra client.query kwargs from the committed strategy
+    cache. Read-only: LT never probes (run-main.yml doesn't commit the cache)."""
+    strategies = {
+        key: _raw_to_strategy(raw)
+        for key, raw in load_strategies().items()
+        if not (isinstance(raw, dict) and "skip" in raw)
+    }
+    return lt_query_args(strategies)
+
+
 async def discover_strategy(
     client: OpenRouterClient,
     endpoint: Endpoint,

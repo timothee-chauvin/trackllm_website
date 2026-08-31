@@ -207,6 +207,8 @@ class ApiConfig(BaseModel):
     max_retries: int
     max_cost_mtok: float
     max_cost_per_query: float
+    lt_prune_window_days: int
+    lt_exclude_provider_segments: list[str]
     max_workers: int
     timeout: float
     abandon_after: int

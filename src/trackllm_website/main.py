@@ -1,10 +1,12 @@
 import asyncio
 import json
 from datetime import datetime, timezone
+from functools import partial
 
 from trackllm_website.api import OpenRouterClient
-from trackllm_website.config import config, logger
-from trackllm_website.logprob_discovery import query_endpoint
+from trackllm_website.bi.common import cached_lt_query_args
+from trackllm_website.config import Endpoint, config, logger
+from trackllm_website.logprob_discovery import QueryFn, query_endpoint
 from trackllm_website.spend import Spend, append_entry
 from trackllm_website.storage import Response, ResultsStorage
 from trackllm_website.util import (
@@ -59,15 +61,27 @@ def write_lt_spend(summary: dict, now: datetime) -> None:
         append_entry(config.spend_dir, slugify(key), "lt", spend, now)
 
 
+def lt_query_fn(
+    query: QueryFn, endpoint: Endpoint, query_args: dict[str, dict]
+) -> QueryFn:
+    args = query_args.get(str(endpoint))
+    return partial(query, **args) if args else query
+
+
 async def main():
     """Query all endpoints with configured prompts and store results."""
     storage = ResultsStorage(data_dir=config.lt_dir)
     openrouter_client = OpenRouterClient()
+    query_args = cached_lt_query_args()
 
     # One task per endpoint: each serializes its first query to discover the
     # endpoint's top_logprobs cap before the remaining prompts run concurrently.
     tasks = [
-        query_endpoint(openrouter_client.query, endpoint, config.prompts)
+        query_endpoint(
+            lt_query_fn(openrouter_client.query, endpoint, query_args),
+            endpoint,
+            config.prompts,
+        )
         for endpoint in config.endpoints_lt
     ]
     total = len(config.endpoints_lt) * len(config.prompts)
