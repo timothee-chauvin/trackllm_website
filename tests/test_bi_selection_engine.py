@@ -1,7 +1,3 @@
-import logging
-
-import pytest
-
 from trackllm_website.bi.selection import (
     Rule,
     SelectionPolicy,
@@ -26,9 +22,9 @@ def test_monthly_cost():
     assert abs(monthly_cost(ep("m", "p", 0.0001)) - 0.6) < 1e-9
 
 
-def test_flagship_selected_over_budget_and_exempt_from_ceiling():
+def test_flagship_within_budget_exempt_from_ceiling_only():
     policy = SelectionPolicy(
-        budget_per_month=1.0,
+        budget_per_month=5.0,
         max_endpoint_cost=0.5,
         exclude=[],
         rules=[
@@ -41,11 +37,13 @@ def test_flagship_selected_over_budget_and_exempt_from_ceiling():
             )
         ],
     )
-    # gpt-5 monthly cost 3.0 > budget AND > ceiling, but flagship => selected
+    # gpt-5 monthly cost 3.0 > ceiling but within budget: the engine doesn't
+    # enforce the ceiling (vetting does), and budget now binds flagships too.
     cands = [ep("openai/gpt-5", "openai", 0.0005)]  # 0.0005*6000 = 3.0
-    selected, breakdown = select_monitoring_targets(cands, policy, [])
+    selected, breakdown, skipped = select_monitoring_targets(cands, policy, [])
     assert cands[0] in selected
     assert breakdown[cands[0]] == "flagships"
+    assert skipped == []
 
 
 def test_cheapest_provider_per_flagship_model():
@@ -64,7 +62,7 @@ def test_cheapest_provider_per_flagship_model():
         ],
     )
     cands = [ep("m/a", "cheap", 0.00001), ep("m/a", "pricey", 0.0001)]
-    selected, _ = select_monitoring_targets(cands, policy, [])
+    selected, _, _ = select_monitoring_targets(cands, policy, [])
     assert [e.provider for e in selected] == ["cheap"]
 
 
@@ -84,7 +82,7 @@ def test_exclude_globs_win():
         ],
     )
     cands = [ep("openai/gpt-image", "openai", 0.00001), ep("m/b", "p", 0.00001)]
-    selected, _ = select_monitoring_targets(cands, policy, [])
+    selected, _, _ = select_monitoring_targets(cands, policy, [])
     assert [e.model for e in selected] == ["m/b"]
 
 
@@ -104,7 +102,7 @@ def test_max_monthly_cost_skips_pricey_in_wildcard_rule():
         ],  # 0.10/mo => cpr<=~1.67e-5
     )
     cands = [ep("m/cheap", "p", 0.00001), ep("m/pricey", "p", 0.00005)]
-    selected, _ = select_monitoring_targets(cands, policy, [])
+    selected, _, _ = select_monitoring_targets(cands, policy, [])
     assert [e.model for e in selected] == ["m/cheap"]
 
 
@@ -125,57 +123,13 @@ def test_budget_stops_wildcard_fill():
     )
     # each endpoint is 0.6/mo; budget 0.6 fits exactly one
     cands = [ep("m/a", "p", 0.0001), ep("m/b", "p", 0.0001)]
-    selected, _ = select_monitoring_targets(cands, policy, [])
+    selected, _, _ = select_monitoring_targets(cands, policy, [])
     assert len(selected) == 1
 
 
-def test_flagship_over_budget_is_allowed_with_warning(caplog):
-    # two flagships, each 6.0/mo, budget 10 => flagships are budget-exempt:
-    # both selected, a warning is logged, NOT an error (per the design).
-    policy = SelectionPolicy(
-        budget_per_month=10.0,
-        max_endpoint_cost=100.0,
-        exclude=[],
-        rules=[
-            Rule(
-                name="flagships",
-                kind="models",
-                patterns=["m/a", "m/b"],
-                providers_per_model=1,
-                flagship=True,
-            )
-        ],
-    )
-    cands = [ep("m/a", "p", 0.001), ep("m/b", "p", 0.001)]  # 6.0/mo each
-    with caplog.at_level(logging.WARNING):
-        selected, _ = select_monitoring_targets(cands, policy, [])
-    assert set(cands) <= set(selected)
-    assert caplog.records
-
-
-def test_nonflagship_named_rule_over_budget_raises():
-    # a NON-flagship named (non-wildcard) rule whose endpoints total > budget => loud error.
-    policy = SelectionPolicy(
-        budget_per_month=10.0,
-        max_endpoint_cost=100.0,
-        exclude=[],
-        rules=[
-            Rule(
-                name="named",
-                kind="models",
-                patterns=["m/a", "m/b"],
-                providers_per_model=1,
-            )
-        ],
-    )
-    cands = [ep("m/a", "p", 0.001), ep("m/b", "p", 0.001)]  # 6.0/mo each => 12.0 total
-    with pytest.raises(ValueError, match="exceeds budget"):
-        select_monitoring_targets(cands, policy, [])
-
-
-def test_nonflagship_overshoot_then_wildcard_still_raises():
-    # a non-flagship named rule overshoots budget, then a trailing wildcard fill rule.
-    # the wildcard must NOT swallow the over-budget error via an early return.
+def test_named_overshoot_then_wildcard_cannot_refill():
+    # a named rule's skip must not free budget for a trailing wildcard to consume
+    # past the named rule's own endpoints.
     policy = SelectionPolicy(
         budget_per_month=10.0,
         max_endpoint_cost=100.0,
@@ -196,16 +150,15 @@ def test_nonflagship_overshoot_then_wildcard_still_raises():
             ),
         ],
     )
-    # m/a, m/b: 6.0/mo each => named rule selects both (12.0 > budget). m/c is an
-    # unselected wildcard candidate: with the buggy in-loop return, the wildcard
-    # early-returns on m/c and the post-loop ValueError never fires.
+    # m/a fits (6.0), m/b is skipped (12.0 > 10), m/c (6.0) doesn't fit either.
     cands = [
         ep("m/a", "p", 0.001),
         ep("m/b", "p", 0.001),
         ep("m/c", "p", 0.001),
     ]
-    with pytest.raises(ValueError, match="exceeds budget"):
-        select_monitoring_targets(cands, policy, [])
+    selected, _, skipped = select_monitoring_targets(cands, policy, [])
+    assert selected == [cands[0]]
+    assert skipped == [(cands[1], "named")]
 
 
 def test_providers_branch_covers_and_skips_pricey():
@@ -229,7 +182,7 @@ def test_providers_branch_covers_and_skips_pricey():
         ep("m/b", "provA", 0.0001),  # 0.6/mo
         ep("m/c", "provB", 0.0001),  # 0.6/mo
     ]
-    selected, _ = select_monitoring_targets(cands, policy, [])
+    selected, _, _ = select_monitoring_targets(cands, policy, [])
     assert [e.provider for e in selected] == ["provA"]
 
 
@@ -257,7 +210,7 @@ def test_providers_rule_honors_patterns():
         ep("m/c", "together", 0.00002),
         ep("m/d", "novita", 0.00002),
     ]
-    selected, _ = select_monitoring_targets(
+    selected, _, _ = select_monitoring_targets(
         cands, _providers_policy(["deepinfra*"]), []
     )
     assert sorted(e.provider for e in selected) == ["deepinfra", "deepinfra-turbo"]
@@ -265,7 +218,7 @@ def test_providers_rule_honors_patterns():
 
 def test_providers_rule_wildcard_covers_everyone():
     cands = [ep("m/a", "deepinfra", 0.00002), ep("m/c", "together", 0.00002)]
-    selected, _ = select_monitoring_targets(cands, _providers_policy(["*"]), [])
+    selected, _, _ = select_monitoring_targets(cands, _providers_policy(["*"]), [])
     assert sorted(e.provider for e in selected) == ["deepinfra", "together"]
 
 
@@ -273,7 +226,9 @@ def test_providers_rule_matches_the_suffix_free_provider_name():
     # by_provider is keyed by provider_without_suffix, so an exact name matches
     # every variant of that provider
     cands = [ep("m/a", "deepinfra/fp8", 0.00002), ep("m/c", "together", 0.00002)]
-    selected, _ = select_monitoring_targets(cands, _providers_policy(["deepinfra"]), [])
+    selected, _, _ = select_monitoring_targets(
+        cands, _providers_policy(["deepinfra"]), []
+    )
     assert [e.provider for e in selected] == ["deepinfra/fp8"]
 
 
@@ -299,7 +254,7 @@ def test_selection_is_deterministic():
         ep("m/b", "p1", 0.0001),
         ep("m/c", "p3", 0.0001),
     ]
-    selected1, labels1 = select_monitoring_targets(list(cands), policy, [])
-    selected2, labels2 = select_monitoring_targets(list(cands), policy, [])
+    selected1, labels1, _ = select_monitoring_targets(list(cands), policy, [])
+    selected2, labels2, _ = select_monitoring_targets(list(cands), policy, [])
     assert selected1 == selected2
     assert labels1 == labels2

@@ -74,7 +74,7 @@ def test_latest_n_popular_exclude_integration():
     ]
     popular_models = ["mistralai/mistral-small"]
 
-    selected, labels = select_monitoring_targets(candidates, policy, popular_models)
+    selected, labels, _ = select_monitoring_targets(candidates, policy, popular_models)
     sel_models = {e.model for e in selected}
 
     # newest-2 per family: older 3rd glm version is NOT selected by flagships.
