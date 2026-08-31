@@ -879,6 +879,7 @@
   "openrouter#moonshotai/kimi-k2.7-code#modelrun/fp4": null,
   "openrouter#moonshotai/kimi-k2.7-code#moonshotai/highspeed": null,
   "openrouter#moonshotai/kimi-k2.7-code#moonshotai/int4": null,
+  "openrouter#moonshotai/kimi-k2.7-code#nebius/fp4": null,
   "openrouter#moonshotai/kimi-k2.7-code#novita": null,
   "openrouter#moonshotai/kimi-k2.7-code#novita/int4": null,
   "openrouter#moonshotai/kimi-k2.7-code#parasail/int4": null,
@@ -1820,6 +1821,7 @@
   "openrouter#z-ai/glm-5.3#atlas-cloud/fp8": null,
   "openrouter#z-ai/glm-5.3#baseten/fp4": null,
   "openrouter#z-ai/glm-5.3#cloudflare": null,
+  "openrouter#z-ai/glm-5.3#deepinfra/fp4": null,
   "openrouter#z-ai/glm-5.3#deepinfra/fp8": null,
   "openrouter#z-ai/glm-5.3#digitalocean": null,
   "openrouter#z-ai/glm-5.3#fireworks": null,
@@ -1830,6 +1832,9 @@
   "openrouter#z-ai/glm-5.3#morph/fp4": null,
   "openrouter#z-ai/glm-5.3#novita/fp8": null,
   "openrouter#z-ai/glm-5.3#parasail/fp8": {
+    "max_tokens": 1
+  },
+  "openrouter#z-ai/glm-5.3#siliconflow/fp8": {
     "max_tokens": 1
   },
   "openrouter#z-ai/glm-5.3#together": {
