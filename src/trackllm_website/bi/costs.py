@@ -131,17 +131,15 @@ def format_preview(summary: dict) -> str:
         lines.append(
             f"  {rule:18s} {info['count']:4d} endpoints  ${info['monthly_cost']:.2f}/mo"
         )
+
+    def row(r):
+        return f"  ${r['monthly_cost']:6.2f}/mo  [{r['rule']:16s}] {r['model']} ({r['provider']})"
+
     lines += ["", "Most expensive selected endpoints:"]
-    for r in summary["endpoints"][:25]:
-        lines.append(
-            f"  ${r['monthly_cost']:6.2f}/mo  [{r['rule']:16s}] {r['model']} ({r['provider']})"
-        )
+    lines += [row(r) for r in summary["endpoints"][:25]]
     if summary["skipped"]:
         lines += ["", "Skipped (over budget):"]
-        for r in summary["skipped"]:
-            lines.append(
-                f"  ${r['monthly_cost']:6.2f}/mo  [{r['rule']:16s}] {r['model']} ({r['provider']})"
-            )
+        lines += [row(r) for r in summary["skipped"]]
     return "\n".join(lines)
 
 

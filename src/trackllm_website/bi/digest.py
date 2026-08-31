@@ -156,8 +156,11 @@ def build_onboarding_email(report, spend_dir):
     def c(o):
         return sum(1 for r in report.rows if r.outcome == o)
 
-    summary = f"{c('onboarded')} onboarded · {c('timeout')} timed out · {c('no_bis')} not enough BIs"
-    subject = f"[trackllm] {_money2(onb_today)} − B3IT onboarding: {c('onboarded')} onboarded, {c('timeout')} timed out, {c('no_bis')} no-BIs"
+    # Budget skips must reach the headline: on a skip-only day, an all-zero
+    # subject would bury the only red rows in the email.
+    budget_note = f" · {n} over budget" if (n := c("not_selected_budget")) else ""
+    summary = f"{c('onboarded')} onboarded · {c('timeout')} timed out · {c('no_bis')} not enough BIs{budget_note}"
+    subject = f"[trackllm] {_money2(onb_today)} − B3IT onboarding: {c('onboarded')} onboarded, {c('timeout')} timed out, {c('no_bis')} no-BIs{budget_note}"
     hrows = [
         (
             _link_html(r.model, r.provider),

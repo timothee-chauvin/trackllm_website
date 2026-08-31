@@ -1,6 +1,7 @@
 """Budget applies to every rule, flagships included; named-rule skips are loud."""
 
 import logging
+from pathlib import Path
 
 from trackllm_website.bi.digest import OUTCOME
 from trackllm_website.bi.selection import (
@@ -109,14 +110,14 @@ def test_wildcard_fill_stops_silently():
     assert skipped == []
 
 
-def test_popular_flagship_rule_no_longer_budget_exempt():
+def test_popular_flagship_skip_is_reported_once():
     policy = SelectionPolicy(
         budget_per_month=0.6,
         max_endpoint_cost=100.0,
         exclude=[],
         rules=[
             Rule(
-                name="popular",
+                name="popular-flagships",
                 kind="popular",
                 patterns=[],
                 providers_per_model="all",
@@ -124,13 +125,20 @@ def test_popular_flagship_rule_no_longer_budget_exempt():
             )
         ],
     )
-    cands = [ep("m/a", "p", 0.0001), ep("m/b", "p", 0.0001)]
-    selected, _, skipped = select_monitoring_targets(cands, policy, ["m/a", "m/b"])
+    cands = [
+        ep("m/a", "p", 0.0001),
+        ep("m/b", "p", 0.0001),
+        ep("m/c", "p", 0.0001),
+    ]
+    selected, _, skipped = select_monitoring_targets(
+        cands, policy, ["m/a", "m/b", "m/c"]
+    )
     assert len(selected) == 1
-    assert skipped == []
+    # one row marking where the flagship popular rule was cut off, not a flood
+    assert skipped == [(cands[1], "popular-flagships")]
 
 
-def test_nonwildcard_providers_rule_respects_budget():
+def test_named_providers_rule_skip_is_reported():
     policy = SelectionPolicy(
         budget_per_month=0.6,
         max_endpoint_cost=100.0,
@@ -146,11 +154,93 @@ def test_nonwildcard_providers_rule_respects_budget():
     )
     cands = [ep("m/a", "provA", 0.0001), ep("m/b", "provA", 0.0001)]
     selected, _, skipped = select_monitoring_targets(cands, policy, [])
+    assert selected == [cands[0]]
+    assert skipped == [(cands[1], "one-provider")]
+
+
+def test_skip_deduped_across_rules():
+    policy = SelectionPolicy(
+        budget_per_month=0.5,
+        max_endpoint_cost=100.0,
+        exclude=[],
+        rules=[
+            Rule(
+                name="first",
+                kind="models",
+                patterns=["m/a"],
+                providers_per_model=1,
+            ),
+            Rule(
+                name="second",
+                kind="models",
+                patterns=["m/*"],
+                providers_per_model=1,
+            ),
+        ],
+    )
+    cands = [ep("m/a", "p", 0.001)]
+    _, _, skipped = select_monitoring_targets(cands, policy, [])
+    assert skipped == [(cands[0], "first")]
+
+
+def test_one_skip_row_per_model_not_per_provider():
+    policy = SelectionPolicy(
+        budget_per_month=0.5,
+        max_endpoint_cost=100.0,
+        exclude=[],
+        rules=[
+            Rule(
+                name="flagships",
+                kind="models",
+                patterns=["m/a"],
+                providers_per_model="all",
+                flagship=True,
+            )
+        ],
+    )
+    cands = [ep("m/a", "p1", 0.001), ep("m/a", "p2", 0.002), ep("m/a", "p3", 0.003)]
+    _, _, skipped = select_monitoring_targets(cands, policy, [])
+    assert len(skipped) == 1
+
+
+def test_nonflagship_popular_rule_stops_silently():
+    policy = SelectionPolicy(
+        budget_per_month=0.6,
+        max_endpoint_cost=100.0,
+        exclude=[],
+        rules=[
+            Rule(
+                name="popular",
+                kind="popular",
+                patterns=[],
+                providers_per_model="all",
+            )
+        ],
+    )
+    cands = [ep("m/a", "p", 0.0001), ep("m/b", "p", 0.0001)]
+    selected, _, skipped = select_monitoring_targets(cands, policy, ["m/a", "m/b"])
     assert len(selected) == 1
+    assert skipped == []
 
 
 def test_not_selected_budget_outcome_is_red():
     assert OUTCOME["not_selected_budget"][1] == "#cf222e"
+
+
+def test_onboarding_email_headline_counts_budget_skips():
+    from trackllm_website.bi.digest import (
+        OnboardingReport,
+        OnboardRow,
+        build_onboarding_email,
+    )
+
+    report = OnboardingReport(
+        date="2026-08-29",
+        rows=[OnboardRow("m/big", "p", "not_selected_budget", None, 0.0)],
+    )
+    subject, plain, _html = build_onboarding_email(report, Path("/nonexistent"))
+    assert "1 over budget" in subject
+    assert "1 over budget" in plain
 
 
 def test_cost_summary_and_preview_show_skipped():

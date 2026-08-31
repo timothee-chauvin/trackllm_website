@@ -81,12 +81,14 @@ def select_monitoring_targets(
     """Pure: apply rules in order within budget.
 
     Returns (selected, rule-label-by-endpoint, skipped). budget_per_month binds
-    every rule, flagships included; a named (non-wildcard) models rule lists an
-    endpoint priority, so patterns fill in list order and an endpoint that no
-    longer fits is skipped, logged as an error and returned in `skipped` so the
-    daily digest can show it in red — never an exception, which would fail the
-    daily job until the config changed. Wildcard and popular fill rules stop at
-    budget silently, as before.
+    every rule, flagships included. Curated rules — non-wildcard models and
+    providers rules, and flagship popular rules — report what no longer fits:
+    the cut is logged as an error and returned in `skipped` (deduped, one entry
+    per model for multi-provider rules) so the daily digest can show it in red —
+    never an exception, which would fail the daily job until the config changed.
+    Named models rules list an endpoint priority, so patterns fill in list order
+    and a cheaper later pattern can still fit after a skip. Wildcard and
+    non-flagship popular fill rules stop at budget silently, as before.
     """
     pool = [e for e in candidates if not _matches_any(e, policy.exclude)]
     by_model: dict[str, list[Endpoint]] = defaultdict(list)
@@ -109,7 +111,12 @@ def select_monitoring_targets(
         selected[e] = label
         spent += monthly_cost(e)
 
+    def fits(e: Endpoint) -> bool:
+        return spent + monthly_cost(e) <= policy.budget_per_month
+
     def skip(e: Endpoint, rule_name: str) -> None:
+        if any(prior == e for prior, _ in skipped):
+            return
         skipped.append((e, rule_name))
         logger.error(
             f"rule {rule_name!r}: {e.model}#{e.provider} "
@@ -155,14 +162,14 @@ def select_monitoring_targets(
                             and monthly_cost(e) > rule.max_monthly_cost
                         ):
                             continue
-                        if spent + monthly_cost(e) > policy.budget_per_month:
+                        if not fits(e):
                             if is_wildcard:
-                                stop = (
-                                    True  # budget reached; remaining eps are costlier
-                                )
-                                break
-                            skip(e, rule.name)  # a cheaper later pattern may still fit
-                            continue
+                                stop = True  # budget reached; remaining are costlier
+                            else:
+                                skip(e, rule.name)  # a cheaper pattern may still fit
+                            # eps are cost-sorted: pricier providers can't fit either,
+                            # so one skip row per model, not one per provider.
+                            break
                         add(e, rule.name)
                     if stop:
                         break
@@ -190,8 +197,11 @@ def select_monitoring_targets(
                     ):
                         continue
                     # popular is a fill rule (popularity feed, not a curated family):
-                    # stop gracefully at budget.
-                    if spent + monthly_cost(e) > policy.budget_per_month:
+                    # stop gracefully at budget. A flagship popular rule is curated
+                    # enough to mark where it was cut off (one row, not a flood).
+                    if not fits(e):
+                        if rule.flagship:
+                            skip(e, rule.name)
                         stop = True
                         break
                     add(e, rule.name)
@@ -212,8 +222,10 @@ def select_monitoring_targets(
                         and monthly_cost(e) > rule.max_monthly_cost
                     ):
                         continue
-                    if spent + monthly_cost(e) > policy.budget_per_month:
-                        continue  # this provider too pricey; try cheaper providers
+                    if not fits(e):
+                        if not is_wildcard:
+                            skip(e, rule.name)
+                        break  # eps are cost-sorted; try other providers
                     add(e, rule.name)
 
     return list(selected), selected, skipped
