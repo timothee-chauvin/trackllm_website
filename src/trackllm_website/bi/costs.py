@@ -27,7 +27,9 @@ def costs_path() -> Path:
 def build_cost_summary(
     candidates: list[Endpoint], policy: SelectionPolicy, popular_models: list[str]
 ) -> dict:
-    selected, breakdown = select_monitoring_targets(candidates, policy, popular_models)
+    selected, breakdown, skipped = select_monitoring_targets(
+        candidates, policy, popular_models
+    )
     rows = sorted(
         (
             {
@@ -52,6 +54,15 @@ def build_cost_summary(
         "n_selected": len(selected),
         "by_rule": dict(by_rule),
         "endpoints": rows,  # full list, descending; frontend shows top-20 + expand
+        "skipped": [
+            {
+                "model": e.model,
+                "provider": e.provider,
+                "rule": rule,
+                "monthly_cost": monthly_cost(e),
+            }
+            for e, rule in skipped
+        ],
     }
 
 
@@ -125,6 +136,12 @@ def format_preview(summary: dict) -> str:
         lines.append(
             f"  ${r['monthly_cost']:6.2f}/mo  [{r['rule']:16s}] {r['model']} ({r['provider']})"
         )
+    if summary["skipped"]:
+        lines += ["", "Skipped (over budget):"]
+        for r in summary["skipped"]:
+            lines.append(
+                f"  ${r['monthly_cost']:6.2f}/mo  [{r['rule']:16s}] {r['model']} ({r['provider']})"
+            )
     return "\n".join(lines)
 
 

@@ -44,7 +44,7 @@ def _patch_deps(monkeypatch, tmp_path, *, reinit=None):
     )
     monkeypatch.setattr(
         "trackllm_website.update_endpoints.select_monitoring_targets",
-        lambda candidates, policy, popular_models: (list(candidates), {}),
+        lambda candidates, policy, popular_models: (list(candidates), {}, []),
     )
     monkeypatch.setattr(
         "trackllm_website.update_endpoints.fetch_popular_models_safe", lambda top_n: []
@@ -174,3 +174,22 @@ def test_empty_report_when_no_to_init(monkeypatch, tmp_path):
 
     assert report.rows == []
     assert report.date != ""
+
+
+def test_budget_skips_reported_even_without_onboards(monkeypatch, tmp_path):
+    _patch_deps(monkeypatch, tmp_path)
+    skipped_ep = ep("m/flagship-too-big")
+    monkeypatch.setattr(
+        "trackllm_website.update_endpoints.select_monitoring_targets",
+        lambda candidates, policy, popular_models: (
+            [],
+            {},
+            [(skipped_ep, "flagships")],
+        ),
+    )
+    report = asyncio.run(ue.update_endpoints_bi_lifecycle([skipped_ep]))
+
+    # the skipped endpoint is not selected, hence not onboarded; the row recurs
+    # daily so the over-budget flagship stays visible in the email.
+    rows = [r for r in report.rows if r.outcome == "not_selected_budget"]
+    assert [(r.model, r.provider) for r in rows] == [("m/flagship-too-big", "p")]

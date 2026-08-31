@@ -1,7 +1,12 @@
 # BI monitoring selection policy. The ONLY place cost is managed.
 # Rules run top to bottom; each adds endpoints (no duplicates) until
-# budget_per_month is reached. Per-endpoint monthly cost = measured
-# cost_per_request x config.bi.samples_per_month (20 BIs x 10 samples x 30 days).
+# budget_per_month is reached — flagships included: the budget is a hard
+# constraint, and list position is priority, so adding flagships eventually
+# means the later ones stop fitting. A named-rule endpoint that no longer fits
+# is skipped and reported as a red row in the daily onboarding email (wildcard
+# fill rules still stop at budget silently). Per-endpoint monthly cost =
+# measured cost_per_request x config.bi.samples_per_month
+# (20 BIs x 10 samples x 30 days).
 #
 # 2026-07-03: re-enabled with a single popularity rule (top-1 model by OpenRouter
 # token usage, all providers — deepseek/deepseek-v4-flash at the time of writing).
@@ -16,6 +21,8 @@
 # endpoints once the budget is hit.
 # 2026-07-30: added flagships (cheapest provider each, budget/ceiling-exempt):
 # est. ~$4.7 one-time onboarding, ~$1.4/mo from measured cost_per_request.
+# 2026-08-29: flagships now count against budget_per_month (still ceiling-exempt);
+# the ~$1.4/mo flagship run-rate fits comfortably inside the $15 budget.
 # Deliberately left out (reasoning burn, ~100 billed tokens/request):
 # x-ai/grok-4.5 (~$3.6/mo) and moonshotai/kimi-k3 (~$9/mo, unmeasured — vet
 # manually first). qwen3.6-max-preview is too_expensive-cached until the next
@@ -50,7 +57,7 @@ patterns = [
     "z-ai/glm-5*",
 ]
 providers_per_model = 1
-flagship = true              # exempt from budget_per_month and max_endpoint_cost
+flagship = true              # exempt from max_endpoint_cost (not from budget_per_month)
 
 [[rule]]
 name = "popular"             # top-N models by token usage; N = config bi.popularity.top_n

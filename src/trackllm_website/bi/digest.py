@@ -19,6 +19,7 @@ OUTCOME = {
     "bad_temperature": ("ignores temperature (cached)", "#6e7781"),
     "gate_inconclusive": ("temperature gate inconclusive (retries)", "#bf8700"),
     "no_strategy": ("skipped: no strategy", "#6e7781"),
+    "not_selected_budget": ("not selected: over budget", "#cf222e"),
     "probes_failed": ("all probes failed (not sampled)", "#cf222e"),
     "error": ("error (see logs)", "#cf222e"),
     "change_detected": ("change detected", "#0969da"),

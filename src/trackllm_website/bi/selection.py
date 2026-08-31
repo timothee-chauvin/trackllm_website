@@ -77,13 +77,16 @@ def exceeds_ceiling(
 
 def select_monitoring_targets(
     candidates: list[Endpoint], policy: SelectionPolicy, popular_models: list[str]
-) -> tuple[list[Endpoint], dict[Endpoint, str]]:
-    """Pure: apply rules in order within budget. Returns (selected, rule-label-by-endpoint).
+) -> tuple[list[Endpoint], dict[Endpoint, str], list[tuple[Endpoint, str]]]:
+    """Pure: apply rules in order within budget.
 
-    Flagships are budget-exempt and ceiling-exempt: a flagship total over budget is
-    logged as a warning, not an error. Wildcard fill rules stop at budget. A
-    non-flagship named (non-wildcard) rule whose total exceeds budget raises ValueError
-    (a config error, not silent truncation).
+    Returns (selected, rule-label-by-endpoint, skipped). budget_per_month binds
+    every rule, flagships included; a named (non-wildcard) models rule lists an
+    endpoint priority, so patterns fill in list order and an endpoint that no
+    longer fits is skipped, logged as an error and returned in `skipped` so the
+    daily digest can show it in red — never an exception, which would fail the
+    daily job until the config changed. Wildcard and popular fill rules stop at
+    budget silently, as before.
     """
     pool = [e for e in candidates if not _matches_any(e, policy.exclude)]
     by_model: dict[str, list[Endpoint]] = defaultdict(list)
@@ -96,6 +99,7 @@ def select_monitoring_targets(
             d[k].sort(key=lambda e: (monthly_cost(e), str(e)))
 
     selected: dict[Endpoint, str] = {}
+    skipped: list[tuple[Endpoint, str]] = []
     spent = 0.0
 
     def add(e: Endpoint, label: str) -> None:
@@ -104,6 +108,14 @@ def select_monitoring_targets(
             return
         selected[e] = label
         spent += monthly_cost(e)
+
+    def skip(e: Endpoint, rule_name: str) -> None:
+        skipped.append((e, rule_name))
+        logger.error(
+            f"rule {rule_name!r}: {e.model}#{e.provider} "
+            f"(${monthly_cost(e):.2f}/mo) does not fit in the "
+            f"${policy.budget_per_month:.2f}/mo budget (${spent:.2f} spent); skipped"
+        )
 
     for rule in policy.rules:
         is_wildcard = rule.patterns == ["*"]
@@ -143,13 +155,14 @@ def select_monitoring_targets(
                             and monthly_cost(e) > rule.max_monthly_cost
                         ):
                             continue
-                        if (
-                            not rule.flagship
-                            and is_wildcard
-                            and spent + monthly_cost(e) > policy.budget_per_month
-                        ):
-                            stop = True  # budget reached; remaining eps are costlier
-                            break
+                        if spent + monthly_cost(e) > policy.budget_per_month:
+                            if is_wildcard:
+                                stop = (
+                                    True  # budget reached; remaining eps are costlier
+                                )
+                                break
+                            skip(e, rule.name)  # a cheaper later pattern may still fit
+                            continue
                         add(e, rule.name)
                     if stop:
                         break
@@ -177,12 +190,8 @@ def select_monitoring_targets(
                     ):
                         continue
                     # popular is a fill rule (popularity feed, not a curated family):
-                    # stop gracefully at budget rather than aborting via the post-loop
-                    # ValueError. Flagship popular rules stay budget-exempt.
-                    if (
-                        not rule.flagship
-                        and spent + monthly_cost(e) > policy.budget_per_month
-                    ):
+                    # stop gracefully at budget.
+                    if spent + monthly_cost(e) > policy.budget_per_month:
                         stop = True
                         break
                     add(e, rule.name)
@@ -203,28 +212,8 @@ def select_monitoring_targets(
                         and monthly_cost(e) > rule.max_monthly_cost
                     ):
                         continue
-                    if (
-                        is_wildcard
-                        and spent + monthly_cost(e) > policy.budget_per_month
-                    ):
+                    if spent + monthly_cost(e) > policy.budget_per_month:
                         continue  # this provider too pricey; try cheaper providers
                     add(e, rule.name)
 
-    flagship_names = {r.name for r in policy.rules if r.flagship}
-    flagship_spend = sum(
-        monthly_cost(e) for e, lbl in selected.items() if lbl in flagship_names
-    )
-    nonflag = sum(
-        monthly_cost(e) for e, lbl in selected.items() if lbl not in flagship_names
-    )
-    if flagship_spend > policy.budget_per_month:
-        logger.warning(
-            f"flagship selection ${flagship_spend:.2f}/mo exceeds budget "
-            f"${policy.budget_per_month:.2f} (flagships are budget-exempt)"
-        )
-    if nonflag > policy.budget_per_month:
-        raise ValueError(
-            f"non-flagship selection ${nonflag:.2f}/mo exceeds budget "
-            f"${policy.budget_per_month:.2f}"
-        )
-    return list(selected), selected
+    return list(selected), selected, skipped

@@ -41,7 +41,7 @@ def test_latest_n_keeps_newest_per_pattern():
         ep("z-ai/glm-5", "p", 0.00001, 2),
         ep("z-ai/glm-4.7", "p", 0.00001, 1),
     ]
-    sel, _ = select_monitoring_targets(cands, pol, [])
+    sel, _, _ = select_monitoring_targets(cands, pol, [])
     assert sorted(e.model for e in sel) == ["z-ai/glm-5.1", "z-ai/glm-5.2"]
 
 
@@ -62,5 +62,5 @@ def test_latest_n_cheapest_provider_per_kept_model():
         ],
     )
     cands = [ep("m/a", "cheap", 0.00001, 6), ep("m/a", "pricey", 0.0001, 6)]
-    sel, _ = select_monitoring_targets(cands, pol, [])
+    sel, _, _ = select_monitoring_targets(cands, pol, [])
     assert [e.provider for e in sel] == ["cheap"]

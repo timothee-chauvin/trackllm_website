@@ -66,7 +66,7 @@ def _patch_deps(monkeypatch, tmp_path, *, select, reinit=None, vet_endpoint=None
 
 
 def _select_all(candidates, policy, popular_models):
-    return list(candidates), {e: "test" for e in candidates}
+    return list(candidates), {e: "test" for e in candidates}, []
 
 
 def test_onboard_writes_onboard_spend(monkeypatch, tmp_path):
