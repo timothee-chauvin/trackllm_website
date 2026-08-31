@@ -792,9 +792,12 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]) -> Onboardin
     """
     policy = load_policy(root / config.bi.selection_path)
     popular_models = fetch_popular_models_safe(config.bi.popularity.top_n)
-    selected, _breakdown = select_monitoring_targets(candidates, policy, popular_models)
+    selected, _breakdown, skipped = select_monitoring_targets(
+        candidates, policy, popular_models
+    )
     logger.info(
         f"Selection: monitoring {len(selected)} of {len(candidates)} candidates"
+        + (f", {len(skipped)} skipped over budget" if skipped else "")
     )
 
     cache = EndpointCache.load(ENDPOINTS_CACHE_BI_PATH)
@@ -830,11 +833,15 @@ async def update_endpoints_bi_lifecycle(candidates: list[Endpoint]) -> Onboardin
         state.retired = RetiredInfo(reason="delisted", since=now, last_recheck=now)
         state.save(config.bi.state_dir)
 
+    # Budget skips recur in the digest daily until the selection policy is fixed.
+    report_rows: list[OnboardRow] = [
+        OnboardRow(e.model, e.provider, "not_selected_budget", None, 0.0)
+        for e, _rule in skipped
+    ]
+
     onboards = [(e, False) for e in actions.onboard]
     rechecks = [(s.endpoint, True) for s in actions.recheck]
     to_init = onboards + rechecks
-    report_rows: list[OnboardRow] = []
-
     # Budget killer: bring the projected month-end spend (trailing rate plus what
     # this run is about to commit to) back under the hard cap before spending.
     projected = projected_month_end(

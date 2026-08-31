@@ -31,7 +31,7 @@ def test_popular_selects_top_n_present_in_candidates():
         ep("m/b", "p", 0.00001),
     ]
     # popularity order: m/b most popular, m/a next, m/c absent from candidates
-    sel, breakdown = select_monitoring_targets(cands, pol, ["m/b", "m/a", "m/c"])
+    sel, breakdown, _ = select_monitoring_targets(cands, pol, ["m/b", "m/a", "m/c"])
     assert set(e.model for e in sel) == {"m/a", "m/b"}
     assert breakdown[next(e for e in sel if e.model == "m/a")] == "popular"
     assert [e.provider for e in sel if e.model == "m/a"] == [
@@ -55,7 +55,7 @@ def test_popular_respects_max_monthly_cost():
         ],
     )  # 0.10/mo => cpr <= ~1.67e-5
     cands = [ep("m/cheap", "p", 0.00001), ep("m/pricey", "p", 0.00005)]
-    sel, _ = select_monitoring_targets(cands, pol, ["m/pricey", "m/cheap"])
+    sel, _, _ = select_monitoring_targets(cands, pol, ["m/pricey", "m/cheap"])
     assert [e.model for e in sel] == ["m/cheap"]
 
 
@@ -71,6 +71,6 @@ def test_popular_stops_at_budget_without_raising():
         ],
     )
     cands = [ep("m/a", "p", 0.0001), ep("m/b", "p", 0.0001), ep("m/c", "p", 0.0001)]
-    sel, breakdown = select_monitoring_targets(cands, pol, ["m/b", "m/a", "m/c"])
+    sel, breakdown, _ = select_monitoring_targets(cands, pol, ["m/b", "m/a", "m/c"])
     assert [e.model for e in sel] == ["m/b"]  # most popular that fits
     assert all(lbl == "popular" for lbl in breakdown.values())

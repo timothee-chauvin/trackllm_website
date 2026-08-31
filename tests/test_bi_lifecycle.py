@@ -172,7 +172,7 @@ def test_onboarding_failure_does_not_abort_others(monkeypatch, tmp_path):
 
     # Selection is a no-op here: every candidate is monitored.
     def select_all(candidates, policy, popular_models):
-        return list(candidates), {e: "test" for e in candidates}
+        return list(candidates), {e: "test" for e in candidates}, []
 
     _patch_lifecycle_deps(monkeypatch, tmp_path, select=select_all, reinit=fake_reinit)
 
@@ -190,7 +190,7 @@ def test_bad_temperature_is_cached_not_monitored(monkeypatch, tmp_path):
     bad_temp = ep("m/badtemp")
 
     def select_all(candidates, policy, popular_models):
-        return list(candidates), {e: "test" for e in candidates}
+        return list(candidates), {e: "test" for e in candidates}, []
 
     async def fake_reinit(client, strategy, endpoint, old_bis, now):
         return ReinitResult(epoch=None, reason="bad_temperature")
@@ -219,7 +219,7 @@ def test_gate_inconclusive_leaves_the_endpoint_unknown(monkeypatch, tmp_path):
     flaky_gate = ep("m/flakygate")
 
     def select_all(candidates, policy, popular_models):
-        return list(candidates), {e: "test" for e in candidates}
+        return list(candidates), {e: "test" for e in candidates}, []
 
     async def fake_reinit(client, strategy, endpoint, old_bis, now):
         return ReinitResult(epoch=None, reason="gate_inconclusive")
@@ -250,7 +250,7 @@ def test_only_selected_candidates_are_onboarded(monkeypatch, tmp_path):
     # Selection keeps only the first two of the three candidates.
     def select_subset(cands, policy, popular_models):
         selected = [chosen_a, chosen_b]
-        return selected, {e: "test" for e in selected}
+        return selected, {e: "test" for e in selected}, []
 
     onboarded = []
 
@@ -285,7 +285,7 @@ def test_executor_stamps_and_clears_deselected_since(monkeypatch, tmp_path):
 
     # Selection keeps only `returning`; `dropped` falls out of the selected set.
     def select_returning(candidates, policy, popular_models):
-        return [returning], {returning: "test"}
+        return [returning], {returning: "test"}, []
 
     async def fake_reinit(client, strategy, endpoint, old_bis, now):
         raise AssertionError("no onboarding expected")
@@ -335,7 +335,7 @@ def test_fresh_onboard_with_all_404_probes_is_retired_unreachable(
     gone = ep("m/gone")
 
     def select_all(candidates, policy, popular_models):
-        return list(candidates), {e: "test" for e in candidates}
+        return list(candidates), {e: "test" for e in candidates}, []
 
     async def fake_reinit(client, strategy, endpoint, old_bis, now):
         raise AssertionError("an unreachable endpoint must not be onboarded")
@@ -360,7 +360,7 @@ def test_fresh_onboard_with_transient_probe_failure_leaves_no_state(
     flaky = ep("m/flaky")
 
     def select_all(candidates, policy, popular_models):
-        return list(candidates), {e: "test" for e in candidates}
+        return list(candidates), {e: "test" for e in candidates}, []
 
     async def fake_reinit(client, strategy, endpoint, old_bis, now):
         raise AssertionError("a failed probe must not reach onboarding")
@@ -385,7 +385,7 @@ def test_onboarding_timeout_is_caught_not_propagated(monkeypatch, tmp_path):
         await asyncio.sleep(1)  # longer than the patched timeout
 
     def select_all(candidates, policy, popular_models):
-        return list(candidates), {e: "test" for e in candidates}
+        return list(candidates), {e: "test" for e in candidates}, []
 
     _patch_lifecycle_deps(monkeypatch, tmp_path, select=select_all, reinit=slow_reinit)
     monkeypatch.setattr(config.bi.reinit, "onboard_timeout_seconds", 0.05)

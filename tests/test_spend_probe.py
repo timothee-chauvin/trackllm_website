@@ -162,7 +162,7 @@ def test_onboard_folds_probe_cost(monkeypatch, tmp_path):
     )
     monkeypatch.setattr(
         "trackllm_website.update_endpoints.select_monitoring_targets",
-        lambda candidates, policy, popular_models: (list(candidates), {}),
+        lambda candidates, policy, popular_models: (list(candidates), {}, []),
     )
     monkeypatch.setattr(
         "trackllm_website.update_endpoints.fetch_popular_models_safe", lambda top_n: []
@@ -207,7 +207,7 @@ def test_onboard_unresolved_strategy_folds_probe_cost(monkeypatch, tmp_path):
     )
     monkeypatch.setattr(
         "trackllm_website.update_endpoints.select_monitoring_targets",
-        lambda candidates, policy, popular_models: (list(candidates), {}),
+        lambda candidates, policy, popular_models: (list(candidates), {}, []),
     )
     monkeypatch.setattr(
         "trackllm_website.update_endpoints.fetch_popular_models_safe", lambda top_n: []

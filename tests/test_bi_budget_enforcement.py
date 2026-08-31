@@ -55,7 +55,7 @@ def _patch_lifecycle(monkeypatch, tmp_path, *, candidates, projected):
 
     monkeypatch.setattr(ue, "resolve_strategies", fake_resolve_strategies)
     monkeypatch.setattr(
-        ue, "select_monitoring_targets", lambda c, p, m: (c, {e: "test" for e in c})
+        ue, "select_monitoring_targets", lambda c, p, m: (c, {e: "test" for e in c}, [])
     )
     monkeypatch.setattr(ue, "fetch_popular_models_safe", lambda top_n: [])
     monkeypatch.setattr(
@@ -247,3 +247,23 @@ def test_digest_header_plain_when_under_target(monkeypatch, tmp_path):
     assert "projected" in plain
     assert "#cf222e" not in _budget_span(html)
     assert "#bf8700" not in _budget_span(html)
+
+
+def test_onboarding_headline_counts_budget_killer_rows(monkeypatch, tmp_path):
+    from trackllm_website.bi.digest import OnboardRow, build_onboarding_email
+
+    now = _seed_ledger(tmp_path, 0.01)
+    monkeypatch.setattr(config.budget, "target_per_month", 500.0)
+    monkeypatch.setattr(config.budget, "hard_cap_per_month", 1000.0)
+    report = OnboardingReport(
+        date=now.date().isoformat(),
+        rows=[
+            OnboardRow("m/a", "p", "skipped_budget", None, 0.0),
+            OnboardRow("m/b", "p", "retired_budget", None, 0.0),
+            OnboardRow("m/c", "p", "not_selected_budget", None, 0.0),
+        ],
+    )
+    subject, plain, _ = build_onboarding_email(report, tmp_path)
+    for text in (subject, plain.split("\n")[1]):
+        assert "1 over budget" in text  # selection skip (#92)
+        assert "2 budget-killed" in text  # projection killer
