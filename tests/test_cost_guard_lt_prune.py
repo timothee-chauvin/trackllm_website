@@ -44,7 +44,8 @@ def test_lt_cost_per_query_from_ledger(tmp_path):
     _write_ledger(
         tmp_path, "slug", "2026-01", [("lt", 0.5, 25, 0), ("monitor", 9, 200, 0)]
     )
-    # 1.0 / (25 + 25 successful lt queries); monitor lines excluded
+    # 0.5 / 25 successful lt queries in the trailing window; monitor lines and
+    # the January entry (outside lt_prune_window_days) excluded
     assert lt_cost_per_query(tmp_path, "slug", NOW) == pytest.approx(0.02)
 
 
