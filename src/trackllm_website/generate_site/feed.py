@@ -9,9 +9,8 @@ from datetime import datetime
 from trackllm_website.generate_site.b3it import B3ITView
 from trackllm_website.generate_site.naming import base_provider
 from trackllm_website.generate_site.peaks import (
-    B3IT_PEAK_WINDOW,
     LT_PEAK_WINDOW,
-    peak_from,
+    shift_from,
 )
 from trackllm_website.util import slugify
 
@@ -99,7 +98,7 @@ def _lt_item(change: dict, drift: list[tuple[datetime, float]], now: datetime) -
     frac = FEED_DEFAULT_CHANGE_FRAC
     if drift:
         day_pairs = [(d.date().isoformat(), v) for d, v in drift]
-        level = peak_from(change["date"][:10], day_pairs, LT_PEAK_WINDOW)
+        level = shift_from(change["date"][:10], day_pairs, LT_PEAK_WINDOW)
         magnitude = round(level, 2) if level is not None else None
         trace, frac = _window(drift, _nearest_index(drift, cd))
     display = magnitude if magnitude is not None else "—"
@@ -109,7 +108,7 @@ def _lt_item(change: dict, drift: list[tuple[datetime, float]], now: datetime) -
         "daysAgo": (now - cd).days,
         "method": "lt",
         "magnitude": magnitude,
-        "desc": f"Logprob averages moved {display} nats from the reference period.",
+        "desc": f"Logprob averages shifted {display} nats at the change.",
         "primary": f"drift {display}",
         "secondary": f"{change['magnitude_display']} conf",
         "sevKey": _severity(magnitude or 0.0, LT_ALERT_THRESHOLD),
@@ -137,8 +136,7 @@ def _b3it_item(change: dict, view: B3ITView | None, now: datetime) -> dict:
         else []
     )
     if pairs:
-        day_pairs = [(d.date().isoformat(), v) for d, v in pairs]
-        level = peak_from(change["date"][:10], day_pairs, B3IT_PEAK_WINDOW)
+        level = view.change_mags.get(change["date"][:10])
         peak = round(level, 3) if level is not None else None
         trace, frac = _window(pairs, _nearest_index(pairs, cd))
     display = f"{peak:.2f}" if peak is not None else "—"
@@ -148,7 +146,7 @@ def _b3it_item(change: dict, view: B3ITView | None, now: datetime) -> dict:
         "daysAgo": (now - cd).days,
         "method": "b3it",
         "magnitude": peak,
-        "desc": f"Border-input output distribution moved (TV {display}) from the reference.",
+        "desc": f"Border-input output distribution shifted (TV {display}) at the change.",
         "primary": f"TV {display}",
         "secondary": "border-input shift",
         "sevKey": _severity(peak or 0.0, B3IT_ALERT_THRESHOLD),

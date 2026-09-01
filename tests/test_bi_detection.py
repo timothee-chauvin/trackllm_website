@@ -8,6 +8,7 @@ from trackllm_website.bi.detection import (
     epoch_tv_series,
     is_unstable,
     select_top_bis,
+    tv_shift,
 )
 from trackllm_website.config import DetectionConfig, config
 
@@ -138,3 +139,10 @@ def test_select_top_bis_by_balance():
         "dirac": [["t", "a"], ["t", "a"], ["t", "a"], ["t", "a"]],
     }
     assert select_top_bis(reference, 2) == ["balanced", "skewed"]
+
+
+def test_tv_shift_is_mean_difference_across_split():
+    tv = [("d1", 0.1), ("d2", 0.3), ("d3", 0.5), ("d4", 0.7)]
+    assert tv_shift(tv, "d3") == pytest.approx(0.4)
+    assert tv_shift(tv, "d1") is None
+    assert tv_shift(tv, "d9") is None

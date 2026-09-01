@@ -22,21 +22,21 @@ const B3IT = {
     ["2026-07-29", 0.4825],
   ] as [string, number][],
   breaks: [], // already thinned: these fixtures are what the chart draws
-  changes: [{ date: "2026-07-26", peakTV: 0.535 }],
+  changes: [{ date: "2026-07-26", shiftTV: 0.535 }],
   firstDate: "2026-07-17",
   lastDate: "2026-07-29",
 };
 
 /** A change stamped after the last sample: nothing on the curve to anchor to. */
-const B3IT_LATE_CHANGE = { ...B3IT, changes: [{ date: "2026-08-14", peakTV: 0.535 }] };
+const B3IT_LATE_CHANGE = { ...B3IT, changes: [{ date: "2026-08-14", shiftTV: 0.535 }] };
 
 /** Two changes a day apart, both at the same height: their labels want one another's
  *  space, and the packing has to move the second somewhere. */
 const B3IT_ADJACENT = {
   ...B3IT,
   changes: [
-    { date: "2026-07-25", peakTV: 0.535 },
-    { date: "2026-07-26", peakTV: 0.536 },
+    { date: "2026-07-25", shiftTV: 0.535 },
+    { date: "2026-07-26", shiftTV: 0.536 },
   ],
 };
 

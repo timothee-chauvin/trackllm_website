@@ -56,8 +56,10 @@ def merge_changes(lt_changes, lt_by_slug, b3it_views) -> list[ChangeEvent]:
 
         # Authoritative epoch closures (live detector).
         for epoch in view.epochs:
-            if epoch.get("end_reason") == "change_detected" and epoch.get(
-                "change_date"
+            if (
+                epoch.get("end_reason") == "change_detected"
+                and epoch.get("change_date")
+                and epoch["change_date"] not in view.gated_dates
             ):
                 _emit(epoch["change_date"])
         # Onsets derived from the TV series of every epoch, including closed and

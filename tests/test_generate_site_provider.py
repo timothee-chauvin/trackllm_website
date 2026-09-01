@@ -313,7 +313,7 @@ def test_provider_view_carries_the_shared_timeline(fake_site):
     ep = next(e for e in tl["endpoints"] if e["slug"] == "org2fa23p")
     assert ep["model"] == "org/a" and ep["modelSlug"] == slugify("org/a")
     assert set(ep["methods"]) == {"lt", "b3it"}
-    assert ep["lt"]["changes"][0]["drift"] == 1.5
+    assert ep["lt"]["changes"][0]["drift"] == 1.4  # level 1.5 after, 0.1 before
     assert [(c["date"], c["model"]) for c in tl["changes"]] == [("2026-06-25", "org/a")]
 
 

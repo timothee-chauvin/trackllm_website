@@ -23,7 +23,7 @@ const B3IT = {
     ["2026-07-29", 0.4825],
   ] as [string, number][],
   breaks: [], // already thinned: these fixtures are what the chart draws
-  changes: [{ date: "2026-07-26", peakTV: 0.535 }],
+  changes: [{ date: "2026-07-26", shiftTV: 0.535 }],
   firstDate: "2026-07-17",
   lastDate: "2026-07-29",
 };
