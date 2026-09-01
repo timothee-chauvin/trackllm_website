@@ -14,6 +14,7 @@ exist.
 import numpy as np
 from pydantic import BaseModel
 
+from trackllm_website.bi.detection import tv_shift
 from trackllm_website.bi.results import get_distribution
 from trackllm_website.bi.phase_2 import Timestamp
 from trackllm_website.config import config
@@ -148,3 +149,12 @@ def changepoint_scan(
     if event is None or event.p_value > cfg.alpha:
         return None
     return event
+
+
+def scan_clears_tv_threshold(
+    tv_over_time: list[tuple[Timestamp, float]], event: ScanEvent
+) -> bool:
+    """The scan's p-value says the split is real; the TV series must also say
+    it is big enough (config.bi.detection.abs_delta) to count as a change."""
+    shift = tv_shift(tv_over_time, event.split_ts)
+    return shift is not None and shift > config.bi.detection.abs_delta

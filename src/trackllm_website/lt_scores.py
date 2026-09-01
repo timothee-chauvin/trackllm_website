@@ -196,7 +196,8 @@ def compute_endpoint_scores(endpoint_dir: Path) -> LTScores | None:
 
     avg_scores = np.nanmean(grid, axis=0)
     changes, sigmas = detect_changes(avg_scores)
-    drift_series = compute_drift_series(per_prompt_data[longest])
+    first_change = ref_dates[changes[0].index] if changes else None
+    drift_series = compute_drift_series(per_prompt_data[longest], first_change)
 
     return LTScores(
         n_per_test=N_PER_TEST,

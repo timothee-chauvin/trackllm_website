@@ -18,7 +18,7 @@ from trackllm_website.bi.detection import (
     epoch_tv_series,
     is_unstable,
 )
-from trackllm_website.bi.scan import ScanEvent, scan_pvalue
+from trackllm_website.bi.scan import ScanEvent, scan_clears_tv_threshold, scan_pvalue
 from trackllm_website.bi.state import Epoch, load_all_states
 from trackllm_website.config import config, logger
 
@@ -93,14 +93,16 @@ def main() -> None:
             n = len({ts for b in er.values() for ts in b})
             if not eligible(epoch, n):
                 continue
-            if already_logged(epoch, epoch_tv_series(ref, er)):
+            tv = epoch_tv_series(ref, er)
+            if already_logged(epoch, tv):
                 continue
             if is_unstable(er):
                 n_unstable += 1
                 continue
             n_scanned += 1
             events = spaced_events(
-                segment_events(er), config.bi.scan.backfill_min_separation_days
+                [e for e in segment_events(er) if scan_clears_tv_threshold(tv, e)],
+                config.bi.scan.backfill_min_separation_days,
             )
             if events:
                 out.setdefault(slug, []).extend(

@@ -28,9 +28,12 @@ export function sparkline(
 ): string {
   if (!trace.length) return '<svg viewBox="0 0 120 34"></svg>';
   const W = 120, H = 34, pad = 3;
+  // A shared cap keeps magnitudes comparable across rows; a series above it
+  // stretches its own axis rather than flattening into a line along the top.
+  const top = Math.max(cap, ...trace);
   const pts = trace.map((v, i): [number, number] => [
     trace.length === 1 ? W / 2 : (i / (trace.length - 1)) * W,
-    H - pad - Math.min(1, Math.max(0, v / cap)) * (H - 2 * pad),
+    H - pad - Math.max(0, v / top) * (H - 2 * pad),
   ]);
   const line = pts
     .map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1))

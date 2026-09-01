@@ -37,6 +37,8 @@ STATUS_COPY: dict[str, str] = {
     "retired:delisted": "Monitoring was retired: the endpoint left the OpenRouter catalog.",
     "retired:stalled": "Monitoring was retired: the endpoint stopped yielding usable samples.",
     "retired:reinit_timeout": "Monitoring was retired: re-initialization after a detected change repeatedly ran out of time.",
+    "retired:too_expensive": "Monitoring was retired: a single query costs more than our per-query guard allows.",
+    "retired:budget": "Monitoring was retired: projected monthly spend ran over the budget cap.",
     "bad_temperature": "This API rejects or ignores the temperature parameter, so T=0 sampling is impossible — presumably to prevent distillation.",
     "liar": "This endpoint bills more than its advertised price implies, so we refuse to fund it.",
     "excluded": "Our selection policy explicitly excludes this endpoint.",
@@ -57,7 +59,13 @@ ERRORS_OUT = frozenset(
 # retired:unreachable is deliberately absent: it reads as "errors out", and the
 # retired headline would otherwise shadow errors_out entirely.
 _RETIRED_HEADLINE = frozenset(
-    {"retired:no_bis", "retired:delisted", "retired:stalled", "retired:reinit_timeout"}
+    {
+        "retired:no_bis",
+        "retired:delisted",
+        "retired:stalled",
+        "retired:reinit_timeout",
+        "retired:budget",
+    }
 )
 
 HEADLINE_ORDER = [
@@ -127,7 +135,7 @@ def headline_for(lt: str, bi: str) -> str:
         return "untrackable"
     if bi == "unprobeable:batch":  # async-only: blocks LT and BI alike
         return "untrackable"
-    if "too_expensive" in (lt, bi):
+    if lt == "too_expensive" or bi in ("too_expensive", "retired:too_expensive"):
         return "too_expensive"
     if bi in ("not_selected", "excluded"):
         return "not_selected"
@@ -152,7 +160,7 @@ def _headline_of(status: str) -> str | None:
         return "tracked"
     if status == "stalled" or status in _RETIRED_HEADLINE:
         return "retired"
-    if status == "too_expensive":
+    if status in ("too_expensive", "retired:too_expensive"):
         return "too_expensive"
     if status == "unprobeable:batch":
         return "untrackable"

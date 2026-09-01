@@ -35,6 +35,7 @@ def test_lt_normal_sigma_shows_rounded():
 
 def test_b3it_change_detected_magnitude_display_blank():
     class V:
+        gated_dates = set()
         model = "m/b"
         provider = "q"
         epochs = [
@@ -54,6 +55,7 @@ def test_b3it_derived_onsets_surface_in_feed():
     """Onsets inside a closed 'gap' epoch (no closure) still reach the feed."""
 
     class V:
+        gated_dates = set()
         model = "m/c"
         provider = "r"
         epochs = [
@@ -76,6 +78,7 @@ def test_b3it_change_detected_not_double_counted_with_derived_onset():
     """A live-detected closure and its derived onset are the same event."""
 
     class V:
+        gated_dates = set()
         model = "m/d"
         provider = "s"
         epochs = [
@@ -109,6 +112,7 @@ def test_merge_sorts_newest_first_across_methods():
     }
 
     class V:
+        gated_dates = set()
         model = "m/b"
         provider = "q"
         epochs = [

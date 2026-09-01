@@ -17,9 +17,8 @@ from trackllm_website.generate_site.freshness import latest
 from trackllm_website.generate_site.lt import EndpointInfo, load_lt_data
 from trackllm_website.generate_site.naming import base_provider
 from trackllm_website.generate_site.peaks import (
-    B3IT_PEAK_WINDOW,
     LT_PEAK_WINDOW,
-    peak_from,
+    shift_from,
 )
 from trackllm_website.generate_site.status import EndpointStatus, status_json
 from trackllm_website.generate_site.status_io import SiteStatuses
@@ -98,7 +97,7 @@ def _lt_changes(
     out = []
     for c in canonical:
         day = c["date"][:10]
-        level = peak_from(day, drift_pairs, LT_PEAK_WINDOW)
+        level = shift_from(day, drift_pairs, LT_PEAK_WINDOW)
         out.append(
             {
                 "date": day,
@@ -109,15 +108,13 @@ def _lt_changes(
     return out
 
 
-def _b3it_changes(
-    canonical: list[dict], tv_pairs: list[tuple[str, float]]
-) -> list[dict]:
+def _b3it_changes(canonical: list[dict], change_mags: dict) -> list[dict]:
     out = []
     for c in canonical:
         day = c["date"][:10]
-        peak = peak_from(day, tv_pairs, B3IT_PEAK_WINDOW)
+        shift = change_mags.get(day)
         out.append(
-            {"date": day, "peakTV": round(peak, 3) if peak is not None else None}
+            {"date": day, "shiftTV": round(shift, 3) if shift is not None else None}
         )
     return out
 
@@ -196,7 +193,7 @@ def _build_endpoint(
         b3it_out = {
             "tv": [list(p) for p in kept],
             "breaks": breaks,
-            "changes": _b3it_changes(_by_method(canonical, "B3IT"), tv_pairs),
+            "changes": _b3it_changes(_by_method(canonical, "B3IT"), view.change_mags),
         }
 
     date_range: list[str] = []

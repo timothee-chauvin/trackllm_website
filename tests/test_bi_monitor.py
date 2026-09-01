@@ -47,6 +47,22 @@ def test_early_change_caught_by_scan():
     assert decision.change_date.date().isoformat() == "2026-07-20"
 
 
+def test_scan_split_below_tv_threshold_is_not_a_change(monkeypatch):
+    # A permutation-significant split that moves TV by less than abs_delta is
+    # the "visually nonexistent change": the epoch must stay open.
+    from trackllm_website.bi.scan import ScanEvent
+
+    state, results = open_state_from_fixture("openai2fgpt-4o-mini23azure")
+    split = sorted({ts for b in results.values() for ts in b})[3]
+    monkeypatch.setattr(
+        monitor_mod,
+        "changepoint_scan",
+        lambda *_: ScanEvent(split_ts=split, p_value=0.001),
+    )
+    decision = decide(state, results, datetime(2026, 2, 15, tzinfo=timezone.utc))
+    assert decision.action == "none"
+
+
 def test_stable_endpoint_no_action():
     state, results = open_state_from_fixture("openai2fgpt-4o-mini23azure")
     decision = decide(state, results, datetime(2026, 2, 15, tzinfo=timezone.utc))

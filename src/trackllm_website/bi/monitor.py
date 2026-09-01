@@ -23,7 +23,7 @@ from trackllm_website.bi.phase_2 import (
 )
 from trackllm_website.bi.budget import projected_month_end
 from trackllm_website.bi.reinit import cleanup_onboarding_progress, reinit
-from trackllm_website.bi.scan import changepoint_scan
+from trackllm_website.bi.scan import changepoint_scan, scan_clears_tv_threshold
 from trackllm_website.bi.sampling import sample_prompts
 from trackllm_website.bi.state import EndpointBIState, RetiredInfo, load_all_states
 from trackllm_website.bi.digest import (
@@ -118,7 +118,7 @@ def decide(state: EndpointBIState, results: dict, now: datetime) -> Decision:
     # baseline, then absorbs whatever level it finds); the changepoint scan
     # covers that window.
     scan_event = changepoint_scan(epoch_results)
-    if scan_event is not None:
+    if scan_event is not None and scan_clears_tv_threshold(tv, scan_event):
         return Decision(
             action="reinit",
             change_date=datetime.fromisoformat(scan_event.split_ts),

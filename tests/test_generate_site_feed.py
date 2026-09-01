@@ -42,6 +42,8 @@ def _b3it_view(slug: str) -> B3ITView:
         epochs=[],
         tv_series={"dates": dates, "values": values},
         changes=[{"date": dates[12], "kind": "onset"}],
+        change_mags={dates[12][:10]: 0.75},
+        gated_dates=set(),
         last_query=dates[-1],
     )
 
@@ -69,7 +71,7 @@ def test_lt_item_carries_drift_magnitude_and_link_slugs():
     items = build_feed_items(changes, {"m2fa23p": _drift(20, 14)}, {}, NOW)
     (item,) = items
     assert item["method"] == "lt"
-    assert item["magnitude"] == 1.2
+    assert item["magnitude"] == 1.1  # level 1.2 after, 0.1 before
     assert item["model"] == "model-x"
     assert item["org"] == "org"
     assert item["providerSlug"] == "chutes"
@@ -99,7 +101,7 @@ def test_lt_item_without_drift_series():
     assert item["trace"] == []
 
 
-def test_b3it_item_uses_peak_tv_from_the_view():
+def test_b3it_item_uses_the_level_shift_from_the_view():
     changes = [
         {
             "date": "2026-06-13T00:00:00Z",
@@ -114,7 +116,7 @@ def test_b3it_item_uses_peak_tv_from_the_view():
     items = build_feed_items(changes, {}, {"s1": _b3it_view("s1")}, NOW)
     (item,) = items
     assert item["method"] == "b3it"
-    assert item["magnitude"] == 0.8
+    assert item["magnitude"] == 0.75  # the view's change_mags level shift
     assert item["sevKey"] == "alert"
 
 

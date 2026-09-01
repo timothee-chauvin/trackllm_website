@@ -132,7 +132,7 @@ def test_stats_report_affected_endpoints_and_providers(fake_site):
     stats = _build(fake_site)["stats"]
     assert stats["endpoints_affected"] == 2
     assert stats["providers_involved"] == 2
-    assert stats["largest_lt_drift"] == pytest.approx(2.0)
+    assert stats["largest_lt_drift"] == pytest.approx(1.39)  # level shift, not peak
 
 
 def test_providers_involved_ignores_changes_with_no_provider(fake_site):

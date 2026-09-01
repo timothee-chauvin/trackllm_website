@@ -17,7 +17,7 @@ import {
 import { areaPath, sampleAt, segments, strokePath } from "./chart_geom";
 import { type StripRow, STRIP_VW, bindSharedHover, dayAt, readCells } from "./model_hover";
 
-// drift/peakTV are null when the level the change reached is unknown: the series
+// drift/shiftTV are null when the level the change reached is unknown: the series
 // has no point on or after it (timeline.py, mirroring feed.py and endpoint.ts).
 export interface LTChange {
   date: string;
@@ -27,7 +27,7 @@ export interface LTChange {
 
 export interface B3ITChange {
   date: string;
-  peakTV: number | null;
+  shiftTV: number | null;
 }
 
 export interface EndpointStatusJSON {
@@ -185,9 +185,9 @@ export function renderTimeline(panel: HTMLElement, D: TimelineData, labels: Time
         ? ep.b3it.changes.map(
             (c): Mark => ({
               date: c.date,
-              y: c.peakTV === null ? null : stripY(c.peakTV, B3IT_CAP),
+              y: c.shiftTV === null ? null : stripY(c.shiftTV, B3IT_CAP),
               color: "var(--b3it)",
-              title: `B3IT ${c.date} · peak TV ${c.peakTV === null ? "—" : c.peakTV}`,
+              title: `B3IT ${c.date} · peak TV ${c.shiftTV === null ? "—" : c.shiftTV}`,
             })
           )
         : []),

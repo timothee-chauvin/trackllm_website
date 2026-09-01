@@ -50,6 +50,8 @@ def _view(slug: str, series) -> B3ITView:
             "values": [v for _, v in series],
         },
         changes=[],
+        change_mags={},
+        gated_dates=set(),
         last_query=series[-1][0].isoformat(),
     )
 

@@ -102,7 +102,7 @@ toks = [f"tok{i}" for i in range(40)]
 dicts = [{t: -0.5 - (i * 0.017 + j * 0.003) for j, t in enumerate(toks)} for i in range(60)]
 start = datetime(2026, 1, 1, tzinfo=timezone.utc)
 obs = [(start + timedelta(hours=i), d) for i, d in enumerate(dicts)]
-payload = repr(build_tensor(dicts).tolist()) + repr(compute_drift_series(obs))
+payload = repr(build_tensor(dicts).tolist()) + repr(compute_drift_series(obs, None))
 print(hashlib.sha256(payload.encode()).hexdigest())
 """
 
@@ -220,3 +220,4 @@ def test_compute_endpoint_scores_populates_drift(tmp_path, monkeypatch):
     s = compute_endpoint_scores(ep)
     assert s is not None and len(s.drift) == len(s.drift_dates) > 0
     assert s.drift[0] < 0.3 and max(s.drift) > 1.0
+

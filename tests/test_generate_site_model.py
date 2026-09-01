@@ -127,7 +127,7 @@ def test_build_model_views_groups_two_providers_of_one_model(tmp_path):
     assert ep1["slug"] == "m2fa23p1"
     assert ep1["lt"] is not None
     assert ep1["lt"]["changes"][0]["sigma"] == "12σ"
-    assert ep1["lt"]["changes"][0]["drift"] == 1.2
+    assert ep1["lt"]["changes"][0]["drift"] == 1.1  # level 1.2 after, 0.1 before
     assert ep1["n_changes"] == 1
     assert ep1["b3it"] is None
 
@@ -153,7 +153,7 @@ def test_build_model_views_includes_b3it_endpoint(tmp_path):
     assert b3_ep["b3it"] is not None
     assert b3_ep["b3it"]["tv"], "expected a non-empty tv series"
     assert b3_ep["b3it"]["changes"], "expected a detected transition"
-    assert b3_ep["b3it"]["changes"][0]["peakTV"] > 0
+    assert b3_ep["b3it"]["changes"][0]["shiftTV"] > 0
     assert b3_ep["n_changes"] == len(b3_ep["b3it"]["changes"])
 
 
@@ -316,7 +316,7 @@ def test_change_count_follows_changes_json_not_the_recomputed_scores(tmp_path):
     ep = view["endpoints"][0]
     assert [c["date"] for c in ep["lt"]["changes"]] == [dates[15][:10]]
     assert ep["lt"]["changes"][0]["sigma"] == "12σ"
-    assert ep["lt"]["changes"][0]["drift"] == 1.2
+    assert ep["lt"]["changes"][0]["drift"] == 1.1  # level 1.2 after, 0.1 before
     assert ep["n_changes"] == 1
     assert view["n_changed"] == 1
     assert len(view["changes"]) == 1
@@ -412,7 +412,7 @@ def test_b3it_change_after_the_last_series_point_has_no_peak(tmp_path):
 
     view = _build_model_views(root)[slugify("m/a")]
     ep = view["endpoints"][0]
-    assert ep["b3it"]["changes"][0]["peakTV"] is None
+    assert ep["b3it"]["changes"][0]["shiftTV"] is None
     assert view["date_max"] >= "2026-02-10"
 
 

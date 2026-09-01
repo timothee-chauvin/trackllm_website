@@ -35,6 +35,20 @@ def epoch_tv_series(
     return out
 
 
+def tv_shift(
+    tv_over_time: list[tuple[Timestamp, float]], split_ts: Timestamp
+) -> float | None:
+    """|mean TV at/after split - mean TV before| -- the same abs_delta yardstick
+    the adaptive rule applies, so a scan split that is statistically real but
+    moves the output distribution by less than a visible change never closes an
+    epoch. None when either side is empty."""
+    pre = [v for ts, v in tv_over_time if ts < split_ts]
+    post = [v for ts, v in tv_over_time if ts >= split_ts]
+    if not pre or not post:
+        return None
+    return abs(statistics.mean(post) - statistics.mean(pre))
+
+
 def adaptive_transitions(
     tv_over_time: list[tuple[Timestamp, float]],
 ) -> list[Timestamp]:

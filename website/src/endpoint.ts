@@ -233,7 +233,7 @@ export function chartSvg(lt: FocusLT | null, b3it: FocusB3IT | null, vw: number)
     {
       lane: b3Geom,
       title: b3Geom.series.length ? b3Title : "",
-      changes: (b3it?.changes ?? []).map((c) => ({ date: c.date, lab: fmtTV(c.peakTV) })),
+      changes: (b3it?.changes ?? []).map((c) => ({ date: c.date, lab: fmtTV(c.shiftTV) })),
     },
   ];
   const cpSvg = cpLanes
@@ -304,7 +304,7 @@ function renderChangesTable(lt: FocusLT | null, b3it: FocusB3IT | null): void {
     rows.push({ date: c.date, method: "lt", mag: fmtDrift(c.drift), conf: c.sigma })
   );
   (b3it?.changes ?? []).forEach((c) =>
-    rows.push({ date: c.date, method: "b3it", mag: fmtTV(c.peakTV), conf: "—" })
+    rows.push({ date: c.date, method: "b3it", mag: fmtTV(c.shiftTV), conf: "—" })
   );
   // no detected changes yet: the section (heading included) is omitted rather
   // than left as an empty table, matching the rest of the site's convention.
