@@ -273,6 +273,7 @@ describe("navigation", () => {
       ["changes.html", "changes.html"],
       ["spend.html", "spend.html"],
       ["methodology.html", "methodology.html"],
+      ["about.html", "about.html"],
     ];
     for (const [page, href] of cases) {
       document.documentElement.innerHTML = readFileSync(requireBuilt(page), "utf8");

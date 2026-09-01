@@ -1,0 +1,24 @@
+{% extends "base.html.j2" %}
+{% from "_macros.html.j2" import affiliations %}
+{% block title %}About | TrackLLM{% endblock %}
+
+{% block content %}
+<div class="wrap">
+  <div class="crumb">
+    <a href="index.html">Home</a><span class="sep">/</span>
+    <span style="color:var(--text-muted)">About</span>
+  </div>
+  <div class="head">
+    <div>
+      <div class="eyebrow">About</div>
+      <p class="lede">TrackLLM is a research project that continuously monitors LLM APIs for undisclosed changes, using two cost-effective methods described in <a href="methodology.html">Methodology</a>.</p>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <p class="prose">The website was originally developed by <a href="https://tchauvin.com" target="_blank" rel="noopener">Timothée Chauvin</a>, as a PhD student at Inria (<a href="https://team.inria.fr/artishau/team/" target="_blank" rel="noopener">ARTISHAU</a> team).</p>
+  <p class="prose">This project is supported by <a href="https://www.inria.fr/" target="_blank" rel="noopener">Inria</a>, <a href="https://www.irisa.fr/" target="_blank" rel="noopener">IRISA</a> and <a href="https://www.cnrs.fr/" target="_blank" rel="noopener">CNRS</a>. <a href="https://fr.wikipedia.org/wiki/Institut_national_pour_l%27%C3%A9valuation_et_la_s%C3%A9curit%C3%A9_de_l%27intelligence_artificielle" target="_blank" rel="noopener">INESIA</a> supports the project with API credits.</p>
+  {{ affiliations() }}
+</main>
+{% endblock %}

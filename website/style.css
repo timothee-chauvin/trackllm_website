@@ -158,8 +158,6 @@ h1.title em { font-style: normal; color: var(--accent); }
 .fresh .lt { color: var(--accent); }
 .fresh .b3it { color: var(--b3it); }
 .fresh .sep { opacity: 0.55; margin: 0 0.4rem; }
-.cap { margin-top: 0.85rem; font-size: 0.82rem; color: var(--text-dim); }
-.cap b { color: var(--accent); font-weight: 600; }
 @media (max-width: 860px) { .telemetry { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 460px) { .telemetry { grid-template-columns: 1fr; } }
 
@@ -529,10 +527,20 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 
 /* methodology page */
 .sec-head h2 .badge { margin-right: 0.5rem; vertical-align: 0.12em; }
+body.about .lede a, body.about .prose a { color: var(--accent); }
+body.about .lede a:hover, body.about .prose a:hover { text-decoration: underline; }
+
+/* Institutional logos are drawn for white paper, so they sit on white in both themes. */
+.affil { display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap; margin-top: 1.6rem; }
+.affil a { display: flex; align-items: center; height: 2.6rem; padding: 0.4rem 0.8rem; border-radius: var(--radius-sm);
+  background: #FFFFFF; border: 1px solid var(--border-soft); opacity: 0.85; transition: opacity .15s; }
+.affil a:hover { opacity: 1; }
+.affil img { height: 100%; width: auto; display: block; }
+
 .prose { color: var(--text-muted); font-size: 0.92rem; max-width: 78ch; margin: 0.9rem 0; }
 .prose b { color: var(--text); font-weight: 600; }
 /* the cards follow the measure -- a full-width panel around a 78ch column reads as empty */
-body.methodology .panel, body.methodology .reads, body.methodology .paper-ref { max-width: calc(78ch + 2.4rem); }
+body.methodology .panel, body.methodology .reads, body.methodology .paper-ref, body.about .panel { max-width: calc(78ch + 2.4rem); }
 .paper-ref { display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; margin: 0 0 0.8rem; font-size: 0.88rem; }
 .paper-ref a { color: var(--accent); font-weight: 600; }
 .paper-ref a:hover { text-decoration: underline; }

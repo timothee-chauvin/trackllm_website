@@ -27,6 +27,7 @@
             <a href="{{ nav_prefix }}{{ page }}.html"{% if body_class == page %} class="active" aria-current="page"{% endif %}>{{ label }}</a>
             {% endfor %}
             <a href="https://github.com/timothee-chauvin/trackllm_website" target="_blank" rel="noopener">GitHub</a>
+            <a href="{{ nav_prefix }}about.html"{% if body_class == 'about' %} class="active" aria-current="page"{% endif %}>About</a>
         </div>
         <div class="nav-right">
             <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle color theme"></button>
@@ -38,7 +39,7 @@
         <footer class="site">
             {% block footer %}
             <span>Data collected via the OpenRouter API.</span>
-            <span><a href="{{ nav_prefix }}methodology.html">Methodology</a> · <a href="https://github.com/timothee-chauvin/trackllm_website">GitHub</a></span>
+            <span><a href="{{ nav_prefix }}methodology.html">Methodology</a> · <a href="https://github.com/timothee-chauvin/trackllm_website">GitHub</a> · <a href="{{ nav_prefix }}about.html">About</a></span>
             {% endblock %}
         </footer>
     </div>

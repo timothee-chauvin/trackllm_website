@@ -1,5 +1,5 @@
 {% extends "base.html.j2" %}
-{% from "_macros.html.j2" import chip, search_box %}
+{% from "_macros.html.j2" import chip, search_box, affiliations %}
 {% block title %}TrackLLM{% endblock %}
 {% block content %}
 <header class="hero">
@@ -12,7 +12,7 @@
     <p class="lede">LLM APIs are opaque black boxes, even for open-weight models. TrackLLM continuously monitors them for <b>undisclosed changes</b> — cheaply — with <b>logprob tracking</b> (LT) where logprobs are exposed, and <b>black-box border input tracking</b> (B3IT) where they aren't. Small changes are fine, but they should be disclosed.</p>
     <div class="telemetry" id="telemetry"></div>
     <p class="fresh" id="freshness"></p>
-    <p class="cap" id="cap"></p>
+    {{ affiliations() }}
   </div>
 </header>
 
