@@ -51,3 +51,12 @@
 {% macro info_label(label, tip) -%}
 <span class="info-label">{{ label }} <button type="button" class="info-btn" data-tip="{{ tip }}" aria-label="{{ tip }}">?</button></span>
 {%- endmacro %}
+
+{# Logos of the institutions behind the project; shared by the front page and About. #}
+{% macro affiliations() %}
+<div class="affil" aria-label="Affiliations">
+  {% for slug, name, ext, url in [('inria', 'Inria', 'svg', 'https://www.inria.fr/'), ('irisa', 'IRISA', 'png', 'https://www.irisa.fr/'), ('cnrs', 'CNRS', 'svg', 'https://www.cnrs.fr/')] %}
+  <a href="{{ url }}" target="_blank" rel="noopener"><img src="logos/{{ slug }}.{{ ext }}" alt="{{ name }}"></a>
+  {% endfor %}
+</div>
+{% endmacro %}

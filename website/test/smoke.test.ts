@@ -229,7 +229,7 @@ describe.each(PAGES)("$name page", (page) => {
 
 /** Pages the generator renders whole: nothing is fetched, so the only ways they
  *  can break are a missing file and a dead link. */
-const STATIC_PAGES = ["methodology.html", "orgs/deepseek.html"];
+const STATIC_PAGES = ["methodology.html", "about.html", "orgs/deepseek.html"];
 
 /** The favicon href is depth-relative, so a page nested one level down needs its
  *  own prefix -- exactly the mistake a root-only check would miss. */

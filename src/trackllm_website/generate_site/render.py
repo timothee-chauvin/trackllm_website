@@ -77,6 +77,7 @@ def render_site(
     org_template = env.get_template("org.html.j2")
     changes_template = env.get_template("changes.html.j2")
     methodology_template = env.get_template("methodology.html.j2")
+    about_template = env.get_template("about.html.j2")
 
     discovered: list[EndpointInfo] = []
     for ep in discover_lt_endpoints(data_dir):
@@ -182,6 +183,11 @@ def render_site(
         methodology_template.render(css_path="style.css", body_class="methodology")
     )
     print("Generated methodology.html")
+
+    (website_dir / "about.html").write_text(
+        about_template.render(css_path="style.css", body_class="about")
+    )
+    print("Generated about.html")
 
     model_views = model_mod.build_model_views(website_dir, endpoints, b3it_views, site)
     write_json_dir(website_dir / "data" / "models", model_views)

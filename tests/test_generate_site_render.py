@@ -224,7 +224,7 @@ def test_nav_marks_only_the_current_page(tmp_path):
     with no nav entry of its own (the Overview) marks none."""
     _scaffold(tmp_path)
     render_site(tmp_path, None, empty_status_inputs())
-    for page in ("changes", "spend", "methodology"):
+    for page in ("changes", "spend", "methodology", "about"):
         html = (tmp_path / f"{page}.html").read_text()
         assert f'<a href="{page}.html" class="active" aria-current="page">' in html
         assert html.count("aria-current") == 1
@@ -240,6 +240,19 @@ def test_render_emits_methodology_page(tmp_path):
     assert "arxiv.org/abs/2602.11083" in page
     assert "tchauvin.com/change-detection-llm-apis" in page
     assert 'href="methodology.html"' in (tmp_path / "index.html").read_text()
+
+
+def test_render_emits_about_page_and_front_page_logos(tmp_path):
+    _scaffold(tmp_path)
+    render_site(tmp_path, None, empty_status_inputs())
+    page = (tmp_path / "about.html").read_text()
+    assert 'href="https://tchauvin.com"' in page
+    assert "INESIA" in page
+    index = (tmp_path / "index.html").read_text()
+    assert 'href="about.html"' in index
+    for logo in ("inria", "irisa", "cnrs"):
+        assert f'src="logos/{logo}.' in index
+        assert f'src="logos/{logo}.' in page
 
 
 def test_favicon_link_is_relative_to_page_depth(tmp_path):
