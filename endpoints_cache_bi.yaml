@@ -1155,6 +1155,30 @@ bad_temperature:
   - 10.0
   - 50.0
 - api: openrouter
+  model: anthropic/claude-fable-5.1
+  provider: amazon-bedrock
+  cost:
+  - 10.0
+  - 50.0
+- api: openrouter
+  model: anthropic/claude-fable-5.1
+  provider: anthropic
+  cost:
+  - 10.0
+  - 50.0
+- api: openrouter
+  model: anthropic/claude-fable-5.1
+  provider: azure
+  cost:
+  - 10.0
+  - 50.0
+- api: openrouter
+  model: anthropic/claude-fable-5.1
+  provider: google-vertex/global
+  cost:
+  - 10.0
+  - 50.0
+- api: openrouter
   model: anthropic/claude-opus-4.7
   provider: amazon-bedrock/eu-west-1
   cost:
@@ -1234,6 +1258,12 @@ bad_temperature:
   - 25.0
 - api: openrouter
   model: anthropic/claude-opus-4.8
+  provider: anthropic/fast
+  cost:
+  - 10.0
+  - 50.0
+- api: openrouter
+  model: anthropic/claude-opus-4.8
   provider: claude-on-aws
   cost:
   - 5.0
@@ -1280,6 +1310,12 @@ bad_temperature:
   cost:
   - 5.0
   - 25.0
+- api: openrouter
+  model: anthropic/claude-opus-5
+  provider: anthropic/fast
+  cost:
+  - 10.0
+  - 50.0
 - api: openrouter
   model: anthropic/claude-opus-5
   provider: claude-on-aws

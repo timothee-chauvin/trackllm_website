@@ -277,6 +277,9 @@
   "openrouter#deepseek/deepseek-v4-flash-0731#together": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#venice": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#wafer/fast": null,
+  "openrouter#deepseek/deepseek-v4-flash-vision-exp#fireworks": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-flash-vision-exp#novita": {
     "effort": "none"
   },
@@ -315,11 +318,18 @@
   "openrouter#deepseek/deepseek-v4-pro-0813#deepseek": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4-pro-0813#digitalocean": null,
   "openrouter#deepseek/deepseek-v4-pro-0813#fireworks": null,
+  "openrouter#deepseek/deepseek-v4-pro-0813#gmicloud/fp8": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-pro-0813#parasail/fp8": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4-pro-0813#sail-research/fp4": null,
+  "openrouter#deepseek/deepseek-v4-pro-0813#streamlake": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-pro-0813#together": {
     "effort": "none"
   },
@@ -606,6 +616,9 @@
   "openrouter#inception/mercury-2#inception": {
     "skip": "hidden reasoning"
   },
+  "openrouter#inception/mercury-2.5-preview#inception": {
+    "effort": "none"
+  },
   "openrouter#inclusionai/ling-2.6-1t#novita": null,
   "openrouter#inclusionai/ling-2.6-flash#novita": null,
   "openrouter#inclusionai/ling-3.0-flash#deepinfra/bf16": null,
@@ -751,6 +764,9 @@
   "openrouter#minimax/minimax-m3#atlas-cloud/fp8": {
     "effort": "none"
   },
+  "openrouter#minimax/minimax-m3#coreweave/fp4": {
+    "effort": "none"
+  },
   "openrouter#minimax/minimax-m3#gmicloud/fp8": null,
   "openrouter#minimax/minimax-m3#minimax/fp8": {
     "effort": "none"
@@ -877,6 +893,7 @@
   "openrouter#moonshotai/kimi-k2.7-code#ambient": null,
   "openrouter#moonshotai/kimi-k2.7-code#ambient/int4": null,
   "openrouter#moonshotai/kimi-k2.7-code#atlas-cloud/int4": null,
+  "openrouter#moonshotai/kimi-k2.7-code#baseten/fp4": null,
   "openrouter#moonshotai/kimi-k2.7-code#cloudflare": null,
   "openrouter#moonshotai/kimi-k2.7-code#coreweave/int4": null,
   "openrouter#moonshotai/kimi-k2.7-code#deepinfra/fp4": null,
@@ -1180,6 +1197,7 @@
   "openrouter#openai/gpt-oss-120b#wandb/fp4": {
     "max_tokens": 4
   },
+  "openrouter#openai/gpt-oss-20b#akashml/bf16": null,
   "openrouter#openai/gpt-oss-20b#amazon-bedrock": {
     "skip": "hidden reasoning"
   },
@@ -1531,6 +1549,9 @@
   "openrouter#qwen/qwen3.8-27b#io-net/fp8": {
     "effort": "none"
   },
+  "openrouter#qwen/qwen3.8-27b#ionstream/fp8": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.8-27b#parasail/fp8": {
     "effort": "none"
   },
@@ -1757,6 +1778,9 @@
   "openrouter#z-ai/glm-5.1#z-ai/fp8": null,
   "openrouter#z-ai/glm-5.2#akashml/fp8": null,
   "openrouter#z-ai/glm-5.2#alibaba": null,
+  "openrouter#z-ai/glm-5.2#alibaba/fast": {
+    "effort": "none"
+  },
   "openrouter#z-ai/glm-5.2#alibaba/fp8": null,
   "openrouter#z-ai/glm-5.2#ambient/fp8": null,
   "openrouter#z-ai/glm-5.2#atlas-cloud/fp8": null,
@@ -1835,7 +1859,9 @@
   "openrouter#z-ai/glm-5.3#fireworks": null,
   "openrouter#z-ai/glm-5.3#friendli": null,
   "openrouter#z-ai/glm-5.3#gmicloud/fp8": null,
+  "openrouter#z-ai/glm-5.3#inceptron/fp4": null,
   "openrouter#z-ai/glm-5.3#io-net/fp8": null,
+  "openrouter#z-ai/glm-5.3#makora/fp4": null,
   "openrouter#z-ai/glm-5.3#modal": null,
   "openrouter#z-ai/glm-5.3#morph/fp4": null,
   "openrouter#z-ai/glm-5.3#novita/fp8": null,
@@ -1844,6 +1870,7 @@
   },
   "openrouter#z-ai/glm-5.3#phala": null,
   "openrouter#z-ai/glm-5.3#reka/fp8": null,
+  "openrouter#z-ai/glm-5.3#sail-research/fp8": null,
   "openrouter#z-ai/glm-5.3#siliconflow/fp8": {
     "max_tokens": 1
   },
@@ -1864,6 +1891,7 @@
   "openrouter#z-ai/glm-5.3-flash#makora": null,
   "openrouter#z-ai/glm-5.3-flash#modal/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#morph/fp8": null,
+  "openrouter#z-ai/glm-5.3-flash#nextbit/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#novita/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#parasail/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#phala/fp8": null,
