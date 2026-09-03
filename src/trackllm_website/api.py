@@ -329,6 +329,8 @@ async def retry_with_exponential_backoff(
             return True, e.status, f"HTTP {e.status}"
         elif isinstance(e, asyncio.TimeoutError):
             return True, None, f"Timeout after {config.api.timeout}s"
+        elif isinstance(e, (aiohttp.ClientConnectionError, aiohttp.ClientPayloadError)):
+            return True, None, f"Connection error: {e!r}"
         return False, None, ""
 
     last_exception: Exception | None = None
@@ -353,3 +355,15 @@ async def retry_with_exponential_backoff(
             last_exception = e
 
     raise last_exception or RuntimeError("Unexpected end of retry loop")
+
+
+async def get_json_with_retry(session: aiohttp.ClientSession, url: str) -> Any:
+    """GET a JSON document, retrying transient failures (5xx, timeouts, dropped or
+    truncated connections) with config.api.max_retries."""
+
+    async def get() -> Any:
+        async with session.get(url) as response:
+            response.raise_for_status()
+            return await response.json()
+
+    return await retry_with_exponential_backoff(get, max_retries=config.api.max_retries)

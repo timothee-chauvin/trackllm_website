@@ -6,11 +6,14 @@ from pathlib import Path
 
 import aiohttp
 import orjson
-import requests
 import yaml
 from pydantic import BaseModel
 
-from trackllm_website.api import OpenRouterClient, QueryTooExpensive
+from trackllm_website.api import (
+    OpenRouterClient,
+    QueryTooExpensive,
+    get_json_with_retry,
+)
 from trackllm_website.bi.common import (
     TOO_EXPENSIVE,
     lt_query_args,
@@ -22,7 +25,7 @@ from trackllm_website.bi.digest import (
     OnboardingReport,
     send_onboarding_digest,
 )
-from trackllm_website.bi.popularity import fetch_popular_models_safe
+from trackllm_website.bi.popularity import MODELS_URL, fetch_popular_models_safe
 from trackllm_website.bi.reinit import cleanup_onboarding_progress, reinit
 from trackllm_website.bi.budget import (
     daily_rates_by_slug,
@@ -418,17 +421,15 @@ async def get_model_endpoints(
             supported_parameters (see parse_model_endpoints)
         logprob_filter: If True, only return endpoints that claim to support logprobs
     """
-    url = f"https://openrouter.ai/api/v1/models/{model_id}/endpoints"
     try:
-        async with session.get(url) as response:
-            data = await response.json()
-            return parse_model_endpoints(
-                data["data"]["endpoints"],
-                model_id,
-                created,
-                model_supports_temperature,
-                logprob_filter,
-            )
+        data = await get_json_with_retry(session, f"{MODELS_URL}/{model_id}/endpoints")
+        return parse_model_endpoints(
+            data["data"]["endpoints"],
+            model_id,
+            created,
+            model_supports_temperature,
+            logprob_filter,
+        )
     except Exception as e:
         logger.error(f"Error fetching endpoints for {model_id}: {e}")
         return []
@@ -446,29 +447,29 @@ async def get_endpoints(
         catalog_path: If not None, snapshot the endpoints fetched BEFORE any
             filtering there (only meaningful on an unfiltered fetch)
     """
-    response = requests.get("https://openrouter.ai/api/v1/models")
-    models = response.json()["data"]
-    model_ids = [model["id"] for model in models]
-    created_by_id = {
-        model["id"]: datetime.fromtimestamp(model["created"], tz=timezone.utc)
-        for model in models
-        if model.get("created") is not None
-    }
-    supports_temperature_by_id = {
-        model["id"]: "temperature" in (model.get("supported_parameters") or [])
-        for model in models
-    }
     all_endpoints = []
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(
+        timeout=aiohttp.ClientTimeout(total=config.api.timeout)
+    ) as session:
+        models = (await get_json_with_retry(session, MODELS_URL))["data"]
+        created_by_id = {
+            model["id"]: datetime.fromtimestamp(model["created"], tz=timezone.utc)
+            for model in models
+            if model.get("created") is not None
+        }
+        supports_temperature_by_id = {
+            model["id"]: "temperature" in (model.get("supported_parameters") or [])
+            for model in models
+        }
         tasks = [
             get_model_endpoints(
                 session,
-                model_id,
-                created_by_id.get(model_id),
-                supports_temperature_by_id.get(model_id, True),
+                model["id"],
+                created_by_id.get(model["id"]),
+                supports_temperature_by_id.get(model["id"], True),
                 logprob_filter=logprob_filter,
             )
-            for model_id in model_ids
+            for model in models
         ]
         async for result in gather_with_concurrency_streaming(
             config.api.max_workers, *tasks
