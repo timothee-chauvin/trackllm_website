@@ -1,5 +1,5 @@
 {% extends "base.html.j2" %}
-{% from "_macros.html.j2" import affiliations %}
+{% from "_macros.html.j2" import affiliations, cite_pill %}
 {% block title %}About | TrackLLM{% endblock %}
 
 {% block content %}
@@ -13,6 +13,7 @@
       <div class="eyebrow">About</div>
       <p class="lede">TrackLLM is a research project that continuously monitors LLM APIs for undisclosed changes, using two cost-effective methods described in <a href="methodology.html">Methodology</a>.</p>
     </div>
+    {{ cite_pill() }}
   </div>
 </div>
 

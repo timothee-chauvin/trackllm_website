@@ -3,26 +3,17 @@
 {% block title %}Methodology | TrackLLM{% endblock %}
 
 {% block content %}
-{# each paper is named twice -- beside its method, and in Read more -- so it is defined once #}
-{% set LT_PAPER = {
-  "url": "https://arxiv.org/abs/2512.03816",
-  "title": "Log Probability Tracking of LLM APIs",
-  "venue": "ICLR 2026 · arXiv:2512.03816",
-  "note": "the LT test, and the TinyChange benchmark",
-} %}
-{% set B3IT_PAPER = {
-  "url": "https://arxiv.org/abs/2602.11083",
-  "title": "Token-Efficient Change Detection in LLM APIs",
-  "venue": "ICML 2026 · arXiv:2602.11083",
-  "note": "border inputs and B3IT",
-} %}
+{% from "_macros.html.j2" import cite_pill %}
+{# each paper is named twice -- beside its method, and in Read more (papers.py defines them) #}
+{% set LT_PAPER = PAPERS.lt %}
+{% set B3IT_PAPER = PAPERS.b3it %}
 {% macro paper_ref(p) %}
-<p class="paper-ref"><a href="{{ p.url }}" target="_blank" rel="noopener">{{ p.title }} →</a><span>{{ p.venue }}</span></p>
+<p class="paper-ref"><a href="{{ p.url }}" target="_blank" rel="noopener">{{ p.title }} →</a><span>{{ p.venue_line }}</span></p>
 {% endmacro %}
 {% macro paper_read(p) %}
 <li>
   <a href="{{ p.url }}" target="_blank" rel="noopener">{{ p.title }} →</a>
-  <span class="meta">{{ p.venue }} — {{ p.note }}.</span>
+  <span class="meta">{{ p.venue_line }} — {{ p.note }}.</span>
 </li>
 {% endmacro %}
 <div class="wrap">
@@ -36,6 +27,7 @@
       <h1>How we detect changes.</h1>
       <p class="lede">LLM APIs are opaque black boxes, even for open-weight models. Can we continuously monitor them for changes? LLM API stability is important for the reliability of downstream applications, for the reproducibility of research and for initial audits to remain relevant. TrackLLM uses two methods, depending on what the API gives us back.</p>
     </div>
+    {{ cite_pill() }}
   </div>
 </div>
 

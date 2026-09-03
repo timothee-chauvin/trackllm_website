@@ -263,6 +263,23 @@ test("the methodology page links out to the blog post and both papers", () => {
   }
 });
 
+/** The Cite pill opens a modal with two click-to-copy boxes: both papers as plain
+ *  text, both as BibTeX. What the script copies is the box's text content, so
+ *  that is what is asserted on. */
+test("the Cite pill's dialog holds both citations and both BibTeX entries", () => {
+  for (const path of ["index.html", "methodology.html", "about.html"]) {
+    document.documentElement.innerHTML = readFileSync(requireBuilt(path), "utf8");
+    const pill = document.querySelector(".cite-pill");
+    expect(pill, `${path} has no Cite pill`).not.toBeNull();
+    expect(pill!.getAttribute("aria-controls")).toBe("citeDialog");
+    const boxes = [...document.querySelectorAll("#citeDialog .cite-box .cite-copyable")];
+    expect(boxes, `${path}: expected a plain and a BibTeX box`).toHaveLength(2);
+    const [plain, bibtex] = boxes.map((b) => b.textContent!.trim());
+    expect(plain.split("arxiv.org/abs/")).toHaveLength(3);
+    expect(bibtex.split("@inproceedings{")).toHaveLength(3);
+  }
+});
+
 test("the org page lists models and links each one", () => {
   document.documentElement.innerHTML = readFileSync(
     requireBuilt("orgs/deepseek.html"),

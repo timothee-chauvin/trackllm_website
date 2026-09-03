@@ -79,6 +79,35 @@ a { color: inherit; text-decoration: none; }
   cursor: pointer; font-size: 0.85rem; line-height: 1; }
 .theme-toggle:hover { color: var(--text); background: var(--surface-3); }
 
+/* Cite pill + modal (_macros.html.j2::cite_pill / cite_dialog), after tchauvin.com:
+   the pill opens a page-centred <dialog>; each box inside copies itself on click. */
+.cite-pill { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.42rem 0.85rem; border-radius: 999px;
+  border: 1px solid var(--accent-line); background: var(--accent-quiet); color: var(--accent);
+  font-size: 0.95rem; font-weight: 700; line-height: 1; cursor: pointer; white-space: nowrap; transition: background .12s, box-shadow .12s; }
+.cite-pill svg { width: 19px; height: 19px; }
+.cite-pill:hover { background: var(--accent-fill); box-shadow: 0 0 0 3px var(--accent-quiet); }
+.hero .cite-pill { margin-top: 1.4rem; }
+.cite-dialog { width: 90%; max-width: 640px; padding: 1.4rem 1.8rem; color: var(--text); background: var(--surface-2);
+  border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 12px 44px rgba(0,0,0,0.3); font-size: 0.92rem; }
+.cite-dialog::backdrop { background: rgba(0,0,0,0.5); }
+.cite-dialog-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.9rem; }
+.cite-dialog-head h2 { margin: 0; font-size: 1.2rem; font-weight: 650; }
+.cite-dialog-close { padding: 0 0.15em; font-size: 1.7rem; line-height: 1; color: var(--text-dim); background: transparent; border: 0; cursor: pointer; }
+.cite-dialog-close:hover { color: var(--text); }
+.cite-box { position: relative; margin-bottom: 0.9rem; padding: 0.8em 5em 0.8em 1em; background: var(--surface); border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm); cursor: pointer; transition: border-color .12s, background .12s; line-height: 1.5; }
+.cite-box:last-child { margin-bottom: 0; }
+.cite-box:hover { border-color: var(--border); background: var(--surface-3); }
+.cite-box p { margin: 0 0 0.6em; overflow-wrap: anywhere; } .cite-box p:last-child { margin-bottom: 0; }
+.cite-box pre { margin: 0; font-family: var(--mono); font-size: 0.8rem; line-height: 1.4; overflow-x: auto; }
+.cite-box-status { position: absolute; top: 0.55em; right: 0.6em; display: inline-flex; align-items: center; gap: 0.3em;
+  color: var(--text-dim); font-size: 0.75rem; font-weight: 600; line-height: 1; pointer-events: none; }
+.cite-box-status svg { width: 15px; height: 15px; }
+.cite-box:hover .cite-box-status { color: var(--text); }
+.cite-box-status .i-done, .cite-box-status .i-label, .cite-box.is-copied .i-copy { display: none; }
+.cite-box.is-copied .cite-box-status { color: var(--stable); }
+.cite-box.is-copied .i-done, .cite-box.is-copied .i-label { display: inline; }
+
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); }
