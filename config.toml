@@ -7,6 +7,7 @@ max_retries = 8
 max_cost_mtok = 30
 max_cost_per_query = 0.0001  # billed $/query; any successful query above this raises QueryTooExpensive
 lt_prune_window_days = 7  # trailing ledger window for the LT per-query prune
+lt_stall_days = 7  # drop an LT endpoint once its last N queried days had no success (mirrors bi.reinit.stall_days)
 # Provider path segments excluded from LT: priority tiers serve the same weights
 # as the base variant at ~2x the price, pure duplicates for change-tracking.
 lt_exclude_provider_segments = ["priority"]
@@ -14,7 +15,6 @@ temperature = 1.0
 max_workers = 80
 top_logprobs_openrouter_default = 20
 timeout = 15
-abandon_after = 100
 openrouter_avoid_free_endpoints = true
 
 [api.top_logprobs_openrouter]

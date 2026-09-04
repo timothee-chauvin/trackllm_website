@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 import numpy as np
 import pytest
 
-from trackllm_website.config import Endpoint
+from trackllm_website.config import Endpoint, config
 from trackllm_website.storage import (
     MonthlyData,
     PartialMonthlyDataError,
@@ -151,3 +151,56 @@ def test_query_date_round_trips_through_its_month_dir():
         datetime(2028, 2, 29, tzinfo=timezone.utc),
     ):
         assert parse_query_date(date.year, date.month, format_query_date(date)) == date
+
+
+def _err_response(day: int, hour: int = 0, month: int = 7) -> Response:
+    return _response(
+        datetime(2026, month, day, hour, 30, 0, tzinfo=timezone.utc),
+        error=ResponseError(http_code=404, message="gone"),
+    )
+
+
+def _store_all(storage: ResultsStorage, responses: list[Response]) -> None:
+    for r in responses:
+        storage.store_response(r)
+
+
+def test_is_stalled_after_stall_days_of_all_errors(tmp_path, monkeypatch):
+    monkeypatch.setattr(config.api, "lt_stall_days", 7)
+    storage = ResultsStorage(tmp_path)
+    _store_all(storage, [_err_response(d, h) for d in range(1, 8) for h in (3, 15)])
+
+    assert storage.is_stalled(ENDPOINT) is True
+
+
+def test_is_stalled_counts_queried_days_not_queries(tmp_path, monkeypatch):
+    """Many errors packed into a few days are not a stall: the rule is day-based
+    so its verdict does not stretch when the hourly cron fires less often."""
+    monkeypatch.setattr(config.api, "lt_stall_days", 7)
+    storage = ResultsStorage(tmp_path)
+    _store_all(storage, [_err_response(d, h) for d in range(1, 4) for h in range(24)])
+
+    assert storage.is_stalled(ENDPOINT) is False
+
+
+def test_is_stalled_only_looks_at_most_recent_queried_days(tmp_path, monkeypatch):
+    monkeypatch.setattr(config.api, "lt_stall_days", 3)
+    storage = ResultsStorage(tmp_path)
+    errors = [_err_response(d) for d in (2, 5, 9)]
+    _store_all(storage, errors + [_response(_date(1), logprobs=_lp(("a", -0.1)))])
+    assert storage.is_stalled(ENDPOINT) is True
+
+    _store_all(storage, [_response(_date(5, hour=20), logprobs=_lp(("a", -0.1)))])
+    assert storage.is_stalled(ENDPOINT) is False
+
+
+def test_is_stalled_spans_month_boundary_and_prompts(tmp_path, monkeypatch):
+    monkeypatch.setattr(config.api, "lt_stall_days", 4)
+    storage = ResultsStorage(tmp_path)
+    june = [_err_response(d, month=6) for d in (29, 30)]
+    july = [_err_response(d, month=7) for d in (1, 2)]
+    _store_all(storage, june + july)
+    for r in july:
+        storage.store_response(r.model_copy(update={"prompt": "other"}))
+
+    assert storage.is_stalled(ENDPOINT) is True
