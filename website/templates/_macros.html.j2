@@ -86,10 +86,7 @@
 {# The modal behind every Cite pill: both papers as plain text, both as BibTeX. #}
 {% macro cite_dialog() %}
 <dialog id="citeDialog" class="cite-dialog" aria-label="Cite TrackLLM">
-  <div class="cite-dialog-head">
-    <h2>Cite TrackLLM</h2>
-    <button type="button" class="cite-dialog-close" aria-label="Close">&times;</button>
-  </div>
+  <button type="button" class="cite-dialog-close" aria-label="Close">&times;</button>
   {% call cite_box("citations") %}{% for p in PAPERS.values() %}<p>{{ p.plain }}</p>
 {% endfor %}{% endcall %}
   {% call cite_box("BibTeX") %}<pre>{{ PAPERS.values() | map(attribute="bibtex") | join("\n\n") }}</pre>{% endcall %}

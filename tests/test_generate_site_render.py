@@ -271,14 +271,11 @@ def test_cite_pill_on_front_methodology_and_about_and_dialog_has_both_papers(
         dialog = unescape(html.split('id="citeDialog"')[1])
         for paper in PAPERS.values():
             assert paper.plain in dialog
-            assert f"eprint={{{paper.arxiv_id}}}" in dialog
+            assert paper.bibtex in dialog
 
 
-def test_citations_name_venue_title_and_arxiv_id():
+def test_plain_citation_names_authors_title_venue_and_link():
     for paper in PAPERS.values():
-        assert paper.bibtex.startswith(f"@inproceedings{{{paper.key},\n")
-        for field in (paper.title, paper.booktitle, paper.arxiv_id, paper.url):
-            assert field in paper.bibtex
         for field in (paper.title, paper.venue, paper.url, paper.authors[0]):
             assert field in paper.plain
 

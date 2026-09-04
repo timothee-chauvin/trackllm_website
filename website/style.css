@@ -87,12 +87,11 @@ a { color: inherit; text-decoration: none; }
 .cite-pill svg { width: 19px; height: 19px; }
 .cite-pill:hover { background: var(--accent-fill); box-shadow: 0 0 0 3px var(--accent-quiet); }
 .hero .cite-pill { margin-top: 1.4rem; }
-.cite-dialog { width: 90%; max-width: 640px; padding: 1.4rem 1.8rem; color: var(--text); background: var(--surface-2);
+.cite-dialog { width: 90%; max-width: 640px; padding: 2.6rem 1.8rem 1.4rem; color: var(--text); background: var(--surface-2);
   border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 12px 44px rgba(0,0,0,0.3); font-size: 0.92rem; }
 .cite-dialog::backdrop { background: rgba(0,0,0,0.5); }
-.cite-dialog-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.9rem; }
-.cite-dialog-head h2 { margin: 0; font-size: 1.2rem; font-weight: 650; }
-.cite-dialog-close { padding: 0 0.15em; font-size: 1.7rem; line-height: 1; color: var(--text-dim); background: transparent; border: 0; cursor: pointer; }
+.cite-dialog-close { position: absolute; top: 0.5rem; right: 0.8rem; padding: 0 0.15em; font-size: 1.7rem; line-height: 1;
+  color: var(--text-dim); background: transparent; border: 0; cursor: pointer; }
 .cite-dialog-close:hover { color: var(--text); }
 .cite-box { position: relative; margin-bottom: 0.9rem; padding: 0.8em 5em 0.8em 1em; background: var(--surface); border: 1px solid var(--border-soft);
   border-radius: var(--radius-sm); cursor: pointer; transition: border-color .12s, background .12s; line-height: 1.5; }
