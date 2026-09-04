@@ -3,12 +3,12 @@
 {% block title %}Methodology | TrackLLM{% endblock %}
 
 {% block content %}
-{% from "_macros.html.j2" import cite_pill %}
+{% from "_macros.html.j2" import cite_pill, copy_bibtex %}
 {# each paper is named twice -- beside its method, and in Read more (papers.py defines them) #}
 {% set LT_PAPER = PAPERS.lt %}
 {% set B3IT_PAPER = PAPERS.b3it %}
 {% macro paper_ref(p) %}
-<p class="paper-ref"><a href="{{ p.url }}" target="_blank" rel="noopener">{{ p.title }} →</a><span>{{ p.venue_line }}</span></p>
+<p class="paper-ref"><a href="{{ p.url }}" target="_blank" rel="noopener">{{ p.title }} →</a><span>{{ p.venue_line }}</span>{{ copy_bibtex(p.bibtex) }}</p>
 {% endmacro %}
 {% macro paper_read(p) %}
 <li>

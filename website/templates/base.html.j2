@@ -71,18 +71,23 @@
         });
         dlg.querySelector('.cite-dialog-close').addEventListener('click', function () { dlg.close(); });
         dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
-        dlg.querySelectorAll('.cite-box').forEach(function (box) {
+        function bindCopy(el, text) {
             function copy() {
-                var text = box.querySelector('.cite-copyable').textContent.trim();
-                navigator.clipboard.writeText(text).then(function () {
-                    box.classList.add('is-copied');
-                    setTimeout(function () { box.classList.remove('is-copied'); }, 1500);
+                navigator.clipboard.writeText(text()).then(function () {
+                    el.classList.add('is-copied');
+                    setTimeout(function () { el.classList.remove('is-copied'); }, 1500);
                 });
             }
-            box.addEventListener('click', copy);
-            box.addEventListener('keydown', function (e) {
+            el.addEventListener('click', copy);
+            if (el.tagName !== 'BUTTON') el.addEventListener('keydown', function (e) {
                 if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); copy(); }
             });
+        }
+        dlg.querySelectorAll('.cite-box').forEach(function (box) {
+            bindCopy(box, function () { return box.querySelector('.cite-copyable').textContent.trim(); });
+        });
+        document.querySelectorAll('.copy-bib').forEach(function (b) {
+            bindCopy(b, function () { return b.dataset.bibtex; });
         });
     })();
     </script>

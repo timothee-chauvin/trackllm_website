@@ -272,6 +272,9 @@ def test_cite_pill_on_front_methodology_and_about_and_dialog_has_both_papers(
         for paper in PAPERS.values():
             assert paper.plain in dialog
             assert paper.bibtex in dialog
+    # Methodology also has a Copy BibTeX button beside each paper
+    methodology = (tmp_path / "methodology.html").read_text()
+    assert methodology.count('class="copy-bib"') == len(PAPERS)
 
 
 def test_plain_citation_names_authors_title_venue_and_link():

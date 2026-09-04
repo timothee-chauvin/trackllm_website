@@ -278,6 +278,10 @@ test("the Cite pill's dialog holds both citations and both BibTeX entries", () =
     expect(plain.split("arxiv.org/abs/")).toHaveLength(3);
     expect(bibtex.split("@inproceedings{")).toHaveLength(3);
   }
+  document.documentElement.innerHTML = readFileSync(requireBuilt("methodology.html"), "utf8");
+  const buttons = [...document.querySelectorAll<HTMLElement>(".paper-ref .copy-bib")];
+  expect(buttons, "methodology: one Copy BibTeX button per paper").toHaveLength(2);
+  for (const b of buttons) expect(b.dataset.bibtex).toMatch(/^@inproceedings\{/);
 });
 
 test("the org page lists models and links each one", () => {
