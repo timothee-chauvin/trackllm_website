@@ -1,18 +1,14 @@
 {
   "name": "trackllm-website",
-  "private": true,
-  "scripts": {
-    "build": "bun build src/endpoint.ts src/spend.ts src/overview.ts src/model.ts src/provider.ts src/changes.ts src/tips.ts --outdir=js --minify --splitting",
-    "watch": "bun build src/endpoint.ts src/spend.ts src/overview.ts src/model.ts src/provider.ts src/changes.ts src/tips.ts --outdir=js --watch --splitting",
-    "test": "bun test"
-  },
-  "dependencies": {
-    "plotly.js-basic-dist-min": "^3.7.0"
-  },
   "devDependencies": {
     "@happy-dom/global-registrator": "^20.11.0",
     "@types/bun": "^1.3.14",
-    "@types/plotly.js-basic-dist-min": "^2.12.4",
     "typescript": "^5.7.0"
+  },
+  "private": true,
+  "scripts": {
+    "build": "bun build src/endpoint.ts src/overview.ts src/model.ts src/provider.ts src/changes.ts src/tips.ts --outdir=js --minify --splitting",
+    "watch": "bun build src/endpoint.ts src/overview.ts src/model.ts src/provider.ts src/changes.ts src/tips.ts --outdir=js --watch --splitting",
+    "test": "bun test"
   }
 }

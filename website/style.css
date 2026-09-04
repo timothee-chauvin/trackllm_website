@@ -293,8 +293,8 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 
 /* untracked endpoint page: catalog metadata in place of a chart */
 .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1.2rem; padding: 1rem 1.4rem; }
-.meta-grid .k { font-size: 0.68rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.25rem; }
-.meta-grid .v { font-family: var(--mono); font-size: 0.95rem; font-weight: 600; }
+.meta-grid .k, .spend-stats .k { font-size: 0.68rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.25rem; }
+.meta-grid .v, .spend-stats .v { font-family: var(--mono); font-size: 0.95rem; font-weight: 600; }
 
 .sec-desc { color: var(--text-muted); font-size: 0.86rem; margin: -0.6rem 0 1.1rem; max-width: 82ch; }
 .sec-desc b { color: var(--text); font-weight: 600; }
@@ -424,9 +424,23 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
   .cmp .axis .ticks { grid-column: 1; }
 }
 
-/* spend page */
-.no-data { color: var(--text-dim); font-size: 0.86rem; padding: 0.8rem 0; }
-.untracked { color: var(--text-dim); }
+/* endpoint page: what this endpoint cost, by activity. One hue per group, the
+   same mapping in the bar and the legend. */
+.spend-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.2rem; padding: 0.8rem 0 1.2rem; }
+.spend-bar { display: flex; height: 10px; border-radius: 5px; overflow: hidden; background: var(--surface-2); }
+.spend-bar > i { display: block; height: 100%; min-width: 2px; }
+.spend-bar > i + i { border-left: 1px solid var(--surface); }
+.spend-legend { list-style: none; margin: 0.9rem 0 0.4rem; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem 1.8rem; font-size: 0.84rem; color: var(--text-muted); }
+.spend-legend li { display: flex; align-items: center; gap: 0.5rem; }
+.spend-legend .num { font-family: var(--mono); font-weight: 600; color: var(--text); }
+.spend-legend .pct { color: var(--text-dim); font-weight: 500; margin-left: 0.4rem; }
+.spend-legend > li > i { width: 9px; height: 9px; border-radius: 3px; flex: none; }
+.spend-legend + .footnote, .spend-stats + .footnote { padding: 0.6rem 0 0; }
+.spend-bar .onboarding, .spend-legend .onboarding { background: var(--b3it); }
+.spend-bar .monitoring, .spend-legend .monitoring { background: var(--accent); }
+.spend-bar .lt, .spend-legend .lt { background: var(--stable); }
+.spend-bar .vetting, .spend-legend .vetting { background: var(--changed); }
+.spend-bar .other, .spend-legend .other { background: var(--retired); }
 
 .empty { padding: 2rem 1.1rem; text-align: center; color: var(--text-dim); font-size: 0.86rem; }
 .empty.load-error { color: var(--alert); background: var(--alert-bg); border-radius: var(--radius); }

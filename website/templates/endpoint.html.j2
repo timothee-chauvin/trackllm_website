@@ -79,6 +79,31 @@
   </section>
   {% endif %}
 
+  {% if spend %}
+  <section class="block">
+    <div class="sec-head"><h2>Spend</h2><span class="hint">what OpenRouter billed for tracking this endpoint</span></div>
+    <div class="panel">
+      <div class="spend-stats">
+        <div><div class="k">Total to date</div><div class="v">${{ spend.total|fmt_cost }}</div></div>
+        <div><div class="k">Last 30 days</div><div class="v">${{ spend.last_30d|fmt_cost }}</div></div>
+        <div><div class="k">Queries</div><div class="v">{{ "{:,}".format(spend.n_queries) }}</div></div>
+        <div><div class="k">Since</div><div class="v">{{ spend.since }}</div></div>
+      </div>
+      {% if spend.total > 0 %}
+      <div class="spend-bar" aria-hidden="true">
+        {%- for g, cost in spend.groups.items() if cost > 0 %}<i class="{{ g }}" style="width:{{ "%.2f"|format(cost / spend.total * 100) }}%"></i>{% endfor -%}
+      </div>
+      <ul class="spend-legend">
+        {% for g, cost in spend.groups.items() %}
+        <li><i class="{{ g }}"></i>{{ group_label[g] }}<span class="num">${{ cost|fmt_cost }}{% set pct = cost / spend.total * 100 %}<span class="pct">{{ "<1%" if 0 < pct < 0.5 else "%.0f%%"|format(pct) }}</span></span></li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+      <div class="footnote"><b>Vetting</b> is the one-off probe that checks the endpoint's billed cost against its advertised price. <b>B3IT (onboarding)</b> is the initial border-input search, by far the most expensive step; <b>B3IT (monitoring)</b> and <b>LT</b> are the recurring daily checks.</div>
+    </div>
+  </section>
+  {% endif %}
+
   <section class="block">
     <div class="method-note">
       <div class="card"><h3><span class="badge lt">LT</span> Logprob tracking</h3><p>Primary signal where the provider returns logprobs. The drift is the mean absolute change in the returned tokens' log-probabilities versus the reference period (in nats — natural-log probability units). The detector also reports σ, one of the metrics feeding its change-detection criterion, which can be high even when the drift is small.</p></div>

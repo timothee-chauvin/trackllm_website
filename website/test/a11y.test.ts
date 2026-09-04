@@ -271,7 +271,6 @@ describe("navigation", () => {
   test("the current page's nav link is marked, and only it", () => {
     const cases: [string, string][] = [
       ["changes.html", "changes.html"],
-      ["spend.html", "spend.html"],
       ["methodology.html", "methodology.html"],
       ["about.html", "about.html"],
     ];

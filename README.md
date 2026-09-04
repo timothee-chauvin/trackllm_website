@@ -72,7 +72,7 @@ website/
 │   ├── b3it/           # border-input state, phase-2 samples, per-endpoint views
 │   ├── spend/          # per-endpoint spend ledgers
 │   └── *.json          # generated, untracked: overview, changes, changes_page, models/, providers/
-└── (generated pages)   # index, changes, spend, methodology + endpoints/ models/ providers/ orgs/
+└── (generated pages)   # index, changes, methodology + endpoints/ models/ providers/ orgs/
 ```
 
 ## Data pipeline
