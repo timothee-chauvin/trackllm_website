@@ -30,6 +30,12 @@ endpoints_lt:
   - 0.02
   - 0.1
 - api: openrouter
+  model: openai/gpt-oss-20b
+  provider: akashml/fp4
+  cost:
+  - 0.02
+  - 0.1
+- api: openrouter
   model: ibm-granite/granite-4.0-h-micro
   provider: cloudflare
   cost:
@@ -237,7 +243,7 @@ endpoints_lt:
   model: openai/gpt-oss-120b
   provider: mancer/fp8
   cost:
-  - 0.065
+  - 0.055
   - 0.5
 - api: openrouter
   model: qwen/qwen3.8-flash
@@ -251,6 +257,12 @@ endpoints_lt:
   cost:
   - 0.13
   - 0.52
+- api: openrouter
+  model: deepseek/deepseek-v4-flash
+  provider: mancer/fp8
+  cost:
+  - 0.175
+  - 0.5
 - api: openrouter
   model: meta-llama/llama-3.3-70b-instruct
   provider: akashml/fp8
@@ -588,6 +600,18 @@ endpoints_lt:
   - 0.6
   - 1.7
 - api: openrouter
+  model: qwen/qwen3.8-27b
+  provider: akashml/fp8
+  cost:
+  - 0.25
+  - 2.2
+- api: openrouter
+  model: qwen/qwen3.8-27b
+  provider: parasail/fp8
+  cost:
+  - 0.28
+  - 2.2
+- api: openrouter
   model: deepseek/deepseek-v4-pro
   provider: digitalocean
   cost:
@@ -595,19 +619,19 @@ endpoints_lt:
   - 1.74
 - api: openrouter
   model: qwen/qwen3.8-27b
-  provider: akashml/fp8
+  provider: darkbloom/fp4
   cost:
-  - 0.35
+  - 0.22
+  - 2.42
+- api: openrouter
+  model: qwen/qwen3.8-27b
+  provider: reka/fp8
+  cost:
+  - 0.24
   - 2.55
 - api: openrouter
   model: qwen/qwen3.8-27b
   provider: ionstream/fp8
-  cost:
-  - 0.35
-  - 2.55
-- api: openrouter
-  model: qwen/qwen3.8-27b
-  provider: reka/fp8
   cost:
   - 0.35
   - 2.55
@@ -629,12 +653,6 @@ endpoints_lt:
   cost:
   - 0.432
   - 3.06
-- api: openrouter
-  model: qwen/qwen3.8-27b
-  provider: parasail/fp8
-  cost:
-  - 0.35
-  - 3.2
 - api: openrouter
   model: qwen/qwen3.8-27b
   provider: cloudflare
