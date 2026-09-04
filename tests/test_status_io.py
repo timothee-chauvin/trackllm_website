@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 import pytest
 from conftest import catalog_entry, empty_status_inputs
 from trackllm_website.bi.state import EndpointBIState
-from trackllm_website.config import Endpoint
+from trackllm_website.config import Endpoint, config
 from trackllm_website.generate_site.lt import EndpointInfo
 from trackllm_website.generate_site.status_io import (
     load_catalog,
@@ -95,12 +95,14 @@ def test_resolve_site_statuses_builds_union_lookups():
     assert site.statuses[state.slug].bi == "monitoring"
 
 
-def _write_error_months(lt_dir, endpoint: Endpoint, n_errors: int):
+def _write_error_days(lt_dir, endpoint: Endpoint, n_days: int):
     d = lt_dir / slugify(f"{endpoint.model}#{endpoint.provider}") / "prompt"
     err = ResponseError(http_code=500, message="boom")
-    dt = datetime(2026, 6, 15, tzinfo=timezone.utc)
+    errors = [
+        (datetime(2026, 6, 1 + day, tzinfo=timezone.utc), err) for day in range(n_days)
+    ]
     MonthlyData(
-        year=2026, month=6, logprob_responses=[], error_responses=[(dt, err)] * n_errors
+        year=2026, month=6, logprob_responses=[], error_responses=errors
     ).serialize(d / "2026-06")
 
 
@@ -108,10 +110,10 @@ def test_lt_stalled_slugs_flags_only_all_error_observed_endpoints(tmp_path):
     stalled = Endpoint(api="openrouter", model="org/dead", provider="p", cost=(1, 2))
     thin = Endpoint(api="openrouter", model="org/thin", provider="p", cost=(1, 2))
     unobserved = Endpoint(api="openrouter", model="org/gone", provider="p", cost=(1, 2))
-    # is_stalled needs config.api.abandon_after all-error latest queries (100)
-    _write_error_months(tmp_path, stalled, 100)
-    _write_error_months(tmp_path, thin, 5)
-    _write_error_months(tmp_path, unobserved, 100)
+    # is_stalled needs config.api.lt_stall_days all-error queried days
+    _write_error_days(tmp_path, stalled, config.api.lt_stall_days)
+    _write_error_days(tmp_path, thin, config.api.lt_stall_days - 1)
+    _write_error_days(tmp_path, unobserved, config.api.lt_stall_days)
 
     observed = {
         slugify("org/dead#p"),

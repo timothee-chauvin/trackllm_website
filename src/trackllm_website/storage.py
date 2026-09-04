@@ -368,11 +368,11 @@ class ResultsStorage:
         # Serialize back to disk
         monthly_data.serialize(path=month_dir)
 
-    def get_prompt_latest_queries(
-        self, prompt_path: Path, n: int
+    def get_prompt_recent_days_queries(
+        self, prompt_path: Path, n_days: int
     ) -> list[tuple[datetime, ResponseLogprobs | ResponseError]]:
-        """Get the latest `n` queries for an endpoint, in a given prompt directory."""
-        latest_queries = []
+        """Every query from the prompt's `n_days` most recent queried days."""
+        queries: list[tuple[datetime, ResponseLogprobs | ResponseError]] = []
         month_dirs = sorted(
             [d for d in prompt_path.iterdir() if d.is_dir()], reverse=True
         )
@@ -381,27 +381,29 @@ class ResultsStorage:
             monthly_data = MonthlyData.load_existing(
                 path=month_dir, year=year, month=month
             )
-            latest_queries.extend(monthly_data.logprob_responses)
-            latest_queries.extend(monthly_data.error_responses)
-            if len(latest_queries) >= n:
-                latest_queries.sort(key=lambda x: x[0], reverse=True)
-                return latest_queries[:n]
-        return latest_queries
+            queries.extend(monthly_data.logprob_responses)
+            queries.extend(monthly_data.error_responses)
+            if len({d.date() for d, _ in queries}) >= n_days:
+                break
+        return _recent_days(queries, n_days)
 
-    def get_latest_queries(
-        self, prompt_paths: list[Path], n: int
+    def get_recent_days_queries(
+        self, prompt_paths: list[Path], n_days: int
     ) -> list[tuple[datetime, ResponseLogprobs | ResponseError]]:
-        """Get the latest `n` queries for this endpoint across all `prompt_paths`."""
-        latest_queries = []
+        """Every query from the endpoint's `n_days` most recent queried days,
+        across all `prompt_paths`."""
+        queries = []
         for prompt_path in prompt_paths:
-            latest_queries.extend(self.get_prompt_latest_queries(prompt_path, n))
-        latest_queries.sort(key=lambda x: x[0], reverse=True)
-        return latest_queries[:n]
+            queries.extend(self.get_prompt_recent_days_queries(prompt_path, n_days))
+        return _recent_days(queries, n_days)
 
     def is_stalled(self, endpoint: Endpoint) -> bool:
-        """Check if an endpoint is stalled by looking at the `config.abandon_after` latest queries.
+        """The endpoint's `config.api.lt_stall_days` most recent queried days all
+        had zero successes — the LT twin of the BI stall rule (bi.reinit.stall_days).
 
-        An endpoint is stalled if it has at least `config.abandon_after` queries, and the latest `config.abandon_after` queries all resulted in errors."""
+        Day-based rather than query-count-based so the verdict does not stretch
+        with the cron cadence: GitHub fires the hourly run-main only a few times a
+        day at times, which turned a fixed query count into weeks of dead retries."""
         # Only prompt directories; skip stray files like lt_scores.json that the
         # LT scoring step writes into the endpoint dir.
         prompt_paths = [
@@ -412,8 +414,15 @@ class ResultsStorage:
         if not prompt_paths:
             # No responses yet
             return False
-        latest_queries = self.get_latest_queries(prompt_paths, config.api.abandon_after)
-        if len(latest_queries) < config.api.abandon_after:
-            # Not enough queries yet
+        queries = self.get_recent_days_queries(prompt_paths, config.api.lt_stall_days)
+        if len({d.date() for d, _ in queries}) < config.api.lt_stall_days:
             return False
-        return all(isinstance(query[1], ResponseError) for query in latest_queries)
+        return all(isinstance(r, ResponseError) for _, r in queries)
+
+
+def _recent_days(
+    queries: list[tuple[datetime, ResponseLogprobs | ResponseError]], n_days: int
+) -> list[tuple[datetime, ResponseLogprobs | ResponseError]]:
+    """Keep only the queries falling on the `n_days` most recent dates."""
+    keep = set(sorted({d.date() for d, _ in queries}, reverse=True)[:n_days])
+    return [q for q in queries if q[0].date() in keep]
