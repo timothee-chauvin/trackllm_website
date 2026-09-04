@@ -336,7 +336,7 @@ describe("the changes table never widens the page", () => {
   const css = readFileSync(join(SITE, "style.css"), "utf8");
 
   test("every changes table can scroll on its own", () => {
-    for (const page of [EP_PAGE, "spend.html"]) {
+    for (const page of [EP_PAGE]) {
       document.documentElement.innerHTML = readFileSync(requireBuilt(page), "utf8");
       const tables = [...document.querySelectorAll("table.changes-tbl")];
       expect(tables.length, `no changes table on ${page}`).toBeGreaterThan(0);

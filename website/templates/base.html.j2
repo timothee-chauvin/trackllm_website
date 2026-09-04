@@ -23,7 +23,7 @@
         {# body_class already names the page every template is rendered as, so it is
            what says which nav link is the current one. #}
         <div class="nav-links">
-            {% for page, label in [('changes', 'Changes'), ('spend', 'Spend'), ('methodology', 'Methodology')] %}
+            {% for page, label in [('changes', 'Changes'), ('methodology', 'Methodology')] %}
             <a href="{{ nav_prefix }}{{ page }}.html"{% if body_class == page %} class="active" aria-current="page"{% endif %}>{{ label }}</a>
             {% endfor %}
             <a href="https://github.com/timothee-chauvin/trackllm_website" target="_blank" rel="noopener">GitHub</a>

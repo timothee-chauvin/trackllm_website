@@ -144,23 +144,34 @@ def test_render_emits_spend(tmp_path):
     zp.mkdir(parents=True)
     (zp / "2026-06.jsonl").write_text(_spend_line("lt", 0.0) + "\n")
 
+    _lt_endpoint(tmp_path, "zero2fcost23ep", "zero/cost", "ep")
+
     render_site(tmp_path, None, empty_status_inputs())
-    assert (tmp_path / "data" / "spend.json").exists()
-    assert (tmp_path / "spend.html").exists()
-    assert "spend" in (tmp_path / "index.html").read_text().lower()
+    assert not (tmp_path / "spend.html").exists()
 
-    # Assert spend data renders with correct cost value
-    spend_html = (tmp_path / "spend.html").read_text()
-    assert "$0.050" in spend_html, "Cost should render with util.format_cost"
-    assert "m2fa23p" in spend_html, "Endpoint slug should appear in spend table"
+    # The endpoint page carries its own spend, formatted with util.format_cost
+    page = (tmp_path / "endpoints" / "m2fa23p.html").read_text()
+    spend_section = page.split("<h2>Spend</h2>")[1].split("</section>")[0]
+    assert "$0.050" in spend_section
+    assert "LT" in spend_section
 
-    # Zero-billed group renders as $0.00 (lt cell + total), not as the no-data dash
-    zero_row = next(r for r in spend_html.split("<tr>") if "zero2fcost23ep" in r)
-    assert zero_row.count("$0.00") == 2
+    # Zero-billed: still a spend section (total + LT line read $0.00), but no
+    # share bar, which would have nothing to divide by
+    zero_page = (tmp_path / "endpoints" / "zero2fcost23ep.html").read_text()
+    zero_section = zero_page.split("<h2>Spend</h2>")[1].split("</section>")[0]
+    assert "$0.00" in zero_section
+    assert "spend-bar" not in zero_section
 
-    # Assert emitted spend.json has expected cumulative cost
+    # spend.json feeds the front-page total
     spend_data = json.loads((tmp_path / "data" / "spend.json").read_text())
     assert spend_data["cumulative"]["lt"] == pytest.approx(0.05)
+
+
+def test_endpoint_without_ledger_has_no_spend_section(tmp_path):
+    _scaffold(tmp_path)
+    render_site(tmp_path, None, empty_status_inputs())
+    page = (tmp_path / "endpoints" / "m2fa23p.html").read_text()
+    assert "<h2>Spend</h2>" not in page
 
 
 def test_render_endpoint_page_context_for_multi_provider_model(tmp_path):
@@ -224,7 +235,7 @@ def test_nav_marks_only_the_current_page(tmp_path):
     with no nav entry of its own (the Overview) marks none."""
     _scaffold(tmp_path)
     render_site(tmp_path, None, empty_status_inputs())
-    for page in ("changes", "spend", "methodology", "about"):
+    for page in ("changes", "methodology", "about"):
         html = (tmp_path / f"{page}.html").read_text()
         assert f'<a href="{page}.html" class="active" aria-current="page">' in html
         assert html.count("aria-current") == 1
@@ -616,24 +627,6 @@ def test_a_dead_lt_series_does_not_hide_a_live_b3it_one(tmp_path):
     overview = json.loads((tmp_path / "data" / "overview.json").read_text())
     row = next(e for e in overview["endpoints"] if e["slug"] == slug)
     assert row["methods"] == ["b3it"]
-
-
-def test_spend_rows_only_link_endpoints_that_have_a_page(tmp_path):
-    """Spend covers every slug we were ever billed for -- discovery probes and
-    endpoints that never produced a series included. Those have no page, so the
-    slug is named but not linked."""
-    _scaffold(tmp_path)
-    for slug in ("m2fa23p", "probe2fonly23q"):
-        d = tmp_path / "data" / "spend" / slug
-        d.mkdir(parents=True)
-        (d / "2026-06.jsonl").write_text(_spend_line("lt", 0.05) + "\n")
-
-    render_site(tmp_path, None, empty_status_inputs())
-
-    html = (tmp_path / "spend.html").read_text()
-    assert 'href="endpoints/m2fa23p.html"' in html
-    assert "probe2fonly23q" in html
-    assert 'href="endpoints/probe2fonly23q.html"' not in html
 
 
 def test_methodology_links_each_paper_from_its_own_section(tmp_path):

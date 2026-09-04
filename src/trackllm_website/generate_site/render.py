@@ -71,7 +71,6 @@ def render_site(
     env.filters["fmt_price"] = format_price
     index_template = env.get_template("index.html.j2")
     endpoint_template = env.get_template("endpoint.html.j2")
-    spend_template = env.get_template("spend.html.j2")
     model_template = env.get_template("model.html.j2")
     provider_template = env.get_template("provider.html.j2")
     org_template = env.get_template("org.html.j2")
@@ -138,10 +137,7 @@ def render_site(
     print(f"\nFound {n_active} active, {n_total - n_active} inactive endpoints")
 
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    endpoint_names = spend_mod.build_endpoint_names(discovered, bi_states)
-    spend = spend_mod.aggregate_spend(
-        website_dir / "data" / "spend", today, endpoint_names
-    )
+    spend = spend_mod.aggregate_spend(website_dir / "data" / "spend", today)
     (website_dir / "data" / "spend.json").write_text(json.dumps(spend))
 
     overview = overview_mod.build_overview(
@@ -252,16 +248,6 @@ def render_site(
     (website_dir / "index.html").write_text(index_html)
     print("Generated index.html")
 
-    spend_html = spend_template.render(
-        spend=spend,
-        tracked=set(lt_by_slug) | set(b3it_views),
-        vetting_tip=spend_mod.VETTING_TIP,
-        css_path="style.css",
-        body_class="spend",
-    )
-    (website_dir / "spend.html").write_text(spend_html)
-    print("Generated spend.html")
-
     for f in endpoints_dir.glob("*.html"):
         f.unlink()
 
@@ -298,6 +284,8 @@ def render_site(
             methods=methods,
             status=status_json(site.statuses[slug]),
             meta=entry.as_meta() if entry else None,
+            spend=spend["by_endpoint"].get(slug),
+            group_label=spend_mod.GROUP_LABEL,
             manifest=manifests[slug],
             css_path="../style.css",
             body_class="endpoint",
