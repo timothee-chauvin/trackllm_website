@@ -277,6 +277,9 @@
   "openrouter#deepseek/deepseek-v4-flash-0731#together": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#venice": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#wafer/fast": null,
+  "openrouter#deepseek/deepseek-v4-flash-vision-exp#atlas-cloud/fp8": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-flash-vision-exp#deepinfra/fp8": {
     "effort": "none"
   },
@@ -284,6 +287,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4-flash-vision-exp#novita": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4-flash-vision-exp#siliconflow/fp8": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4-pro#alibaba": null,
@@ -937,6 +943,7 @@
   "openrouter#moonshotai/kimi-k2.7-code#venice/int4": null,
   "openrouter#morph/morph-v3-fast#morph": null,
   "openrouter#morph/morph-v3-large#morph": null,
+  "openrouter#morph/morph-v3-large#morph/fp8": null,
   "openrouter#nex-agi/nex-n2-mini#nex-agi": {
     "max_tokens": 4
   },
@@ -1910,6 +1917,7 @@
   "openrouter#z-ai/glm-5.3#z-ai/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#baseten/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#cloudflare": null,
+  "openrouter#z-ai/glm-5.3-flash#coreweave/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#deepinfra/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#digitalocean": null,
   "openrouter#z-ai/glm-5.3-flash#fireworks": null,

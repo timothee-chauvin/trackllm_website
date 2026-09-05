@@ -102,12 +102,6 @@ endpoints_lt:
   - 0.042
   - 0.22
 - api: openrouter
-  model: deepseek/deepseek-v4-flash
-  provider: sail-research/fp4
-  cost:
-  - 0.09
-  - 0.18
-- api: openrouter
   model: deepseek/deepseek-v4-flash-0731
   provider: makora
   cost:
@@ -125,6 +119,12 @@ endpoints_lt:
   cost:
   - 0.1
   - 0.2
+- api: openrouter
+  model: deepseek/deepseek-v4-flash-0731
+  provider: streamlake/fp8
+  cost:
+  - 0.088
+  - 0.264
 - api: openrouter
   model: meta-llama/llama-3.2-3b-instruct
   provider: parasail/bf16
@@ -192,12 +192,6 @@ endpoints_lt:
   - 0.1
   - 0.4
 - api: openrouter
-  model: deepseek/deepseek-v4-flash-0731
-  provider: streamlake/fp8
-  cost:
-  - 0.132
-  - 0.396
-- api: openrouter
   model: google/gemma-3-27b-it
   provider: parasail/fp8
   cost:
@@ -243,7 +237,7 @@ endpoints_lt:
   model: openai/gpt-oss-120b
   provider: mancer/fp8
   cost:
-  - 0.055
+  - 0.05
   - 0.5
 - api: openrouter
   model: qwen/qwen3.8-flash
@@ -589,27 +583,21 @@ endpoints_lt:
   - 1.68
 - api: openrouter
   model: deepseek/deepseek-chat-v3.1
-  provider: google-vertex/us-west2
-  cost:
-  - 0.6
-  - 1.7
-- api: openrouter
-  model: deepseek/deepseek-chat-v3.1
   provider: mara
   cost:
   - 0.6
   - 1.7
 - api: openrouter
   model: qwen/qwen3.8-27b
-  provider: akashml/fp8
+  provider: parasail/fp8
   cost:
-  - 0.25
+  - 0.24
   - 2.2
 - api: openrouter
   model: qwen/qwen3.8-27b
-  provider: parasail/fp8
+  provider: akashml/fp8
   cost:
-  - 0.28
+  - 0.25
   - 2.2
 - api: openrouter
   model: deepseek/deepseek-v4-pro
@@ -675,8 +663,8 @@ endpoints_lt:
   model: deepseek/deepseek-v4-pro-0813
   provider: streamlake
   cost:
-  - 1.1154
-  - 3.3462
+  - 1.12068
+  - 3.36204
 - api: openrouter
   model: deepseek/deepseek-v4-pro-0813
   provider: gmicloud/fp8
