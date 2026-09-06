@@ -710,6 +710,7 @@
   "openrouter#meta-llama/llama-4-maverick#novita/fp8": null,
   "openrouter#meta-llama/llama-4-maverick#parasail/fp8": null,
   "openrouter#meta-llama/llama-4-scout#deepinfra/fp8": null,
+  "openrouter#meta-llama/llama-4-scout#google-vertex/us-east5": null,
   "openrouter#meta-llama/llama-4-scout#groq": null,
   "openrouter#meta-llama/llama-4-scout#novita/bf16": null,
   "openrouter#meta-llama/llama-guard-4-12b#deepinfra/bf16": {
@@ -1195,6 +1196,7 @@
   "openrouter#openai/gpt-oss-120b#deepinfra/bf16": {
     "max_tokens": 4
   },
+  "openrouter#openai/gpt-oss-120b#deepinfra/fp8": null,
   "openrouter#openai/gpt-oss-120b#deepinfra/turbo": {
     "max_tokens": 4
   },
@@ -1918,6 +1920,7 @@
   "openrouter#z-ai/glm-5.3-flash#baseten/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#cloudflare": null,
   "openrouter#z-ai/glm-5.3-flash#coreweave/fp8": null,
+  "openrouter#z-ai/glm-5.3-flash#deepinfra/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#deepinfra/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#digitalocean": null,
   "openrouter#z-ai/glm-5.3-flash#fireworks": null,
