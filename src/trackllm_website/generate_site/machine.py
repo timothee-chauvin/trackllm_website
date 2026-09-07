@@ -274,7 +274,8 @@ def render_markdown(
             )
     for directory, files in by_dir.items():
         _write_dir(directory, ".md", files)
-    print(f"Generated {sum(len(f) for f in by_dir.values())} markdown pages")
+    (website_dir / "llms.txt").write_text(env.get_template("llms.txt.j2").render())
+    print(f"Generated {sum(len(f) for f in by_dir.values())} markdown pages + llms.txt")
 
 
 def _entry(item: dict) -> dict:

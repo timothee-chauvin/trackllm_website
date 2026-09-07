@@ -77,6 +77,15 @@ def test_every_markdown_site_link_is_absolute_and_resolves(site: Path):
             assert target.exists(), f"{md.relative_to(site)}: {href}"
 
 
+def test_llms_txt_is_generated_with_resolving_links(site: Path):
+    txt = (site / "llms.txt").read_text()
+    assert txt.startswith("# TrackLLM")
+    for href in _md_links(txt):
+        assert href.startswith("https://"), href
+        if href.startswith(f"{SITE_URL}/"):
+            assert (site / href.removeprefix(f"{SITE_URL}/")).exists(), href
+
+
 def test_markdown_header_names_html_feed_and_json(site: Path):
     md = (site / "endpoints" / "m2fa23p.md").read_text()
     assert "https://www.trackllm.net/endpoints/m2fa23p.html" in md

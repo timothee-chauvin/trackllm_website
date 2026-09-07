@@ -22,7 +22,7 @@ watch: install
 .PHONY: clean
 # Clean generated files
 clean:
-	rm -rf website/js website/endpoints website/models website/orgs website/providers website/feeds website/*.html website/*.md website/node_modules website/data/overview.json website/data/models website/data/providers
+	rm -rf website/js website/endpoints website/models website/orgs website/providers website/feeds website/*.html website/*.md website/llms.txt website/node_modules website/data/overview.json website/data/models website/data/providers
 
 .PHONY: test
 # Full suite. The JS smoke tests render the generated site, so they need a build.
