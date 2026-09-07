@@ -140,6 +140,12 @@ too_expensive:
   - 0.5
   - 2.18
 - api: openrouter
+  model: deepseek/deepseek-v4-flash
+  provider: phala
+  cost:
+  - 0.2
+  - 0.4
+- api: openrouter
   model: deepseek/deepseek-v4-pro
   provider: gmicloud/fp8
   cost:
@@ -337,6 +343,12 @@ too_expensive:
   cost:
   - 0.95
   - 4.0
+- api: openrouter
+  model: moonshotai/kimi-k2.6
+  provider: gmicloud/fp8
+  cost:
+  - 0.855
+  - 3.6
 - api: openrouter
   model: moonshotai/kimi-k2.6
   provider: novita
@@ -2798,6 +2810,16 @@ unprobeable:
   reason: flaky
   detail: 'cached: hidden reasoning'
 - api: openrouter
+  model: moonshotai/kimi-k2.7-code
+  provider: together
+  cost:
+  - 0.95
+  - 4.0
+  reason: flaky
+  detail: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"id\":
+    \"ozHUrzy-2kFHot-a3734a26aa5f8462\",\n  \"error\": {\n    \"message\": \"Unable
+    to access non-serverless model moonshota...'
+- api: openrouter
   model: moonshotai/kimi-k3
   provider: baseten/fp8
   cost:
@@ -3202,6 +3224,15 @@ unprobeable:
   reason: flaky
   detail: 'cached: hidden reasoning'
 - api: openrouter
+  model: openai/gpt-oss-20b
+  provider: fireworks
+  cost:
+  - 0.07
+  - 0.3
+  reason: flaky
+  detail: '{"message":"Provider returned error","code":404,"metadata":{"raw":"{\"error\":{\"message\":\"Model
+    not found, inaccessible, and/or not deployed\",\"param\":\"model\",\"code\":\"NOT_FOUND\",\"type\":\"...'
+- api: openrouter
   model: openai/gpt-oss-20b:batch
   provider: together
   cost:
@@ -3363,12 +3394,8 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
-  openrouter#moonshotai/kimi-k2.7-code#together:
-    count: 2
-    last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"id\":
-      \"oz9pb5p-2kFHot-a36b05dbe811f79b\",\n  \"error\": {\n    \"message\": \"Unable
-      to access non-serverless model moonshota...'
-  openrouter#openai/gpt-oss-20b#fireworks:
-    count: 2
-    last_error: '{"message":"Provider returned error","code":404,"metadata":{"raw":"{\"error\":{\"message\":\"Model
-      not found, inaccessible, and/or not deployed\",\"param\":\"model\",\"code\":\"NOT_FOUND\",\"type\":\"...'
+  openrouter#deepseek/deepseek-chat-v3.1#google-vertex/us-west2:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":503,"metadata":{"raw":"[{\n  \"error\":
+      {\n    \"code\": 503,\n    \"message\": \"Model server is not available. Please
+      retry. endpoint_id: 4539483288854593...'

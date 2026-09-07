@@ -120,18 +120,6 @@ endpoints_lt:
   - 0.1
   - 0.2
 - api: openrouter
-  model: qwen/qwen3.8-27b
-  provider: darkbloom/fp4
-  cost:
-  - 0.15
-  - 0.2
-- api: openrouter
-  model: deepseek/deepseek-v4-flash-0731
-  provider: streamlake/fp8
-  cost:
-  - 0.088
-  - 0.264
-- api: openrouter
   model: meta-llama/llama-3.2-3b-instruct
   provider: parasail/bf16
   cost:
@@ -186,17 +174,17 @@ endpoints_lt:
   - 0.12
   - 0.36
 - api: openrouter
-  model: qwen/qwen3-vl-30b-a3b-instruct
-  provider: darkbloom/fp4
-  cost:
-  - 0.09
-  - 0.4
-- api: openrouter
   model: google/gemma-4-26b-a4b-it
   provider: nextbit/bf16
   cost:
   - 0.1
   - 0.4
+- api: openrouter
+  model: deepseek/deepseek-v4-flash-0731
+  provider: streamlake/fp8
+  cost:
+  - 0.132
+  - 0.396
 - api: openrouter
   model: google/gemma-3-27b-it
   provider: parasail/fp8
@@ -516,12 +504,6 @@ endpoints_lt:
   - 0.29
   - 1.14
 - api: openrouter
-  model: kwaipilot/kat-coder-pro-v2
-  provider: streamlake
-  cost:
-  - 0.3
-  - 1.2
-- api: openrouter
   model: meta-llama/llama-3.1-70b-instruct
   provider: coreweave/bf16
   cost:
@@ -576,6 +558,12 @@ endpoints_lt:
   - 0.21
   - 1.9
 - api: openrouter
+  model: qwen/qwen3.8-27b
+  provider: darkbloom/fp4
+  cost:
+  - 0.15
+  - 2.0
+- api: openrouter
   model: deepseek/deepseek-chat-v3.1
   provider: coreweave/fp8
   cost:
@@ -617,12 +605,6 @@ endpoints_lt:
   cost:
   - 0.214
   - 2.55
-- api: openrouter
-  model: morph/morph-v3-large
-  provider: morph/fp8
-  cost:
-  - 0.9
-  - 1.9
 - api: openrouter
   model: qwen/qwen3.8-27b
   provider: ionstream/fp8
@@ -669,8 +651,8 @@ endpoints_lt:
   model: deepseek/deepseek-v4-pro-0813
   provider: streamlake
   cost:
-  - 1.12068
-  - 3.36204
+  - 1.1154
+  - 3.3462
 - api: openrouter
   model: deepseek/deepseek-v4-pro-0813
   provider: gmicloud/fp8
@@ -701,6 +683,12 @@ endpoints_lt:
   cost:
   - 0.95
   - 4.0
+- api: openrouter
+  model: z-ai/glm-5.2
+  provider: decart/fast
+  cost:
+  - 1.26
+  - 3.96
 - api: openrouter
   model: deepseek/deepseek-v4-pro-0813
   provider: digitalocean
@@ -755,12 +743,6 @@ endpoints_lt:
   cost:
   - 3.0
   - 4.0
-- api: openrouter
-  model: qwen/qwen3.6-max-preview
-  provider: alibaba
-  cost:
-  - 1.027
-  - 6.162
 - api: openrouter
   model: anthracite-org/magnum-v4-72b
   provider: mancer/fp8

@@ -1828,6 +1828,9 @@
   "openrouter#z-ai/glm-5.2#cloudflare/fast": null,
   "openrouter#z-ai/glm-5.2#coreweave/fp4": null,
   "openrouter#z-ai/glm-5.2#crusoe/fp8": null,
+  "openrouter#z-ai/glm-5.2#decart/fast": {
+    "effort": "none"
+  },
   "openrouter#z-ai/glm-5.2#decart/fp4": null,
   "openrouter#z-ai/glm-5.2#deepinfra/fp4": null,
   "openrouter#z-ai/glm-5.2#digitalocean": null,
@@ -1889,6 +1892,7 @@
   "openrouter#z-ai/glm-5.3#baseten/fp4": null,
   "openrouter#z-ai/glm-5.3#baseten/fp8": null,
   "openrouter#z-ai/glm-5.3#cloudflare": null,
+  "openrouter#z-ai/glm-5.3#crusoe/fp8": null,
   "openrouter#z-ai/glm-5.3#decart/fp4": null,
   "openrouter#z-ai/glm-5.3#deepinfra/fp4": null,
   "openrouter#z-ai/glm-5.3#deepinfra/fp8": null,
@@ -1911,6 +1915,7 @@
   "openrouter#z-ai/glm-5.3#siliconflow/fp8": {
     "max_tokens": 1
   },
+  "openrouter#z-ai/glm-5.3#streamlake": null,
   "openrouter#z-ai/glm-5.3#together": {
     "max_tokens": 1
   },
