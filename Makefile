@@ -12,7 +12,7 @@ build: install
 .PHONY: serve
 # Serve the website locally
 serve: build
-	cd website && python -m http.server 8000
+	uv run python scripts/serve.py 8000
 
 .PHONY: watch
 # Watch TypeScript for changes (run in separate terminal)
@@ -22,7 +22,7 @@ watch: install
 .PHONY: clean
 # Clean generated files
 clean:
-	rm -rf website/js website/endpoints website/models website/orgs website/index.html website/node_modules website/data/overview.json website/data/models
+	rm -rf website/js website/endpoints website/models website/orgs website/providers website/feeds website/*.html website/*.md website/llms.txt website/node_modules website/data/overview.json website/data/models website/data/providers
 
 .PHONY: test
 # Full suite. The JS smoke tests render the generated site, so they need a build.

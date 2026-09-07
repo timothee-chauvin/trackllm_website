@@ -1,5 +1,5 @@
 {% extends "base.html.j2" %}
-{% from "_macros.html.j2" import timeline_panel %}
+{% from "_macros.html.j2" import timeline_panel, subscribe_icon %}
 
 {% block title %}{{ model.split("/")[-1] }} | TrackLLM{% endblock %}
 
@@ -12,7 +12,7 @@
   </div>
   <div class="head">
     <div>
-      <h1>{{ model.split("/")[-1] }} <span class="org">· <a href="{{ nav_prefix }}orgs/{{ org_slug }}.html">{{ org }}</a></span></h1>
+      <h1>{{ model.split("/")[-1] }} <span class="org">· <a href="{{ nav_prefix }}orgs/{{ org_slug }}.html">{{ org }}</a></span> {{ subscribe_icon(machine, nav_prefix) }}</h1>
       <p class="lede" id="lede"></p>
       <div class="summary" id="summary"></div>
     </div>
@@ -30,5 +30,5 @@
 
 {% block scripts %}
     <script type="application/json" id="model-slug">{{ model_slug|tojson }}</script>
-    <script type="module" src="../js/model.js"></script>
+    <script type="module" src="../js/model.js?v={{ ASSET_V }}"></script>
 {% endblock %}

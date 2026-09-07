@@ -1,3 +1,4 @@
+import hashlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -9,6 +10,7 @@ from trackllm_website.config import HeroConfig
 from trackllm_website.generate_site import b3it as b3it_mod
 from trackllm_website.generate_site import changes as changes_mod
 from trackllm_website.generate_site import changes_page as changes_page_mod
+from trackllm_website.generate_site import machine as machine_mod
 from trackllm_website.generate_site import manifest as manifest_mod
 from trackllm_website.generate_site import model as model_mod
 from trackllm_website.generate_site import org as org_mod
@@ -43,6 +45,15 @@ def write_json_dir(directory: Path, views: dict[str, dict]) -> None:
         (directory / f"{slug}.json").write_text(json.dumps(view))
 
 
+def asset_version(website_dir: Path) -> str:
+    """Content hash over the fingerprintless assets the templates reference."""
+    h = hashlib.sha256()
+    for f in [website_dir / "style.css", *sorted((website_dir / "js").glob("*.js"))]:
+        if f.exists():
+            h.update(f.read_bytes())
+    return h.hexdigest()[:10]
+
+
 def render_site(
     website_dir: Path, hero_pin: HeroConfig | None, status_inputs: StatusInputs
 ) -> None:
@@ -69,6 +80,12 @@ def render_site(
     # STATUS_COPY (status.py) stays the one place that copy is written.
     env.globals["STATUS_COPY"] = STATUS_COPY
     env.globals["PAPERS"] = PAPERS
+    env.globals["SITE_URL"] = machine_mod.SITE_URL
+    # Cache busting: GitHub Pages serves with max-age=600, so without this a
+    # visitor loading freshly deployed HTML keeps rendering it against a stale
+    # cached stylesheet or entrypoint for up to 10 minutes. bun's shared chunks
+    # are already content-hashed; only style.css and the entrypoints need it.
+    env.globals["ASSET_V"] = asset_version(website_dir)
     env.filters["fmt_cost"] = format_cost
     env.filters["fmt_price"] = format_price
     index_template = env.get_template("index.html.j2")
@@ -79,6 +96,15 @@ def render_site(
     changes_template = env.get_template("changes.html.j2")
     methodology_template = env.get_template("methodology.html.j2")
     about_template = env.get_template("about.html.j2")
+
+    # Every page's render context is kept: machine.py renders the .md twin from
+    # the same context, so the two can never show different data.
+    md_pages: dict[str, list[dict]] = {}
+
+    def page(kind: str, slug: str, json_paths: list[str], **ctx) -> dict:
+        ctx["machine"] = machine_mod.links(kind, slug, json_paths)
+        md_pages.setdefault(kind, []).append(ctx)
+        return ctx
 
     discovered: list[EndpointInfo] = []
     for ep in discover_lt_endpoints(data_dir):
@@ -161,11 +187,17 @@ def render_site(
     for pslug, view in provider_views.items():
         (provider_pages_dir / f"{pslug}.html").write_text(
             provider_template.render(
-                provider=view["name"],
-                provider_slug=pslug,
-                css_path="../style.css",
-                body_class="provider",
-                nav_prefix="../",
+                **page(
+                    "provider",
+                    pslug,
+                    [f"data/providers/{pslug}.json"],
+                    provider=view["name"],
+                    provider_slug=pslug,
+                    view=view,
+                    css_path="../style.css",
+                    body_class="provider",
+                    nav_prefix="../",
+                )
             )
         )
     print(f"Generated {len(provider_views)} provider pages in providers/")
@@ -173,17 +205,38 @@ def render_site(
     changes_page = changes_page_mod.build_changes_page(website_dir, lt_data, b3it_views)
     (website_dir / "data" / "changes_page.json").write_text(json.dumps(changes_page))
     (website_dir / "changes.html").write_text(
-        changes_template.render(css_path="style.css", body_class="changes")
+        changes_template.render(
+            **page(
+                "changes",
+                "",
+                ["data/changes_page.json", "data/changes.json"],
+                changes_page=changes_page,
+                css_path="style.css",
+                body_class="changes",
+                nav_prefix="",
+            )
+        )
     )
     print("Generated changes.html")
 
     (website_dir / "methodology.html").write_text(
-        methodology_template.render(css_path="style.css", body_class="methodology")
+        methodology_template.render(
+            **page(
+                "methodology",
+                "",
+                [],
+                css_path="style.css",
+                body_class="methodology",
+                nav_prefix="",
+            )
+        )
     )
     print("Generated methodology.html")
 
     (website_dir / "about.html").write_text(
-        about_template.render(css_path="style.css", body_class="about")
+        about_template.render(
+            **page("about", "", [], css_path="style.css", body_class="about", nav_prefix="")
+        )
     )
     print("Generated about.html")
 
@@ -197,13 +250,19 @@ def render_site(
 
     for mslug, view in model_views.items():
         model_html = model_template.render(
-            model_slug=mslug,
-            model=view["model"],
-            org=view["org"],
-            org_slug=slugify(view["org"]),
-            css_path="../style.css",
-            body_class="model",
-            nav_prefix="../",
+            **page(
+                "model",
+                mslug,
+                [f"data/models/{mslug}.json"],
+                model_slug=mslug,
+                model=view["model"],
+                org=view["org"],
+                org_slug=slugify(view["org"]),
+                view=view,
+                css_path="../style.css",
+                body_class="model",
+                nav_prefix="../",
+            )
         )
         (model_pages_dir / f"{mslug}.html").write_text(model_html)
     print(f"Generated {len(model_views)} model pages in models/")
@@ -217,11 +276,16 @@ def render_site(
     for oslug, view in org_views.items():
         (org_pages_dir / f"{oslug}.html").write_text(
             org_template.render(
-                org=view["name"],
-                view=view,
-                css_path="../style.css",
-                body_class="org",
-                nav_prefix="../",
+                **page(
+                    "org",
+                    oslug,
+                    [],
+                    org=view["name"],
+                    view=view,
+                    css_path="../style.css",
+                    body_class="org",
+                    nav_prefix="../",
+                )
             )
         )
     print(f"Generated {len(org_views)} org pages in orgs/")
@@ -244,8 +308,15 @@ def render_site(
             slug_to_status_summary[e["slug"]] = view["status_summary"]
 
     index_html = index_template.render(
-        css_path="style.css",
-        body_class="index",
+        **page(
+            "index",
+            "",
+            ["data/overview.json"],
+            overview=overview,
+            css_path="style.css",
+            body_class="index",
+            nav_prefix="",
+        )
     )
     (website_dir / "index.html").write_text(index_html)
     print("Generated index.html")
@@ -276,33 +347,56 @@ def render_site(
         entry = site.entries.get(slug)
 
         provider_slug = slugify(base_provider(provider))
+        model_slug = slug_to_model_slug.get(slug, "")
+        series_json = [f"data/models/{model_slug}.json"] if model_slug else []
+        if slug in b3it_views:
+            series_json.append(f"data/b3it/{slug}/b3it.json")
         endpoint_html = endpoint_template.render(
-            endpoint=ep,
-            model=model,
-            org=model.split("/")[0],
-            org_slug=slugify(model.split("/")[0]),
-            model_name=model.split("/")[-1],
-            provider=provider,
-            methods=methods,
-            status=status_json(site.statuses[slug]),
-            meta=entry.as_meta() if entry else None,
-            spend=spend["by_endpoint"].get(slug),
-            group_label=spend_mod.GROUP_LABEL,
-            manifest=manifests[slug],
-            css_path="../style.css",
-            body_class="endpoint",
-            nav_prefix="../",
-            provider_base=base_provider(provider),
-            provider_slug=provider_slug,
-            # only providers with tracked endpoints get a page; never link a 404
-            provider_has_page=provider_slug in provider_views,
-            model_slug=slug_to_model_slug.get(slug, ""),
-            n_endpoints=slug_to_n_endpoints.get(slug, 1),
-            n_providers=slug_to_n_providers.get(slug, 1),
-            n_models=provider_views.get(provider_slug, {}).get("n_models", 1),
-            status_summary=slug_to_status_summary.get(slug, ""),
+            **page(
+                "endpoint",
+                slug,
+                series_json,
+                endpoint=ep,
+                model=model,
+                org=model.split("/")[0],
+                org_slug=slugify(model.split("/")[0]),
+                model_name=model.split("/")[-1],
+                provider=provider,
+                methods=methods,
+                status=status_json(site.statuses[slug]),
+                meta=entry.as_meta() if entry else None,
+                spend=spend["by_endpoint"].get(slug),
+                group_label=spend_mod.GROUP_LABEL,
+                manifest=manifests[slug],
+                css_path="../style.css",
+                body_class="endpoint",
+                nav_prefix="../",
+                provider_base=base_provider(provider),
+                provider_slug=provider_slug,
+                # only providers with tracked endpoints get a page; never link a 404
+                provider_has_page=provider_slug in provider_views,
+                model_slug=model_slug,
+                n_endpoints=slug_to_n_endpoints.get(slug, 1),
+                n_providers=slug_to_n_providers.get(slug, 1),
+                n_models=provider_views.get(provider_slug, {}).get("n_models", 1),
+                status_summary=slug_to_status_summary.get(slug, ""),
+            )
         )
         (endpoints_dir / f"{slug}.html").write_text(endpoint_html)
 
     print(f"Generated {len(site.statuses)} endpoint pages in endpoints/")
+
+    built_at = datetime.now(timezone.utc)
+    machine_mod.render_markdown(website_dir, built_at, md_pages)
+    machine_mod.render_feeds(
+        website_dir,
+        built_at,
+        changes_page["items"],
+        {
+            "endpoint": set(site.statuses),
+            "model": set(model_views),
+            "provider": set(provider_views),
+            "org": set(org_views),
+        },
+    )
     print(f"\nSite generated in {website_dir}/")

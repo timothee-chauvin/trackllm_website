@@ -70,6 +70,27 @@
 </button>
 {%- endmacro %}
 
+{# Subscribe: the page's Atom feed (machine.py). Two shapes for two homes -- the
+   hero pill sits beside the Cite pill, the icon button beside a page's h1. Both
+   count the click as a GoatCounter event, so per-scope interest is measurable
+   without storing anything. Icon: Lucide rss. #}
+{% macro rss_icon() -%}
+<svg class="rss-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+{%- endmacro %}
+
+{% macro subscribe_pill(machine, nav_prefix) -%}
+<a class="cite-pill sub-pill" href="{{ nav_prefix }}{{ machine.feed }}" type="application/atom+xml"
+  data-goatcounter-click="subscribe/{{ machine.scope }}" aria-label="{{ machine.subscribe_label }} (Atom feed)">
+  {{ rss_icon() }} Subscribe
+</a>
+{%- endmacro %}
+
+{% macro subscribe_icon(machine, nav_prefix) -%}
+<a class="sub-icon" href="{{ nav_prefix }}{{ machine.feed }}" type="application/atom+xml"
+  data-goatcounter-click="subscribe/{{ machine.scope }}" aria-label="{{ machine.subscribe_label }} (Atom feed)"
+  title="{{ machine.subscribe_label }}">{{ rss_icon() }}</a>
+{%- endmacro %}
+
 {# Copy / copied indicator shared by the boxes and buttons below; .is-copied
    (base.html.j2) swaps which half shows. #}
 {% macro copy_icons() -%}

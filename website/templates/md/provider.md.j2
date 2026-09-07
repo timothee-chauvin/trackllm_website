@@ -1,0 +1,40 @@
+{% import "_base.md.j2" as b %}
+{% set D = view %}
+{{ b.header("Provider: " ~ D.name, machine, nav_prefix) }}
+{{ b.crumb([("Home", nav_prefix ~ "index.md"), (D.name, "")]) }}
+{{ D.n_endpoints }} endpoint{{ "s" if D.n_endpoints != 1 }} across {{ D.n_models }} model{{ "s" if D.n_models != 1 }} and {{ D.n_variants }} serving variant{{ "s" if D.n_variants != 1 }}, {% if D.first and D.last %}monitored {{ D.first }} – {{ D.last }}{% else %}with no monitoring recorded yet{% endif %}. {{ D.changes | length }} change{{ "s" if D.changes | length != 1 }} detected across {{ D.endpoints | selectattr("nChanges") | list | length }} endpoint{{ "s" if D.endpoints | selectattr("nChanges") | list | length != 1 }}.
+
+## Drift rate
+
+Detected changes per endpoint-year of monitoring, with a 95% Poisson interval. A rate is withheld below 0.5 endpoint-years of exposure.
+
+{{ b.table(["Method", "Endpoints", "Endpoint-years", "Changes", "Rate (/endpoint-year)", "95% interval"], [
+  ("LT", D.lt.endpoints, D.lt.years, D.lt.changes, D.lt.rate | rate, D.lt.ci | ci),
+  ("B3IT", D.b3it.endpoints, D.b3it.years, D.b3it.changes, D.b3it.rate | rate, D.b3it.ci | ci),
+]) }}
+## Drift by model
+
+Every endpoint {{ D.name }} serves. Each endpoint's full drift series and detected changes are in the JSON above.
+
+## Monitoring & changes over time
+
+Endpoints under monitoring each month (the exposure the rate divides by) are in the JSON above under `months` and `variants[].monitoring`.
+
+## Serving variants
+
+A provider's quantizations are separate serving stacks and drift separately.
+
+{{ b.table(["Variant", "Endpoints", "LT rate", "LT 95% interval", "LT changes", "B3IT endpoints", "B3IT changes"],
+  D.variants | map("variant_row") | list) }}
+## Endpoints
+
+{{ b.table(["Model", "Variant", "Org", "Status", "Changes", "Methods", "Stable for (days)"],
+  D.endpoints | map("dir_row", nav_prefix) | list) }}
+## Detected changes
+
+{% if D.changes %}
+{{ b.table(["Date", "Endpoint", "Method", "Magnitude", "Description"], D.changes | map("change_row", nav_prefix) | list) }}
+{% else %}
+No change detected so far.
+{% endif %}
+{{ b.footer(nav_prefix) }}

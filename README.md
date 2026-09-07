@@ -72,7 +72,9 @@ website/
 │   ├── b3it/           # border-input state, phase-2 samples, per-endpoint views
 │   ├── spend/          # per-endpoint spend ledgers
 │   └── *.json          # generated, untracked: overview, changes, changes_page, models/, providers/
+├── feeds/              # generated Atom feeds: all.xml + one per endpoint/model/provider/org
 └── (generated pages)   # index, changes, methodology + endpoints/ models/ providers/ orgs/
+                        # each X.html has an X.md twin for agents (generate_site/machine.py)
 ```
 
 ## Data pipeline

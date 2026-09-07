@@ -38,9 +38,7 @@ def _lt_endpoint(website: Path, slug: str, model: str, provider: str):
 def _scaffold(website: Path):
     # copy real templates + style so rendering matches production
     src = Path("website")
-    (website / "templates").mkdir(parents=True)
-    for t in (src / "templates").glob("*.j2"):
-        shutil.copy(t, website / "templates" / t.name)
+    shutil.copytree(src / "templates", website / "templates")
     (website / "style.css").write_text((src / "style.css").read_text())
     # a series, not just a directory: an endpoint with no observations is not
     # rendered at all (tracked.py)
@@ -347,7 +345,7 @@ def test_render_emits_org_pages(tmp_path):
     render_site(tmp_path, None, empty_status_inputs())
     page = (tmp_path / "orgs" / f"{slugify('m')}.html").read_text()
     assert f'href="../models/{slugify("m/a")}.html"' in page
-    assert "<h1>m</h1>" in page
+    assert "<h1>m " in page  # followed by the subscribe icon
 
 
 def test_org_pages_are_rewritten_from_scratch(tmp_path):

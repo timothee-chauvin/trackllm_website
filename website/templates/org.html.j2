@@ -1,5 +1,5 @@
 {% extends "base.html.j2" %}
-{% from "_macros.html.j2" import headline_badge %}
+{% from "_macros.html.j2" import headline_badge, subscribe_icon %}
 
 {% block title %}{{ org }} | TrackLLM{% endblock %}
 
@@ -14,7 +14,7 @@
   <div class="head">
     <div>
       <div class="eyebrow">Organization</div>
-      <h1>{{ org }}</h1>
+      <h1>{{ org }} {{ subscribe_icon(machine, nav_prefix) }}</h1>
       <p class="lede">{{ view.n_models }} model{{ s(view.n_models) }}, with {{ view.n_endpoints }} tracked endpoint{{ s(view.n_endpoints) }}
         across {{ view.n_providers }} provider{{ s(view.n_providers) }}.
         <span class="hl">{{ view.n_changed }}</span> of {{ "it" if view.n_models == 1 else "them" }}
@@ -64,5 +64,5 @@
 
 {% block scripts %}
     {# no other script on this page; it only needs the model badges' popover #}
-    <script type="module" src="{{ nav_prefix }}js/tips.js"></script>
+    <script type="module" src="{{ nav_prefix }}js/tips.js?v={{ ASSET_V }}"></script>
 {% endblock %}

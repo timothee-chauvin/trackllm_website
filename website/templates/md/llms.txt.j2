@@ -1,0 +1,28 @@
+# TrackLLM
+
+> TrackLLM continuously monitors LLM APIs for undisclosed changes, using logprob
+> tracking (LT) where logprobs are exposed and black-box border input tracking
+> (B3IT) where they aren't. Every HTML page on this site has a markdown twin at
+> the same path (X.html → X.md) with the same content and absolute links — read
+> those instead of the HTML.
+
+Endpoint slugs are stable: `<model>@<provider>` with `/` → `2f` and `@` → `23`;
+an endpoint's page is `endpoints/<slug>.md`.
+
+## Start here
+
+- [Homepage]({{ SITE_URL }}/index.md): live stats, latest changes, every provider and endpoint
+- [Change log]({{ SITE_URL }}/changes.md): every detected change with magnitude and description
+- [Methodology]({{ SITE_URL }}/methodology.md): how LT and B3IT work, links to both papers
+
+## Data
+
+- [overview.json]({{ SITE_URL }}/data/overview.json): stats, endpoint directory, provider rates
+- [changes.json]({{ SITE_URL }}/data/changes.json): every detected change, newest first
+- [changes_page.json]({{ SITE_URL }}/data/changes_page.json): change log with descriptions and month histogram
+- per-model `data/models/<slug>.json` (full drift/TV series per endpoint), per-provider `data/providers/<slug>.json`, per-endpoint `data/b3it/<slug>/b3it.json`
+- [Raw data repository]({{ DATA_REPO_URL }}): every collected API response, committed hourly
+
+## Feeds
+
+- [All changes (Atom)]({{ SITE_URL }}/feeds/all.xml), plus one feed per endpoint, model, provider and organization at `feeds/<kind>/<slug>.xml`

@@ -1,0 +1,25 @@
+{% import "_base.md.j2" as b %}
+{% set D = view %}
+{{ b.header(D.model.split("/")[-1] ~ " · " ~ D.org, machine, nav_prefix) }}
+{{ b.crumb([("Home", nav_prefix ~ "index.md"), (D.org, nav_prefix ~ "orgs/" ~ org_slug ~ ".md"), (D.model.split("/")[-1], "")]) }}
+{% set tracked = D.endpoints | selectattr("methods") | list %}
+{% if tracked %}
+{{ D.n_endpoints }} tracked endpoint{{ "s" if D.n_endpoints != 1 }} across {{ D.n_providers }} provider{{ "s" if D.n_providers != 1 }}, monitored {{ D.date_min }} – {{ D.date_max }}. {{ D.n_changed }} of them show{{ "s" if D.n_changed == 1 }} at least one detected change ({{ D.changes | length }} changes total). {{ D.status_summary }} across the catalog.
+{% else %}
+This model is not tracked: {{ D.status_summary }}. Each endpoint below says why ({{ D.n_endpoints_total }} catalog endpoints, status: {{ D.headline }}).
+{% endif %}
+
+## Drift by provider
+
+The same model, served by every provider. A model version is nominally fixed — so a change here is the provider's serving stack moving. Each endpoint's full drift series (LT `drift`, B3IT `tv`) and detected changes are in the JSON above.
+
+{{ b.table(["Endpoint", "Provider", "Methods", "Status", "Monitored", "Changes"],
+  D.endpoints | map("model_ep_row", nav_prefix) | list) }}
+## Detected changes
+
+{% if D.changes %}
+{{ b.table(["Date", "Method", "Provider"], D.changes | map("model_change_row") | list) }}
+{% else %}
+No change detected so far.
+{% endif %}
+{{ b.footer(nav_prefix) }}

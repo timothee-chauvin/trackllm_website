@@ -112,10 +112,11 @@ function stubFetch(pageDir: string): void {
 /** Relative hrefs that point at a file the generator did not emit. */
 function deadLinks(root: ParentNode, pageDir: string): string[] {
   const missing: string[] = [];
-  for (const a of root.querySelectorAll("a[href]")) {
+  // link[rel=alternate]: the page's markdown twin and Atom feed (machine.py)
+  for (const a of root.querySelectorAll("a[href], link[rel=alternate][href]")) {
     const href = a.getAttribute("href") ?? "";
     if (!href || href.startsWith("http") || href.startsWith("#")) continue;
-    if (!existsSync(resolve(SITE, pageDir, href.split("#")[0]))) missing.push(href);
+    if (!existsSync(resolve(SITE, pageDir, href.split("#")[0].split("?")[0]))) missing.push(href);
   }
   return missing;
 }

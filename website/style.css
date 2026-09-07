@@ -86,7 +86,14 @@ a { color: inherit; text-decoration: none; }
   font-size: 0.95rem; font-weight: 700; line-height: 1; cursor: pointer; white-space: nowrap; transition: background .12s, border-color .12s; }
 .cite-pill svg { width: 19px; height: 19px; }
 .cite-pill:hover { background: var(--surface-2); border-color: var(--text-dim); }
-.hero .cite-pill { margin-top: 1.4rem; }
+.hero .hero-pills { margin-top: 1.4rem; display: flex; gap: 0.6rem; flex-wrap: wrap; }
+/* Every RSS icon is the same feed-orange, wherever it appears. */
+.rss-i { color: var(--changed); }
+.sub-pill svg { width: 17px; height: 17px; }
+/* RSS icon beside a page h1, sized to the title's cap height */
+.sub-icon { display: inline-flex; vertical-align: baseline; }
+.sub-icon svg { width: 0.75em; height: 0.75em; }
+.sub-icon:hover { opacity: 0.8; }
 .cite-dialog { width: 90%; max-width: 640px; padding: 2.6rem 1.8rem 1.4rem; color: var(--text); background: var(--surface-2);
   border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 12px 44px rgba(0,0,0,0.3); font-size: 0.92rem; }
 .cite-dialog::backdrop { background: rgba(0,0,0,0.5); }
@@ -152,6 +159,8 @@ footer.site { max-width: var(--maxw); margin: 2rem auto 0; border-top: 1px solid
   padding: 1.1rem clamp(1rem, 4vw, 2rem); color: var(--text-dim); font-size: 0.8rem;
   display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 footer.site a { color: var(--text-muted); } footer.site a:hover { color: var(--accent); }
+footer.site .agents { flex-basis: 100%; color: var(--text-dim); }
+footer.site .rss-i { width: 11px; height: 11px; vertical-align: -1px; }
 
 .hero { position: relative; padding: clamp(2.4rem, 6vw, 4rem) 0 1.4rem; overflow: hidden; }
 /* Both hero layers are top-anchored and full-bleed; overview.ts sets their height to
