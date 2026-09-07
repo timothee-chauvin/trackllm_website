@@ -89,5 +89,5 @@
 
 {% block scripts %}
     <script type="application/json" id="providerData">{{ provider_slug|tojson }}</script>
-    <script type="module" src="../js/provider.js"></script>
+    <script type="module" src="../js/provider.js?v={{ ASSET_V }}"></script>
 {% endblock %}

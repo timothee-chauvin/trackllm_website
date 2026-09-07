@@ -1,3 +1,4 @@
+import hashlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -44,6 +45,15 @@ def write_json_dir(directory: Path, views: dict[str, dict]) -> None:
         (directory / f"{slug}.json").write_text(json.dumps(view))
 
 
+def asset_version(website_dir: Path) -> str:
+    """Content hash over the fingerprintless assets the templates reference."""
+    h = hashlib.sha256()
+    for f in [website_dir / "style.css", *sorted((website_dir / "js").glob("*.js"))]:
+        if f.exists():
+            h.update(f.read_bytes())
+    return h.hexdigest()[:10]
+
+
 def render_site(
     website_dir: Path, hero_pin: HeroConfig | None, status_inputs: StatusInputs
 ) -> None:
@@ -71,6 +81,11 @@ def render_site(
     env.globals["STATUS_COPY"] = STATUS_COPY
     env.globals["PAPERS"] = PAPERS
     env.globals["SITE_URL"] = machine_mod.SITE_URL
+    # Cache busting: GitHub Pages serves with max-age=600, so without this a
+    # visitor loading freshly deployed HTML keeps rendering it against a stale
+    # cached stylesheet or entrypoint for up to 10 minutes. bun's shared chunks
+    # are already content-hashed; only style.css and the entrypoints need it.
+    env.globals["ASSET_V"] = asset_version(website_dir)
     env.filters["fmt_cost"] = format_cost
     env.filters["fmt_price"] = format_price
     index_template = env.get_template("index.html.j2")

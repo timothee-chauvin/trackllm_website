@@ -115,7 +115,7 @@
 
 {% block scripts %}
     <script type="application/json" id="manifest">{{ manifest | tojson }}</script>
-    {% if methods %}<script type="module" src="../js/endpoint.js"></script>
+    {% if methods %}<script type="module" src="../js/endpoint.js?v={{ ASSET_V }}"></script>
     {% else %}{# untracked: only the server-rendered headline badge needs the popover #}
-    <script type="module" src="../js/tips.js"></script>{% endif %}
+    <script type="module" src="../js/tips.js?v={{ ASSET_V }}"></script>{% endif %}
 {% endblock %}

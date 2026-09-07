@@ -116,7 +116,7 @@ function deadLinks(root: ParentNode, pageDir: string): string[] {
   for (const a of root.querySelectorAll("a[href], link[rel=alternate][href]")) {
     const href = a.getAttribute("href") ?? "";
     if (!href || href.startsWith("http") || href.startsWith("#")) continue;
-    if (!existsSync(resolve(SITE, pageDir, href.split("#")[0]))) missing.push(href);
+    if (!existsSync(resolve(SITE, pageDir, href.split("#")[0].split("?")[0]))) missing.push(href);
   }
   return missing;
 }

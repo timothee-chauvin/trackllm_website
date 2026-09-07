@@ -13,7 +13,7 @@
     })();
     </script>
     <link rel="icon" href="{{ nav_prefix }}favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="{{ css_path }}">
+    <link rel="stylesheet" href="{{ css_path }}?v={{ ASSET_V }}">
     {# machine access (machine.py): the md twin and the feed of this page #}
     <link rel="alternate" type="text/markdown" href="{{ nav_prefix }}{{ machine.md }}">
     {% if machine.feed %}<link rel="alternate" type="application/atom+xml" title="TrackLLM changes" href="{{ nav_prefix }}{{ machine.feed }}">{% endif %}
@@ -73,7 +73,8 @@
     })();
     (function () {
         var dlg = document.getElementById('citeDialog');
-        document.querySelectorAll('.cite-pill').forEach(function (p) {
+        // button.: the hero Subscribe link shares the pill class for its looks only
+        document.querySelectorAll('button.cite-pill').forEach(function (p) {
             p.addEventListener('click', function () { dlg.showModal(); });
         });
         dlg.querySelector('.cite-dialog-close').addEventListener('click', function () { dlg.close(); });

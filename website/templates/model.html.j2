@@ -30,5 +30,5 @@
 
 {% block scripts %}
     <script type="application/json" id="model-slug">{{ model_slug|tojson }}</script>
-    <script type="module" src="../js/model.js"></script>
+    <script type="module" src="../js/model.js?v={{ ASSET_V }}"></script>
 {% endblock %}
