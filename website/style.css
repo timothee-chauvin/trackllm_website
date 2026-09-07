@@ -157,8 +157,7 @@ footer.site { max-width: var(--maxw); margin: 2rem auto 0; border-top: 1px solid
   padding: 1.1rem clamp(1rem, 4vw, 2rem); color: var(--text-dim); font-size: 0.8rem;
   display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 footer.site a { color: var(--text-muted); } footer.site a:hover { color: var(--accent); }
-  font-family: var(--mono); font-size: 0.76rem; color: var(--text-dim); }
-  border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font: inherit; cursor: pointer; }
+footer.site .agents { flex-basis: 100%; color: var(--text-dim); }
 
 .hero { position: relative; padding: clamp(2.4rem, 6vw, 4rem) 0 1.4rem; overflow: hidden; }
 /* Both hero layers are top-anchored and full-bleed; overview.ts sets their height to
