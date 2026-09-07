@@ -79,6 +79,41 @@ a { color: inherit; text-decoration: none; }
   cursor: pointer; font-size: 0.85rem; line-height: 1; }
 .theme-toggle:hover { color: var(--text); background: var(--surface-3); }
 
+/* Cite pill + modal (_macros.html.j2::cite_pill / cite_dialog), after tchauvin.com:
+   the pill opens a page-centred <dialog>; each box inside copies itself on click. */
+.cite-pill { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.42rem 0.85rem; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--bg); color: var(--text);
+  font-size: 0.95rem; font-weight: 700; line-height: 1; cursor: pointer; white-space: nowrap; transition: background .12s, border-color .12s; }
+.cite-pill svg { width: 19px; height: 19px; }
+.cite-pill:hover { background: var(--surface-2); border-color: var(--text-dim); }
+.hero .cite-pill { margin-top: 1.4rem; }
+.cite-dialog { width: 90%; max-width: 640px; padding: 2.6rem 1.8rem 1.4rem; color: var(--text); background: var(--surface-2);
+  border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 12px 44px rgba(0,0,0,0.3); font-size: 0.92rem; }
+.cite-dialog::backdrop { background: rgba(0,0,0,0.5); }
+.cite-dialog-close { position: absolute; top: 0.5rem; right: 0.8rem; padding: 0 0.15em; font-size: 1.7rem; line-height: 1;
+  color: var(--text-dim); background: transparent; border: 0; cursor: pointer; }
+.cite-dialog-close:hover { color: var(--text); }
+.cite-box { position: relative; margin-bottom: 0.9rem; padding: 0.8em 5em 0.8em 1em; background: var(--surface); border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm); cursor: pointer; transition: border-color .12s, background .12s; line-height: 1.5; }
+.cite-box:last-child { margin-bottom: 0; }
+.cite-box:hover { border-color: var(--border); background: var(--surface-3); }
+.cite-box p { margin: 0 0 0.6em; overflow-wrap: anywhere; } .cite-box p:last-child { margin-bottom: 0; }
+.cite-box pre { margin: 0; font-family: var(--mono); font-size: 0.8rem; line-height: 1.4; overflow-x: auto; }
+.cite-box-status { position: absolute; top: 0.55em; right: 0.6em; display: inline-flex; align-items: center; gap: 0.3em;
+  color: var(--text-dim); font-size: 0.75rem; font-weight: 600; line-height: 1; pointer-events: none; }
+.cite-box-status svg { width: 15px; height: 15px; }
+.cite-box:hover .cite-box-status { color: var(--text); }
+.cite-box.is-copied .cite-box-status { color: var(--stable); }
+/* copy_icons(): before copying only the copy glyph (and a button's own label)
+   show; .is-copied flips to the check + "Copied" */
+.i-done, .i-label, .is-copied .i-copy, .is-copied .l { display: none; }
+.is-copied .i-done, .is-copied .i-label { display: inline; }
+.copy-bib { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.28rem 0.6rem; font-family: var(--mono); font-size: 0.72rem;
+  border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg); color: var(--text-muted); cursor: pointer; white-space: nowrap; }
+.copy-bib svg { width: 13px; height: 13px; }
+.copy-bib:hover { color: var(--text); border-color: var(--text-dim); }
+.copy-bib.is-copied { color: var(--stable); border-color: var(--stable); }
+
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); }

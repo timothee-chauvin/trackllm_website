@@ -2,6 +2,7 @@ import json
 import pytest
 import shutil
 from datetime import datetime, timezone
+from html import unescape
 from pathlib import Path
 
 from conftest import (
@@ -14,6 +15,7 @@ from conftest import (
     write_month_dir,
 )
 from trackllm_website.config import Endpoint
+from trackllm_website.generate_site.papers import PAPERS
 from trackllm_website.generate_site.render import render_site
 from trackllm_website.update_endpoints import LTFailure, LTFailureCache
 from trackllm_website.util import slugify
@@ -251,6 +253,34 @@ def test_render_emits_methodology_page(tmp_path):
     assert "arxiv.org/abs/2602.11083" in page
     assert "tchauvin.com/change-detection-llm-apis" in page
     assert 'href="methodology.html"' in (tmp_path / "index.html").read_text()
+
+
+def test_cite_pill_on_front_methodology_and_about_and_dialog_has_both_papers(
+    tmp_path,
+):
+    _scaffold(tmp_path)
+    render_site(tmp_path, None, empty_status_inputs())
+    for page, has_pill in (
+        ("index", True),
+        ("methodology", True),
+        ("about", True),
+        ("changes", False),
+    ):
+        html = (tmp_path / f"{page}.html").read_text()
+        assert ('class="cite-pill"' in html) == has_pill
+        dialog = unescape(html.split('id="citeDialog"')[1])
+        for paper in PAPERS.values():
+            assert paper.plain in dialog
+            assert paper.bibtex in dialog
+    # Methodology also has a Copy BibTeX button beside each paper
+    methodology = (tmp_path / "methodology.html").read_text()
+    assert methodology.count('class="copy-bib"') == len(PAPERS)
+
+
+def test_plain_citation_names_authors_title_venue_and_link():
+    for paper in PAPERS.values():
+        for field in (paper.title, paper.venue, paper.url, paper.authors[0]):
+            assert field in paper.plain
 
 
 def test_render_emits_about_page_and_front_page_logos(tmp_path):

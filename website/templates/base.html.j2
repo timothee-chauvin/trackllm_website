@@ -1,4 +1,5 @@
 {% set nav_prefix = nav_prefix | default('') %}
+{% from "_macros.html.j2" import cite_dialog %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,6 +44,7 @@
             {% endblock %}
         </footer>
     </div>
+    {{ cite_dialog() }}
     {% block scripts %}{% endblock %}
     <script>
     (function () {
@@ -61,6 +63,32 @@
                 btn.textContent = label(next);
             });
         }
+    })();
+    (function () {
+        var dlg = document.getElementById('citeDialog');
+        document.querySelectorAll('.cite-pill').forEach(function (p) {
+            p.addEventListener('click', function () { dlg.showModal(); });
+        });
+        dlg.querySelector('.cite-dialog-close').addEventListener('click', function () { dlg.close(); });
+        dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
+        function bindCopy(el, text) {
+            function copy() {
+                navigator.clipboard.writeText(text()).then(function () {
+                    el.classList.add('is-copied');
+                    setTimeout(function () { el.classList.remove('is-copied'); }, 1500);
+                });
+            }
+            el.addEventListener('click', copy);
+            if (el.tagName !== 'BUTTON') el.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); copy(); }
+            });
+        }
+        dlg.querySelectorAll('.cite-box').forEach(function (box) {
+            bindCopy(box, function () { return box.querySelector('.cite-copyable').textContent.trim(); });
+        });
+        document.querySelectorAll('.copy-bib').forEach(function (b) {
+            bindCopy(b, function () { return b.dataset.bibtex; });
+        });
     })();
     </script>
     <!-- Privacy-friendly analytics with https://www.goatcounter.com -->
