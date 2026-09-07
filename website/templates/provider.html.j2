@@ -1,18 +1,13 @@
 {% extends "base.html.j2" %}
-{% from "_macros.html.j2" import chip, search_box, timeline_panel, subscribe_icon %}
+{% from "_macros.html.j2" import chip, search_box, timeline_panel, subscribe_icon, brand_title %}
 
 {% block title %}{{ provider }} | TrackLLM{% endblock %}
 
 {% block content %}
 <div class="wrap">
-  <div class="crumb">
-    <a href="{{ nav_prefix }}index.html">Home</a><span class="sep">/</span>
-    <span style="color:var(--text-muted)">{{ provider }}</span>
-  </div>
   <div class="head">
     <div>
-      <div class="eyebrow">Provider</div>
-      <h1>{{ provider }} {{ subscribe_icon(machine, nav_prefix) }}</h1>
+      <h1>{{ brand_title(brand, nav_prefix) }} {{ subscribe_icon(machine, nav_prefix) }}</h1>
       <p class="lede" id="lede"></p>
       <div class="summary" id="summary"></div>
     </div>

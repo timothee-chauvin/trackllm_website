@@ -219,7 +219,7 @@ def test_render_emits_changes_page(tmp_path):
     _scaffold(tmp_path)
     render_site(tmp_path, None, empty_status_inputs())
     page = json.loads((tmp_path / "data" / "changes_page.json").read_text())
-    assert set(page) == {"stats", "items", "months", "top_endpoints"}
+    assert set(page) == {"stats", "items", "top_endpoints"}
     assert (tmp_path / "changes.html").exists()
     assert 'id="log"' in (tmp_path / "changes.html").read_text()
 
@@ -227,7 +227,11 @@ def test_render_emits_changes_page(tmp_path):
 def test_nav_links_to_changes(tmp_path):
     _scaffold(tmp_path)
     render_site(tmp_path, None, empty_status_inputs())
-    assert 'href="changes.html"' in (tmp_path / "index.html").read_text()
+    index = (tmp_path / "index.html").read_text()
+    for page in ("changes", "providers", "endpoints"):
+        assert f'href="{page}.html"' in index
+        assert (tmp_path / f"{page}.html").exists()
+        assert (tmp_path / f"{page}.md").exists()
 
 
 def test_nav_marks_only_the_current_page(tmp_path):
@@ -331,13 +335,15 @@ def test_endpoint_head_links_model_provider_and_org(tmp_path):
     assert f'href="../orgs/{slugify("m")}.html"' in head
 
 
-def test_endpoint_and_model_crumbs_link_the_org(tmp_path):
+def test_endpoint_and_model_heads_link_the_org(tmp_path):
     _scaffold(tmp_path)
     render_site(tmp_path, None, empty_status_inputs())
     org_href = f'href="../orgs/{slugify("m")}.html"'
     for path in ("endpoints/m2fa23p.html", f"models/{slugify('m/a')}.html"):
-        crumb = (tmp_path / path).read_text().split('<div class="crumb">')[1]
-        assert org_href in crumb.split("</div>")[0], path
+        html = (tmp_path / path).read_text()
+        assert '<div class="crumb">' not in html, path
+        head = html.split('<div class="head">')[1].split("</div>\n</div>")[0]
+        assert org_href in head, path
 
 
 def test_render_emits_org_pages(tmp_path):

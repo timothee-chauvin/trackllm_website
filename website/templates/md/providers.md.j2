@@ -1,0 +1,17 @@
+{% import "_base.md.j2" as b %}
+{% set S = overview.stats %}
+{{ b.header("Providers — who drifts the most", machine, nav_prefix) }}
+{{ b.crumb([("Home", "index.md"), ("Providers", "")]) }}
+{{ S.provider_companies }} provider companies serving {{ S.providers }} variants and {{ S.endpoints }} endpoints we have tracked. Detected changes per endpoint-year of LT monitoring — normalized for fleet size & monitoring length — with a 95% Poisson interval. Providers are grouped by company; their serving variants are compared on the provider page.
+
+## Drift rate
+
+Providers with at least 0.5 endpoint-years of LT monitoring, most drift-prone first.
+
+{{ b.table(["Provider", "Endpoints", "LT endpoint-years", "LT changes", "LT rate", "LT 95% interval"],
+  overview.providers | rateable | map("plot_row", nav_prefix) | list) }}
+## All providers
+
+{{ b.table(["Provider", "Endpoints", "Models", "Variants", "LT endpoint-years", "LT changes", "LT rate", "LT 95% interval", "B3IT endpoints", "B3IT endpoint-years", "Last change"],
+  overview.providers | map("provider_row", nav_prefix) | list) }}
+{{ b.footer(nav_prefix) }}

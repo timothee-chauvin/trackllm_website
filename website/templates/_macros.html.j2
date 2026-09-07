@@ -52,6 +52,47 @@
 <span class="info-label">{{ label }} <button type="button" class="info-btn" data-tip="{{ tip }}" aria-label="{{ tip }}">?</button></span>
 {%- endmacro %}
 
+{# The button under a front-page block that is a slice of a page of its own.
+   `what` completes "More: ..." for assistive tech, since "More…" alone names nothing. #}
+{% macro more_link(href, what) -%}
+<a class="more-btn" href="{{ href }}" aria-label="More: {{ what }}">More…</a>
+{%- endmacro %}
+
+{# The endpoint directory table (directory.ts). Sortable on the Endpoints page,
+   where the headers carry data-sort and the footer the shown count; a plain
+   preview on the front page. #}
+{% macro dir_table(sortable) -%}
+{# a sortable table is the page; a preview shows its few rows whole #}
+{% set cols = [("model", "Model", ""), ("provider", "Provider", "col-hide"), ("status", "Status", ""),
+               ("nChanges", "Changes", "r"), (none, "Methods", "col-hide"), ("stableDays", "Stable for", "r col-hide"),
+               (none, "Drift from baseline", "col-hide")] %}
+<div class="table-wrap{{ "" if sortable else " preview" }}">
+  <div class="table-scroll">
+    <table class="dir">
+      <thead>
+        <tr>
+          {% for key, label, cls in cols %}
+          <th scope="col"{% if sortable and key %} data-sort="{{ key }}"{% endif %}{% if cls %} class="{{ cls }}"{% endif %}>{{ label }}{% if sortable and key %} <span class="arr"></span>{% endif %}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody id="dirBody"></tbody>
+    </table>
+  </div>
+  {% if sortable %}<div class="dir-foot" id="dirFoot"></div>{% endif %}
+</div>
+{%- endmacro %}
+
+{# A provider's logo and name -- the Jinja twin of components.ts::brandHtml, for
+   the server-rendered provider page title. #}
+{% macro brand_title(b, nav_prefix) -%}
+{% set cls = ("brand-wordmark" if b.kind == "wordmark" else "brand-logo") ~ (" mono" if b.mono) %}
+<span class="pbrand">
+{%- if b.logo and b.dark %}<img class="{{ cls }} logo-light" src="{{ nav_prefix }}logos/providers/{{ b.logo }}" alt=""><img class="{{ cls }} logo-dark" src="{{ nav_prefix }}logos/providers/{{ b.dark }}" alt="">
+{%- elif b.logo %}<img class="{{ cls }}" src="{{ nav_prefix }}logos/providers/{{ b.logo }}" alt="">
+{%- endif %}{{ b.name }}</span>
+{%- endmacro %}
+
 {# Logos of the institutions behind the project; shared by the front page and About. #}
 {% macro affiliations() %}
 <div class="affil" aria-label="Affiliations">

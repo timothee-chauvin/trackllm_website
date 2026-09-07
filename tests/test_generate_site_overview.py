@@ -106,6 +106,7 @@ def test_build_overview_shape(fake_site):
         "status",
         "nChanges",
         "trace",
+        "changeFracs",
     }
     assert (
         ov["stats"]["changes_total"]
@@ -162,7 +163,7 @@ def test_feed_lt_item_has_drift_level_and_conf(fake_site):
     assert lt_item["secondary"] == "40σ conf"
     assert lt_item["sevKey"] == "alert"
     assert (
-        lt_item["desc"] == "Logprob averages shifted 1.4 nats at the change."
+        lt_item["desc"] == "Logprob averages moved 1.4 nats from baseline"
     )
     assert len(lt_item["trace"]) > 0
     assert lt_item["model"] == "a"

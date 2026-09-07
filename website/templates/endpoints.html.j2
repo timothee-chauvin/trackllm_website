@@ -1,0 +1,52 @@
+{% extends "base.html.j2" %}
+{% from "_macros.html.j2" import chip, search_box, dir_table %}
+
+{% block title %}All endpoints | TrackLLM{% endblock %}
+
+{% block content %}
+<div class="wrap">
+  <div class="head">
+    <div>
+      <h1>Endpoints</h1>
+      <p class="lede" id="lede"></p>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <section class="block">
+    <div class="sec-head">
+      <h2>Endpoints</h2>
+      <span class="hint">chips within a row are alternatives (any of them matches); rows combine, and so does the search</span>
+    </div>
+    <div class="toolbar">
+      {{ search_box("q", "Search model, provider, or org…", "Search endpoints by model, provider, or org") }}
+    </div>
+    <div class="chip-groups" id="chips">
+      <div class="chip-row"><span class="k">Status</span><div class="chips">
+        {{ chip("Tracked", "st", "tracked", on=true) }}
+        {{ chip("Retired", "st", "retired", state="state-retired") }}
+        {{ chip("Untrackable", "st", "untrackable") }}
+        {{ chip("Too expensive", "st", "too_expensive") }}
+        {{ chip("Not selected", "st", "not_selected") }}
+        {{ chip("Errors", "st", "errors_out") }}
+        {{ chip("Pending", "st", "pending") }}
+        {{ chip("Free", "st", "free_excluded") }}
+      </div></div>
+      <div class="chip-row"><span class="k">Method</span><div class="chips">
+        {{ chip("LT", "f", "lt") }}
+        {{ chip("B3IT", "f", "b3it") }}
+      </div></div>
+      <div class="chip-row"><span class="k">Changes</span><div class="chips">
+        {{ chip("Ever changed", "c", "everchanged", state="state-changed") }}
+        {{ chip("Recent (60d)", "c", "recent", state="state-changed") }}
+      </div></div>
+    </div>
+    {{ dir_table(sortable=true) }}
+  </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+    <script type="module" src="js/endpoints.js?v={{ ASSET_V }}"></script>
+{% endblock %}

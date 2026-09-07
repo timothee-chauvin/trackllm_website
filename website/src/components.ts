@@ -20,11 +20,14 @@ export function fmtCost(x: number): string {
   return x.toFixed(Math.min(100, decimals));
 }
 
+/** `marks` are changepoints as fractions of the x-axis: each gets a dashed line,
+ *  and with `dot` a disc on the curve as well (the feed's changepoint). */
 export function sparkline(
   trace: number[],
   cap: number,
   color: string,
-  frac: number | null
+  marks: number[],
+  dot = false
 ): string {
   if (!trace.length) return '<svg viewBox="0 0 120 34"></svg>';
   const W = 120, H = 34, pad = 3;
@@ -38,13 +41,23 @@ export function sparkline(
   const line = pts
     .map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1))
     .join(" ");
-  const mark =
-    frac === null
-      ? ""
-      : `<line x1="${(frac * W).toFixed(1)}" y1="0" x2="${(frac * W).toFixed(1)}" y2="${H}" stroke="${color}" stroke-width="1" stroke-dasharray="2 2" opacity="0.65"/>`;
-  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">
-    <path d="${line} L${W} ${H} L0 ${H} Z" fill="${color}" opacity="0.13"/>${mark}
-    <path d="${line}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>`;
+  // y on the drawn curve at fraction f of the axis, interpolated between samples
+  const yAt = (f: number): number => {
+    const i = f * (pts.length - 1);
+    const lo = Math.floor(i), hi = Math.min(pts.length - 1, lo + 1);
+    return pts[lo][1] + (pts[hi][1] - pts[lo][1]) * (i - lo);
+  };
+  const lines = marks
+    .map((f) => `<line x1="${(f * W).toFixed(1)}" y1="0" x2="${(f * W).toFixed(1)}" y2="${H}" stroke="${color}" stroke-width="1" stroke-dasharray="2 2" opacity="0.65" vector-effect="non-scaling-stroke"/>`)
+    .join("");
+  // the disc is drawn in a nested svg with its own aspect so the stretch of the
+  // strip (preserveAspectRatio="none") never turns it into an ellipse
+  const dots = dot
+    ? marks.map((f) => `<svg x="${(f * W - 4).toFixed(1)}" y="${(yAt(f) - 4).toFixed(1)}" width="8" height="8" viewBox="0 0 8 8" preserveAspectRatio="xMidYMid meet"><circle cx="4" cy="4" r="3" fill="${color}" stroke="var(--bg)" stroke-width="1.2"/></svg>`).join("")
+    : "";
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true" class="${dot ? "spark-dot" : ""}">
+    <path d="${line} L${W} ${H} L0 ${H} Z" fill="${color}" opacity="0.13"/>${lines}
+    <path d="${line}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>${dots}</svg>`;
 }
 
 export function rateBar(
@@ -179,6 +192,18 @@ export function untrackedDirCells(
     <td class="col-hide"></td>
     <td class="r col-hide"><span class="org-cell">—</span></td>
     <td class="col-hide reason-cell"><span class="reason" title="${esc(r.reason)}">${esc(r.reason)}</span></td>`;
+}
+
+/** A provider's logo and name, as the Jinja macro brand_title draws it (twins).
+ *  `root` is the page's prefix back to the site root ("" or "../"). The name is
+ *  always written out: a wordmark logo is only sized differently. */
+export function brandHtml(b: { name: string; logo: string | null; kind: string; mono: boolean; dark: string | null }, root: string): string {
+  if (!b.logo) return `<span class="pbrand">${esc(b.name)}</span>`;
+  const cls = `${b.kind === "wordmark" ? "brand-wordmark" : "brand-logo"}${b.mono ? " mono" : ""}`;
+  const img = (file: string, theme: string): string =>
+    `<img class="${cls} ${theme}" src="${root}logos/providers/${esc(file)}" alt="" loading="lazy">`;
+  const logos = b.dark ? img(b.logo, "logo-light") + img(b.dark, "logo-dark") : img(b.logo, "");
+  return `<span class="pbrand">${logos}${esc(b.name)}</span>`;
 }
 
 export function methodBadges(methods: string[]): string {
@@ -403,6 +428,25 @@ function tipLine(text: string, described: boolean): HTMLElement {
   return el;
 }
 
+/** Compact controls -- filter chips, status badges and pills -- caption into a
+ *  floating tooltip instead: an in-flow caption after a chip reflows the whole
+ *  chip row (every button jumps), and one after a badge grows its table cell.
+ *  A strip keeps the in-flow caption, whose width is the strip's own. */
+const FLOAT_TIP = ".chip, .badge, .pill";
+const FLOAT_GAP = 6;
+const FLOAT_MARGIN = 8;
+
+/** Fix `line` just under `el`, kept inside the viewport horizontally. It goes on
+ *  document.body so no clipping ancestor (.table-wrap, .feed) can cut it off. */
+function floatTip(line: HTMLElement, el: Element): void {
+  line.classList.add("tip-float");
+  document.body.appendChild(line);
+  const r = el.getBoundingClientRect();
+  const left = Math.max(FLOAT_MARGIN, Math.min(r.left, window.innerWidth - line.offsetWidth - FLOAT_MARGIN));
+  line.style.left = `${left}px`;
+  line.style.top = `${r.bottom + FLOAT_GAP}px`;
+}
+
 /** How far a press may travel and still count as a tap rather than a scroll. */
 const TAP_SLOP = 10;
 
@@ -420,12 +464,12 @@ type TipOrigin = keyof typeof ORIGIN_RANK;
  *  One binding (on `root`, typically document.body) serves every [data-tip]
  *  element on the page, present at bind time or added to the DOM afterwards. */
 export function bindTips(root: Element): void {
-  let open: { el: Element; origin: TipOrigin } | null = null;
+  let open: { el: Element; origin: TipOrigin; line: HTMLElement } | null = null;
   let press: { el: Element | null; x: number; y: number } | null = null;
   const close = (): void => {
-    const line = root.querySelector(".tipline");
-    if (line?.hasAttribute("role")) open?.el.removeAttribute("aria-describedby");
-    line?.remove();
+    if (!open) return;
+    if (open.line.hasAttribute("role")) open.el.removeAttribute("aria-describedby");
+    open.line.remove();
     open = null;
   };
   const show = (el: Element, origin: TipOrigin): void => {
@@ -438,10 +482,15 @@ export function bindTips(root: Element): void {
     close();
     const described = !el.hasAttribute("aria-label");
     const line = tipLine(el.getAttribute("data-tip")!, described);
-    el.insertAdjacentElement("afterend", line);
+    if (el.matches(FLOAT_TIP)) floatTip(line, el);
+    else el.insertAdjacentElement("afterend", line);
     if (described) el.setAttribute("aria-describedby", line.id);
-    open = { el, origin };
+    open = { el, origin, line };
   };
+  // a floating tip is anchored to where its element was; a scroll anywhere
+  // (including inside a .table-scroll port) moves that out from under it
+  root.addEventListener("scroll", () => { if (open?.line.classList.contains("tip-float")) close(); },
+    { capture: true, passive: true });
   const activate = (el: Element): void => {
     if (open?.el === el && open.origin === "tap") close();
     else show(el, "tap");
@@ -558,6 +607,12 @@ export function monthLabel(month: string): string {
   return MONTH_NAMES[+month.slice(5, 7) - 1] + " '" + month.slice(2, 4);
 }
 
+/** "2026-09-02" -> "2 Sep", with the year appended when it is not `now`'s. */
+export function shortDate(date: string, now: number): string {
+  const label = `${+date.slice(8, 10)} ${MONTH_NAMES[+date.slice(5, 7) - 1]}`;
+  return date.slice(0, 4) === new Date(now).getUTCFullYear().toString() ? label : `${label} ${date.slice(0, 4)}`;
+}
+
 /** "2026-07-24" -> "Jul 2026"; null -> em dash. */
 export function prettyDate(date: string | null): string {
   return date ? MONTH_NAMES[+date.slice(5, 7) - 1] + " " + date.slice(0, 4) : "—";
@@ -598,23 +653,20 @@ export interface FeedItem {
 /** A change-feed row. Both surfaces that render it (index.html, changes.html) sit at
  *  the site root, so the link paths are root-relative with no prefix.
  *  "model @ provider" names one endpoint, so it is one link to that endpoint's page. */
-export function eventRow(e: FeedItem): string {
+export function eventRow(e: FeedItem, now = Date.now()): string {
   const isLT = e.method === "lt";
   const color = isLT ? "var(--accent)" : "var(--b3it)";
   // no endpointSlug: the endpoint has left the fleet and no page was generated for
   // it (feed.py leaves its page slugs empty), so the name is text, not a 404 link
   const names = `<span class="model">${esc(e.model)}</span>
-        <span class="at">@ ${esc(e.provider)}</span>`;
-  return `<div class="event" style="--sev:var(--${e.sevKey})">
-    <div class="when">${esc(e.date)}<span class="rel">${relDays(e.daysAgo)}</span></div>
+        <span class="at">served by ${esc(e.provider)}</span>`;
+  return `<div class="event">
+    <div class="when" title="${esc(e.date)} · ${relDays(e.daysAgo)}">${shortDate(e.date, now)}</div>
     <div class="what">
       <div>${e.endpointSlug ? `<a href="endpoints/${esc(e.endpointSlug)}.html">${names}</a>` : names}</div>
       <div class="desc">${esc(e.desc)}</div>
     </div>
-    <div class="spark">${sparkline(e.trace, isLT ? LT_CAP : B3IT_CAP, color, e.changeFrac)}</div>
-    <div class="mag">${methodBadges([e.method])}
-      <div class="delta">${esc(e.primary)}</div>
-      <div class="conf">${esc(e.secondary)}</div>
-    </div>
+    <div class="spark">${sparkline(e.trace, isLT ? LT_CAP : B3IT_CAP, color, [e.changeFrac], true)}</div>
+    <div class="meth">${methodBadges([e.method])}</div>
   </div>`;
 }

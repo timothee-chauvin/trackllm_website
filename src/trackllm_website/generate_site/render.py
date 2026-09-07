@@ -88,7 +88,6 @@ def render_site(
     env.globals["ASSET_V"] = asset_version(website_dir)
     env.filters["fmt_cost"] = format_cost
     env.filters["fmt_price"] = format_price
-    index_template = env.get_template("index.html.j2")
     endpoint_template = env.get_template("endpoint.html.j2")
     model_template = env.get_template("model.html.j2")
     provider_template = env.get_template("provider.html.j2")
@@ -193,6 +192,7 @@ def render_site(
                     [f"data/providers/{pslug}.json"],
                     provider=view["name"],
                     provider_slug=pslug,
+                    brand=view["brand"],
                     view=view,
                     css_path="../style.css",
                     body_class="provider",
@@ -235,7 +235,9 @@ def render_site(
 
     (website_dir / "about.html").write_text(
         about_template.render(
-            **page("about", "", [], css_path="style.css", body_class="about", nav_prefix="")
+            **page(
+                "about", "", [], css_path="style.css", body_class="about", nav_prefix=""
+            )
         )
     )
     print("Generated about.html")
@@ -307,19 +309,23 @@ def render_site(
             slug_to_n_providers[e["slug"]] = n_providers
             slug_to_status_summary[e["slug"]] = view["status_summary"]
 
-    index_html = index_template.render(
-        **page(
-            "index",
-            "",
-            ["data/overview.json"],
-            overview=overview,
-            css_path="style.css",
-            body_class="index",
-            nav_prefix="",
+    # The front page, and the two pages its provider and endpoint sections are
+    # slices of; all three render from overview.json.
+    for kind in ("index", "providers", "endpoints"):
+        (website_dir / f"{kind}.html").write_text(
+            env.get_template(f"{kind}.html.j2").render(
+                **page(
+                    kind,
+                    "",
+                    ["data/overview.json"],
+                    overview=overview,
+                    css_path="style.css",
+                    body_class=kind,
+                    nav_prefix="",
+                )
+            )
         )
-    )
-    (website_dir / "index.html").write_text(index_html)
-    print("Generated index.html")
+        print(f"Generated {kind}.html")
 
     for f in endpoints_dir.glob("*.html"):
         f.unlink()

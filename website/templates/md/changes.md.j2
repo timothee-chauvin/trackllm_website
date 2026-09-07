@@ -8,9 +8,6 @@ The complete log: {{ S.total }} detected change{{ "s" if S.total != 1 }} across 
   ("Changes", S.total), ("Endpoints affected", S.endpoints_affected), ("Providers involved", S.providers_involved),
   ("Last 30 days", S.changes_30d), ("Largest LT drift (nats)", S.largest_lt_drift), ("As of", S.now),
 ]) }}
-## Timeline
-
-{{ b.table(["Month", "LT", "B3IT"], changes_page.months | map("month_row") | list) }}
 ## Most-changed endpoints
 
 {{ b.table(["Endpoint", "Changes", "Last change"], changes_page.top_endpoints | map("top_row", nav_prefix) | list) }}

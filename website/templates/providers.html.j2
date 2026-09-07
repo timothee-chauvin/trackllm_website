@@ -1,0 +1,57 @@
+{% extends "base.html.j2" %}
+{% from "_macros.html.j2" import search_box %}
+
+{% block title %}Providers | TrackLLM{% endblock %}
+
+{% block content %}
+<div class="wrap">
+  <div class="head">
+    <div>
+      <h1 id="pageTitle">Providers</h1>
+      <p class="lede" id="lede"></p>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <section class="block">
+    <div class="sec-head">
+      <h2>Drift rate</h2>
+      <span class="hint">detected changes per <b>endpoint-year</b> of LT monitoring — normalized for fleet size &amp; monitoring length — with a 95% Poisson interval. Providers are grouped by company; their serving variants (fp8, fp4, …) are compared on the provider page</span>
+    </div>
+    <div class="panel rplot" id="provPlot"></div>
+  </section>
+
+  <section class="block">
+    <div class="sec-head">
+      <h2>All providers</h2>
+      <span class="hint">including the ones without enough monitoring for a rate yet; 1 square = one endpoint-month of LT monitoring</span>
+    </div>
+    <div class="toolbar">
+      {{ search_box("provQ", "Search provider…", "Search providers") }}
+    </div>
+    <div class="table-wrap">
+      <div class="table-scroll">
+        <table class="dir">
+          <thead>
+            <tr>
+              <th scope="col" data-psort="name">Provider <span class="arr"></span></th>
+              <th scope="col" data-psort="n_endpoints" class="r">Endpoints <span class="arr"></span></th>
+              <th scope="col" data-psort="lt_rate">LT drift rate <span class="arr"></span></th>
+              <th scope="col" class="col-hide">LT monitoring</th>
+              <th scope="col" class="col-hide">B3IT</th>
+              <th scope="col" data-psort="last_change" class="r col-hide">Last change <span class="arr"></span></th>
+            </tr>
+          </thead>
+          <tbody id="provBody"></tbody>
+        </table>
+      </div>
+      <div class="dir-foot" id="provFoot"></div>
+    </div>
+  </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+    <script type="module" src="js/providers.js?v={{ ASSET_V }}"></script>
+{% endblock %}

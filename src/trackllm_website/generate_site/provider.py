@@ -14,6 +14,7 @@ from datetime import datetime
 from pathlib import Path
 
 from trackllm_website.generate_site.b3it import B3ITView
+from trackllm_website.generate_site.brands import brand_json, load_brands
 from trackllm_website.generate_site.clock import site_now
 from trackllm_website.generate_site.feed import build_feed_items
 from trackllm_website.generate_site.lt import EndpointInfo, LTData
@@ -103,6 +104,7 @@ def build_provider_views(
     data_dir = website_dir / "data"
     lt_by_slug = {e.slug: e for e in lt_endpoints}
     rows_by_slug = {r["slug"]: r for r in endpoint_rows}
+    brands = load_brands(website_dir)
 
     changes = load_changes(data_dir)
     canonical = changes_by_slug(changes)
@@ -194,6 +196,7 @@ def build_provider_views(
         views[slugify(base)] = {
             "name": base,
             "slug": slugify(base),
+            "brand": brand_json(brands, slugify(base)),
             "timeline": timeline if timeline["date_min"] else None,
             "n_endpoints": len(slugs),
             "n_models": len(models[base]),
@@ -230,6 +233,7 @@ def overview_rows(views: dict[str, dict]) -> list[dict]:
         {
             "name": view["name"],
             "slug": view["slug"],
+            "brand": view["brand"],
             "n_endpoints": view["n_endpoints"],
             "n_models": view["n_models"],
             "n_variants": view["n_variants"],

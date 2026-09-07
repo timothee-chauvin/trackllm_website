@@ -40,8 +40,11 @@ def _row_state(
     change_dates: list[datetime],
     values: list[float],
     retired: bool,
-) -> tuple[str, list[float], int | None]:
-    """Directory row (status/trace/stableDays) for one endpoint.
+) -> tuple[str, list[float], list[float], int | None]:
+    """Directory row (status/trace/changeFracs/stableDays) for one endpoint.
+
+    `changeFracs` places each change on the trace as a fraction of the observed
+    span, the way feed.py's changeFrac does for the feed window.
 
     Mirrors endpoint.ts::computeStatus (date-gap based). `change_dates` is the
     endpoint's slice of the canonical merged list -- the same one the row's
@@ -64,12 +67,18 @@ def _row_state(
         change_dates[-1] if change_dates else (obs_dates[0] if obs_dates else None)
     )
     stable_days = (now - stable_since).days if stable_since is not None else None
-    return status, downsample_trace(values, TRACE_LEN), stable_days
+    span = (obs_dates[-1] - obs_dates[0]).total_seconds() if len(obs_dates) > 1 else 0
+    fracs = [
+        round(min(1.0, max(0.0, (cd - obs_dates[0]).total_seconds() / span)), 3)
+        for cd in change_dates
+        if span
+    ]
+    return status, downsample_trace(values, TRACE_LEN), fracs, stable_days
 
 
 def _b3it_row_state(
     view: B3ITView, now: datetime, change_dates: list[datetime]
-) -> tuple[str, list[float], int | None]:
+) -> tuple[str, list[float], list[float], int | None]:
     """Directory row for a B3IT-only endpoint: its tv_series is the trace.
 
     The view's own retired status is load-bearing -- a B3IT endpoint the pipeline
@@ -110,6 +119,7 @@ def _untracked_row(slug: str, site: SiteStatuses) -> dict:
         "stableDays": None,
         "nChanges": 0,
         "trace": [],
+        "changeFracs": [],
         **_status_fields(site.statuses[slug]),
     }
 
@@ -161,12 +171,13 @@ def build_overview(
             methods.append("b3it")
 
         trace: list[float] = []
+        fracs: list[float] = []
         status = "stable"
         stable_days: int | None = None
 
         info = lt_data.get(slug)
         if info is not None and now is not None:
-            status, trace, stable_days = _row_state(
+            status, trace, fracs, stable_days = _row_state(
                 now,
                 info.dates,
                 change_dates[slug],
@@ -174,7 +185,9 @@ def build_overview(
                 retired=False,
             )
         elif view is not None and now is not None:
-            status, trace, stable_days = _b3it_row_state(view, now, change_dates[slug])
+            status, trace, fracs, stable_days = _b3it_row_state(
+                view, now, change_dates[slug]
+            )
 
         endpoint_recs.append(
             {
@@ -190,6 +203,7 @@ def build_overview(
                 "stableDays": stable_days,
                 "nChanges": len(change_dates[slug]),
                 "trace": trace,
+                "changeFracs": fracs,
                 **_status_fields(site.statuses[slug]),
             }
         )

@@ -7,6 +7,7 @@ import {
   LT_CAP,
   bindActivation,
   esc,
+  highlight,
   methodBadges,
   sparkline,
   statusPill,
@@ -26,6 +27,7 @@ export interface EndpointRow {
   stableDays: number | null;
   nChanges: number;
   trace: number[];
+  changeFracs: number[]; // each change's position along `trace`, 0..1
   headline: string;
   reason: string;
 }
@@ -111,7 +113,7 @@ function trackedDirCells(r: EndpointRow, root: string): string {
     <td class="r"><span class="cc ${r.nChanges ? "some" : "zero"}">${r.nChanges}</span></td>
     <td class="col-hide"><span class="methods">${methodBadges(r.methods)}</span></td>
     <td class="r col-hide">${stableCell(r)}</td>
-    <td class="col-hide spark-cell">${sparkline(r.trace, isLT ? LT_CAP : B3IT_CAP, isLT ? "var(--accent)" : "var(--b3it)", null)}</td>`;
+    <td class="col-hide spark-cell">${sparkline(r.trace, isLT ? LT_CAP : B3IT_CAP, isLT ? "var(--accent)" : "var(--b3it)", r.changeFracs)}</td>`;
 }
 
 export interface DirectoryConfig {
@@ -129,6 +131,32 @@ export interface DirectoryConfig {
   leadCells: (r: EndpointRow, q: string) => string;
 }
 
+/** The rows of a directory table, already filtered and sorted. */
+export function dirRowsHtml(
+  list: EndpointRow[],
+  root: string,
+  leadCells: (r: EndpointRow, q: string) => string,
+  q: string
+): string {
+  return list.map((r) => {
+    const cells = r.methods.length ? trackedDirCells(r, root) : untrackedDirCells(r, root);
+    return `<tr>${leadCells(r, q)}${cells}</tr>`;
+  }).join("") || '<tr><td colspan="7"><div class="empty">No endpoints match.</div></td></tr>';
+}
+
+/** The Overview and Endpoints pages' leading cells: model (linked to its page) over
+ *  org, then the provider -- linked only when that provider has a page. */
+export function overviewLeadCells(providerPages: Set<string>): (r: EndpointRow, q: string) => string {
+  return (r, q) => {
+    const provCell = providerPages.has(r.providerSlug)
+      ? `<a class="prov-cell" href="providers/${esc(r.providerSlug)}.html">${highlight(r.provider, q)}</a>`
+      : `<span class="prov-cell">${highlight(r.provider, q)}</span>`;
+    return `
+      <td><a class="model-cell" href="models/${esc(r.modelSlug)}.html">${highlight(r.model, q)}</a><div class="org-cell">${highlight(r.org, q)}</div></td>
+      <td class="col-hide">${provCell}</td>`;
+  };
+}
+
 /** Wire up a directory table (search input, sortable headers, first paint) and
  *  return its render function for the page's own chip handlers to call. */
 export function initDirectory(cfg: DirectoryConfig): () => void {
@@ -137,11 +165,7 @@ export function initDirectory(cfg: DirectoryConfig): () => void {
     const q = cfg.q.value.trim();
     const list = cfg.list(q);
     sortEndpointRows(list, sort.key, sort.dir, cfg.providerValue);
-    cfg.body.innerHTML = list.map((r) => {
-      const head = `<tr>${cfg.leadCells(r, q)}`;
-      const cells = r.methods.length ? trackedDirCells(r, cfg.root) : untrackedDirCells(r, cfg.root);
-      return `${head}${cells}</tr>`;
-    }).join("") || '<tr><td colspan="7"><div class="empty">No endpoints match.</div></td></tr>';
+    cfg.body.innerHTML = dirRowsHtml(list, cfg.root, cfg.leadCells, q);
     cfg.foot.textContent = `${list.length} of ${cfg.rows.length} endpoints`;
     sort.paintSort();
   }

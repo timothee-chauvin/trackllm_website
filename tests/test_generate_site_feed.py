@@ -175,7 +175,7 @@ def test_b3it_item_without_a_view_reports_no_magnitude():
     (item,) = build_feed_items(changes, {}, {}, NOW)
     assert item["magnitude"] is None
     assert item["primary"] == "TV —"
-    assert "TV —" in item["desc"]
+    assert "(total variation —)" in item["desc"]
     assert item["trace"] == []
 
 

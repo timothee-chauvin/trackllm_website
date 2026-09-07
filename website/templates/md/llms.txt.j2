@@ -11,15 +11,17 @@ an endpoint's page is `endpoints/<slug>.md`.
 
 ## Start here
 
-- [Homepage]({{ SITE_URL }}/index.md): live stats, latest changes, every provider and endpoint
+- [Homepage]({{ SITE_URL }}/index.md): live stats, the latest changes, the most drift-prone providers and most-changed endpoints
 - [Change log]({{ SITE_URL }}/changes.md): every detected change with magnitude and description
+- [Providers]({{ SITE_URL }}/providers.md): every provider company with its LT drift rate and monitoring volume
+- [All endpoints]({{ SITE_URL }}/endpoints.md): every endpoint in the catalog with its tracking status and change count
 - [Methodology]({{ SITE_URL }}/methodology.md): how LT and B3IT work, links to both papers
 
 ## Data
 
 - [overview.json]({{ SITE_URL }}/data/overview.json): stats, endpoint directory, provider rates
 - [changes.json]({{ SITE_URL }}/data/changes.json): every detected change, newest first
-- [changes_page.json]({{ SITE_URL }}/data/changes_page.json): change log with descriptions and month histogram
+- [changes_page.json]({{ SITE_URL }}/data/changes_page.json): change log with descriptions
 - per-model `data/models/<slug>.json` (full drift/TV series per endpoint), per-provider `data/providers/<slug>.json`, per-endpoint `data/b3it/<slug>/b3it.json`
 - [Raw data repository]({{ DATA_REPO_URL }}): every collected API response, committed hourly
 
