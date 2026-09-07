@@ -27,6 +27,7 @@ export interface EndpointRow {
   stableDays: number | null;
   nChanges: number;
   trace: number[];
+  changeFracs: number[]; // each change's position along `trace`, 0..1
   headline: string;
   reason: string;
 }
@@ -112,7 +113,7 @@ function trackedDirCells(r: EndpointRow, root: string): string {
     <td class="r"><span class="cc ${r.nChanges ? "some" : "zero"}">${r.nChanges}</span></td>
     <td class="col-hide"><span class="methods">${methodBadges(r.methods)}</span></td>
     <td class="r col-hide">${stableCell(r)}</td>
-    <td class="col-hide spark-cell">${sparkline(r.trace, isLT ? LT_CAP : B3IT_CAP, isLT ? "var(--accent)" : "var(--b3it)", null)}</td>`;
+    <td class="col-hide spark-cell">${sparkline(r.trace, isLT ? LT_CAP : B3IT_CAP, isLT ? "var(--accent)" : "var(--b3it)", r.changeFracs)}</td>`;
 }
 
 export interface DirectoryConfig {

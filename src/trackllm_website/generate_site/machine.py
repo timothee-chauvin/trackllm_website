@@ -176,7 +176,7 @@ def _org_model_row(m: dict, nav: str) -> tuple:
 
 def _provider_row(p: dict, nav: str) -> tuple:
     return (
-        _provider(nav, p["slug"], p["name"]),
+        _provider(nav, p["slug"], p["brand"]["name"]),
         p["n_endpoints"],
         p["n_models"],
         p["n_variants"],
@@ -205,7 +205,7 @@ def _rateable(provs: list[dict]) -> list[dict]:
 
 def _plot_row(p: dict, nav: str) -> tuple:
     return (
-        _provider(nav, p["slug"], p["name"]),
+        _provider(nav, p["slug"], p["brand"]["name"]),
         p["n_endpoints"],
         p["lt_years"],
         p["lt_changes"],

@@ -7,13 +7,8 @@
 
 {% block content %}
 <div class="wrap">
-  <div class="crumb">
-    <a href="{{ nav_prefix }}index.html">Home</a><span class="sep">/</span>
-    <span style="color:var(--text-muted)">{{ org }}</span>
-  </div>
   <div class="head">
     <div>
-      <div class="eyebrow">Organization</div>
       <h1>{{ org }} {{ subscribe_icon(machine, nav_prefix) }}</h1>
       <p class="lede">{{ view.n_models }} model{{ s(view.n_models) }}, with {{ view.n_endpoints }} tracked endpoint{{ s(view.n_endpoints) }}
         across {{ view.n_providers }} provider{{ s(view.n_providers) }}.

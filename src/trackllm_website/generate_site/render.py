@@ -192,6 +192,7 @@ def render_site(
                     [f"data/providers/{pslug}.json"],
                     provider=view["name"],
                     provider_slug=pslug,
+                    brand=view["brand"],
                     view=view,
                     css_path="../style.css",
                     body_class="provider",

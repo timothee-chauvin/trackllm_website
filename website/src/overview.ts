@@ -154,7 +154,9 @@ export async function init(): Promise<void> {
   paintFreshness();
   setInterval(paintFreshness, FRESH_TICK_MS);
 
-  document.getElementById("feed")!.innerHTML = DATA.feed.map(eventRow).join("");
+  const now = Date.now();
+  document.getElementById("feed")!.innerHTML = DATA.feed.map(e => eventRow(e, now)).join("");
+  document.getElementById("allChanges")!.textContent = `All ${S.changes_total} changes →`;
 
   // ---- providers: the most drift-prone slice of the rate plot ----
   const provs = DATA.providers;

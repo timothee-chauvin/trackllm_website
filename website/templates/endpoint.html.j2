@@ -5,12 +5,6 @@
 
 {% block content %}
 <div class="wrap">
-  <div class="crumb">
-    <a href="{{ nav_prefix }}index.html">Home</a><span class="sep">/</span>
-    <a href="{{ nav_prefix }}orgs/{{ org_slug }}.html">{{ org }}</a><span class="sep">/</span>
-    {% if model_slug %}<a href="{{ nav_prefix }}models/{{ model_slug }}.html">{{ model_name }}</a>{% else %}<span>{{ model_name }}</span>{% endif %}<span class="sep">/</span>
-    <span style="color:var(--text-muted)">@ {{ provider }}</span>
-  </div>
   <div class="head">
     <div>
       {# every name here is a page: the model, the company serving it, the company that trained it #}
@@ -104,12 +98,6 @@
   </section>
   {% endif %}
 
-  <section class="block">
-    <div class="method-note">
-      <div class="card"><h3><span class="badge lt">LT</span> Logprob tracking</h3><p>Primary signal where the provider returns logprobs. The drift is the mean absolute change in the returned tokens' log-probabilities versus the reference period (in nats — natural-log probability units). The detector also reports σ, one of the metrics feeding its change-detection criterion, which can be high even when the drift is small.</p></div>
-      <div class="card"><h3><span class="badge b3it">B3IT</span> Border inputs</h3><p>Black-box fallback for endpoints that hide logprobs. Tracks how far the top-token votes on a ranked set of near-tie prompts have moved from the reference distribution (total variation, 0–1). Corroborates LT where both run on the same endpoint.</p></div>
-    </div>
-  </section>
 </main>
 {% endblock %}
 

@@ -1,5 +1,5 @@
 // The sortable, searchable provider-company table on the Providers page.
-import { MIN_ENDPOINT_YEARS, esc, plural, rateBar, volGrid } from "./components";
+import { MIN_ENDPOINT_YEARS, brandHtml, esc, plural, rateBar, volGrid } from "./components";
 import { initSortHeaders } from "./directory";
 import { ProviderRate } from "./overview_data";
 
@@ -18,7 +18,7 @@ export function initProviderTable(provs: ProviderRate[]): void {
 
   function render(): void {
     const q = provQ.value.trim().toLowerCase();
-    const list = provs.filter(p => !q || p.name.toLowerCase().includes(q));
+    const list = provs.filter(p => !q || `${p.name} ${p.brand.name}`.toLowerCase().includes(q));
     list.sort((a, b) => {
       let av: string | number, bv: string | number;
       if (provSort.key === "lt_rate") {
@@ -36,10 +36,10 @@ export function initProviderTable(provs: ProviderRate[]): void {
     });
     document.getElementById("provBody")!.innerHTML =
       list.map(p => `<tr>
-        <td><a class="model-cell" href="providers/${esc(p.slug)}.html">${esc(p.name)}</a>
+        <td><a class="model-cell" href="providers/${esc(p.slug)}.html">${brandHtml(p.brand, "")}</a>
           <div class="org-cell">${p.n_variants > 1 ? plural(p.n_variants, "serving variant") : "single variant"} · ${plural(p.n_models, "model")}</div></td>
         <td class="r"><span class="cc">${p.n_endpoints}</span></td>
-        <td style="min-width:190px">${rateBar(p.lt_years, p.lt_rate, p.lt_ci, maxRate)}</td>
+        <td style="min-width:150px">${rateBar(p.lt_years, p.lt_rate, p.lt_ci, maxRate)}</td>
         <td class="col-hide">${volGrid(p.lt_years)}</td>
         <td class="col-hide">${p.b3it_endpoints
           ? `<span class="vol"><span class="lbl">${p.b3it_endpoints} ep · ${p.b3it_years.toFixed(1)} ep-yr</span></span>`

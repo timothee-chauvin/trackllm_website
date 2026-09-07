@@ -335,13 +335,15 @@ def test_endpoint_head_links_model_provider_and_org(tmp_path):
     assert f'href="../orgs/{slugify("m")}.html"' in head
 
 
-def test_endpoint_and_model_crumbs_link_the_org(tmp_path):
+def test_endpoint_and_model_heads_link_the_org(tmp_path):
     _scaffold(tmp_path)
     render_site(tmp_path, None, empty_status_inputs())
     org_href = f'href="../orgs/{slugify("m")}.html"'
     for path in ("endpoints/m2fa23p.html", f"models/{slugify('m/a')}.html"):
-        crumb = (tmp_path / path).read_text().split('<div class="crumb">')[1]
-        assert org_href in crumb.split("</div>")[0], path
+        html = (tmp_path / path).read_text()
+        assert '<div class="crumb">' not in html, path
+        head = html.split('<div class="head">')[1].split("</div>\n</div>")[0]
+        assert org_href in head, path
 
 
 def test_render_emits_org_pages(tmp_path):

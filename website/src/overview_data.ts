@@ -36,6 +36,7 @@ export interface Stats {
 export interface ProviderRate {
   name: string;
   slug: string;
+  brand: Brand;
   n_endpoints: number;
   n_models: number;
   n_variants: number;
@@ -46,6 +47,16 @@ export interface ProviderRate {
   b3it_endpoints: number;
   b3it_years: number;
   last_change: string | null;
+}
+
+/** How a provider is shown (brands.py / provider_brands.yaml): its display name
+ *  and, when one was found, its logo. A wordmark logo *is* the name. */
+export interface Brand {
+  name: string;
+  logo: string | null;
+  kind: "icon" | "wordmark";
+  mono: boolean; // a flat dark mark: inverted in the dark theme
+  dark: string | null; // a light-on-dark variant, shown in the dark theme instead
 }
 
 /** The one real change event the hero draws, chosen at build time (hero.py). */

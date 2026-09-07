@@ -1,7 +1,7 @@
 // The provider drift-rate dot plot: one row per rateable provider company, a dot
 // at the LT rate with its 95% Poisson interval as a whisker, on one shared axis.
 // Drawn on the Overview (top slice) and the Providers page (every rateable row).
-import { esc, plural } from "./components";
+import { brandHtml, esc, plural } from "./components";
 import { ProviderRate } from "./overview_data";
 
 const NICE_STEPS = [0.1, 0.2, 0.25, 0.5, 1, 2, 5, 10];
@@ -37,7 +37,7 @@ export function ratePlot(rows: ProviderRate[], root: string): string {
     const what = `${rate.toFixed(2)} changes per endpoint-year (95% interval ${lo.toFixed(2)}–${hi.toFixed(2)}): ` +
       `${plural(p.lt_changes, "change")} in ${p.lt_years.toFixed(1)} endpoint-years`;
     return `<a class="rrow" href="${root}providers/${esc(p.slug)}.html" title="${esc(what)}">
-      <span class="rname">${esc(p.name)}<small>${p.n_endpoints} ep · ${p.lt_years.toFixed(1)} ep-yr</small></span>
+      <span class="rname">${brandHtml(p.brand, root)}<small>${p.n_endpoints} ep · ${p.lt_years.toFixed(1)} ep-yr</small></span>
       <span class="rtrack">${grid}<i class="ci" style="left:${pc(lo)};width:${pc(hi - lo)}"></i><i class="dot" style="left:${pc(rate)}"></i></span>
       <span class="rval">${rate.toFixed(2)}</span>
     </a>`;

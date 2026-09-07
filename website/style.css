@@ -5,7 +5,7 @@
    light-dark(), which needs color-scheme and would restyle UA scrollbars and
    form controls. Keep both light copies identical. */
 :root, :root[data-theme="dark"] {
-  --bg: #0B0F14; --surface: #12181F; --surface-2: #171F28; --surface-3: #1E2731;
+  --bg: #0B0F14; --surface: #0B0F14; --surface-2: #12181F; --surface-3: #171F28;
   --border: #232C38; --border-soft: #1A222C; --text: #E6EDF3; --text-muted: #91A0B2;
   --text-dim: #7F8EA0; --accent: #37C2E0; --accent-quiet: rgba(55,194,224,0.12);
   --accent-line: rgba(55,194,224,0.35); --accent-fill: rgba(55,194,224,0.14);
@@ -19,7 +19,7 @@
 }
 @media (prefers-color-scheme: light) {
   :root {
-    --bg: #FAFCFD; --surface: #F1F5F8; --surface-2: #FFFFFF; --surface-3: #FFFFFF;
+    --bg: #FAFCFD; --surface: #FAFCFD; --surface-2: #F1F5F8; --surface-3: #F4F7FA;
     --border: #DCE4EC; --border-soft: #E7EDF2; --text: #101720; --text-muted: #566072;
     --text-dim: #647183; --accent: #0E86A6; --accent-quiet: rgba(14,134,166,0.09);
     --accent-line: rgba(14,134,166,0.30); --accent-fill: rgba(14,134,166,0.10);
@@ -30,7 +30,7 @@
   }
 }
 :root[data-theme="light"] {
-  --bg: #FAFCFD; --surface: #F1F5F8; --surface-2: #FFFFFF; --surface-3: #FFFFFF;
+  --bg: #FAFCFD; --surface: #FAFCFD; --surface-2: #F1F5F8; --surface-3: #F4F7FA;
   --border: #DCE4EC; --border-soft: #E7EDF2; --text: #101720; --text-muted: #566072;
   --text-dim: #647183; --accent: #0E86A6; --accent-quiet: rgba(14,134,166,0.09);
   --accent-line: rgba(14,134,166,0.30); --accent-fill: rgba(14,134,166,0.10);
@@ -124,8 +124,6 @@ a { color: inherit; text-decoration: none; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2rem); }
-.crumb { font-size: 0.82rem; color: var(--text-dim); padding: 1.3rem 0 0.4rem; font-family: var(--mono); }
-.crumb a:hover { color: var(--accent); } .crumb .sep { opacity: 0.5; margin: 0 0.15rem; }
 
 .badge { display: inline-block; font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.16rem 0.5rem; border-radius: 5px; border: 1px solid transparent; font-weight: 600; }
 .badge.lt { color: var(--accent); background: var(--accent-quiet); border-color: color-mix(in srgb, var(--accent) 32%, transparent); }
@@ -218,33 +216,26 @@ section.block { padding: 2.6rem 0 0.6rem; }
   font-size: 0.85rem; font-weight: 550; color: var(--text-muted); background: var(--surface); border: 1px solid var(--border); transition: all .13s; }
 .more-btn:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-quiet); }
 
-/* clip-path, not overflow: hidden -- the latter would make .feed the scrollport for
-   the sticky .mohead inside it, which then parks var(--nav-h) below the feed's own
-   top and covers the first change instead of tracking the nav. */
-.feed { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: var(--radius); clip-path: inset(0 round var(--radius)); background: var(--surface); }
-.event { display: grid; grid-template-columns: 104px 1fr 132px 118px; align-items: center; gap: 1rem;
-  padding: 0.85rem 1.1rem 0.85rem 1.35rem; position: relative; border-top: 1px solid var(--border-soft); transition: background .14s; }
+/* A plain list, no box: a sticky .mohead inside it needs .feed to be neither a
+   scroll container (overflow) nor clipped, or the banner parks under the feed's
+   own top instead of tracking the nav. */
+.feed { display: flex; flex-direction: column; }
+.event { display: grid; grid-template-columns: 72px 1fr 120px 52px; align-items: center; gap: 1.2rem;
+  padding: 0.85rem 0.5rem; border-top: 1px solid var(--border-soft); transition: background .14s; }
 .event:first-child { border-top: none; }
 .event:hover { background: var(--surface-2); }
-.event::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--sev); }
-.event .when { font-family: var(--mono); font-size: 0.8rem; color: var(--text-muted); }
-.event .when .rel { display: block; color: var(--text-dim); font-size: 0.72rem; }
+.event .when { font-size: 0.86rem; color: var(--text-muted); white-space: nowrap; }
 .event .what { min-width: 0; }
-.event .what .model { font-weight: 580; letter-spacing: -0.01em; }
+.event .what .model { font-weight: 640; letter-spacing: -0.01em; }
 .event .what a:hover .model { color: var(--accent); }
-.event .what .at { color: var(--text-dim); font-weight: 400; }
-.event .what .desc { color: var(--text-muted); font-size: 0.83rem; margin-top: 0.1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.event .what .at { color: var(--text-muted); font-weight: 400; }
+.event .what .desc { color: var(--text-muted); font-size: 0.84rem; margin-top: 0.1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .event .spark { height: 34px; }
-.event .spark svg { width: 100%; height: 34px; display: block; }
-.event .mag { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 0.12rem; }
-.event .mag .badge { margin-bottom: 0.15rem; }
-.event .mag .delta { font-family: var(--mono); font-size: 0.92rem; color: var(--sev); font-weight: 650; }
-.event .mag .delta small { font-weight: 500; color: var(--text-dim); font-size: 0.7rem; }
-.event .mag .conf { font-family: var(--mono); font-size: 0.72rem; color: var(--text-muted); }
-.event .mag .conf b { color: var(--text); font-weight: 600; }
+.event .spark svg { width: 100%; height: 34px; display: block; overflow: visible; }
+.event .meth { text-align: right; }
 @media (max-width: 720px) {
-  .event { grid-template-columns: 1fr 108px; grid-template-areas: "what mag" "when spark"; row-gap: 0.5rem; }
-  .event .when { grid-area: when; } .event .what { grid-area: what; } .event .spark { grid-area: spark; } .event .mag { grid-area: mag; }
+  .event { grid-template-columns: 1fr 100px; grid-template-areas: "what meth" "when spark"; row-gap: 0.5rem; }
+  .event .when { grid-area: when; } .event .what { grid-area: what; } .event .spark { grid-area: spark; } .event .meth { grid-area: meth; }
 }
 
 .panel { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: 0.6rem 1.4rem 1rem; }
@@ -277,7 +268,8 @@ section.block { padding: 2.6rem 0 0.6rem; }
 .chip-row .k { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-dim); min-width: 4.2rem; }
 
 .table-wrap { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--surface); }
-.table-scroll { max-height: 580px; overflow-y: auto; }
+.table-scroll { max-height: 580px; overflow: auto; }
+.table-wrap.preview .table-scroll { max-height: none; }
 table.dir { width: 100%; border-collapse: collapse; }
 table.dir thead th { position: sticky; top: 0; z-index: 2; text-align: left; font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase;
   color: var(--text-dim); font-weight: 600; padding: 0.7rem 1.1rem; background: var(--surface-3); border-bottom: 1px solid var(--border); cursor: pointer; white-space: nowrap; user-select: none; }
@@ -292,7 +284,7 @@ table.dir tbody td.spark-cell { width: 130px; }
 table.dir tbody td.spark-cell > svg { width: 100%; height: 26px; display: block; }
 td .model-cell { font-weight: 560; letter-spacing: -0.01em; }
 td .model-cell:hover { color: var(--accent); }
-td .org-cell { color: var(--text-dim); font-size: 0.74rem; }
+td .org-cell { color: var(--text-dim); font-size: 0.74rem; white-space: nowrap; }
 td .prov-cell { color: var(--text-muted); font-family: var(--mono); font-size: 0.79rem; }
 /* untracked directory rows: the one-line reason sits where the sparkline would */
 td.reason-cell { max-width: 340px; }
@@ -305,7 +297,7 @@ td.reason-cell .reason { display: block; max-width: 340px; overflow: hidden; tex
 td.cell-tip { position: relative; }
 td.cell-tip > .badge, td.cell-tip > .pill { position: relative; z-index: 1; }
 td.cell-tip > .cell-go { position: absolute; inset: 0; z-index: 0; }
-td .cc { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+td .cc { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
 td .cc.zero { color: var(--text-dim); }
 td .cc.some { color: var(--changed); font-weight: 600; }
 td .methods { display: flex; gap: 0.3rem; }
@@ -391,12 +383,6 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
   .changes-tbl th { font-size: 0.66rem; letter-spacing: normal; }
   .changes-tbl td { font-size: 0.82rem; }
 }
-
-.method-note { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-.method-note .card { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: 1rem 1.2rem; }
-.method-note .card h3 { font-size: 0.92rem; margin: 0 0 0.4rem; display: flex; align-items: center; gap: 0.5rem; }
-.method-note .card p { font-size: 0.83rem; color: var(--text-muted); margin: 0; }
-@media (max-width: 620px) { .method-note { grid-template-columns: 1fr; } }
 
 /* Chart caption: what a tapped or focused strip has to say, since a touch device
    never sees a hover-only <title> (components.ts::stripTip / bindTips). Nothing is
@@ -543,6 +529,26 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
   .rrow, .raxis { grid-template-columns: 96px 1fr 44px; gap: 0.6rem; }
   .rname small { display: none; }
 }
+
+/* Provider brand: logo beside the name (components.ts::brandHtml / brand_title).
+   A flat dark mark (.mono) is inverted for the dark theme; a provider with a
+   proper dark variant swaps images instead. */
+.pbrand { display: inline-flex; align-items: center; gap: 0.4em; min-width: 0; }
+.brand-logo { width: 1.15em; height: 1.15em; flex: none; object-fit: contain; }
+.brand-wordmark { height: 1em; width: auto; max-width: 9em; object-fit: contain; }
+.head h1 .brand-logo { width: 1.25em; height: 1.25em; }
+.head h1 .brand-wordmark { height: 1.1em; max-width: 12em; }
+.logo-dark { display: none; }
+:root[data-theme="dark"] .mono { filter: invert(1) hue-rotate(180deg); }
+:root[data-theme="dark"] .logo-light { display: none; }
+:root[data-theme="dark"] .logo-dark { display: inline; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .mono { filter: invert(1) hue-rotate(180deg); }
+  :root:not([data-theme="light"]) .logo-light { display: none; }
+  :root:not([data-theme="light"]) .logo-dark { display: inline; }
+}
+.rname .pbrand { justify-content: flex-end; max-width: 100%; }
+.rname .pbrand > :last-child { overflow: hidden; text-overflow: ellipsis; }
 
 /* ranked boards */
 .board { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
