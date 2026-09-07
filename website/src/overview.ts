@@ -2,24 +2,15 @@
 // with other bundler entrypoints when type-checked as one tsc program) and lets the
 // smoke tests re-render a fresh document without busting the module cache.
 import {
-  FeedItem,
-  MIN_ENDPOINT_YEARS,
-  bindActivation,
   bindTips,
   esc,
   eventRow,
-  highlight,
   magnitudeLabel,
   methodBadges,
-  plural,
-  rateBar,
   relDays,
   relativeAge,
-  showLoadError,
-  toggleChip,
-  volGrid,
 } from "./components";
-import { EndpointRow, initDirectory, initSortHeaders } from "./directory";
+import { dirRowsHtml, overviewLeadCells, sortEndpointRows } from "./directory";
 import {
   HERO_CLEAR_GAP,
   HERO_HIT_WIDTH,
@@ -32,97 +23,24 @@ import {
   heroDrawnTo,
   heroStretch,
 } from "./hero_geom";
+import { Hero, OverviewData, fmtInt, loadOverview } from "./overview_data";
+import { rateablePlotRows, ratePlot } from "./rate_plot";
 
-interface Stats {
-  // headline counts, so they agree with the directory's status chips: `endpoints`
-  // is the fleet we ever tracked (tracked + retired) and `active` its tracked half
-  endpoints: number;
-  providers: number;
-  provider_companies: number;
-  models: number;
-  orgs: number;
-  changes_total: number;
-  changes_lt: number;
-  changes_b3it: number;
-  active: number;
-  changed_endpoints: number;
-  changes_30d: number;
-  lt_endpoints: number;
-  b3it_endpoints: number;
-  b3it_monitoring: number;
-  b3it_since: string | null;
-  queries: number;
-  since: string | null;
-  spend_cumulative: number;
-  now: string | null;
-  // absolute instants (overview.py), turned into an age here at page load
-  last_query_lt: string | null;
-  last_query_b3it: string | null;
-}
-
-/** One provider *company*, with its serving variants pooled (provider.py::overview_rows).
- *  `lt_rate` and `lt_ci` are null together, and that null is the "not enough
- *  monitoring" state — never a rate of zero, and never recomputed here. */
-interface ProviderRate {
-  name: string;
-  slug: string;
-  n_endpoints: number;
-  n_models: number;
-  n_variants: number;
-  lt_years: number;
-  lt_changes: number;
-  lt_rate: number | null;
-  lt_ci: [number, number] | null;
-  b3it_endpoints: number;
-  b3it_years: number;
-  last_change: string | null;
-}
-
-/** The one real change event the hero draws, chosen at build time (hero.py). */
-interface Hero {
-  slug: string;
-  model: string;
-  org: string;
-  provider: string;
-  method: "lt" | "b3it";
-  date: string;
-  daysAgo: number;
-  magnitude: number;
-  baseline: number;
-  start: string;
-  end: string;
-  values: number[];
-  changeFrac: number;
-  yMax: number;
-}
-
-type ProviderSortKey = "name" | "n_endpoints" | "lt_rate" | "last_change";
-
-const BOARD_SIZE = 5;
-const QUIET_MIN_YEARS = 1; // a "nothing detected yet" board entry needs real exposure
+const PLOT_SIZE = 10; // the front page shows the most drift-prone slice
+const DIR_SIZE = 10; // ... and the most-changed endpoints
 const FRESH_TICK_MS = 60_000; // the line's own resolution, so no point ticking faster
 
 export async function init(): Promise<void> {
-  let DATA: {
-    stats: Stats;
-    hero: Hero | null;
-    feed: FeedItem[];
-    providers: ProviderRate[];
-    endpoints: EndpointRow[];
-  };
+  let DATA: OverviewData;
   try {
-    const res = await fetch("data/overview.json");
-    if (!res.ok) throw new Error(`overview.json: HTTP ${res.status}`);
-    DATA = await res.json();
+    DATA = await loadOverview("telemetry");
   } catch (err) {
-    showLoadError("telemetry", "the overview data");
     // no half-broken hero above the error card: drop its layers and the live dot
     document.getElementById("eyebrow")?.remove();
     document.querySelectorAll(".hero-trace, .hero-hit-layer, .hero-tip").forEach(el => el.remove());
     throw err;
   }
   const S = DATA.stats;
-  const fmtInt = (n: number): string => n.toLocaleString("en-US");
   const fmtM = (n: number): string =>
     n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e3 ? (n / 1e3).toFixed(0) + "k" : "" + n;
 
@@ -238,142 +156,20 @@ export async function init(): Promise<void> {
 
   document.getElementById("feed")!.innerHTML = DATA.feed.map(eventRow).join("");
 
-  // ---- providers: two ranked boards, then the full sortable table ----
+  // ---- providers: the most drift-prone slice of the rate plot ----
   const provs = DATA.providers;
-  // One scale for every bar drawn on this page. Spans only what is drawn — the
-  // rates and their interval upper bounds — so no band is clipped; zero-rate rows
-  // render as text, so their (rule-of-three) ceilings must not set the scale.
-  const drawn = provs.filter(p => p.lt_rate !== null && p.lt_rate > 0);
-  const maxRate = Math.max(
-    1,
-    ...drawn.map(p => p.lt_rate!),
-    ...drawn.map(p => p.lt_ci?.[1] ?? 0)
-  );
+  document.getElementById("provPlot")!.innerHTML =
+    ratePlot(rateablePlotRows(provs).slice(0, PLOT_SIZE), "");
 
-  function boardRow(p: ProviderRate, i: number): string {
-    return `<a class="brow" href="providers/${esc(p.slug)}.html">
-      <span class="rk">${i + 1}</span>
-      <span class="pv">${esc(p.name)}<small>${plural(p.n_endpoints, "endpoint")} · ${plural(p.n_variants, "variant")}</small></span>
-      ${rateBar(p.lt_years, p.lt_rate, p.lt_ci, maxRate)}
-      <span class="meta"><b>${p.lt_changes}</b> chg<br>${p.lt_years.toFixed(1)} ep-yr</span></a>`;
-  }
-  function board(title: string, tag: string, desc: string, rows: ProviderRate[]): string {
-    return `<div class="board"><h3>${title} <em>${tag}</em></h3><p>${desc}</p>
-      ${rows.map(boardRow).join("") || '<div class="empty">Nothing to rank yet.</div>'}</div>`;
-  }
-
-  const drifty = provs
-    .filter(p => p.lt_rate !== null && p.lt_changes > 0)
-    .sort((a, b) => b.lt_rate! - a.lt_rate!)
-    .slice(0, BOARD_SIZE);
-  const quiet = provs
-    .filter(p => p.lt_changes === 0 && p.lt_years >= QUIET_MIN_YEARS)
-    .sort((a, b) => b.lt_years - a.lt_years)
-    .slice(0, BOARD_SIZE);
-  document.getElementById("provBoards")!.innerHTML =
-    board("Most drift-prone", "LT · rate", "Bar is the point estimate, the faint band its 95% interval.", drifty) +
-    board("Nothing detected yet", "LT · upper bound",
-      "Ranked by monitoring volume.", quiet);
-
-  const provQ = document.getElementById("provQ") as HTMLInputElement;
-  const provSort = initSortHeaders<ProviderSortKey>(
-    "psort", "lt_rate", -1, ["n_endpoints", "lt_rate", "last_change"], renderProviders);
-
-  function renderProviders(): void {
-    const q = provQ.value.trim().toLowerCase();
-    const list = provs.filter(p => !q || p.name.toLowerCase().includes(q));
-    list.sort((a, b) => {
-      let av: string | number, bv: string | number;
-      if (provSort.key === "lt_rate") {
-        // an unmeasurable rate is not a low rate: park those rows at the bottom in
-        // both directions, so reversing the sort never promotes them to the top
-        if ((a.lt_rate === null) !== (b.lt_rate === null)) return a.lt_rate === null ? 1 : -1;
-        av = a.lt_rate ?? 0; bv = b.lt_rate ?? 0;
-      }
-      else if (provSort.key === "n_endpoints") { av = a.n_endpoints; bv = b.n_endpoints; }
-      else if (provSort.key === "last_change") { av = a.last_change ?? ""; bv = b.last_change ?? ""; }
-      else { av = a.name.toLowerCase(); bv = b.name.toLowerCase(); }
-      if (av < bv) return -provSort.dir;
-      if (av > bv) return provSort.dir;
-      return a.name.localeCompare(b.name);
-    });
-    document.getElementById("provBody")!.innerHTML =
-      list.map(p => `<tr>
-        <td><a class="model-cell" href="providers/${esc(p.slug)}.html">${esc(p.name)}</a>
-          <div class="org-cell">${p.n_variants > 1 ? plural(p.n_variants, "serving variant") : "single variant"} · ${plural(p.n_models, "model")}</div></td>
-        <td class="r"><span class="cc">${p.n_endpoints}</span></td>
-        <td style="min-width:190px">${rateBar(p.lt_years, p.lt_rate, p.lt_ci, maxRate)}</td>
-        <td class="col-hide">${volGrid(p.lt_years)}</td>
-        <td class="col-hide">${p.b3it_endpoints
-          ? `<span class="vol"><span class="lbl">${p.b3it_endpoints} ep · ${p.b3it_years.toFixed(1)} ep-yr</span></span>`
-          : '<span class="org-cell">—</span>'}</td>
-        <td class="r col-hide"><span class="cc ${p.last_change ? "some" : "zero"}">${p.last_change ? esc(p.last_change) : "—"}</span></td>
-      </tr>`).join("") || '<tr><td colspan="6"><div class="empty">No providers match.</div></td></tr>';
-    const unrated = provs.filter(p => p.lt_rate === null).length;
-    document.getElementById("provFoot")!.textContent =
-      `${list.length} of ${provs.length} providers · ${unrated} under ${MIN_ENDPOINT_YEARS} endpoint-years, so not yet rateable`;
-    provSort.paintSort();
-  }
-  provQ.addEventListener("input", renderProviders);
-  renderProviders();
-
-  // ---- endpoint directory ----
+  // ---- endpoints: the most-changed actively tracked rows ----
   const rows = DATA.endpoints;
-  // provider pages only exist for providers with tracked endpoints; a row whose
-  // provider has none must name it without linking it
   const providerPages = new Set(provs.map(p => p.slug));
-  const active = new Set<string>();
-  // headline chips are OR within the group; an empty set means no status constraint
-  const statusFilters = new Set<string>(["tracked"]);
-  const render = initDirectory({
-    rows,
-    root: "",
-    q: document.getElementById("q") as HTMLInputElement,
-    body: document.getElementById("dirBody")!,
-    foot: document.getElementById("dirFoot")!,
-    descending: ["stableDays", "nChanges"],
-    providerValue: r => r.provider.toLowerCase(),
-    list: q => {
-      const ql = q.toLowerCase();
-      const mf = [...active].filter(f => f === "lt" || f === "b3it");
-      // a change-history chip bypasses the status group: its result set is defined
-      // by the change criterion alone (only observed endpoints can have changes),
-      // exactly as before the status chips existed
-      const changeChip = active.has("everchanged") || active.has("recent");
-      // gray out whatever the current mode ignores, so chips never look
-      // toggleable while having no effect
-      const chipsEl = document.getElementById("chips")!;
-      chipsEl.classList.toggle("bypass-all", !!q);
-      chipsEl.classList.toggle("bypass-status", changeChip);
-      // a search spans every row: chips must never hide a hit
-      return q
-        ? rows.filter(r => `${r.model} ${r.provider} ${r.org}`.toLowerCase().includes(ql))
-        : rows.filter(r => {
-            if (!changeChip && statusFilters.size && !statusFilters.has(r.headline)) return false;
-            if (mf.length && !mf.every(m => r.methods.includes(m))) return false;
-            if (active.has("everchanged") && r.nChanges === 0) return false;
-            if (active.has("recent") && r.status !== "changed") return false;
-            return true;
-          });
-    },
-    leadCells: (r, q) => {
-      const provCell = providerPages.has(r.providerSlug)
-        ? `<a class="prov-cell" href="providers/${esc(r.providerSlug)}.html">${highlight(r.provider, q)}</a>`
-        : `<span class="prov-cell">${highlight(r.provider, q)}</span>`;
-      return `
-        <td><a class="model-cell" href="models/${esc(r.modelSlug)}.html">${highlight(r.model, q)}</a><div class="org-cell">${highlight(r.org, q)}</div></td>
-        <td class="col-hide">${provCell}</td>`;
-    },
-  });
+  const top = rows.filter(r => r.headline === "tracked");
+  sortEndpointRows(top, "nChanges", -1, r => r.provider.toLowerCase());
+  document.getElementById("dirBody")!.innerHTML =
+    dirRowsHtml(top.slice(0, DIR_SIZE), "", overviewLeadCells(providerPages), "");
   document.getElementById("dirCount")!.innerHTML = `${fmtInt(rows.length)} endpoints · <b style="color:var(--changed)">${S.changes_total} changes</b> across ${S.changed_endpoints} of them`;
-  // two chip groups share the toolbar: data-st chips toggle the status set,
-  // data-f chips the method/change set
-  bindActivation(document.getElementById("chips")!, ".chip", chip => {
-    const st = chip.dataset.st;
-    toggleChip(chip, st ? statusFilters : active, st ?? chip.dataset.f!);
-    render();
-  });
-  // one binding for the status chips above and every directory badge/pill render() draws
+  // every directory badge/pill above carries a popover
   bindTips(document.body);
 }
 

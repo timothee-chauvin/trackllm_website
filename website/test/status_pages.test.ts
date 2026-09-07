@@ -1,5 +1,6 @@
 /**
- * Status front end against the generated site: chips, search with highlight,
+ * Status front end against the generated site: the Endpoints page's chips and
+ * search with highlight,
  * untracked endpoint/model pages. Same harness as smoke.test.ts -- real
  * generated HTML + JSON, so it also fails when the generator stops emitting
  * the status fields. Rows are discovered from the data, never hardcoded to a
@@ -67,11 +68,22 @@ beforeAll(() => {
 });
 afterAll(() => GlobalRegistrator.unregister());
 
-async function renderOverview(): Promise<void> {
-  document.documentElement.innerHTML = readFileSync(requireBuilt("index.html"), "utf8");
+async function renderEndpoints(): Promise<void> {
+  document.documentElement.innerHTML = readFileSync(requireBuilt("endpoints.html"), "utf8");
   stubFetch(".");
-  await (await import("../src/overview")).init();
+  await (await import("../src/endpoints")).init();
 }
+
+const click = (el: Element): void => {
+  el.dispatchEvent(new Event("click", { bubbles: true }));
+};
+const chipF = (attr: string, value: string): HTMLElement => {
+  const el = document.querySelector<HTMLElement>(`#chips .chip[data-${attr}="${value}"]`);
+  if (!el) throw new Error(`no ${attr} chip for ${value}`);
+  return el;
+};
+const matching = (q: string): FleetRow[] =>
+  ROWS.filter((r) => `${r.model} ${r.provider} ${r.org}`.toLowerCase().includes(q));
 
 const search = (q: string): void => {
   const input = document.getElementById("q") as HTMLInputElement;
@@ -88,9 +100,9 @@ const chip = (st: string): HTMLElement => {
 const shownCount = (): number =>
   Number(/^(\d+) of /.exec(document.getElementById("dirFoot")!.textContent ?? "")?.[1]);
 
-describe("overview status chips", () => {
+describe("endpoint directory chips", () => {
   test("default shows only tracked-headline rows, chips reveal the rest", async () => {
-    await renderOverview();
+    await renderEndpoints();
     const byHeadline = (h: string): number => ROWS.filter((r) => r.headline === h).length;
     expect(chip("tracked").classList.contains("on")).toBe(true);
     expect(shownCount()).toBe(byHeadline("tracked"));
@@ -107,47 +119,49 @@ describe("overview status chips", () => {
     expect(body.textContent).toContain("no tracking method can work");
   });
 
-  test("change-history chips bypass the status group", async () => {
-    // a retired-headline endpoint with past changes must appear under "Ever
-    // changed" while the default tracked chip is on, as before status chips
+  // The three chip rows are facets: OR inside a row, AND across rows. Nothing
+  // bypasses anything, so what the footer counts is always what the chips say.
+  test("change-history chips combine with the status row", async () => {
     const retiredChanged = rowWith(
       (r) => r.headline === "retired" && r.nChanges > 0,
       "retired-headline row with changes",
     );
-    await renderOverview();
-    document
-      .querySelector('#chips .chip[data-f="everchanged"]')!
-      .dispatchEvent(new Event("click", { bubbles: true }));
+    await renderEndpoints();
+    click(chipF("c", "everchanged"));
     const changed = ROWS.filter((r) => r.nChanges > 0);
+    expect(shownCount()).toBe(changed.filter((r) => r.headline === "tracked").length);
+    expect(
+      document.querySelector(`#dirBody a[href="endpoints/${retiredChanged.slug}.html"]`),
+    ).toBeNull();
+
+    click(chip("tracked")); // no status constraint: every changed row, whatever its fate
     expect(shownCount()).toBe(changed.length);
     expect(
       document.querySelector(`#dirBody a[href="endpoints/${retiredChanged.slug}.html"]`),
     ).not.toBeNull();
   });
 
-  test("bypassed chips are marked inactive", async () => {
-    // change-history chips bypass the status group; a search bypasses every chip
-    await renderOverview();
-    const chipsEl = document.getElementById("chips")!;
-    expect(chipsEl.classList.contains("bypass-status")).toBe(false);
-    document
-      .querySelector('#chips .chip[data-f="everchanged"]')!
-      .dispatchEvent(new Event("click", { bubbles: true }));
-    expect(chipsEl.classList.contains("bypass-status")).toBe(true);
-    search("gpt-5");
-    expect(chipsEl.classList.contains("bypass-all")).toBe(true);
-    search("");
-    expect(chipsEl.classList.contains("bypass-all")).toBe(false);
+  test("method chips are alternatives, not a conjunction", async () => {
+    await renderEndpoints();
+    const tracked = ROWS.filter((r) => r.headline === "tracked");
+    const has = (m: string): number => tracked.filter((r) => r.methods.includes(m)).length;
+    click(chipF("f", "lt"));
+    expect(shownCount()).toBe(has("lt"));
+    click(chipF("f", "b3it"));
+    expect(shownCount()).toBe(
+      tracked.filter((r) => r.methods.includes("lt") || r.methods.includes("b3it")).length,
+    );
+    expect(shownCount()).toBeGreaterThanOrEqual(Math.max(has("lt"), has("b3it")));
   });
 
   test("no status chip active means no status constraint", async () => {
-    await renderOverview();
+    await renderEndpoints();
     chip("tracked").dispatchEvent(new Event("click", { bubbles: true }));
     expect(shownCount()).toBe(ROWS.length);
   });
 
   test("provider names without a provider page are not linked", async () => {
-    await renderOverview();
+    await renderEndpoints();
     chip("tracked").dispatchEvent(new Event("click", { bubbles: true })); // show all
     const hrefs = document
       .getElementById("dirBody")!
@@ -160,14 +174,14 @@ describe("overview status chips", () => {
   });
 });
 
-describe("overview search", () => {
-  test("finds gpt-5 by model despite the tracked chip, with <mark>", async () => {
+describe("endpoint directory search", () => {
+  test("narrows within the chips, and highlights the hit with <mark>", async () => {
     rowWith((r) => untracked(r) && r.model.includes("gpt-5"), "untracked gpt-5");
-    await renderOverview();
+    await renderEndpoints();
     search("gpt-5");
-    const matches = ROWS.filter((r) =>
-      `${r.model} ${r.provider} ${r.org}`.toLowerCase().includes("gpt-5"),
-    );
+    const matches = matching("gpt-5");
+    expect(shownCount()).toBe(matches.filter((r) => r.headline === "tracked").length);
+    click(chip("tracked")); // every match, untracked ones included
     expect(shownCount()).toBe(matches.length);
     const body = document.getElementById("dirBody")!;
     expect(body.innerHTML).toContain("<mark>gpt-5</mark>");
@@ -175,11 +189,10 @@ describe("overview search", () => {
   });
 
   test("finds alibaba by provider name, with <mark>", async () => {
-    await renderOverview();
+    await renderEndpoints();
+    click(chip("tracked"));
     search("alibaba");
-    const matches = ROWS.filter((r) =>
-      `${r.model} ${r.provider} ${r.org}`.toLowerCase().includes("alibaba"),
-    );
+    const matches = matching("alibaba");
     expect(matches.length).toBeGreaterThan(0);
     expect(shownCount()).toBe(matches.length);
     const prov = document.querySelector("#dirBody .prov-cell mark");
@@ -187,7 +200,7 @@ describe("overview search", () => {
   });
 
   test("clearing the search restores the chip filter", async () => {
-    await renderOverview();
+    await renderEndpoints();
     search("gpt-5");
     search("");
     expect(shownCount()).toBe(ROWS.filter((r) => r.headline === "tracked").length);

@@ -209,8 +209,14 @@ section.block { padding: 2.6rem 0 0.6rem; }
 .sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 1.1rem; flex-wrap: wrap; }
 .sec-head h2 { font-size: 1.18rem; font-weight: 640; letter-spacing: -0.015em; margin: 0; }
 .sec-head .hint { color: var(--text-dim); font-size: 0.82rem; flex: 1; min-width: 220px; }
-.sec-head a.more { color: var(--accent); font-size: 0.85rem; }
-.sec-head a.more:hover { text-decoration: underline; }
+/* a front-page section is a slice of a page of its own: its heading links there
+   (the chevron says so), and so does the More button under the block */
+.sec-head h2 a::after { content: " ›"; color: var(--text-dim); font-weight: 500; }
+.sec-head h2 a:hover { color: var(--accent); }
+.sec-head h2 a:hover::after { color: var(--accent); }
+.more-btn { display: block; margin: 0.7rem auto 0; width: fit-content; padding: 0.45rem 1.4rem; border-radius: 20px;
+  font-size: 0.85rem; font-weight: 550; color: var(--text-muted); background: var(--surface); border: 1px solid var(--border); transition: all .13s; }
+.more-btn:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-quiet); }
 
 /* clip-path, not overflow: hidden -- the latter would make .feed the scrollport for
    the sticky .mohead inside it, which then parks var(--nav-h) below the feed's own
@@ -265,8 +271,10 @@ section.block { padding: 2.6rem 0 0.6rem; }
 .chip.on { color: var(--accent); border-color: var(--accent); background: var(--accent-quiet); }
 .chip.on.state-changed { color: var(--changed); border-color: var(--changed); background: var(--changed-bg); }
 .chip.on.state-retired { color: var(--retired); border-color: var(--retired); background: var(--retired-bg); }
-/* chips the current mode ignores: search bypasses every chip, change-history chips the status group */
-.chips.bypass-all .chip, .chips.bypass-status .chip[data-st] { opacity: 0.45; }
+/* the Endpoints page's chips, one labeled row per filter group (endpoints.ts) */
+.chip-groups { display: grid; gap: 0.45rem; margin-bottom: 0.9rem; }
+.chip-row { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.chip-row .k { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-dim); min-width: 4.2rem; }
 
 .table-wrap { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--surface); }
 .table-scroll { max-height: 580px; overflow-y: auto; }
@@ -399,6 +407,12 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 .tipline { padding: 0.3rem 0 0.1rem; font-family: var(--mono); font-size: 0.72rem;
   line-height: 1.4; color: var(--text-muted); overflow-wrap: anywhere;
   flex-basis: 100%; /* drop to its own line in a flex row (.head .badges, .cmp .pv .mm) */ }
+/* Chips, badges and pills caption into this instead (components.ts::floatTip): a
+   real tooltip, out of the flow, so opening one never moves the control under the
+   pointer -- or any of its neighbours. Fixed, so a clipping .table-wrap cannot cut it. */
+.tipline.tip-float { position: fixed; z-index: 60; pointer-events: none; max-width: min(24rem, calc(100vw - 16px));
+  padding: 0.4rem 0.65rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.28); color: var(--text); font-family: var(--sans); font-size: 0.78rem; }
 
 /* An info button beside a label (e.g. "Vetting" on the spend page), sharing the
    tap/click/focus data-tip + bindTips mechanism above. */
@@ -504,9 +518,33 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 .rbar.nd { background: transparent; height: auto; min-height: 22px; }
 .rbar.nd > b { position: static; transform: none; color: var(--text-dim); font-weight: 500; padding-top: 3px; }
 
+/* Provider drift-rate dot plot (rate_plot.ts): name | dot with its 95% interval on
+   a shared axis | rate. One series, so the LT accent carries it; the gridlines are
+   per row and recessive, the dot wears a surface ring so it reads over its whisker. */
+.rplot { padding: 0.5rem 1.2rem 0.6rem; }
+.rrow, .raxis { display: grid; grid-template-columns: 150px 1fr 56px; align-items: center; gap: 1rem; }
+.rrow { padding: 0.38rem 0; border-top: 1px solid var(--border-soft); }
+.rrow:first-child { border-top: none; }
+.rrow:hover { background: var(--surface-2); }
+.rrow:hover .rname { color: var(--accent); }
+.rname { text-align: right; font-weight: 550; font-size: 0.87rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rname small { display: block; color: var(--text-dim); font-weight: 400; font-size: 0.68rem; font-family: var(--mono); }
+.rtrack { position: relative; height: 22px; }
+.rtrack .gl { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--border); }
+.rtrack .ci { position: absolute; top: 50%; height: 2px; transform: translateY(-50%); background: var(--accent); opacity: 0.55; border-radius: 1px; }
+.rtrack .dot { position: absolute; top: 50%; width: 10px; height: 10px; transform: translate(-50%, -50%); border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 0 2px var(--surface); }
+.rrow:hover .rtrack .dot { box-shadow: 0 0 0 2px var(--surface-2); }
+.rval { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 0.82rem; font-weight: 600; }
+.raxis { padding-top: 0.35rem; border-top: 1px solid var(--border); }
+.raxis .ticks { position: relative; height: 14px; font-family: var(--mono); font-size: 0.66rem; color: var(--text-dim); }
+.raxis .ticks span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+@media (max-width: 560px) {
+  .rrow, .raxis { grid-template-columns: 96px 1fr 44px; gap: 0.6rem; }
+  .rname small { display: none; }
+}
+
 /* ranked boards */
-.boards { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
-@media (max-width: 900px) { .boards { grid-template-columns: 1fr; } }
 .board { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
 .board > h3 { margin: 0; padding: 0.85rem 1.1rem 0.4rem; font-size: 0.95rem; font-weight: 620; letter-spacing: -0.01em; display: flex; align-items: baseline; gap: 0.55rem; }
 .board > h3 em { font-style: normal; font-family: var(--mono); font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; }
@@ -560,22 +598,7 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 .legend .k i.bar { border-radius: 2px; height: 6px; width: 14px; }
 
 /* changes page */
-.hist { padding: 1rem 1.2rem 0.3rem; }
-.hist .bars { display: flex; align-items: flex-end; gap: 3px; height: 132px; }
-/* each column is a <button> (changes.ts), so the UA button styling is stripped back
-   to the bare bar it was as a div -- only the focus ring is new */
-.hist .mo { flex: 1; display: flex; flex-direction: column; align-items: stretch; justify-content: flex-end; gap: 1px; cursor: pointer; min-width: 0; position: relative;
-  appearance: none; -webkit-appearance: none; border: 0; padding: 0; background: none; font: inherit; color: inherit; text-align: inherit;
-  overflow: visible; /* the count label sits above the bar's own box */ }
-.hist .mo .b3 { background: var(--b3it); border-radius: 2px 2px 0 0; }
-.hist .mo .lt { background: var(--accent); opacity: 0.85; }
-.hist .mo .lt.bottom { border-radius: 0 0 2px 2px; }
-.hist .mo:hover .lt, .hist .mo:hover .b3 { filter: brightness(1.2); }
-.hist .mo.dim { opacity: 0.3; }
-.hist .mo .n { position: absolute; top: -1.05rem; left: 50%; transform: translateX(-50%); font-family: var(--mono); font-size: 0.62rem; color: var(--text-dim); }
-.hist .xaxis { display: flex; gap: 3px; margin-top: 0.4rem; }
-.hist .xaxis span { flex: 1; text-align: center; font-family: var(--mono); font-size: 0.6rem; color: var(--text-dim); min-width: 0; overflow: hidden; }
-.hist .xaxis span.q { color: var(--text-muted); }
+.sec-head .hint a { color: var(--accent); }
 .mohead { position: sticky; top: var(--nav-h); z-index: 3; display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
   padding: 0.45rem 1.1rem; background: var(--surface-3); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
   font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); }

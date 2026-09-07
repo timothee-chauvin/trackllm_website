@@ -4,6 +4,8 @@ __pycache__
 /website/index.html
 /website/spend.html
 /website/changes.html
+/website/providers.html
+/website/endpoints.html
 /website/methodology.html
 /website/about.html
 /website/*.md

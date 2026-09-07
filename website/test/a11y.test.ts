@@ -60,6 +60,18 @@ async function renderOverview(): Promise<void> {
   await (await import("../src/overview")).init();
 }
 
+async function renderEndpoints(): Promise<void> {
+  document.documentElement.innerHTML = readFileSync(requireBuilt("endpoints.html"), "utf8");
+  stubFetch(".");
+  await (await import("../src/endpoints")).init();
+}
+
+async function renderProviders(): Promise<void> {
+  document.documentElement.innerHTML = readFileSync(requireBuilt("providers.html"), "utf8");
+  stubFetch(".");
+  await (await import("../src/providers")).init();
+}
+
 async function renderChanges(): Promise<void> {
   document.documentElement.innerHTML = readFileSync(requireBuilt("changes.html"), "utf8");
   stubFetch(".");
@@ -71,7 +83,7 @@ const shownCount = (): number =>
 
 describe("filter chips", () => {
   test("every chip is a button to the keyboard, with its state exposed", async () => {
-    await renderOverview();
+    await renderEndpoints();
     const chips = document.querySelectorAll<HTMLElement>(".chip");
     expect(chips.length).toBeGreaterThan(0);
     for (const c of chips) {
@@ -85,7 +97,7 @@ describe("filter chips", () => {
   });
 
   test("Enter and Space toggle a chip, and aria-pressed follows", async () => {
-    await renderOverview();
+    await renderEndpoints();
     const tracked = document.querySelector<HTMLElement>('#chips .chip[data-st="tracked"]')!;
     const all = shownCount();
 
@@ -100,7 +112,7 @@ describe("filter chips", () => {
   });
 
   test("Space activates rather than scrolling the page", async () => {
-    await renderOverview();
+    await renderEndpoints();
     const chip = document.querySelector<HTMLElement>('#chips .chip[data-f="lt"]')!;
     expect(press(chip, " ").defaultPrevented).toBe(true);
     // an unrelated key is left alone
@@ -108,7 +120,7 @@ describe("filter chips", () => {
     expect(chip.getAttribute("aria-pressed")).toBe("true");
   });
 
-  // the Overview binds its chips directly; the other pages go through
+  // the Endpoints page binds its chips directly; the other pages go through
   // bindFilterChips, which has its own keyboard wiring to get right
   test("a bindFilterChips group is keyboard-operable too", async () => {
     await renderChanges();
@@ -121,6 +133,45 @@ describe("filter chips", () => {
   });
 });
 
+/** A chip's explanation used to be inserted into the chip row itself, which
+ *  reflowed every chip after it on each hover. It is a floating tooltip now: on
+ *  the body, out of the flow, and gone again when the pointer leaves. */
+describe("chip tooltips", () => {
+  const tapped = (el: Element): void => {
+    for (const type of ["pointerdown", "pointerup"]) el.dispatchEvent(new Event(type, { bubbles: true }));
+  };
+
+  test("float over the page instead of joining the chip row", async () => {
+    await renderEndpoints();
+    const chip = document.querySelector<HTMLElement>('#chips .chip[data-st="retired"]')!;
+    const row = chip.parentElement!;
+    const before = row.children.length;
+    tapped(chip);
+    const tip = document.querySelector(".tipline")!;
+    expect(tip, "no tooltip opened").not.toBeNull();
+    expect(tip.classList.contains("tip-float")).toBe(true);
+    expect(tip.parentElement).toBe(document.body);
+    expect(tip.textContent).toBe(chip.dataset.tip!);
+    expect(row.children.length, "the chip row gained an element").toBe(before);
+    // the badge's own words describe it to assistive tech while it is open
+    expect(chip.getAttribute("aria-describedby")).toBe(tip.id);
+    tapped(chip);
+    expect(document.querySelector(".tipline")).toBeNull();
+    expect(chip.hasAttribute("aria-describedby")).toBe(false);
+  });
+
+  test("a status badge in the table floats too, so the row keeps its height", async () => {
+    await renderEndpoints();
+    document.querySelector<HTMLElement>('#chips .chip[data-st="tracked"]')!.click();
+    const badge = document.querySelector<HTMLElement>("#dirBody .badge.st")!;
+    const cell = badge.parentElement!;
+    const before = cell.children.length;
+    tapped(badge);
+    expect(document.querySelector("body > .tipline.tip-float")).not.toBeNull();
+    expect(cell.children.length).toBe(before);
+  });
+});
+
 describe("sortable column headers", () => {
   const sortable = (): HTMLElement[] => [
     ...document.querySelectorAll<HTMLElement>("#dirBody")[0].closest("table")!
@@ -128,7 +179,7 @@ describe("sortable column headers", () => {
   ];
 
   test("are focusable and announce the current sort", async () => {
-    await renderOverview();
+    await renderEndpoints();
     const headers = sortable();
     expect(headers.length).toBeGreaterThan(1);
     for (const th of headers) {
@@ -142,7 +193,7 @@ describe("sortable column headers", () => {
   });
 
   test("Enter sorts, and aria-sort moves to the column that now owns it", async () => {
-    await renderOverview();
+    await renderEndpoints();
     const model = sortable().find((th) => th.dataset.sort === "model")!;
     const changes = sortable().find((th) => th.dataset.sort === "nChanges")!;
 
@@ -157,50 +208,11 @@ describe("sortable column headers", () => {
   });
 
   test("the provider table keeps its own sort state", async () => {
-    await renderOverview();
+    await renderProviders();
     const psorted = [...document.querySelectorAll<HTMLElement>("th[data-psort]")].filter(
       (th) => th.getAttribute("aria-sort") !== "none",
     );
     expect(psorted.map((th) => th.dataset.psort)).toEqual(["lt_rate"]);
-  });
-});
-
-describe("changes-page month histogram", () => {
-  /** The month's two counts, from its accessible name. */
-  const counts = (b: Element): number[] =>
-    [...(b.getAttribute("aria-label") ?? "").matchAll(/(\d+) (?:LT|B3IT)/g)].map((m) => +m[1]);
-
-  test("each month is a named button carrying its counts", async () => {
-    await renderChanges();
-    const bars = document.querySelectorAll<HTMLElement>("#hist .mo");
-    expect(bars.length).toBeGreaterThan(1);
-    for (const b of bars) {
-      expect(b.tagName).toBe("BUTTON"); // hence tabbable and Enter/Space-activatable
-      expect(b.getAttribute("type")).toBe("button");
-      const label = b.getAttribute("aria-label") ?? "";
-      expect(label, `${b.dataset.m} has no counts in its name`).toMatch(
-        /^\w{3} '\d\d: \d+ LT, \d+ B3IT/,
-      );
-      expect(b.getAttribute("aria-pressed")).toBe("false");
-    }
-  });
-
-  test("activating a bar filters the log and marks itself pressed", async () => {
-    await renderChanges();
-    const bars = [...document.querySelectorAll<HTMLElement>("#hist .mo")];
-    const bar = bars.find((b) => counts(b).some((n) => n > 0))!;
-    expect(bar, "no month with any change to filter to").toBeDefined();
-    const count = document.getElementById("logCount")!;
-    const before = count.textContent;
-
-    bar.click(); // what Enter/Space dispatches on a native button
-    expect(bar.getAttribute("aria-pressed")).toBe("true");
-    expect(count.textContent).not.toBe(before);
-    expect(bars.filter((b) => b.getAttribute("aria-pressed") === "true")).toEqual([bar]);
-
-    bar.click(); // pressing the same month again clears the filter
-    expect(bar.getAttribute("aria-pressed")).toBe("false");
-    expect(count.textContent).toBe(before);
   });
 });
 
@@ -216,7 +228,7 @@ describe("accessible names", () => {
   });
 
   test("every search input is named", () => {
-    for (const path of ["index.html", "changes.html", "providers/chutes.html"]) {
+    for (const path of ["endpoints.html", "providers.html", "changes.html", "providers/chutes.html"]) {
       const html = readFileSync(requireBuilt(path), "utf8");
       const inputs = [...html.matchAll(/<input [^>]*>/g)].map((m) => m[0]);
       expect(inputs.length, `${path} has no search input`).toBeGreaterThan(0);
@@ -271,6 +283,8 @@ describe("navigation", () => {
   test("the current page's nav link is marked, and only it", () => {
     const cases: [string, string][] = [
       ["changes.html", "changes.html"],
+      ["providers.html", "providers.html"],
+      ["endpoints.html", "endpoints.html"],
       ["methodology.html", "methodology.html"],
       ["about.html", "about.html"],
     ];
@@ -294,7 +308,7 @@ describe("navigation", () => {
 /** .table-wrap clips (overflow: hidden), so a table wide enough to overflow it
  *  disappears at the edge unless it sits in the .table-scroll port. */
 test("every directory table sits in a scroll port", () => {
-  for (const path of ["index.html", "providers/chutes.html", "orgs/deepseek.html"]) {
+  for (const path of ["index.html", "endpoints.html", "providers.html", "providers/chutes.html", "orgs/deepseek.html"]) {
     document.documentElement.innerHTML = readFileSync(requireBuilt(path), "utf8");
     const tables = document.querySelectorAll("table.dir");
     expect(tables.length, `${path} has no directory table`).toBeGreaterThan(0);

@@ -1,11 +1,10 @@
-"""data/changes_page.json: the complete change log, its month histogram and rankings.
+"""data/changes_page.json: the complete change log and its rankings.
 
 Reads only already-generated data; the enrichment itself lives in feed.py so the
 Overview's latest-changes slice and this log can never disagree.
 """
 
 import json
-from collections import Counter
 from datetime import datetime
 from pathlib import Path
 
@@ -13,7 +12,6 @@ from trackllm_website.generate_site.b3it import B3ITView
 from trackllm_website.generate_site.clock import site_now
 from trackllm_website.generate_site.feed import build_feed_items
 from trackllm_website.generate_site.lt import LTData
-from trackllm_website.generate_site.months import month_range
 
 TOP_ENDPOINTS = 5
 RECENT_DAYS = 30
@@ -44,14 +42,6 @@ def build_changes_page(
     now = site_now(lt_data, b3it_views)
     drift_by_slug = {slug: d.drift for slug, d in lt_data.items()}
     items = build_feed_items(changes, drift_by_slug, b3it_views, now) if now else []
-
-    # A change outside the observed span (e.g. an epoch closure recorded after an
-    # endpoint's last sampled point) must still land in a bucket, or the histogram
-    # would silently drop it.
-    span = all_dates + [i["date"] for i in items]
-    months = month_range(min(span), max(span)) if span else []
-    lt_counts = Counter(i["date"][:7] for i in items if i["method"] == "lt")
-    b3it_counts = Counter(i["date"][:7] for i in items if i["method"] == "b3it")
 
     per_endpoint: dict[str, dict] = {}
     for item in items:  # items are newest first, so the first hit is the latest
@@ -91,10 +81,6 @@ def build_changes_page(
             "now": now.strftime("%Y-%m-%d") if now else None,
         },
         "items": items,
-        "months": [
-            {"month": m, "lt": lt_counts.get(m, 0), "b3it": b3it_counts.get(m, 0)}
-            for m in months
-        ],
         "top_endpoints": sorted(
             per_endpoint.values(), key=lambda r: (-r["n"], r["slug"])
         )[:TOP_ENDPOINTS],

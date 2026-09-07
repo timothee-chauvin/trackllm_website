@@ -39,14 +39,28 @@ const PAGES: Page[] = [
     html: "index.html",
     entry: "../src/overview.ts",
     ready: "#dirBody tr",
-    mounts: ["telemetry", "freshness", "feed", "provBoards", "provBody", "dirBody"],
+    mounts: ["telemetry", "freshness", "feed", "provPlot", "dirBody"],
   },
   {
     name: "changes",
     html: "changes.html",
     entry: "../src/changes.ts",
     ready: "#log .event",
-    mounts: ["lede", "summary", "hist", "topEndpoints", "log"],
+    mounts: ["lede", "summary", "topEndpoints", "log"],
+  },
+  {
+    name: "providers",
+    html: "providers.html",
+    entry: "../src/providers.ts",
+    ready: "#provBody tr",
+    mounts: ["lede", "provPlot", "provBody", "provFoot"],
+  },
+  {
+    name: "endpoints",
+    html: "endpoints.html",
+    entry: "../src/endpoints.ts",
+    ready: "#dirBody tr",
+    mounts: ["lede", "dirBody", "dirFoot"],
   },
   {
     name: "provider",
@@ -205,6 +219,34 @@ describe.each(PAGES)("$name page", (page) => {
     const tip = document.getElementById("heroTip")!.textContent ?? "";
     expect(tip, "the hover card names no endpoint").toMatch(/\S+\s*@\s*\S+/);
     expect(tip, "the hover card gives no change date").toMatch(/\d{4}-\d{2}-\d{2}/);
+  });
+
+  /** The front page shows a slice of each of these; the slice must be the top of
+   *  what the full page shows, and never the whole of it. */
+  test.if(page.name === "overview")("previews the Providers and Endpoints pages", () => {
+    const plotRows = document.querySelectorAll("#provPlot .rrow");
+    expect(plotRows.length).toBeGreaterThan(1);
+    const full = JSON.parse(readFileSync(requireBuilt("data/overview.json"), "utf8"));
+    const rateable = full.providers.filter((p: { lt_rate: number | null }) => p.lt_rate !== null);
+    expect(plotRows.length).toBeLessThan(rateable.length);
+    expect(document.querySelectorAll("#dirBody tr").length).toBeLessThan(full.endpoints.length);
+    for (const href of ["changes.html", "providers.html", "endpoints.html"]) {
+      expect(document.querySelector(`.sec-head h2 a[href="${href}"]`), `no heading link to ${href}`).not.toBeNull();
+      expect(document.querySelector(`a.more-btn[href="${href}"]`), `no More button to ${href}`).not.toBeNull();
+    }
+  });
+
+  test.if(page.name === "providers")("plots every rateable provider on one axis", () => {
+    const full = JSON.parse(readFileSync(requireBuilt("data/overview.json"), "utf8"));
+    const rateable = full.providers.filter((p: { lt_rate: number | null }) => p.lt_rate !== null);
+    expect(document.querySelectorAll("#provPlot .rrow").length).toBe(rateable.length);
+    const ticks = [...document.querySelectorAll("#provPlot .raxis .ticks span")].map((t) => +t.textContent!);
+    expect(ticks[0]).toBe(0);
+    expect(ticks.length).toBeGreaterThan(2);
+    // no whisker may run past the axis
+    for (const ci of document.querySelectorAll<HTMLElement>("#provPlot .ci")) {
+      expect(parseFloat(ci.style.left) + parseFloat(ci.style.width)).toBeLessThanOrEqual(100.01);
+    }
   });
 
   test("fills every mount point", () => {

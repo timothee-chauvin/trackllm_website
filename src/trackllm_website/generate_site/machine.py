@@ -20,6 +20,10 @@ from trackllm_website.util import format_cost, format_price, slugify
 SITE_URL = "https://www.trackllm.net"
 DATA_REPO_URL = "https://github.com/timothee-chauvin/trackllm_data"
 GLOBAL_FEED_CAP = 200
+# The front page's slices of the Providers and Endpoints pages: twins of
+# overview.ts::PLOT_SIZE / DIR_SIZE, so index.md shows the same rows index.html does.
+PLOT_PREVIEW = 10
+DIR_PREVIEW = 10
 # Links in the .md twins are absolute: the pages are made to be copied into an
 # LLM context, where a relative link points nowhere.
 _BASE = f"{SITE_URL}/"
@@ -186,12 +190,34 @@ def _provider_row(p: dict, nav: str) -> tuple:
     )
 
 
-def _month_row(m: dict) -> tuple:
-    return (m["month"], m["lt"], m["b3it"])
-
-
 def _top_row(t: dict, nav: str) -> tuple:
     return (_ep(nav, t["slug"], f"{t['model']} @ {t['provider']}"), t["n"], t["last"])
+
+
+# The drift-rate plot's rows (rate_plot.ts::rateablePlotRows): providers with a
+# rate at all, most drift-prone first, a zero rate ordered by its upper bound.
+def _rateable(provs: list[dict]) -> list[dict]:
+    return sorted(
+        (p for p in provs if p["lt_rate"] is not None),
+        key=lambda p: (-p["lt_rate"], -p["lt_ci"][1], p["name"]),
+    )
+
+
+def _plot_row(p: dict, nav: str) -> tuple:
+    return (
+        _provider(nav, p["slug"], p["name"]),
+        p["n_endpoints"],
+        p["lt_years"],
+        p["lt_changes"],
+        _rate(p["lt_rate"]),
+        _ci(p["lt_ci"]),
+    )
+
+
+# The front page's endpoint preview (overview.ts): actively tracked rows, most changes first.
+def _most_changed(rows: list[dict], n: int) -> list[dict]:
+    tracked = [r for r in rows if r["headline"] == "tracked"]
+    return sorted(tracked, key=lambda r: (-r["nChanges"], r["model"].lower()))[:n]
 
 
 def _spend_group_row(item: tuple, labels: dict) -> tuple:
@@ -215,8 +241,10 @@ _ROW_FILTERS = {
     "change_row": _change_row,
     "org_model_row": _org_model_row,
     "provider_row": _provider_row,
-    "month_row": _month_row,
     "top_row": _top_row,
+    "rateable": _rateable,
+    "plot_row": _plot_row,
+    "most_changed": _most_changed,
     "spend_group_row": _spend_group_row,
     "spend_endpoint_row": _spend_endpoint_row,
     "label": lambda g, labels: labels[g],
@@ -263,6 +291,8 @@ def render_markdown(
         DATA_REPO_URL=DATA_REPO_URL,
         built_at=built_at.strftime("%Y-%m-%d %H:%M UTC"),
         FEED_CAP=GLOBAL_FEED_CAP,
+        PLOT_PREVIEW=PLOT_PREVIEW,
+        DIR_PREVIEW=DIR_PREVIEW,
     )
     by_dir: dict[Path, dict[str, str]] = {}
     for kind, contexts in pages.items():

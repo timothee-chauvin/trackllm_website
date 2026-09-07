@@ -1,5 +1,5 @@
 {% extends "base.html.j2" %}
-{% from "_macros.html.j2" import chip, search_box, affiliations, cite_pill, subscribe_pill %}
+{% from "_macros.html.j2" import affiliations, cite_pill, subscribe_pill, more_link, dir_table %}
 {% block title %}TrackLLM{% endblock %}
 {% block content %}
 <header class="hero">
@@ -18,85 +18,33 @@
 </header>
 
 <main class="wrap">
+  {# Each section is a slice of a page of its own: the heading links there, and
+     so does the More button under the block. #}
   <section class="block">
     <div class="sec-head">
-      <h2>Latest detected changes</h2>
+      <h2><a href="changes.html">Latest detected changes</a></h2>
       <span class="hint">sparkline is the endpoint's drift around the changepoint (dashed): LT tracks how far the returned logprob averages have moved from the reference period (nats; the headline number is the shift in that level at the change); B3IT the total-variation shift of border-input outputs (0–1)</span>
-      <a class="more" href="changes.html">Full changelog →</a>
     </div>
     <div class="feed" id="feed"></div>
+    {{ more_link("changes.html", "the full changelog") }}
   </section>
 
   <section class="block">
     <div class="sec-head">
-      <h2>Providers</h2>
-      <span class="hint">detected changes per <b>endpoint-year</b> of monitoring — normalized for fleet size &amp; monitoring length — with a 95% Poisson interval. Providers are grouped by company; their serving variants (fp8, fp4, …) are compared on the provider page</span>
+      <h2><a href="providers.html">Providers</a></h2>
+      <span class="hint">detected changes per <b>endpoint-year</b> of LT monitoring — normalized for fleet size &amp; monitoring length — with a 95% Poisson interval. The most drift-prone providers; each is a company with its serving variants (fp8, fp4, …) pooled</span>
     </div>
-    <div class="boards" id="provBoards"></div>
-    <div class="toolbar">
-      {{ search_box("provQ", "Search provider…", "Search providers") }}
-    </div>
-    <div class="table-wrap">
-      <div class="table-scroll">
-        <table class="dir">
-          <thead>
-            <tr>
-              <th scope="col" data-psort="name">Provider <span class="arr"></span></th>
-              <th scope="col" data-psort="n_endpoints" class="r">Endpoints <span class="arr"></span></th>
-              <th scope="col" data-psort="lt_rate">LT drift rate (changes / endpoint-year) <span class="arr"></span></th>
-              <th scope="col" class="col-hide">Monitoring (1 sq = endpoint-month)</th>
-              <th scope="col" class="col-hide">B3IT</th>
-              <th scope="col" data-psort="last_change" class="r col-hide">Last change <span class="arr"></span></th>
-            </tr>
-          </thead>
-          <tbody id="provBody"></tbody>
-        </table>
-      </div>
-      <div class="dir-foot" id="provFoot"></div>
-    </div>
+    <div class="panel rplot" id="provPlot"></div>
+    {{ more_link("providers.html", "every provider") }}
   </section>
 
   <section class="block">
     <div class="sec-head">
-      <h2>Endpoints</h2>
+      <h2><a href="endpoints.html">Endpoints</a></h2>
       <span class="hint" id="dirCount"></span>
     </div>
-    <div class="toolbar">
-      {{ search_box("q", "Search model, provider, or org…", "Search endpoints by model, provider, or org") }}
-      <div class="chips" id="chips">
-        {{ chip("Tracked", "st", "tracked", on=true) }}
-        {{ chip("Retired", "st", "retired", state="state-retired") }}
-        {{ chip("Untrackable", "st", "untrackable") }}
-        {{ chip("Too expensive", "st", "too_expensive") }}
-        {{ chip("Not selected", "st", "not_selected") }}
-        {{ chip("Errors", "st", "errors_out") }}
-        {{ chip("Pending", "st", "pending") }}
-        {{ chip("Free", "st", "free_excluded") }}
-        {{ chip("LT", "f", "lt") }}
-        {{ chip("B3IT", "f", "b3it") }}
-        {{ chip("Ever changed", "f", "everchanged", state="state-changed") }}
-        {{ chip("Recent (60d)", "f", "recent", state="state-changed") }}
-      </div>
-    </div>
-    <div class="table-wrap">
-      <div class="table-scroll">
-        <table class="dir">
-          <thead>
-            <tr>
-              <th scope="col" data-sort="model">Model <span class="arr"></span></th>
-              <th scope="col" data-sort="provider" class="col-hide">Provider <span class="arr"></span></th>
-              <th scope="col" data-sort="status">Status <span class="arr"></span></th>
-              <th scope="col" data-sort="nChanges" class="r">Changes <span class="arr"></span></th>
-              <th scope="col" class="col-hide">Methods</th>
-              <th scope="col" data-sort="stableDays" class="r col-hide">Stable for <span class="arr"></span></th>
-              <th scope="col" class="col-hide">Drift from baseline</th>
-            </tr>
-          </thead>
-          <tbody id="dirBody"></tbody>
-        </table>
-      </div>
-      <div class="dir-foot" id="dirFoot"></div>
-    </div>
+    {{ dir_table(sortable=false) }}
+    {{ more_link("endpoints.html", "all endpoints") }}
   </section>
 
 </main>

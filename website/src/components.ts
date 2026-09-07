@@ -403,6 +403,25 @@ function tipLine(text: string, described: boolean): HTMLElement {
   return el;
 }
 
+/** Compact controls -- filter chips, status badges and pills -- caption into a
+ *  floating tooltip instead: an in-flow caption after a chip reflows the whole
+ *  chip row (every button jumps), and one after a badge grows its table cell.
+ *  A strip keeps the in-flow caption, whose width is the strip's own. */
+const FLOAT_TIP = ".chip, .badge, .pill";
+const FLOAT_GAP = 6;
+const FLOAT_MARGIN = 8;
+
+/** Fix `line` just under `el`, kept inside the viewport horizontally. It goes on
+ *  document.body so no clipping ancestor (.table-wrap, .feed) can cut it off. */
+function floatTip(line: HTMLElement, el: Element): void {
+  line.classList.add("tip-float");
+  document.body.appendChild(line);
+  const r = el.getBoundingClientRect();
+  const left = Math.max(FLOAT_MARGIN, Math.min(r.left, window.innerWidth - line.offsetWidth - FLOAT_MARGIN));
+  line.style.left = `${left}px`;
+  line.style.top = `${r.bottom + FLOAT_GAP}px`;
+}
+
 /** How far a press may travel and still count as a tap rather than a scroll. */
 const TAP_SLOP = 10;
 
@@ -420,12 +439,12 @@ type TipOrigin = keyof typeof ORIGIN_RANK;
  *  One binding (on `root`, typically document.body) serves every [data-tip]
  *  element on the page, present at bind time or added to the DOM afterwards. */
 export function bindTips(root: Element): void {
-  let open: { el: Element; origin: TipOrigin } | null = null;
+  let open: { el: Element; origin: TipOrigin; line: HTMLElement } | null = null;
   let press: { el: Element | null; x: number; y: number } | null = null;
   const close = (): void => {
-    const line = root.querySelector(".tipline");
-    if (line?.hasAttribute("role")) open?.el.removeAttribute("aria-describedby");
-    line?.remove();
+    if (!open) return;
+    if (open.line.hasAttribute("role")) open.el.removeAttribute("aria-describedby");
+    open.line.remove();
     open = null;
   };
   const show = (el: Element, origin: TipOrigin): void => {
@@ -438,10 +457,15 @@ export function bindTips(root: Element): void {
     close();
     const described = !el.hasAttribute("aria-label");
     const line = tipLine(el.getAttribute("data-tip")!, described);
-    el.insertAdjacentElement("afterend", line);
+    if (el.matches(FLOAT_TIP)) floatTip(line, el);
+    else el.insertAdjacentElement("afterend", line);
     if (described) el.setAttribute("aria-describedby", line.id);
-    open = { el, origin };
+    open = { el, origin, line };
   };
+  // a floating tip is anchored to where its element was; a scroll anywhere
+  // (including inside a .table-scroll port) moves that out from under it
+  root.addEventListener("scroll", () => { if (open?.line.classList.contains("tip-float")) close(); },
+    { capture: true, passive: true });
   const activate = (el: Element): void => {
     if (open?.el === el && open.origin === "tap") close();
     else show(el, "tap");

@@ -232,7 +232,7 @@ describe("chart marks answer a tap", () => {
   });
 
   test("tapping one captions it, right where it was tapped", () => {
-    const strip = document.querySelector("#cmp [data-tip]")!;
+    const strip = document.querySelector("#cmp svg[data-tip]")!;
     expect(document.querySelector("#cmp .tipline"), "the caption starts absent").toBeNull();
     tap(strip);
     const line = document.querySelector("#cmp .tipline")!;
@@ -243,7 +243,7 @@ describe("chart marks answer a tap", () => {
   });
 
   test("tapping again takes it away", () => {
-    const strip = document.querySelector("#cmp [data-tip]")!;
+    const strip = document.querySelector("#cmp svg[data-tip]")!;
     tap(strip);
     expect(document.querySelectorAll("#cmp .tipline").length, "captions piled up").toBe(1);
     tap(strip);
@@ -251,7 +251,7 @@ describe("chart marks answer a tap", () => {
   });
 
   test("only ever one caption: a second strip moves it", () => {
-    const [a, b] = [...document.querySelectorAll("#cmp [data-tip]")];
+    const [a, b] = [...document.querySelectorAll("#cmp svg[data-tip]")];
     tap(a);
     tap(b);
     const lines = [...document.querySelectorAll("#cmp .tipline")];
@@ -260,7 +260,7 @@ describe("chart marks answer a tap", () => {
   });
 
   test("the focus a tap brings does not undo the tap", () => {
-    const strip = document.querySelector("#cmp [data-tip]")!;
+    const strip = document.querySelector("#cmp svg[data-tip]")!;
     // the order a tap arrives in: the press, the focus it moves, then the release
     strip.dispatchEvent(new Event("pointerdown", { bubbles: true }));
     strip.dispatchEvent(new Event("focusin", { bubbles: true }));
@@ -271,7 +271,7 @@ describe("chart marks answer a tap", () => {
   });
 
   test("the focus leaving for another strip does not take that strip's caption", () => {
-    const [a, b] = [...document.querySelectorAll("#cmp [data-tip]")];
+    const [a, b] = [...document.querySelectorAll("#cmp svg[data-tip]")];
     tap(a);
     // pressing b captions it, and only then does focus leave a
     tap(b);
@@ -283,7 +283,7 @@ describe("chart marks answer a tap", () => {
   });
 
   test("a press that travels is a scroll, not a tap", () => {
-    const strip = document.querySelector("#cmp [data-tip]")!;
+    const strip = document.querySelector("#cmp svg[data-tip]")!;
     strip.dispatchEvent(Object.assign(new Event("pointerdown", { bubbles: true }), { clientX: 100, clientY: 300 }));
     strip.dispatchEvent(Object.assign(new Event("pointerup", { bubbles: true }), { clientX: 100, clientY: 120 }));
     expect(document.querySelector("#cmp .tipline"), "a scroll captioned a strip").toBeNull();
@@ -292,7 +292,7 @@ describe("chart marks answer a tap", () => {
   // keyboard focus itself is browser-verified: it turns on :focus-visible, which
   // happy-dom answers false to (a tap must not caption through the focus it moves)
   test("Enter on a strip captions it, and again clears it", () => {
-    const strip = document.querySelector("#cmp [data-tip]")!;
+    const strip = document.querySelector("#cmp svg[data-tip]")!;
     const key = (): boolean =>
       strip.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
     key();

@@ -108,16 +108,6 @@ def test_items_sorted_newest_first(fake_site):
     assert dates == sorted(dates, reverse=True)
 
 
-def test_month_histogram_totals_equal_the_change_count(fake_site):
-    page = _build(fake_site)
-    assert sum(m["lt"] + m["b3it"] for m in page["months"]) == page["stats"]["total"]
-
-
-def test_months_are_contiguous(fake_site):
-    months = [m["month"] for m in _build(fake_site)["months"]]
-    assert months == ["2026-04", "2026-05", "2026-06"]
-
-
 def test_top_endpoints_ranked_by_change_count(fake_site):
     top = _build(fake_site)["top_endpoints"]
     assert len(top) <= TOP_N
@@ -222,6 +212,4 @@ def test_b3it_changes_are_counted_alongside_lt(fake_site_with_b3it):
     assert page["stats"]["b3it"] == 1
     assert page["stats"]["endpoints_affected"] == 3
     assert page["stats"]["providers_involved"] == 3
-    by_month = {m["month"]: m for m in page["months"]}
-    assert by_month["2026-05"]["b3it"] == 1
-    assert sum(m["lt"] + m["b3it"] for m in page["months"]) == 4
+    assert sum(1 for i in page["items"] if i["method"] == "b3it") == 1
