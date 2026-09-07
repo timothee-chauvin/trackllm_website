@@ -1,0 +1,9 @@
+{% import "_base.md.j2" as b %}
+{{ b.header("About TrackLLM", machine, nav_prefix) }}
+{{ b.crumb([("Home", nav_prefix ~ "index.md"), ("About", "")]) }}
+TrackLLM is a research project that continuously monitors LLM APIs for undisclosed changes, using two cost-effective methods described in [Methodology]({{ nav_prefix }}methodology.md).
+
+The website was originally developed by [Timothée Chauvin](https://tchauvin.com), as a PhD student at Inria ([ARTISHAU](https://team.inria.fr/artishau/team/) team).
+
+This project is supported by [Inria](https://www.inria.fr/), [IRISA](https://www.irisa.fr/), [CNRS](https://www.cnrs.fr/), and [INESIA](https://fr.wikipedia.org/wiki/Institut_national_pour_l%27%C3%A9valuation_et_la_s%C3%A9curit%C3%A9_de_l%27intelligence_artificielle).
+{{ b.footer(nav_prefix) }}

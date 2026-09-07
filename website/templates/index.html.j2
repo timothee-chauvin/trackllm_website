@@ -1,5 +1,5 @@
 {% extends "base.html.j2" %}
-{% from "_macros.html.j2" import chip, search_box, affiliations, cite_pill %}
+{% from "_macros.html.j2" import chip, search_box, affiliations, cite_pill, subscribe_pill %}
 {% block title %}TrackLLM{% endblock %}
 {% block content %}
 <header class="hero">
@@ -13,7 +13,7 @@
     <div class="telemetry" id="telemetry"></div>
     <p class="fresh" id="freshness"></p>
     {{ affiliations() }}
-    {{ cite_pill() }}
+    <div class="hero-pills">{{ cite_pill() }} {{ subscribe_pill(machine, nav_prefix) }}</div>
   </div>
 </header>
 

@@ -219,7 +219,9 @@ def render_site(
     print("Generated methodology.html")
 
     (website_dir / "about.html").write_text(
-        about_template.render(css_path="style.css", body_class="about")
+        about_template.render(
+            **page("about", "", [], css_path="style.css", body_class="about", nav_prefix="")
+        )
     )
     print("Generated about.html")
 

@@ -54,15 +54,19 @@ def links(kind: str, slug: str, json_paths: list[str]) -> dict:
         page = f"{_PAGE_DIRS[kind]}/{slug}"
         feed = f"feeds/{_PAGE_DIRS[kind]}/{slug}.xml"
         scope = f"{kind}/{slug}"
+        noun = "organization" if kind == "org" else kind
+        subscribe_label = f"Subscribe to this {noun}'s changes"
     else:
         page = kind
         feed = "feeds/all.xml" if kind == "index" else None
         scope = "all" if kind == "index" else None
+        subscribe_label = "Subscribe to all changes" if feed else None
     return {
         "html": f"{page}.html",
         "md": f"{page}.md",
         "feed": feed,
         "scope": scope,
+        "subscribe_label": subscribe_label,
         "json": json_paths,
     }
 
@@ -232,6 +236,7 @@ def _md_env(templates_dir: Path) -> Environment:
     )
     env.filters["slug"] = slugify
     env.filters["fmt_price"] = format_price
+    env.filters["fmt_cost"] = format_cost
     env.filters["rate"] = _rate
     env.filters["ci"] = _ci
     env.filters.update(_ROW_FILTERS)

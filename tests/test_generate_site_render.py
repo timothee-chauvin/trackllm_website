@@ -345,7 +345,7 @@ def test_render_emits_org_pages(tmp_path):
     render_site(tmp_path, None, empty_status_inputs())
     page = (tmp_path / "orgs" / f"{slugify('m')}.html").read_text()
     assert f'href="../models/{slugify("m/a")}.html"' in page
-    assert "<h1>m</h1>" in page
+    assert "<h1>m " in page  # followed by the subscribe icon
 
 
 def test_org_pages_are_rewritten_from_scratch(tmp_path):

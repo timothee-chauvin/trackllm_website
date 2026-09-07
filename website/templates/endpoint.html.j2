@@ -1,5 +1,5 @@
 {% extends "base.html.j2" %}
-{% from "_macros.html.j2" import headline_badge %}
+{% from "_macros.html.j2" import headline_badge, subscribe_icon %}
 
 {% block title %}{{ model }} @ {{ provider }} | TrackLLM{% endblock %}
 
@@ -14,7 +14,7 @@
   <div class="head">
     <div>
       {# every name here is a page: the model, the company serving it, the company that trained it #}
-      <h1>{% if model_slug %}<a href="{{ nav_prefix }}models/{{ model_slug }}.html">{{ model_name }}</a>{% else %}{{ model_name }}{% endif %}</h1>
+      <h1>{% if model_slug %}<a href="{{ nav_prefix }}models/{{ model_slug }}.html">{{ model_name }}</a>{% else %}{{ model_name }}{% endif %} {{ subscribe_icon(machine, nav_prefix) }}</h1>
       {# a provider without tracked endpoints has no page, so its name is not a link #}
       <div class="prov">@ {% if provider_has_page %}<a href="{{ nav_prefix }}providers/{{ provider_slug }}.html">{{ provider }}</a>{% else %}{{ provider }}{% endif %}
         <span style="color:var(--text-dim)">· <a href="{{ nav_prefix }}orgs/{{ org_slug }}.html">{{ org }}</a></span></div>

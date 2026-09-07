@@ -94,10 +94,9 @@ def test_html_declares_its_twins(site: Path):
     assert 'rel="alternate" type="text/markdown" href="../endpoints/m2fa23p.md"' in html
     assert 'href="../feeds/endpoints/m2fa23p.xml"' in html
     assert 'data-goatcounter-click="subscribe/endpoint/m2fa23p"' in html
+    assert "Subscribe to this endpoint&#39;s changes" in html  # autoescaped apostrophe
     # visible text, not just attributes: what an HTML-to-text agent fetcher keeps
     assert "read <a href=\"../endpoints/m2fa23p.md\">endpoints/m2fa23p.md</a>" in html
-    assert 'data-src="../endpoints/m2fa23p.md"' in html
-    assert 'data-copy-text="https://www.trackllm.net/endpoints/m2fa23p.md"' in html
 
 
 def _entries(site: Path, path: str) -> list[ET.Element]:

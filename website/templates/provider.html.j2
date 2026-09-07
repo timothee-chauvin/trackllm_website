@@ -1,5 +1,5 @@
 {% extends "base.html.j2" %}
-{% from "_macros.html.j2" import chip, search_box, timeline_panel %}
+{% from "_macros.html.j2" import chip, search_box, timeline_panel, subscribe_icon %}
 
 {% block title %}{{ provider }} | TrackLLM{% endblock %}
 
@@ -12,7 +12,7 @@
   <div class="head">
     <div>
       <div class="eyebrow">Provider</div>
-      <h1>{{ provider }}</h1>
+      <h1>{{ provider }} {{ subscribe_icon(machine, nav_prefix) }}</h1>
       <p class="lede" id="lede"></p>
       <div class="summary" id="summary"></div>
     </div>

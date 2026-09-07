@@ -50,6 +50,14 @@ From the OpenRouter catalog snapshot.
 ]) }}
 {% endif %}
 
+{% if spend %}
+## Spend
+
+What OpenRouter billed for tracking this endpoint.
+
+{{ b.table(["Total to date", "Last 30 days", "Queries", "Since"],
+  [("$" ~ (spend.total | fmt_cost), "$" ~ (spend.last_30d | fmt_cost), spend.n_queries, spend.since)]) }}
+{% endif %}
 ## Methods
 
 - **LT — logprob tracking.** Primary signal where the provider returns logprobs. The drift is the mean absolute change in the returned tokens' log-probabilities versus the reference period (nats). The detector also reports σ, one of the metrics feeding its change-detection criterion, which can be high even when the drift is small.
