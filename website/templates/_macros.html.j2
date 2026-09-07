@@ -87,11 +87,10 @@
    the server-rendered provider page title. #}
 {% macro brand_title(b, nav_prefix) -%}
 {% set cls = ("brand-wordmark" if b.kind == "wordmark" else "brand-logo") ~ (" mono" if b.mono) %}
-{% set alt = b.name if b.kind == "wordmark" else "" %}
 <span class="pbrand">
-{%- if b.logo and b.dark %}<img class="{{ cls }} logo-light" src="{{ nav_prefix }}logos/providers/{{ b.logo }}" alt="{{ alt }}"><img class="{{ cls }} logo-dark" src="{{ nav_prefix }}logos/providers/{{ b.dark }}" alt="{{ alt }}">
-{%- elif b.logo %}<img class="{{ cls }}" src="{{ nav_prefix }}logos/providers/{{ b.logo }}" alt="{{ alt }}">
-{%- endif %}{{ b.name if b.kind != "wordmark" or not b.logo }}</span>
+{%- if b.logo and b.dark %}<img class="{{ cls }} logo-light" src="{{ nav_prefix }}logos/providers/{{ b.logo }}" alt=""><img class="{{ cls }} logo-dark" src="{{ nav_prefix }}logos/providers/{{ b.dark }}" alt="">
+{%- elif b.logo %}<img class="{{ cls }}" src="{{ nav_prefix }}logos/providers/{{ b.logo }}" alt="">
+{%- endif %}{{ b.name }}</span>
 {%- endmacro %}
 
 {# Logos of the institutions behind the project; shared by the front page and About. #}

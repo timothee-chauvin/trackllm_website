@@ -195,14 +195,15 @@ export function untrackedDirCells(
 }
 
 /** A provider's logo and name, as the Jinja macro brand_title draws it (twins).
- *  `root` is the page's prefix back to the site root ("" or "../"). */
+ *  `root` is the page's prefix back to the site root ("" or "../"). The name is
+ *  always written out: a wordmark logo is only sized differently. */
 export function brandHtml(b: { name: string; logo: string | null; kind: string; mono: boolean; dark: string | null }, root: string): string {
   if (!b.logo) return `<span class="pbrand">${esc(b.name)}</span>`;
   const cls = `${b.kind === "wordmark" ? "brand-wordmark" : "brand-logo"}${b.mono ? " mono" : ""}`;
   const img = (file: string, theme: string): string =>
-    `<img class="${cls} ${theme}" src="${root}logos/providers/${esc(file)}" alt="${b.kind === "wordmark" ? esc(b.name) : ""}" loading="lazy">`;
+    `<img class="${cls} ${theme}" src="${root}logos/providers/${esc(file)}" alt="" loading="lazy">`;
   const logos = b.dark ? img(b.logo, "logo-light") + img(b.dark, "logo-dark") : img(b.logo, "");
-  return `<span class="pbrand">${logos}${b.kind === "wordmark" ? "" : esc(b.name)}</span>`;
+  return `<span class="pbrand">${logos}${esc(b.name)}</span>`;
 }
 
 export function methodBadges(methods: string[]): string {

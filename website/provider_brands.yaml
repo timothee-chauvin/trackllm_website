@@ -1,0 +1,606 @@
+# Provider display names and logos (generate_site/brands.py). Keyed by the
+# OpenRouter provider slug; logos live in logos/providers/. `mono` marks a flat
+# dark mark the dark theme inverts; `dark` names a light-on-dark variant instead.
+
+ai21:
+  name: "AI21"
+  logo: "ai21.png"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://docs.ai21.com/"
+aion-labs:
+  name: "Aion Labs"
+  logo: "aion-labs.png"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://www.aionlabs.ai/"
+akashml:
+  name: "AkashML"
+  logo: "akashml.svg"
+  kind: "icon"
+  mono: true
+  dark: "akashml-dark.svg"
+  source: "https://akashml.com/favicon.svg"
+alibaba:
+  name: "Alibaba Cloud"
+  logo: "alibaba.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://cdn.simpleicons.org/alibabacloud"
+amazon-bedrock:
+  name: "Amazon Bedrock"
+  logo: "amazon-bedrock.png"
+  kind: "wordmark"
+  mono: false
+  dark: null
+  source: "https://aws.amazon.com/bedrock/"
+ambient:
+  name: "Ambient"
+  logo: "ambient.png"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://ambient.xyz/"
+anthropic:
+  name: "Anthropic"
+  logo: "anthropic.svg"
+  kind: "icon"
+  mono: true
+  dark: null
+  source: "https://cdn.simpleicons.org/anthropic"
+arcee-ai:
+  name: "Arcee AI"
+  logo: "arcee-ai.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://www.arcee.ai/"
+atlas-cloud:
+  name: "Atlas Cloud"
+  logo: "atlas-cloud.svg"
+  kind: "icon"
+  mono: true
+  dark: null
+  source: "https://www.atlascloud.ai/"
+azure:
+  name: "Microsoft Azure"
+  logo: "azure.png"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://github.com/Azure"
+baidu:
+  name: "Baidu Qianfan"
+  logo: "baidu.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://cdn.simpleicons.org/baidu"
+baseten:
+  name: "Baseten"
+  logo: "baseten.png"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://www.baseten.co/"
+byteplus:
+  name: "BytePlus"
+  logo: "byteplus.svg"
+  kind: "icon"
+  mono: true
+  dark: "byteplus-dark.svg"
+  source: "https://www.byteplus.com/"
+cerebras:
+  name: "Cerebras"
+  logo: "cerebras.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://www.cerebras.ai/"
+chutes:
+  name: "Chutes"
+  logo: "chutes.svg"
+  kind: "icon"
+  mono: true
+  dark: null
+  source: "https://chutes.ai/"
+clarifai:
+  name: "Clarifai"
+  logo: "clarifai.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://cdn.simpleicons.org/clarifai"
+claude-on-aws:
+  name: "Claude on AWS"
+  logo: "claude-on-aws.svg"
+  kind: "wordmark"
+  mono: false
+  dark: "claude-on-aws-dark.svg"
+  source: "https://commons.wikimedia.org/wiki/File:Amazon_Web_Services_Logo.svg"
+cloudflare:
+  name: "Cloudflare Workers AI"
+  logo: "cloudflare.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://www.cloudflare.com/logo.svg"
+cohere:
+  name: "Cohere"
+  logo: "cohere.svg"
+  kind: "icon"
+  mono: false
+  dark: "cohere-dark.svg"
+  source: "https://cohere.com/logo_mobile.svg"
+coreweave:
+  name: "CoreWeave"
+  logo: "coreweave.svg"
+  kind: "icon"
+  mono: true
+  dark: "coreweave-dark.svg"
+  source: "https://www.coreweave.com/"
+crusoe:
+  name: "Crusoe"
+  logo: "crusoe.svg"
+  kind: "icon"
+  mono: true
+  dark: null
+  source: "https://www.crusoe.ai/"
+darkbloom:
+  name: "Darkbloom"
+  logo: "darkbloom.svg"
+  kind: "icon"
+  mono: true
+  dark: null
+  source: "https://www.darkbloom.dev/"
+decart:
+  name: "Decart"
+  logo: "decart.png"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://decart.ai/"
+deepinfra:
+  name: "DeepInfra"
+  logo: "deepinfra.svg"
+  kind: "icon"
+  mono: true
+  dark: null
+  source: "https://deepinfra.com/"
+deepseek:
+  name: "DeepSeek"
+  logo: "deepseek.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://cdn.simpleicons.org/deepseek"
+dekallm:
+  name: "DekaLLM"
+  logo: "dekallm.png"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://www.cloudeka.id/"
+digitalocean:
+  name: "DigitalOcean"
+  logo: "digitalocean.svg"
+  kind: "icon"
+  mono: true
+  dark: null
+  source: "https://www.digitalocean.com/"
+fireworks:
+  name: "Fireworks AI"
+  logo: "fireworks.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://fireworks.ai/icon0.svg"
+friendli:
+  name: "FriendliAI"
+  logo: "friendli.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://friendli.ai/favicon/favicon.svg"
+gmicloud:
+  name: "GMI Cloud"
+  logo: "gmicloud.svg"
+  kind: "icon"
+  mono: true
+  dark: null
+  source: "https://www.gmicloud.ai/"
+google-ai-studio:
+  name: "Google AI Studio"
+  logo: "google-ai-studio.png"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://www.gstatic.com/images/branding/productlogos/ai_studio/v1/web-96dp/logo_ai_studio_color_2x_web_96dp.png"
+google-vertex:
+  name: "Google Vertex AI"
+  logo: "google-vertex.png"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://www.gstatic.com/cgc/super_cloud_gradient.png"
+groq:
+  name: "Groq"
+  logo: "groq.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://groq.com/favicon.svg"
+hyperbolic:
+  name: "Hyperbolic"
+  logo: "hyperbolic.svg"
+  kind: "icon"
+  mono: true
+  dark: null
+  source: "https://hyperbolic.xyz/"
+inception:
+  name: "Inception Labs"
+  logo: "inception.png"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://framerusercontent.com/images/y5L2OctMTnQDhiVDBUBArywmSY.png"
+inceptron:
+  name: "Inceptron"
+  logo: "inceptron.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://framerusercontent.com/images/GlFn3XVnJw57e2ab8cjgbZs04s.svg"
+infermatic:
+  name: "Infermatic"
+  logo: "infermatic.png"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://infermatic.ai/wp-content/themes/infermatic-fs/img/apple-icon-180x180.png"
+inflection:
+  name: "Inflection AI"
+  logo: "inflection.png"
+  kind: "icon"
+  mono: false
+  dark: "inflection-dark.png"
+  source: "https://framerusercontent.com/images/knot51rbhpixtqNkYngDvKPfaOE.png"
+io-net:
+  name: "io.net"
+  logo: "io-net.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://io.net/icons/favicon-source.svg"
+ionstream:
+  name: "ionstream"
+  logo: "ionstream.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://ionstream.ai/favicon.svg"
+klusterai:
+  name: "kluster.ai"
+  logo: "klusterai.png"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://github.com/kluster-ai"
+lambda:
+  name: "Lambda"
+  logo: "lambda.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://lambda.ai/hubfs/favicon-48x48-1.svg"
+liquid:
+  name: "Liquid AI"
+  logo: "liquid.svg"
+  kind: "icon"
+  mono: true
+  dark: null
+  source: "https://www.liquid.ai/"
+makora:
+  name: "Makora"
+  logo: "makora.png"
+  kind: "icon"
+  mono: false
+  dark: "makora-dark.png"
+  source: "https://www.makora.com/"
+mancer:
+  name: "Mancer"
+  logo: "mancer.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://mancer.tech/"
+mara:
+  name: "MARA"
+  logo: "mara.png"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://www.mara.com/"
+meta:
+  name: "Meta"
+  logo: "meta.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://www.llama.com/"
+minimax:
+  name: "MiniMax"
+  logo: "minimax.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://platform.minimax.io/"
+mistral:
+  name: "Mistral AI"
+  logo: "mistral.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://mistral.ai/"
+modal:
+  name: "Modal"
+  logo: "modal.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://modal.com/"
+modelrun:
+  name: "ModelRun"
+  logo: "modelrun.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://www.modular.com/"
+moonshotai:
+  name: "Moonshot AI"
+  logo: "moonshotai.svg"
+  kind: "icon"
+  mono: true
+  dark: null
+  source: "https://cdn.simpleicons.org/moonshotai"
+morph:
+  name: "Morph"
+  logo: "morph.png"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://github.com/morphllm"
+ncompass:
+  name: "nCompass"
+  logo: "ncompass.png"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://ncompass.tech/"
+nebius:
+  name: "Nebius Token Factory"
+  logo: "nebius.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://nebius.com/"
+nex-agi:
+  name: "Nex AGI"
+  logo: "nex-agi.png"
+  kind: "icon"
+  mono: true
+  dark: null
+  source: "https://github.com/nex-agi"
+nextbit:
+  name: "Nextbit"
+  logo: "nextbit.png"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://nextbit256.com/Nextbit_mark_Main@2x.png"
+novita:
+  name: "Novita AI"
+  logo: "novita.svg"
+  kind: "icon"
+  mono: true
+  dark: null
+  source: "https://novita.ai/logo/logo_small.svg"
+nvidia:
+  name: "NVIDIA"
+  logo: "nvidia.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://cdn.simpleicons.org/nvidia"
+open-inference:
+  name: "Open Inference"
+  logo: "open-inference.png"
+  kind: "icon"
+  mono: true
+  dark: "open-inference-dark.png"
+  source: "https://openinference.xyz/inducta_logos/inducta_white.png"
+openai:
+  name: "OpenAI"
+  logo: "openai.svg"
+  kind: "icon"
+  mono: true
+  dark: null
+  source: "https://cdn.openai.com/brand/OpenAI-black-monoblossom.svg"
+parasail:
+  name: "Parasail"
+  logo: "parasail.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://www.parasail.io/favicon.svg"
+perceptron:
+  name: "Perceptron"
+  logo: "perceptron.png"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://www.perceptron.inc/"
+perplexity:
+  name: "Perplexity"
+  logo: "perplexity.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://www.perplexity.ai/favicon.svg"
+phala:
+  name: "Phala"
+  logo: "phala.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://phala.network/home/logo.svg"
+poolside:
+  name: "Poolside"
+  logo: "poolside.svg"
+  kind: "icon"
+  mono: false
+  dark: "poolside-dark.svg"
+  source: "https://poolside.ai/favicon/favicon.svg"
+reka:
+  name: "Reka AI"
+  logo: "reka.png"
+  kind: "wordmark"
+  mono: true
+  dark: null
+  source: "https://www.reka.ai/"
+relace:
+  name: "Relace"
+  logo: "relace.svg"
+  kind: "icon"
+  mono: false
+  dark: "relace-dark.svg"
+  source: "https://www.relace.ai/"
+sail-research:
+  name: "Sail Research"
+  logo: "sail-research.png"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://github.com/sailresearchco"
+sakana:
+  name: "Sakana AI"
+  logo: "sakana.png"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://sakana.ai/sakana-logo-hero.png"
+sambanova:
+  name: "SambaNova"
+  logo: "sambanova.png"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://sambanova.ai/"
+sambanova-turbo:
+  name: "SambaNova Turbo"
+  logo: "sambanova.png"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://sambanova.ai/"
+seed:
+  name: "ByteDance Seed"
+  logo: "seed.svg"
+  kind: "icon"
+  mono: true
+  dark: null
+  source: "https://seed.bytedance.com/"
+siliconflow:
+  name: "SiliconFlow"
+  logo: "siliconflow.png"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://www.siliconflow.com/"
+stepfun:
+  name: "StepFun"
+  logo: "stepfun.png"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://www.stepfun.com/"
+streamlake:
+  name: "StreamLake"
+  logo: "streamlake.png"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://www.streamlake.com/"
+tencent:
+  name: "Tencent Cloud"
+  logo: "tencent.png"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://www.tencentcloud.com/"
+thinkingmachines:
+  name: "Thinking Machines"
+  logo: "thinkingmachines.png"
+  kind: "wordmark"
+  mono: true
+  dark: null
+  source: "https://thinkingmachines.ai/"
+together:
+  name: "Together AI"
+  logo: "together.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://www.together.ai/"
+upstage:
+  name: "Upstage"
+  logo: "upstage.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://www.upstage.ai/"
+venice:
+  name: "Venice AI"
+  logo: "venice.svg"
+  kind: "icon"
+  mono: true
+  dark: null
+  source: "https://venice.ai/"
+wafer:
+  name: "Wafer"
+  logo: "wafer.svg"
+  kind: "icon"
+  mono: true
+  dark: null
+  source: "https://www.wafer.ai/"
+wandb:
+  name: "Weights & Biases"
+  logo: "wandb.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://wandb.ai/"
+xai:
+  name: "xAI"
+  logo: "xai.svg"
+  kind: "icon"
+  mono: true
+  dark: null
+  source: "https://x.ai/"
+xiaomi:
+  name: "Xiaomi"
+  logo: "xiaomi.svg"
+  kind: "icon"
+  mono: false
+  dark: null
+  source: "https://www.mi.com/"
+z-ai:
+  name: "Z.ai"
+  logo: "z-ai.svg"
+  kind: "icon"
+  mono: false
+  dark: "z-ai-dark.svg"
+  source: "https://z.ai/"
