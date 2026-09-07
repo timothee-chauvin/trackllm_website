@@ -1,5 +1,5 @@
 {% set nav_prefix = nav_prefix | default('') %}
-{% from "_macros.html.j2" import cite_dialog %}
+{% from "_macros.html.j2" import cite_dialog, rss_icon %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,12 +43,12 @@
         <footer class="site">
             {% block footer %}
             <span>Data collected via the OpenRouter API.{% for j in machine.json %} · <a href="{{ nav_prefix }}{{ j }}">JSON{{ "" if loop.length == 1 else " " ~ loop.index }}</a>{% endfor %}</span>
-            <span>{% if machine.feed %}<a href="{{ nav_prefix }}{{ machine.feed }}" type="application/atom+xml" data-goatcounter-click="subscribe/{{ machine.scope }}">{{ machine.subscribe_label }}</a> · {% endif %}<a href="{{ nav_prefix }}methodology.html">Methodology</a> · <a href="https://github.com/timothee-chauvin/trackllm_website">GitHub</a> · <a href="{{ nav_prefix }}about.html">About</a></span>
+            <span>{% if machine.feed %}<a href="{{ nav_prefix }}{{ machine.feed }}" type="application/atom+xml" data-goatcounter-click="subscribe/{{ machine.scope }}">{{ machine.subscribe_label }} {{ rss_icon() }}</a> · {% endif %}<a href="{{ nav_prefix }}methodology.html">Methodology</a> · <a href="https://github.com/timothee-chauvin/trackllm_website">GitHub</a> · <a href="{{ nav_prefix }}about.html">About</a></span>
             {% endblock %}
             {# Visible text on purpose: HTML-to-text converters -- what agents
                read -- drop attributes, so a <link rel=alternate> alone never
                reaches them. #}
-            <span class="agents">AI agents: read <a href="{{ nav_prefix }}{{ machine.md }}">{{ machine.md }}</a> instead of this page.</span>
+            <span class="agents">AI agents: markdown version of this page at <a href="{{ nav_prefix }}{{ machine.md }}">{{ machine.md }}</a>.</span>
         </footer>
     </div>
     {{ cite_dialog() }}
