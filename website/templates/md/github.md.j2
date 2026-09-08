@@ -1,0 +1,7 @@
+{% import "_base.md.j2" as b %}
+{{ b.header("TrackLLM on GitHub", machine, nav_prefix) }}
+{{ b.crumb([("Home", nav_prefix ~ "index.md"), ("GitHub", "")]) }}
+TrackLLM is open source: the code that collects the data and builds this site, and the raw data itself.
+
+{{ b.repo_links() }}
+{{ b.footer(nav_prefix) }}

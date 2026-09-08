@@ -95,8 +95,6 @@ def render_site(
     provider_template = env.get_template("provider.html.j2")
     org_template = env.get_template("org.html.j2")
     changes_template = env.get_template("changes.html.j2")
-    methodology_template = env.get_template("methodology.html.j2")
-    about_template = env.get_template("about.html.j2")
 
     # Every page's render context is kept: machine.py renders the .md twin from
     # the same context, so the two can never show different data.
@@ -221,28 +219,15 @@ def render_site(
     )
     print("Generated changes.html")
 
-    (website_dir / "methodology.html").write_text(
-        methodology_template.render(
-            **page(
-                "methodology",
-                "",
-                [],
-                css_path="style.css",
-                body_class="methodology",
-                nav_prefix="",
+    for name in ("methodology", "about", "github"):
+        (website_dir / f"{name}.html").write_text(
+            env.get_template(f"{name}.html.j2").render(
+                **page(
+                    name, "", [], css_path="style.css", body_class=name, nav_prefix=""
+                )
             )
         )
-    )
-    print("Generated methodology.html")
-
-    (website_dir / "about.html").write_text(
-        about_template.render(
-            **page(
-                "about", "", [], css_path="style.css", body_class="about", nav_prefix=""
-            )
-        )
-    )
-    print("Generated about.html")
+        print(f"Generated {name}.html")
 
     model_views = model_mod.build_model_views(website_dir, endpoints, b3it_views, site)
     write_json_dir(website_dir / "data" / "models", model_views)

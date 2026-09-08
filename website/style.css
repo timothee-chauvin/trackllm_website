@@ -614,8 +614,8 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 
 /* methodology page */
 .sec-head h2 .badge { margin-right: 0.5rem; vertical-align: 0.12em; }
-body.about .lede a, body.about .prose a { color: var(--accent); }
-body.about .lede a:hover, body.about .prose a:hover { text-decoration: underline; }
+body.about .lede a, body.about .prose a, body.github .prose a { color: var(--accent); }
+body.about .lede a:hover, body.about .prose a:hover, body.github .prose a:hover { text-decoration: underline; }
 
 /* Institutional logos are drawn for white paper, so they sit on white in both themes. */
 .affil { display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap; margin-top: 1.6rem; }

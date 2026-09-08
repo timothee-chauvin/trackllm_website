@@ -1,5 +1,5 @@
 {% extends "base.html.j2" %}
-{% from "_macros.html.j2" import affiliations, cite_pill %}
+{% from "_macros.html.j2" import affiliations, cite_pill, repo_links %}
 {% block title %}About | TrackLLM{% endblock %}
 
 {% block content %}
@@ -20,8 +20,7 @@
 
   <section class="block" id="github">
     <div class="sec-head"><h2>GitHub</h2></div>
-    <p class="prose">Code: <a href="{{ CODE_REPO_URL }}" target="_blank" rel="noopener">{{ CODE_REPO_URL }}</a><br>
-    Data: <a href="{{ DATA_REPO_URL }}" target="_blank" rel="noopener">{{ DATA_REPO_URL }}</a></p>
+    {{ repo_links() }}
   </section>
 </main>
 {% endblock %}

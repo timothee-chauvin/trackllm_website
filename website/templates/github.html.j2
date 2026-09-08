@@ -1,0 +1,18 @@
+{% extends "base.html.j2" %}
+{% from "_macros.html.j2" import repo_links %}
+{% block title %}GitHub | TrackLLM{% endblock %}
+
+{% block content %}
+<div class="wrap">
+  <div class="head">
+    <div>
+      <h1>GitHub</h1>
+      <p class="lede">TrackLLM is open source: the code that collects the data and builds this site, and the raw data itself.</p>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  {{ repo_links() }}
+</main>
+{% endblock %}

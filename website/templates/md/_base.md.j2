@@ -35,8 +35,13 @@
 {% macro provider_link(nav_prefix, slug, text) %}{% if slug %}[{{ text }}]({{ nav_prefix }}providers/{{ slug }}.md){% else %}{{ text }}{% endif %}{% endmacro %}
 {% macro org_link(nav_prefix, org) %}[{{ org }}]({{ nav_prefix }}orgs/{{ org | slug }}.md){% endmacro %}
 
+{% macro repo_links() %}
+- Code: {{ CODE_REPO_URL }}
+- Data: {{ DATA_REPO_URL }}
+{% endmacro %}
+
 {% macro footer(nav_prefix) %}
 
 ---
-Data collected via the OpenRouter API. [Home]({{ nav_prefix }}index.md) · [Changes]({{ nav_prefix }}changes.md) · [Providers]({{ nav_prefix }}providers.md) · [Endpoints]({{ nav_prefix }}endpoints.md) · [Methodology]({{ nav_prefix }}methodology.md) · [About]({{ nav_prefix }}about.md) · [GitHub]({{ nav_prefix }}about.md#github)
+Data collected via the OpenRouter API. [Home]({{ nav_prefix }}index.md) · [Changes]({{ nav_prefix }}changes.md) · [Providers]({{ nav_prefix }}providers.md) · [Endpoints]({{ nav_prefix }}endpoints.md) · [Methodology]({{ nav_prefix }}methodology.md) · [About]({{ nav_prefix }}about.md) · [GitHub]({{ nav_prefix }}github.md)
 {% endmacro %}
