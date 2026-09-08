@@ -38,7 +38,7 @@
   </section>
 </main>
 
-<div class="note">Magnitude is the drift level reached after the changepoint — nats for LT, total variation for B3IT. σ is one of the metrics feeding LT's change-detection criterion, not a size measure: a change can score high on σ and still be behaviorally small.</div>
+<div class="note">Magnitude is the level shift across the change, the number its detector gated on — for LT the mean drift over the 7 days after minus the 7 days before, in nats; for B3IT the total-variation shift against the epoch's reference.</div>
 {% endblock %}
 
 {% block scripts %}

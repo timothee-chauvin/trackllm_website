@@ -28,15 +28,11 @@ Full series: [{{ j.path }}]({{ nav_prefix }}{{ j.path }}){{ "" if loop.last }}
 {% endfor %}
 ## Detected changes
 
-{# σ is LT's detection score; a B3IT-only table has no such column #}
 {% set rows = [] %}
-{% for c in manifest.changes.lt %}{% do rows.append((c.date, "LT", (c.drift ~ " nats") if c.drift is not none else "—", c.sigma)) %}{% endfor %}
-{% for c in manifest.changes.b3it %}{% do rows.append((c.date, "B3IT", ("TV " ~ c.shiftTV) if c.shiftTV is not none else "—", "")) %}{% endfor %}
-{% if rows and manifest.changes.lt %}
-{{ b.table(["Date", "Method", "Drift reached", "σ"], rows | sort(reverse=true)) }}
-{% elif rows %}
-{% set rows3 = [] %}{% for r in rows | sort(reverse=true) %}{% do rows3.append(r[:3]) %}{% endfor %}
-{{ b.table(["Date", "Method", "Drift reached"], rows3) }}
+{% for c in manifest.changes.lt %}{% do rows.append((c.date, "LT", (c.shift ~ " nats") if c.shift is not none else "—")) %}{% endfor %}
+{% for c in manifest.changes.b3it %}{% do rows.append((c.date, "B3IT", ("TV " ~ c.shiftTV) if c.shiftTV is not none else "—")) %}{% endfor %}
+{% if rows %}
+{{ b.table(["Date", "Method", "Level shift"], rows | sort(reverse=true)) }}
 {% else %}
 No change detected so far.
 {% endif %}
@@ -64,6 +60,6 @@ What OpenRouter billed for tracking this endpoint.
 {% endif %}
 ## Methods
 
-- **LT — logprob tracking.** Primary signal where the provider returns logprobs. The drift is the mean absolute change in the returned tokens' log-probabilities versus the reference period (nats). The detector also reports σ, one of the metrics feeding its change-detection criterion, which can be high even when the drift is small.
+- **LT — logprob tracking.** Primary signal where the provider returns logprobs. The drift is the mean absolute change in the returned tokens' log-probabilities versus the reference period (nats). A detected changepoint is published once the level shift across it — mean drift over the 7 days after minus the 7 days before — reaches 0.1 nats; that shift is the magnitude shown.
 - **B3IT — border inputs.** Black-box fallback for endpoints that hide logprobs. Tracks how far the top-token votes on a ranked set of near-tie prompts have moved from the reference distribution (total variation, 0–1).
 {{ b.footer(nav_prefix) }}

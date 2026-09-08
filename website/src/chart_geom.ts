@@ -5,8 +5,9 @@ import { DAY_MS, td } from "./components";
 
 export interface LTChange {
   date: string;
-  sigma: string;
-  drift: number | null; // null when the drift lane has no data yet to look up a level in
+  // the level shift the publication gate passed on (timeline.py); null only for a
+  // change whose level was never recorded
+  shift: number | null;
 }
 
 export interface B3ITChange {
@@ -28,6 +29,9 @@ export interface FocusB3IT {
   tv: [string, number][];
   breaks: number[];
   changes: B3ITChange[];
+  // one entry per monitoring epoch (b3it.py): each detected change re-initialises
+  // the reference, so the TV lane restarts near 0 at every boundary
+  epochs: { start: string; end: string | null }[];
   // raw tv_series observation range, independent of the (possibly downsampled) `tv` trace.
   firstDate: string;
   lastDate: string;

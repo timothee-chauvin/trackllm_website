@@ -39,6 +39,8 @@ def _scaffold(website: Path) -> None:
                         "date": CHANGE_DATE,
                         "sigma": 9.0,
                         "first_detected": "2026-06-21T00:00:00Z",
+                        "level_shift": 0.9,
+                        "published": True,
                     }
                 ]
             }

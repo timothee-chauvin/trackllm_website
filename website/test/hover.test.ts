@@ -23,6 +23,7 @@ const B3IT = {
     ["2026-07-29", 0.4825],
   ] as [string, number][],
   breaks: [], // already thinned: these fixtures are what the chart draws
+  epochs: [],
   changes: [{ date: "2026-07-26", shiftTV: 0.535 }],
   firstDate: "2026-07-17",
   lastDate: "2026-07-29",
@@ -33,7 +34,7 @@ const LT = {
     ["2026-07-17", 0.02], ["2026-07-22", 0.05], ["2026-07-26", 0.81], ["2026-07-29", 0.78],
   ] as [string, number][],
   breaks: [], // already thinned: these fixtures are what the chart draws
-  changes: [{ date: "2026-07-26", sigma: "42σ", drift: 0.81 }],
+  changes: [{ date: "2026-07-26", shift: 0.81 }],
   firstDate: "2026-07-17",
   lastDate: "2026-07-29",
 };

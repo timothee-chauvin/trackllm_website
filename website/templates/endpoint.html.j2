@@ -39,7 +39,7 @@
   {% if methods %}
   <section class="block">
     <div class="sec-head"><h2>Drift from baseline</h2></div>
-    <p class="sec-desc">Both signals measure how far this endpoint's behavior has moved from its <b>reference period</b> (the two weeks before its first detected change, or its first two weeks). <span class="lt">LT</span> tracks the average change in the returned tokens' log-probabilities (nats); <span class="b3">B3IT</span> tracks the total-variation distance of the border-input votes (0–1). Both read <b>0 when the endpoint matches its baseline</b> and rise — staying elevated — after a real change. Dashed lines mark detected changepoints; <b>σ</b> is one of the metrics feeding LT's change-detection criterion, separate from how far the signal actually moved.</p>
+    <p class="sec-desc">Both signals measure how far this endpoint's behavior has moved from its <b>reference period</b> (the two weeks before its first detected change, or its first two weeks). <span class="lt">LT</span> tracks the average change in the returned tokens' log-probabilities (nats); <span class="b3">B3IT</span> tracks the total-variation distance of the border-input votes (0–1). Both read <b>0 when the endpoint matches its baseline</b> and rise — staying elevated — after a real change. Dashed lines mark published changes, labeled with the <b>level shift</b> across them: for LT the mean drift over the 7 days after minus the 7 days before; for B3IT the total-variation shift its detector measured.</p>
     <div class="panel">
       {# the tip is a sibling of the chart, not a child: every redraw replaces #mainchart's contents #}
       <div class="chartbox">
@@ -50,16 +50,16 @@
     </div>
   </section>
 
-  {# Rendered only with changes to list, and the σ column only with LT ones (σ is
-     LT's detection score): the section is decided here, in the static HTML, so an
-     unchanged endpoint never ships an empty table for a reader without scripts. #}
+  {# Rendered only with changes to list: the section is decided here, in the
+     static HTML, so an unchanged endpoint never ships an empty table for a reader
+     without scripts. #}
   {% if manifest.changes.lt or manifest.changes.b3it %}
   <section class="block" id="changesSection">
     <div class="sec-head"><h2>Detected changes</h2></div>
     <div class="panel">
       <div class="tblwrap">
         <table class="changes-tbl">
-          <thead><tr><th scope="col">Date</th><th scope="col">Method</th><th scope="col" class="r">Drift reached</th>{% if manifest.changes.lt %}<th scope="col" class="r"><span class="sym">σ</span></th>{% endif %}</tr></thead>
+          <thead><tr><th scope="col">Date</th><th scope="col">Method</th><th scope="col" class="r">Level shift</th></tr></thead>
           <tbody id="changerows"></tbody>
         </table>
       </div>

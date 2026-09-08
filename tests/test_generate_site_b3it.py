@@ -264,3 +264,39 @@ def test_backfill_events_surface_as_scan_changes():
     backfill = [{"date": "2026-01-05T00:00:00+00:00", "p_value": 0.001}]
     view = derive_b3it(state, {}, backfill)
     assert {"date": "2026-01-05T00:00:00+00:00", "kind": "scan"} in view.changes
+
+
+def test_change_magnitude_is_the_tv_shift_on_the_full_reference_series(monkeypatch):
+    """backfill.py and monitor.decide gate on tv_shift over every reference BI; the
+    plot is ranked (top-k) for visibility. What is published is the gate's number,
+    so a change can never show a magnitude the gate would have rejected."""
+    days = [f"2026-01-{d:02d}T00:00:00+00:00" for d in range(1, 9)]
+    ref = {
+        "signal": [("2025-12-31T00:00:00+00:00", "A")] * 10,
+        "noise": [("2025-12-31T00:00:00+00:00", "A")] * 10,
+    }
+    results = {
+        "signal": {d: [(d, "A" if i < 4 else "B")] * 10 for i, d in enumerate(days)},
+        "noise": {d: [(d, "A")] * 10 for d in days},
+    }
+    state = EndpointBIState(
+        endpoint=_ep(),
+        status="monitoring",
+        retired=None,
+        epochs=[
+            Epoch(
+                start=datetime(2026, 1, 1, tzinfo=timezone.utc),
+                border_inputs=["signal", "noise"],
+                reference=ref,
+            )
+        ],
+    )
+    monkeypatch.setattr(
+        "trackllm_website.generate_site.b3it.select_top_bis",
+        lambda reference, k: ["signal"],
+    )
+    backfill = [{"date": days[4], "p_value": 0.001}]
+    view = derive_b3it(state, results, backfill)
+    # ranked plot: the signal BI alone flips to TV 1; the gate saw both BIs: 0.5
+    assert view.tv_series["values"][-1] == pytest.approx(1.0)
+    assert view.change_mags[days[4][:10]] == pytest.approx(0.5)

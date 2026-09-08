@@ -1,16 +1,6 @@
 from dataclasses import asdict, dataclass
 from datetime import datetime
 
-from trackllm_website.lt_scores import normalize_sigma
-
-
-def _lt_magnitude_display(sigma: float | None) -> str:
-    # The detector already stores effectively-infinite sigmas as null; the
-    # re-normalization here only shields against pre-migration legacy entries.
-    if sigma is None or normalize_sigma(sigma) is None:
-        return "∞σ"
-    return f"{sigma:.0f}σ"
-
 
 @dataclass
 class ChangeEvent:
@@ -19,8 +9,10 @@ class ChangeEvent:
     model: str
     provider: str
     method: str
+    # LT: the level shift across the change (lt_drift.level_shift), the number the
+    # publication gate passed on. B3IT: None here; feed.py takes the TV shift from
+    # the view, the number its detector gated on.
     magnitude: float | None
-    magnitude_display: str
 
 
 def merge_changes(lt_changes, lt_by_slug, b3it_views) -> list[ChangeEvent]:
@@ -29,18 +21,13 @@ def merge_changes(lt_changes, lt_by_slug, b3it_views) -> list[ChangeEvent]:
         ep = lt_by_slug.get(slug)
         model = ep.model if ep else slug
         provider = ep.provider if ep else ""
+        # lt_events logs every detected changepoint; only those whose level shift
+        # cleared the gate are published.
         for ev in evs:
-            sigma = ev["sigma"]
+            if not ev["published"]:
+                continue
             events.append(
-                ChangeEvent(
-                    ev["date"],
-                    slug,
-                    model,
-                    provider,
-                    "LT",
-                    sigma,
-                    _lt_magnitude_display(sigma),
-                )
+                ChangeEvent(ev["date"], slug, model, provider, "LT", ev["level_shift"])
             )
     for slug, view in b3it_views.items():
         seen: set[datetime] = set()
@@ -51,7 +38,7 @@ def merge_changes(lt_changes, lt_by_slug, b3it_views) -> list[ChangeEvent]:
                 return
             seen.add(key)
             events.append(
-                ChangeEvent(date, slug, view.model, view.provider, "B3IT", None, "")
+                ChangeEvent(date, slug, view.model, view.provider, "B3IT", None)
             )
 
         # Authoritative epoch closures (live detector).

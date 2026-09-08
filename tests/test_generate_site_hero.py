@@ -31,7 +31,6 @@ def _change(slug: str = "ep", day: int = 20) -> dict:
         "provider": "p/fp8",
         "method": "LT",
         "magnitude": 99.0,
-        "magnitude_display": "99σ",
     }
 
 

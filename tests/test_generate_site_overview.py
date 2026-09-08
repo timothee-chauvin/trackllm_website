@@ -18,7 +18,6 @@ from trackllm_website.config import Endpoint, HeroConfig
 from trackllm_website.generate_site.changes import merge_changes, to_json
 from trackllm_website.generate_site.lt import discover_lt_endpoints, load_all_lt_data
 from trackllm_website.generate_site.feed import downsample_trace
-from trackllm_website.generate_site.peaks import shift_from
 from trackllm_website.generate_site.overview import build_overview
 from trackllm_website.generate_site.status import STATUS_COPY
 from trackllm_website.util import slugify
@@ -88,8 +87,7 @@ def fake_site(tmp_path):
                     "model": "m/a",
                     "provider": "p",
                     "method": "LT",
-                    "magnitude": 40.0,
-                    "magnitude_display": "40σ",
+                    "magnitude": 1.4,
                 }
             ]
         )
@@ -164,12 +162,10 @@ def test_status_retired_when_no_recent_observation(tmp_path):
 def test_feed_lt_item_has_drift_level_and_conf(fake_site):
     ov = _build_overview(fake_site)
     lt_item = next(f for f in ov["feed"] if f["method"] == "lt")
-    assert lt_item["primary"] == "drift 1.4"  # level 1.5 after, 0.1 before
-    assert lt_item["secondary"] == "40σ conf"
+    assert lt_item["primary"] == "shift 1.40"  # the event's own level shift
+    assert lt_item["secondary"] == "±7-day level shift"
     assert lt_item["sevKey"] == "alert"
-    assert lt_item["desc"] == (
-        "Logprob averages moved 1.4 nats from baseline (40σ on the detection statistic)"
-    )
+    assert lt_item["desc"] == "Logprob averages moved 1.40 nats from baseline"
     assert len(lt_item["trace"]) > 0
     assert lt_item["model"] == "a"
     assert lt_item["provider"] == "p"
@@ -345,7 +341,6 @@ def test_b3it_row_status_counts_an_epoch_closure_change(tmp_path):
                     "provider": "q",
                     "method": "B3IT",
                     "magnitude": None,
-                    "magnitude_display": "",
                 }
             ]
         )
@@ -532,7 +527,6 @@ def test_pinned_hero_reaches_overview_json(tmp_path):
             "provider": "p",
             "method": "LT",
             "magnitude": 99.0,
-            "magnitude_display": "99σ",
         }
     ]
     (root / "data" / "changes.json").write_text(json.dumps(changes))
@@ -588,9 +582,3 @@ def test_stale_hero_pin_fails_the_build(tmp_path):
             NOW,
         )
 
-
-def test_shift_from_is_the_level_change_across_the_day():
-    pairs = [("d1", 0.1), ("d2", 0.1), ("d3", 2.5), ("d4", 2.3)]
-    assert shift_from("d3", pairs, 20) == pytest.approx(2.3)
-    assert shift_from("d1", pairs, 20) is None
-    assert shift_from("d9", pairs, 20) is None

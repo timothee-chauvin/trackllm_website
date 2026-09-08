@@ -30,7 +30,7 @@ const LT = {
     ["2025-01-01", 0.02], ["2025-06-01", 0.05], ["2025-06-20", 0.62], ["2026-02-01", 0.58],
   ] as [string, number][],
   breaks: [], // already thinned: these fixtures are what the chart draws
-  changes: [{ date: "2025-06-20", sigma: "42σ", drift: 0.62 }],
+  changes: [{ date: "2025-06-20", shift: 0.62 }],
   firstDate: "2025-01-01",
   lastDate: "2026-02-01",
 };
@@ -40,9 +40,9 @@ const LT = {
 const CROWDED = {
   ...LT,
   changes: [
-    { date: "2025-06-16", sigma: "23σ", drift: 0.6 },
-    { date: "2025-06-20", sigma: "53σ", drift: 0.62 },
-    { date: "2025-06-23", sigma: "128σ", drift: 0.61 },
+    { date: "2025-06-16", shift: 0.6 },
+    { date: "2025-06-20", shift: 0.62 },
+    { date: "2025-06-23", shift: 0.61 },
   ],
 };
 
@@ -50,9 +50,9 @@ const CROWDED = {
 const SPREAD = {
   ...LT,
   changes: [
-    { date: "2025-03-01", sigma: "23σ", drift: 0.6 },
-    { date: "2025-08-01", sigma: "53σ", drift: 0.62 },
-    { date: "2025-12-01", sigma: "128σ", drift: 0.61 },
+    { date: "2025-03-01", shift: 0.6 },
+    { date: "2025-08-01", shift: 0.62 },
+    { date: "2025-12-01", shift: 0.61 },
   ],
 };
 

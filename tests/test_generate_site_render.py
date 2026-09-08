@@ -78,6 +78,8 @@ def test_render_emits_changes_and_unified_index(tmp_path):
                         "date": "2026-06-20T00:00:00Z",
                         "sigma": 9.0,
                         "first_detected": "2026-06-21T00:00:00Z",
+                        "level_shift": 0.9,
+                        "published": True,
                     }
                 ]
             }
@@ -491,6 +493,8 @@ def test_endpoint_manifest_carries_the_canonical_status_and_changes(tmp_path):
                         "date": DATES[3],
                         "sigma": 9.0,
                         "first_detected": DATES[4],
+                        "level_shift": 0.9,
+                        "published": True,
                     }
                 ]
             }
@@ -509,7 +513,7 @@ def test_endpoint_manifest_carries_the_canonical_status_and_changes(tmp_path):
     )
     assert manifest["state"] == row["status"] == "changed"
     assert [c["date"] for c in manifest["changes"]["lt"]] == [DATES[3][:10]]
-    assert manifest["changes"]["lt"][0]["sigma"] == "9σ"
+    assert manifest["changes"]["lt"][0]["shift"] == 0.9
     assert len(manifest["changes"]["lt"]) == row["nChanges"]
 
 
@@ -530,6 +534,8 @@ def test_endpoint_manifest_count_matches_the_row_without_a_drift_lane(tmp_path):
                         "date": DATES[3],
                         "sigma": 9.0,
                         "first_detected": DATES[4],
+                        "level_shift": 0.9,
+                        "published": True,
                     }
                 ]
             }
@@ -548,7 +554,8 @@ def test_endpoint_manifest_count_matches_the_row_without_a_drift_lane(tmp_path):
     )
     assert manifest["state"] == row["status"] == "changed"
     assert len(manifest["changes"]["lt"]) == row["nChanges"] == 1
-    assert manifest["changes"]["lt"][0]["drift"] is None
+    # the level is the event's own, not re-derived from the (empty) lane
+    assert manifest["changes"]["lt"][0]["shift"] == 0.9
 
 
 def test_render_emits_status_pages_for_catalog_endpoints(tmp_path):

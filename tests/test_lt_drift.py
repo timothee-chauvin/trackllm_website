@@ -1,6 +1,12 @@
 from datetime import datetime, timedelta, timezone
 
-from trackllm_website.lt_drift import REFERENCE_DAYS, compute_drift_series
+import pytest
+
+from trackllm_website.lt_drift import (
+    REFERENCE_DAYS,
+    compute_drift_series,
+    level_shift,
+)
 
 
 def _obs(day, dist):
@@ -106,9 +112,6 @@ def test_fewer_returned_tokens_than_the_reference_is_not_drift():
 
 # --- level shift (the publication gate and the published magnitude) ---
 
-import pytest
-
-from trackllm_website.lt_drift import level_shift
 
 
 def _pairs(values):

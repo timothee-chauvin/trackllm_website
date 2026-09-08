@@ -7,6 +7,7 @@ from pathlib import Path
 
 import numpy as np
 import orjson
+import pytest
 
 import trackllm_website.lt_scores as lt_scores
 from trackllm_website.config import Endpoint
@@ -227,7 +228,6 @@ def test_compute_endpoint_scores_populates_drift(tmp_path, monkeypatch):
 
 # --- logprob floor and core tokens ---
 
-import pytest
 
 
 def test_sentinel_logprobs_are_floored_and_missing_tokens_censored_at_the_row_min():
