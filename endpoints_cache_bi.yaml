@@ -146,6 +146,12 @@ too_expensive:
   - 0.2
   - 0.4
 - api: openrouter
+  model: deepseek/deepseek-v4-flash-0731
+  provider: wafer/fast
+  cost:
+  - 0.1
+  - 0.25
+- api: openrouter
   model: deepseek/deepseek-v4-pro
   provider: gmicloud/fp8
   cost:
@@ -3395,7 +3401,7 @@ unprobeable:
   detail: null
 failure_streaks:
   openrouter#deepseek/deepseek-chat-v3.1#google-vertex/us-west2:
-    count: 1
+    count: 2
     last_error: '{"message":"Provider returned error","code":503,"metadata":{"raw":"[{\n  \"error\":
       {\n    \"code\": 503,\n    \"message\": \"Model server is not available. Please
       retry. endpoint_id: 4539483288854593...'
