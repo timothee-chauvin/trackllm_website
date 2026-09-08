@@ -357,6 +357,9 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 .sec-desc b { color: var(--text); font-weight: 600; }
 .sec-desc .lt { color: var(--accent); font-weight: 600; } .sec-desc .b3 { color: var(--b3it); font-weight: 600; }
 
+/* the gutter is always reserved: a readout that makes the page taller must not
+   toggle the scrollbar, rescale the chart and move the very rule being hovered */
+html { scrollbar-gutter: stable; }
 .chartbox { position: relative; }
 .chartwrap { padding: 0.8rem 1rem 0.4rem; } .chart svg { width: 100%; height: auto; display: block; }
 /* the lane hit targets swallow no gestures: touch-action keeps a swipe over the
