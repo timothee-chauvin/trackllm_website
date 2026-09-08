@@ -1,4 +1,5 @@
-"""LT change-event log: current detection, with stable first-detected dates."""
+"""LT change-event log: current detection, with stable first-detected dates and
+the publication gate (lt_drift.LT_MIN_SHIFT on each change's level shift)."""
 
 from datetime import datetime
 from pathlib import Path
@@ -6,6 +7,7 @@ from pathlib import Path
 import orjson
 from pydantic import BaseModel
 
+from trackllm_website.lt_drift import LT_MIN_SHIFT
 from trackllm_website.lt_scores import PEAK_DISTANCE, ChangePoint, LTScores
 from trackllm_website.util import atomic_write_bytes
 
@@ -18,6 +20,13 @@ class LTChangeEvent(BaseModel):
     date: datetime
     sigma: float | None  # mirrors ChangePoint.sigma; None when deviation undefined
     first_detected: datetime
+    # Defaults only so an lt_changes.json written before the gate existed still
+    # loads: the first recompute after that fills both fields for every event.
+    level_shift: float | None = None  # mirrors ChangePoint.level_shift
+    # Sticky: set the first time the level shift clears LT_MIN_SHIFT, never unset.
+    # The shift is a moving mean over the days after the change, so it would
+    # otherwise flip a published change on and off as days arrive.
+    published: bool = False
 
 
 def merge_events(
@@ -28,7 +37,7 @@ def merge_events(
     now: datetime,
 ) -> list[LTChangeEvent]:
     """A recomputed change within PEAK_DISTANCE indices of an existing event is
-    the same event: keep first_detected, refresh index/date/sigma.
+    the same event: keep first_detected and published, refresh the rest.
 
     Each event is claimed by at most one change, so two nearby changes cannot
     collapse onto one event. An event no current change claims is dropped:
@@ -38,6 +47,7 @@ def merge_events(
     unclaimed = list(existing)
     merged: list[LTChangeEvent] = []
     for cp in changes:
+        passes = cp.level_shift is not None and cp.level_shift >= LT_MIN_SHIFT
         match = next(
             (e for e in unclaimed if abs(e.index - cp.index) <= PEAK_DISTANCE), None
         )
@@ -46,6 +56,8 @@ def merge_events(
             match.index = cp.index
             match.date = dates[cp.index]
             match.sigma = cp.sigma
+            match.level_shift = cp.level_shift
+            match.published = match.published or passes
             merged.append(match)
         else:
             merged.append(
@@ -55,6 +67,8 @@ def merge_events(
                     date=dates[cp.index],
                     sigma=cp.sigma,
                     first_detected=now,
+                    level_shift=cp.level_shift,
+                    published=passes,
                 )
             )
     merged.sort(key=lambda e: e.index)
