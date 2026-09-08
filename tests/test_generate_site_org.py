@@ -10,12 +10,13 @@ def _model_view(model: str, endpoints: list[tuple[str, str]], changes: list[str]
         "date_min": "2026-06-01",
         "date_max": "2026-06-30",
         "n_endpoints": len(endpoints),
+        "n_active": len(endpoints),
         "n_providers": len({base for _, base in endpoints}),
         "n_endpoints_total": len(endpoints),
         "n_changed": 1 if changes else 0,
         "max_drift": 0.0,
         "headline": "tracked",
-        "status_summary": f"{len(endpoints)} of {len(endpoints)} endpoints trackable",
+        "status_summary": f"{len(endpoints)} tracked",
         "changes": [{"date": d, "method": "lt", "provider": "p"} for d in changes],
         "endpoints": [
             {"provider": provider, "base": base, "methods": ["lt"]}
@@ -37,6 +38,7 @@ def test_build_org_views_groups_models_by_org():
     assert m["name"] == "m"
     assert m["n_models"] == 2
     assert m["n_endpoints"] == 2
+    assert m["n_active"] == 2
     assert m["n_changes"] == 1
     assert m["n_changed"] == 1
     assert {row["name"] for row in m["models"]} == {"a", "b"}
@@ -82,14 +84,14 @@ def test_org_models_sort_most_changed_first():
 
 def test_org_model_rows_carry_status_badges():
     view = _model_view("m/untrackable", [("p1", "p1")], [])
-    view["n_endpoints"] = 0
+    view["n_endpoints"] = view["n_active"] = 0
     view["headline"] = "untrackable"
-    view["status_summary"] = "0 of 1 endpoint trackable"
+    view["status_summary"] = "1 untrackable"
     view["endpoints"] = [{"provider": "p1", "base": "p1", "methods": []}]
     views = build_org_views({slugify("m/untrackable"): view})
     (row,) = views[slugify("m")]["models"]
     assert row["headline"] == "untrackable"
-    assert row["status_summary"] == "0 of 1 endpoint trackable"
+    assert row["status_summary"] == "1 untrackable"
     assert row["n_endpoints_total"] == 1
 
 

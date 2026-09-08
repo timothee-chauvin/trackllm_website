@@ -1,0 +1,23 @@
+{% extends "base.html.j2" %}
+
+{% block title %}Page not found | TrackLLM{% endblock %}
+
+{% block content %}
+<div class="wrap">
+  <div class="head">
+    <div>
+      <h1>Page not found</h1>
+      <p class="lede">There is no page at this address. Endpoint pages come and go with the OpenRouter catalog, and a model or provider only has a page while at least one of its endpoints is monitored.</p>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <section class="block">
+    <div class="panel">
+      <p class="prose">Find what you were after on the <a href="/endpoints.html">endpoint directory</a> — it lists every endpoint in the catalog, tracked or not, with a search box — or start from the <a href="/index.html">home page</a>, the <a href="/changes.html">change log</a> or the <a href="/providers.html">providers</a>.</p>
+      <p class="prose">An endpoint's address is <code>/endpoints/&lt;slug&gt;.html</code>, where the slug is <code>&lt;model&gt;#&lt;provider&gt;</code> with every character outside <code>A–Z a–z 0–9 . _ - + = @ ~ ,</code> replaced by its two-digit hex code: <code>/</code> → <code>2f</code>, <code>#</code> → <code>23</code>, <code>:</code> → <code>3a</code>.</p>
+    </div>
+  </section>
+</main>
+{% endblock %}

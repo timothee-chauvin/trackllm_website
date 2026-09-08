@@ -23,16 +23,20 @@ Model: {{ b.model_link(nav_prefix, model_slug, model) }} · Provider: {{ b.provi
 Both signals measure how far this endpoint's behavior has moved from its reference period (its first two weeks). LT tracks the average change in the returned tokens' log-probabilities (nats); B3IT tracks the total-variation distance of the border-input votes (0–1). Both read 0 when the endpoint matches its baseline and rise — staying elevated — after a real change.
 
 {% for j in machine.json %}
-Full series: [{{ j }}]({{ nav_prefix }}{{ j }}){{ "" if loop.last }}
+Full series: [{{ j.path }}]({{ nav_prefix }}{{ j.path }}){{ "" if loop.last }}
 
 {% endfor %}
 ## Detected changes
 
+{# σ is LT's detection score; a B3IT-only table has no such column #}
 {% set rows = [] %}
-{% for c in manifest.changes.lt %}{% do rows.append((c.date, "LT", c.drift ~ " nats", c.sigma)) %}{% endfor %}
-{% for c in manifest.changes.b3it %}{% do rows.append((c.date, "B3IT", "TV " ~ c.peakTV, "")) %}{% endfor %}
-{% if rows %}
+{% for c in manifest.changes.lt %}{% do rows.append((c.date, "LT", (c.drift ~ " nats") if c.drift is not none else "—", c.sigma)) %}{% endfor %}
+{% for c in manifest.changes.b3it %}{% do rows.append((c.date, "B3IT", ("TV " ~ c.shiftTV) if c.shiftTV is not none else "—", "")) %}{% endfor %}
+{% if rows and manifest.changes.lt %}
 {{ b.table(["Date", "Method", "Drift reached", "σ"], rows | sort(reverse=true)) }}
+{% elif rows %}
+{% set rows3 = [] %}{% for r in rows | sort(reverse=true) %}{% do rows3.append(r[:3]) %}{% endfor %}
+{{ b.table(["Date", "Method", "Drift reached"], rows3) }}
 {% else %}
 No change detected so far.
 {% endif %}

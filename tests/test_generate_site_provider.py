@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timezone
 
 import pytest
 
@@ -76,14 +77,21 @@ def fake_site(tmp_path):
     return root
 
 
+NOW = datetime(
+    2026, 6, 30, tzinfo=timezone.utc
+)  # the build clock, the fixtures' last day
+
+
 def _views_with(root, inputs):
     lt_dir = root / "data" / "lt"
     lt_endpoints = list(discover_lt_endpoints(lt_dir))
     lt_data = load_all_lt_data(lt_dir, [e.slug for e in lt_endpoints])
     b3it = b3it_views_for(root)
     site = site_statuses_for(root, inputs)
-    rows = build_overview(root, lt_data, lt_endpoints, b3it, None, site)["endpoints"]
-    return build_provider_views(root, lt_data, lt_endpoints, b3it, rows, site)
+    rows = build_overview(root, lt_data, lt_endpoints, b3it, None, site, NOW)[
+        "endpoints"
+    ]
+    return build_provider_views(root, lt_data, lt_endpoints, b3it, rows, site, NOW)
 
 
 def _views(root):

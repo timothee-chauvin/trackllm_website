@@ -6,7 +6,10 @@ from pathlib import Path
 
 from trackllm_website.generate_site.b3it import B3ITView
 from trackllm_website.generate_site.lt import EndpointInfo
-from trackllm_website.generate_site.status import dominant_headline
+from trackllm_website.generate_site.status import (
+    dominant_headline,
+    headline_breakdown,
+)
 from trackllm_website.generate_site.status_io import SiteStatuses
 from trackllm_website.generate_site.timeline import (
     build_timeline,
@@ -54,27 +57,24 @@ def build_model_views(
         max_drift = round(max(drift_values, default=0.0), 2)
 
         headlines = [site.statuses[s].headline for s in slugs]
-        # "trackable" = at least one method could ever work, not "being tracked"
-        n_trackable = sum(1 for h in headlines if h != "untrackable")
-        n_total = len(slugs)
 
         out[slugify(model)] = {
             "model": model,
             "org": model.split("/")[0],
             # Endpoints are serving variants: two of them can be the same company
             # (chutes and chutes/fp8), so the two counts are not interchangeable.
-            # The n_endpoints/n_providers counts describe the tracked fleet;
-            # n_endpoints_total spans the whole catalog for this model.
+            # n_endpoints/n_providers describe the monitored fleet (every endpoint
+            # with a series, retired ones included); n_active the part of it still
+            # tracked; n_endpoints_total the whole catalog for this model.
             "n_endpoints": len(tracked),
+            "n_active": sum(1 for e in tracked if e["status"]["headline"] == "tracked"),
             "n_providers": len({e["base"] for e in tracked}),
-            "n_endpoints_total": n_total,
+            "n_endpoints_total": len(slugs),
             "n_changed": sum(1 for e in tracked if e["n_changes"]),
             "max_drift": max_drift,
             "headline": dominant_headline(headlines),
-            "status_summary": (
-                f"{n_trackable} of {n_total} "
-                f"endpoint{'s' if n_total != 1 else ''} trackable"
-            ),
+            # every catalog endpoint of this model by headline, most common first
+            "status_summary": headline_breakdown(headlines),
             **timeline,
         }
     return out

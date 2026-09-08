@@ -91,12 +91,17 @@ export function buildLT(scores: LTScoresData | null, changes: LTChange[]): Focus
   const drift = scores.drift ?? [];
   const pairs: [string, number][] = driftDates.map((d, i) => [d.slice(0, 10), round(drift[i], 3)]);
   const { series, breaks } = downsampleRuns(pairs, TRACE_LEN);
+  // The observed span is the drift lane's: `dates` are the test statistic's own
+  // instants, which start 24 queries (about a day) after the first observation
+  // and stop as early before the last -- "Monitored Aug 2026" for an endpoint
+  // first queried on 31 Jul. (lt.py::LTData.obs_dates is the Python twin.)
+  const obsDates = driftDates.length ? driftDates : scores.dates;
   return {
     drift: series,
     breaks,
     changes,
-    firstDate: scores.dates[0].slice(0, 10),
-    lastDate: last(scores.dates)!.slice(0, 10),
+    firstDate: obsDates[0].slice(0, 10),
+    lastDate: last(obsDates)!.slice(0, 10),
   };
 }
 
@@ -306,20 +311,18 @@ function renderChangesTable(lt: FocusLT | null, b3it: FocusB3IT | null): void {
   (b3it?.changes ?? []).forEach((c) =>
     rows.push({ date: c.date, method: "b3it", mag: fmtTV(c.shiftTV), conf: "—" })
   );
-  // no detected changes yet: the section (heading included) is omitted rather
-  // than left as an empty table, matching the rest of the site's convention.
-  if (!rows.length) {
-    document.getElementById("changesSection")?.remove();
-    return;
-  }
+  // The template renders the section only with changes to list (and the σ
+  // header only with LT ones, σ being LT's detection score); the rows follow it.
+  if (!rows.length) return;
   rows.sort((a, b) => td(b.date) - td(a.date));
+  const withSigma = rows.some((r) => r.method === "lt");
   el.innerHTML = rows
     .map(
       (r) => `<tr>
     <td class="date">${esc(r.date)}</td>
     <td><span class="badge ${r.method}">${r.method}</span></td>
     <td class="r mag" style="color:${r.method === "lt" ? "var(--accent)" : "var(--b3it)"}">${r.mag}</td>
-    <td class="r num" style="color:var(--text-muted)">${esc(r.conf)}</td></tr>`
+    ${withSigma ? `<td class="r num" style="color:var(--text-muted)">${esc(r.conf)}</td>` : ""}</tr>`
     )
     .join("");
 }

@@ -1,10 +1,10 @@
 {% import "_base.md.j2" as b %}
 {{ b.header("Organization: " ~ view.name, machine, nav_prefix) }}
 {{ b.crumb([("Home", nav_prefix ~ "index.md"), (view.name, "")]) }}
-{{ view.n_models }} model{{ "s" if view.n_models != 1 }}, with {{ view.n_endpoints }} tracked endpoint{{ "s" if view.n_endpoints != 1 }} across {{ view.n_providers }} provider{{ "s" if view.n_providers != 1 }}. {{ view.n_changed }} of {{ "it" if view.n_models == 1 else "them" }} {{ "shows" if view.n_changed == 1 else "show" }} at least one detected change ({{ view.n_changes }} changes total) — the model version is nominally fixed, so the movement is in how it is served.
+{{ view.n_models }} model{{ "s" if view.n_models != 1 }}, with {{ view.n_endpoints }} monitored endpoint{{ "s" if view.n_endpoints != 1 }} ({{ view.n_active }} actively tracked, {{ view.n_endpoints - view.n_active }} no longer) across {{ view.n_providers }} provider{{ "s" if view.n_providers != 1 }}. {{ view.n_changed }} of {{ "it" if view.n_models == 1 else "them" }} {{ "shows" if view.n_changed == 1 else "show" }} at least one detected change ({{ view.n_changes }} changes total) — the model version is nominally fixed, so the movement is in how it is served.
 
 ## Models
 
-{{ b.table(["Model", "Endpoints", "Providers", "Changes", "Endpoints changed", "Last change", "Status"], view.models | map("org_model_row", nav_prefix) | list) }}
+{{ b.table(["Model", "Monitored endpoints", "Providers", "Changes", "Endpoints changed", "Last change", "Status"], view.models | map("org_model_row", nav_prefix) | list) }}
 {{ view.n_models }} model{{ "s" if view.n_models != 1 }}{% if view.first %} · monitored since {{ view.first }}{% endif %}
 {{ b.footer(nav_prefix) }}

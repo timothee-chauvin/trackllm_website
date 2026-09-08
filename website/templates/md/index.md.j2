@@ -4,7 +4,7 @@
 LLM APIs are opaque black boxes, even for open-weight models. TrackLLM continuously monitors them for undisclosed changes — cheaply — with logprob tracking (LT) where logprobs are exposed, and black-box border input tracking (B3IT) where they aren't. Small changes are fine, but they should be disclosed.
 
 {{ b.table(["Stat", "Value"], [
-  ("Endpoints in the catalog", S.endpoints), ("Active (tracked) endpoints", S.active),
+  ("Endpoints in the catalog", S.catalog_endpoints), ("Endpoints ever monitored", S.endpoints), ("Active (tracked) endpoints", S.active),
   ("LT endpoints", S.lt_endpoints), ("B3IT endpoints", S.b3it_endpoints), ("B3IT under monitoring", S.b3it_monitoring),
   ("Providers / companies", S.providers ~ " / " ~ S.provider_companies), ("Models / organizations", S.models ~ " / " ~ S.orgs),
   ("Changes detected (LT / B3IT)", S.changes_total ~ " (" ~ S.changes_lt ~ " / " ~ S.changes_b3it ~ ")"),
@@ -21,7 +21,7 @@ Everything on this site is available without a browser:
 - **JSON** — the same files the HTML pages fetch: [data/overview.json]({{ nav_prefix }}data/overview.json) (stats, hero, latest changes, every endpoint row, provider rows), [data/changes.json]({{ nav_prefix }}data/changes.json) (every detected change, newest first), [data/changes_page.json]({{ nav_prefix }}data/changes_page.json) (the change log with descriptions), [data/spend.json]({{ nav_prefix }}data/spend.json), `data/models/<slug>.json` (per-model: every endpoint's full drift / TV series and changes), `data/providers/<slug>.json` (per-provider rates, variants, endpoints), `data/b3it/<slug>/b3it.json` (per-endpoint border-input state). Each page's header names the JSON it was rendered from.
 - **Raw data** — every collected response, committed hourly: {{ DATA_REPO_URL }}. The generator that turns it into this site: {{ CODE_REPO_URL }}.
 
-Slugs are stable: an endpoint's slug is `<model>@<provider>` with `/` → `2f` and `@` → `23`, and its page is `endpoints/<slug>.md`.
+Endpoint slugs are stable: `<model>#<provider>` with every character outside `{{ SLUG_KEPT_CHARS }}` replaced by its two-digit hex code — `/` → `2f`, `#` → `23`, `:` → `3a` (so `moonshotai/kimi-k3:free` at `chutes/fp8` is `moonshotai2fkimi-k33afree23chutes2ffp8`); its page is `endpoints/<slug>.md`.
 
 ## Latest detected changes
 
@@ -36,7 +36,7 @@ Detected changes per endpoint-year of LT monitoring, with a 95% Poisson interval
   (overview.providers | rateable)[:PLOT_PREVIEW] | map("plot_row", nav_prefix) | list) }}
 ## Endpoints
 
-{{ overview.endpoints | length }} endpoints in the catalog; the {{ DIR_PREVIEW }} tracked ones with the most detected changes are below, every one of them on [endpoints.md]({{ nav_prefix }}endpoints.md).
+{{ S.endpoints }} endpoints monitored at some point ({{ S.active }} under active tracking) out of {{ S.catalog_endpoints }} in the catalog; the {{ DIR_PREVIEW }} tracked ones with the most detected changes are below, every one of them on [endpoints.md]({{ nav_prefix }}endpoints.md).
 
 {{ b.table(["Model", "Provider", "Org", "Status", "Changes", "Methods", "Last change"],
   overview.endpoints | most_changed(DIR_PREVIEW) | map("dir_row", nav_prefix) | list) }}

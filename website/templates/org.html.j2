@@ -10,14 +10,15 @@
   <div class="head">
     <div>
       <h1>{{ org }} {{ subscribe_icon(machine, nav_prefix) }}</h1>
-      <p class="lede">{{ view.n_models }} model{{ s(view.n_models) }}, with {{ view.n_endpoints }} tracked endpoint{{ s(view.n_endpoints) }}
-        across {{ view.n_providers }} provider{{ s(view.n_providers) }}.
+      <p class="lede">{{ view.n_models }} model{{ s(view.n_models) }}, with {{ view.n_endpoints }} monitored endpoint{{ s(view.n_endpoints) }}
+        ({{ view.n_active }} actively tracked, {{ view.n_endpoints - view.n_active }} no longer) across {{ view.n_providers }} provider{{ s(view.n_providers) }}.
         <span class="hl">{{ view.n_changed }}</span> of {{ "it" if view.n_models == 1 else "them" }}
         {{ "shows" if view.n_changed == 1 else "show" }} at least one detected change &mdash;
         the model version is nominally fixed, so the movement is in how it is served.</p>
       <div class="summary">
         <div class="s"><div class="v">{{ view.n_models }}</div><div class="k">Models</div></div>
-        <div class="s"><div class="v">{{ view.n_endpoints }}</div><div class="k">Endpoints</div></div>
+        <div class="s"><div class="v">{{ view.n_endpoints }}</div><div class="k">Monitored endpoints</div></div>
+        <div class="s"><div class="v">{{ view.n_active }}</div><div class="k">Actively tracked</div></div>
         <div class="s"><div class="v" style="color:var(--changed)">{{ view.n_changes }}</div><div class="k">Changes total</div></div>
         <div class="s"><div class="v">{{ view.n_providers }}</div><div class="k">Providers</div></div>
       </div>
@@ -33,7 +34,7 @@
     <div class="table-wrap"><div class="table-scroll"><table class="dir">
       <thead><tr>
         <th scope="col">Model</th>
-        <th scope="col" class="r">Endpoints</th>
+        <th scope="col" class="r">Monitored endpoints</th>
         <th scope="col" class="r col-hide">Providers</th>
         <th scope="col" class="r">Changes</th>
         <th scope="col" class="r col-hide">Endpoints changed</th>

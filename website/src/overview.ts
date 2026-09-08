@@ -77,7 +77,7 @@ export async function init(): Promise<void> {
     const method = h.method === "lt" ? "LT" : "B3IT";
     tip.innerHTML = `<div class="who">${methodBadges([h.method])}
         <b>${esc(h.model)}</b><span class="at">@ ${esc(h.provider)}</span></div>
-      <div class="what">Live data from this endpoint — ${method} detected a change on
+      <div class="what">Real data from this endpoint — ${method} detected a change on
         ${esc(h.date)} (${relDays(h.daysAgo)}), moving from
         ${magnitudeLabel(h.method, h.baseline)} to ${magnitudeLabel(h.method, h.magnitude)}.
         Showing ${esc(h.start)} to <span class="drawn-to">${esc(h.end)}</span>, one point per day.</div>
@@ -119,7 +119,7 @@ export async function init(): Promise<void> {
 
   document.getElementById("eyebrow")!.innerHTML = `<span class="dot"></span> Continuously monitoring ${S.active} active endpoints`;
   const stats = [
-    { label: "Endpoints", value: fmtInt(S.endpoints), sub: `${S.active} active · ${S.endpoints - S.active} retired` },
+    { label: "Endpoints monitored", value: fmtInt(S.endpoints), sub: `${S.active} active · ${S.endpoints - S.active} retired · ${fmtInt(S.catalog_endpoints)} in the catalog` },
     { label: "Models tracked", value: fmtInt(S.models), sub: `across ${S.orgs} orgs` },
     { label: "Providers", value: fmtInt(S.provider_companies), sub: `${S.providers} serving variants` },
     { label: "Queries logged", value: fmtM(S.queries), sub: `since ${S.since}` },
@@ -171,7 +171,7 @@ export async function init(): Promise<void> {
   sortEndpointRows(top, "nChanges", -1);
   document.getElementById("dirBody")!.innerHTML =
     dirRowsHtml(top.slice(0, DIR_SIZE), "", overviewLeadCells(providerPages), "");
-  document.getElementById("dirCount")!.innerHTML = `${fmtInt(rows.length)} endpoints · <b style="color:var(--changed)">${S.changes_total} changes</b> across ${S.changed_endpoints} of them`;
+  document.getElementById("dirCount")!.innerHTML = `${fmtInt(S.endpoints)} endpoints monitored, of ${fmtInt(S.catalog_endpoints)} in the catalog · <b style="color:var(--changed)">${S.changes_total} changes</b> across ${S.changed_endpoints} endpoints`;
   // every directory badge/pill above carries a popover
   bindTips(document.body);
 }

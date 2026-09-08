@@ -14,7 +14,10 @@ from trackllm_website.generate_site.status import (
     STATUS_COPY,
     CatalogEntry,
     EndpointStatus,
+    DETAIL_MAX_CHARS,
     dominant_headline,
+    headline_breakdown,
+    humanize_detail,
     headline_for,
     one_line_reason,
     resolve_statuses,
@@ -372,6 +375,80 @@ class TestReasonAndJson:
         assert dominant_headline(["pending", "untrackable"]) == "untrackable"
         assert dominant_headline(["untrackable", "tracked"]) == "tracked"
         assert dominant_headline(["free_excluded"]) == "free_excluded"
+
+    def test_dominant_headline_is_the_majority_reason_below_retired(self):
+        """One untrackable endpoint must not badge a model whose other fifteen are
+        merely too expensive (kimi-k3 read "untrackable · 17 of 18 trackable")."""
+        assert (
+            dominant_headline(["untrackable"] + ["too_expensive"] * 15)
+            == "too_expensive"
+        )
+        assert dominant_headline(["retired", "untrackable", "untrackable"]) == "retired"
+
+    def test_headline_breakdown_counts_most_common_first(self):
+        assert (
+            headline_breakdown(
+                ["too_expensive"] * 15 + ["errors_out"] * 2 + ["untrackable"]
+            )
+            == "15 too expensive · 2 errors out · 1 untrackable"
+        )
+        assert (
+            headline_breakdown(["pending", "untrackable"])
+            == "1 untrackable · 1 pending"
+        )
+
+
+class TestDetails:
+    def test_cost_guard_trip_is_too_expensive_not_an_error(self):
+        failures = LTFailureCache(
+            failures=[
+                LTFailure(
+                    model="org/m",
+                    provider="p",
+                    reason="error: openrouter#org/m#p: $0.000366/query > $0.0001/query guard",
+                    last_seen=NOW,
+                )
+            ]
+        )
+        statuses = resolve(catalog=[entry("org/m", "p")], lt_failures=failures)
+        assert (statuses[S].lt, statuses[S].lt_detail) == ("too_expensive", None)
+        assert statuses[S].headline == "too_expensive"
+
+    def test_bi_guard_trip_is_too_expensive_too(self):
+        cache = EndpointCache(liars=[], too_expensive=[], bad_temperature=[])
+        cache.add_unprobeable(
+            ep("org/m", "p"), reason="flaky", detail="too_expensive: $0.000738/query"
+        )
+        statuses = resolve(catalog=[entry("org/m", "p")], bi_cache=cache)
+        assert (statuses[S].bi, statuses[S].bi_detail) == ("too_expensive", None)
+
+    @pytest.mark.parametrize(
+        ("raw", "shown"),
+        [
+            ("plain: 0 Timeout after 15.0s", "the request timed out"),
+            (
+                'No usage in response; body: {"id":"gen-1"}',
+                "the response carried no usage or cost data",
+            ),
+            (
+                'error: {"message":"Provider returned error","code":400,"metadata":{"raw":"{\\"error\\":{\\"message\\":\\"logprobs are not supported with reasoning models.\\"}}"}}',
+                "HTTP 400: logprobs are not supported with reasoning models.",
+            ),
+            (
+                'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"","provider_name":"X"}}',
+                "HTTP 400: the provider returned an error",
+            ),
+            ("returned 5 logprobs, expected 20", "returned 5 logprobs, expected 20"),
+            ("hidden reasoning", "hidden reasoning"),
+            (None, None),
+        ],
+    )
+    def test_humanize_detail_keeps_the_innermost_message(self, raw, shown):
+        assert humanize_detail(raw) == shown
+
+    def test_humanize_detail_truncates_at_a_word(self):
+        text = humanize_detail("x " * 200)
+        assert text.endswith("…") and len(text) <= DETAIL_MAX_CHARS + 1
 
     def test_catalog_entry_as_meta(self):
         e = entry("org/m", "p", cost=(2.0, 8.0), supports_logprobs=False)

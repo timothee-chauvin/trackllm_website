@@ -1,6 +1,6 @@
 import hashlib
 import json
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
@@ -55,14 +55,18 @@ def asset_version(website_dir: Path) -> str:
 
 
 def render_site(
-    website_dir: Path, hero_pin: HeroConfig | None, status_inputs: StatusInputs
+    website_dir: Path,
+    hero_pin: HeroConfig | None,
+    status_inputs: StatusInputs,
+    built_at: datetime,
 ) -> None:
     """Generate the static site.
 
-    `hero_pin` and `status_inputs` are threaded in rather than read from
-    config/committed files so a synthetic site can be rendered without them; the
-    real build passes `config.hero` and `load_status_inputs()`, and a pin that
-    cannot resolve raises.
+    `hero_pin`, `status_inputs` and `built_at` are threaded in rather than read
+    from config/committed files/the wall clock so a synthetic site can be
+    rendered without them; the real build passes `config.hero`,
+    `load_status_inputs()` and the current time, and a pin that cannot resolve
+    raises.
     """
     data_dir = website_dir / "data" / "lt"
     endpoints_dir = website_dir / "endpoints"
@@ -96,13 +100,19 @@ def render_site(
     org_template = env.get_template("org.html.j2")
     changes_template = env.get_template("changes.html.j2")
 
+    # `built_at` is the one clock of the build: every age on the site ("stable for
+    # N days", "14d ago", the 30-day windows, the retired cutoff) is measured
+    # against it. The build time, not the newest observation: that one lagged a
+    # day behind the calendar, and every "stable for" count with it.
     # Every page's render context is kept: machine.py renders the .md twin from
     # the same context, so the two can never show different data.
     md_pages: dict[str, list[dict]] = {}
+    html_pages: list[str] = []
 
     def page(kind: str, slug: str, json_paths: list[str], **ctx) -> dict:
         ctx["machine"] = machine_mod.links(kind, slug, json_paths)
         md_pages.setdefault(kind, []).append(ctx)
+        html_pages.append(ctx["machine"]["html"])
         return ctx
 
     discovered: list[EndpointInfo] = []
@@ -163,15 +173,21 @@ def render_site(
     n_total = len(set(lt_by_slug) | set(b3it_views))
     print(f"\nFound {n_active} active, {n_total - n_active} inactive endpoints")
 
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    today = built_at.strftime("%Y-%m-%d")
     spend = spend_mod.aggregate_spend(website_dir / "data" / "spend", today)
     (website_dir / "data" / "spend.json").write_text(json.dumps(spend))
 
     overview = overview_mod.build_overview(
-        website_dir, lt_data, endpoints, b3it_views, hero_pin, site
+        website_dir, lt_data, endpoints, b3it_views, hero_pin, site, built_at
     )
     provider_views = provider_mod.build_provider_views(
-        website_dir, lt_data, endpoints, b3it_views, overview["endpoints"], site
+        website_dir,
+        lt_data,
+        endpoints,
+        b3it_views,
+        overview["endpoints"],
+        site,
+        built_at,
     )
     overview["providers"] = provider_mod.overview_rows(provider_views)
     (website_dir / "data" / "overview.json").write_text(json.dumps(overview))
@@ -202,7 +218,9 @@ def render_site(
         )
     print(f"Generated {len(provider_views)} provider pages in providers/")
 
-    changes_page = changes_page_mod.build_changes_page(website_dir, lt_data, b3it_views)
+    changes_page = changes_page_mod.build_changes_page(
+        website_dir, lt_data, b3it_views, built_at
+    )
     (website_dir / "data" / "changes_page.json").write_text(json.dumps(changes_page))
     (website_dir / "changes.html").write_text(
         changes_template.render(
@@ -228,6 +246,18 @@ def render_site(
             )
         )
         print(f"Generated {name}.html")
+
+    # GitHub Pages serves 404.html for every missing path, at any depth, so its
+    # links are absolute. Not registered through page(): no md twin, no sitemap entry.
+    (website_dir / "404.html").write_text(
+        env.get_template("404.html.j2").render(
+            machine=machine_mod.links("404", "", []),
+            css_path="/style.css",
+            body_class="notfound",
+            nav_prefix="/",
+        )
+    )
+    print("Generated 404.html")
 
     model_views = model_mod.build_model_views(website_dir, endpoints, b3it_views, site)
     write_json_dir(website_dir / "data" / "models", model_views)
@@ -379,8 +409,8 @@ def render_site(
 
     print(f"Generated {len(site.statuses)} endpoint pages in endpoints/")
 
-    built_at = datetime.now(timezone.utc)
     machine_mod.render_markdown(website_dir, built_at, md_pages)
+    machine_mod.render_sitemap(website_dir, built_at, html_pages)
     machine_mod.render_feeds(
         website_dir,
         built_at,

@@ -101,14 +101,24 @@ def _lt_item(change: dict, drift: list[tuple[datetime, float]], now: datetime) -
         level = shift_from(change["date"][:10], day_pairs, LT_PEAK_WINDOW)
         magnitude = round(level, 2) if level is not None else None
         trace, frac = _window(drift, _nearest_index(drift, cd))
-    display = magnitude if magnitude is not None else "—"
+    # A level that rounds to 0.00 is a real but tiny move, never "0.0 nats": the
+    # detector fires on the statistic (in σ), which can be huge for a small shift.
+    if magnitude is None:
+        display = "—"
+    elif magnitude < 0.01:
+        display = "<0.01"
+    else:
+        display = f"{magnitude}"
     return {
         "date": change["date"][:10],
         "iso": change["date"],
         "daysAgo": (now - cd).days,
         "method": "lt",
         "magnitude": magnitude,
-        "desc": f"Logprob averages moved {display} nats from baseline",
+        "desc": (
+            f"Logprob averages moved {display} nats from baseline "
+            f"({change['magnitude_display']} on the detection statistic)"
+        ),
         "primary": f"drift {display}",
         "secondary": f"{change['magnitude_display']} conf",
         "sevKey": _severity(magnitude or 0.0, LT_ALERT_THRESHOLD),

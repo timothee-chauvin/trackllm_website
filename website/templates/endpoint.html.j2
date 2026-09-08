@@ -50,17 +50,22 @@
     </div>
   </section>
 
+  {# Rendered only with changes to list, and the σ column only with LT ones (σ is
+     LT's detection score): the section is decided here, in the static HTML, so an
+     unchanged endpoint never ships an empty table for a reader without scripts. #}
+  {% if manifest.changes.lt or manifest.changes.b3it %}
   <section class="block" id="changesSection">
     <div class="sec-head"><h2>Detected changes</h2></div>
     <div class="panel">
       <div class="tblwrap">
         <table class="changes-tbl">
-          <thead><tr><th scope="col">Date</th><th scope="col">Method</th><th scope="col" class="r">Drift reached</th><th scope="col" class="r">σ</th></tr></thead>
+          <thead><tr><th scope="col">Date</th><th scope="col">Method</th><th scope="col" class="r">Drift reached</th>{% if manifest.changes.lt %}<th scope="col" class="r"><span class="sym">σ</span></th>{% endif %}</tr></thead>
           <tbody id="changerows"></tbody>
         </table>
       </div>
     </div>
   </section>
+  {% endif %}
   {% elif meta %}
   <section class="block">
     <div class="sec-head"><h2>Endpoint details</h2><span class="hint">from the OpenRouter catalog snapshot</span></div>

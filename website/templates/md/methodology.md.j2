@@ -7,9 +7,9 @@ LLM APIs are opaque black boxes, even for open-weight models. Can we continuousl
 
 Used wherever the provider returns logprobs. Paper: [Log Probability Tracking of LLM APIs](https://arxiv.org/abs/2512.03816) (ICLR 2026 · arXiv:2512.03816).
 
-When logprobs are returned by the API provider, we can use this for extremely sensitive and cost-effective change detection. LT is a simple statistical test on the average value of each token logprob, requesting only a single token of output.
+When the API returns logprobs, they make for extremely sensitive and cost-effective change detection. LT is a simple statistical test on the average value of each token's logprob, requesting only a single token of output.
 
-Logprobs are non-deterministic, because inference on GPUs is non-deterministic, but we can still basically track logprob averages and this works great. The test detects changes as small as one step of fine-tuning, and is more sensitive than existing methods while being 1,000x cheaper — logprobs can be used to monitor for changes at extremely low cost, e.g. $0.14/year for hourly sampling of GPT-4.1.
+Logprobs are noisy, because inference on GPUs is non-deterministic, but their averages over a few dozen queries are stable enough to track. The test detects changes as small as one step of fine-tuning, and is more sensitive than existing methods while being 1,000x cheaper — logprobs can be used to monitor for changes at extremely low cost, e.g. $0.14/year for hourly sampling of GPT-4.1.
 
 ## B3IT — Black-box border input tracking
 
@@ -18,6 +18,16 @@ Used where logprobs aren't exposed. Paper: [Token-Efficient Change Detection in 
 Where logprobs aren't exposed, we operate in a strict black box, observing only output tokens. The first phase identifies border inputs: inputs for which sampling at T=0 doesn't always give the same output, i.e. for which there exists more than one output top token. They can easily be found just from black-box sampling, trying thousands of short inputs and keeping the border inputs. These inputs are then sampled repeatedly, to check whether the endpoint has moved away from its borders.
 
 Optimal change detection depends on the model's Jacobian and the Fisher information of the output distribution; analyzing these in low-temperature regimes shows that border inputs enable powerful change detection tests. B3IT performs on par with the best available gray-box approaches while reducing costs by 30x.
+
+## How a change is called
+
+The detection rules, baselines and thresholds behind every entry in the change log (from lt_scores.py, lt_drift.py and config.toml).
+
+- **LT — the test.** Every endpoint is queried around the clock with the same short prompts, asking for one output token and its top-k logprobs. At each point in the series, the 24 queries before it are compared with the 24 after: the statistic is the mean absolute difference between the two windows' average logprob vectors, in nats. Each statistic is measured against the endpoint's own noise — the running mean and standard deviation of the previous 100 statistics, skipping the 48 most recent so a change never contaminates its own baseline. That standardized score is the σ shown beside LT changes.
+- **LT — the rule.** A change is called at a peak of the score where σ > 12 and the raw statistic exceeds 1.0 nat; peaks closer than 48 points count as one change. σ says how surprising the move was given the endpoint's usual jitter, not how far it went — a quiet endpoint can score dozens of σ on a shift that is behaviorally tiny.
+- **LT — drift, the line on the charts.** How far a day's average logprob vector sits from a reference period: the 14 days before the endpoint's first detected change, or its first 14 days if it never changed. Mean absolute difference over tokens, in nats; 0 while the endpoint matches its reference, elevated after a real change. The "drift reached" of a change is the drift level in the days that follow it — the magnitude the feed and change log report.
+- **B3IT — the signal.** After discovery, the 20 most balanced border inputs are kept and each is sampled 10 times a day. The first batch after (re)initialization is the reference; every later day's vote distribution per input is compared with it by total variation distance (0–1), averaged over the inputs. That is the line on the charts.
+- **B3IT — the rule.** A day deviates when its TV differs from a trailing baseline — the 14 days before the last 4, which are excluded, with at least 5 days in it — by more than 0.2 and by more than 4 baseline standard deviations. A change is called after 3 consecutive deviating days and dated at the first of them; in an epoch's first 30 batches a permutation test (α = 0.005) looks for an earlier split, held to the same 0.2 yardstick. A detected change re-initializes the endpoint: new border inputs, new reference, a new epoch on the chart.
 
 ## Read more
 

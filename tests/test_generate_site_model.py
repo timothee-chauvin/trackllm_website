@@ -471,8 +471,8 @@ def test_catalog_only_model_gets_a_view_with_status_summary(tmp_path):
     view = views[slugify("openai/gpt-5.4")]
     assert view["model"] == "openai/gpt-5.4" and view["org"] == "openai"
     assert view["n_endpoints"] == 0 and view["n_providers"] == 0
-    assert view["n_endpoints_total"] == 2
-    assert view["status_summary"] == "0 of 2 endpoints trackable"
+    assert view["n_active"] == 0 and view["n_endpoints_total"] == 2
+    assert view["status_summary"] == "2 untrackable"
     assert view["headline"] == "untrackable"
     assert view["date_min"] is None and view["changes"] == []
     for ep in view["endpoints"]:
@@ -498,7 +498,8 @@ def test_tracked_endpoints_carry_status_and_sort_before_untracked(tmp_path):
     ]
     view = _build_model_views_with(root, inputs)[slugify("m/a")]
     assert view["n_endpoints"] == 1 and view["n_endpoints_total"] == 2
-    assert view["status_summary"] == "2 of 2 endpoints trackable"
+    assert view["n_active"] == 1
+    assert view["status_summary"] == "1 tracked · 1 pending"
     assert view["headline"] == "tracked"
     tracked, untracked = view["endpoints"]
     assert tracked["slug"] == "m2fa23p" and tracked["status"]["lt"] == "tracked"

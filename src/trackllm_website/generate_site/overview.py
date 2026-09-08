@@ -8,12 +8,12 @@ views, changes.json, spend.json) -- never raw logprobs.
 
 import json
 from collections import Counter, defaultdict
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
 from trackllm_website.config import HeroConfig
 from trackllm_website.generate_site.b3it import B3ITView
-from trackllm_website.generate_site.clock import site_now
 from trackllm_website.generate_site.feed import (
     TRACE_LEN,
     build_feed_items,
@@ -34,34 +34,50 @@ FEED_LT_SIZE = 6
 FEED_B3IT_SIZE = 4
 
 
+@dataclass
+class Lane:
+    """One method's series for a directory row: the days it was observed on, the
+    values it plots, and whether the pipeline itself has retired that method."""
+
+    obs_dates: list[datetime]
+    values: list[float]
+    pipeline_retired: bool
+
+    def alive(self, now: datetime) -> bool:
+        return (
+            not self.pipeline_retired
+            and bool(self.obs_dates)
+            and (now - self.obs_dates[-1]).days <= RETIRED_GAP_DAYS
+        )
+
+
 def _row_state(
-    now: datetime,
-    obs_dates: list[datetime],
-    change_dates: list[datetime],
-    values: list[float],
-    retired: bool,
+    now: datetime, lanes: list[Lane], change_dates: list[datetime]
 ) -> tuple[str, list[float], list[float], str | None, bool]:
     """Directory row (status/trace/changeFracs/lastChange/recent) for one endpoint.
 
-    `changeFracs` places each change on the trace as a fraction of the observed
-    span, the way feed.py's changeFrac does for the feed window.
+    `lanes` are the endpoint's methods with a series, the first one being the
+    lane the trace is drawn from. The row is retired only when every lane is:
+    an endpoint whose LT queries stalled but whose B3IT sampling is fresh is
+    still being watched, and must not wear a Retired pill above a "B3IT:
+    actively monitored" status. `changeFracs` places each change on the trace
+    as a fraction of the observed span, the way feed.py's changeFrac does for
+    the feed window.
 
     "stable" is reserved for an endpoint that has never changed; any detected
     change makes it "changed" for good, and `recent` says whether the last one
     is within RECENT_CHANGE_DAYS. `change_dates` is the endpoint's slice of the
     canonical merged list -- the same one the row's nChanges counts, so the row
-    can never read "stable" beside a nonzero count. `retired` is the pipeline's
-    own verdict, independent of the observation gap.
+    can never read "stable" beside a nonzero count.
     """
-    last_obs = obs_dates[-1] if obs_dates else None
-    gap_retired = last_obs is not None and (now - last_obs).days > RETIRED_GAP_DAYS
     last_change = change_dates[-1] if change_dates else None
-    if retired or gap_retired:
+    if not any(lane.alive(now) for lane in lanes):
         status = "retired"
     else:
         status = "changed" if last_change is not None else "stable"
     recent = last_change is not None and (now - last_change).days <= RECENT_CHANGE_DAYS
 
+    obs_dates, values = lanes[0].obs_dates, lanes[0].values
     span = (obs_dates[-1] - obs_dates[0]).total_seconds() if len(obs_dates) > 1 else 0
     fracs = [
         round(min(1.0, max(0.0, (cd - obs_dates[0]).total_seconds() / span)), 3)
@@ -72,23 +88,24 @@ def _row_state(
     return status, downsample_trace(values, TRACE_LEN), fracs, last_change_day, recent
 
 
-def _b3it_row_state(
-    view: B3ITView, now: datetime, change_dates: list[datetime]
-) -> tuple[str, list[float], list[float], str | None, bool]:
-    """Directory row for a B3IT-only endpoint: its tv_series is the trace.
-
-    The view's own retired status is load-bearing -- a B3IT endpoint the pipeline
-    has explicitly retired (e.g. delisted, no border inputs) must show as retired
-    even if its last tv_series point happens to fall inside RETIRED_GAP_DAYS.
-    """
-    tv_dates = [datetime.fromisoformat(s) for s in view.tv_series["dates"]]
-    return _row_state(
-        now,
-        tv_dates,
-        change_dates,
-        view.tv_series["values"],
-        view.status == "retired",
-    )
+def _lanes(info: LTData | None, view: B3ITView | None) -> list[Lane]:
+    """LT first (its drift is the trace when both exist). LT has no pipeline
+    verdict of its own here: its stall is read off the observation gap. The
+    B3IT view's status is load-bearing -- an endpoint the pipeline explicitly
+    retired (delisted, no border inputs) is retired even if its last tv_series
+    point happens to fall inside RETIRED_GAP_DAYS."""
+    lanes = []
+    if info is not None:
+        lanes.append(Lane(info.obs_dates, [v for _, v in info.drift], False))
+    if view is not None:
+        lanes.append(
+            Lane(
+                [datetime.fromisoformat(s) for s in view.tv_series["dates"]],
+                view.tv_series["values"],
+                view.status == "retired",
+            )
+        )
+    return lanes
 
 
 def _status_fields(st: EndpointStatus) -> dict:
@@ -128,12 +145,13 @@ def build_overview(
     b3it_views: dict[str, B3ITView],
     hero_pin: HeroConfig | None,
     site: SiteStatuses,
+    now: datetime,
 ) -> dict:
+    """`now` is the build's clock, which every age on the site is measured
+    against: the recent-change window, the 30-day counts, the retired cutoff."""
     data_dir = website_dir / "data"
 
     lt_by_slug = {e.slug: e for e in lt_endpoints}
-
-    now = site_now(lt_data, b3it_views)
 
     changes_path = data_dir / "changes.json"
     changes = json.loads(changes_path.read_text()) if changes_path.exists() else []
@@ -167,25 +185,9 @@ def build_overview(
         if view:
             methods.append("b3it")
 
-        trace: list[float] = []
-        fracs: list[float] = []
-        status = "stable"
-        last_change: str | None = None
-        recent = False
-
-        info = lt_data.get(slug)
-        if info is not None and now is not None:
-            status, trace, fracs, last_change, recent = _row_state(
-                now,
-                info.dates,
-                change_dates[slug],
-                [v for _, v in info.drift],
-                retired=False,
-            )
-        elif view is not None and now is not None:
-            status, trace, fracs, last_change, recent = _b3it_row_state(
-                view, now, change_dates[slug]
-            )
+        status, trace, fracs, last_change, recent = _row_state(
+            now, _lanes(lt_data.get(slug), view), change_dates[slug]
+        )
 
         endpoint_recs.append(
             {
@@ -208,7 +210,7 @@ def build_overview(
         )
 
     drift_by_slug = {slug: d.drift for slug, d in lt_data.items()}
-    all_items = build_feed_items(changes, drift_by_slug, b3it_views, now) if now else []
+    all_items = build_feed_items(changes, drift_by_slug, b3it_views, now)
     lt_items = [i for i in all_items if i["method"] == "lt"][:FEED_LT_SIZE]
     b3it_items = [i for i in all_items if i["method"] == "b3it"][:FEED_B3IT_SIZE]
     feed = sorted(lt_items + b3it_items, key=lambda i: i["iso"], reverse=True)
@@ -216,7 +218,7 @@ def build_overview(
     # passes config.hero, and a pin that cannot resolve raises rather than blanking.
     hero = (
         build_hero(changes, drift_by_slug, b3it_views, now, hero_pin)
-        if now and hero_pin
+        if hero_pin
         else None
     )
 
@@ -235,8 +237,6 @@ def build_overview(
     )
 
     def _changes_in_window(lo_days: int, hi_days: int) -> int:
-        if now is None:
-            return 0
         return sum(
             1
             for c in changes
@@ -261,6 +261,7 @@ def build_overview(
     stats = {
         # the fleet we have ever tracked: everything the two chips below cover
         "endpoints": headlines["tracked"] + headlines["retired"],
+        "catalog_endpoints": len(endpoint_recs) + len(untracked_recs),
         "providers": len({r["provider"] for r in endpoint_recs}),
         "provider_companies": len(
             {base_provider(r["provider"]) for r in endpoint_recs}
@@ -283,12 +284,12 @@ def build_overview(
         ),
         "queries": sum(len(d.scores) * d.n_per_test for d in lt_data.values()),
         "since": (
-            min(d.dates[0] for d in lt_data.values()).strftime("%b %Y")
+            min(d.obs_dates[0] for d in lt_data.values()).strftime("%b %Y")
             if lt_data
             else None
         ),
         "spend_cumulative": round(sum(spend.get("cumulative", {}).values()), 2),
-        "now": now.strftime("%Y-%m-%d") if now else None,
+        "now": now.strftime("%Y-%m-%d"),
         # Absolute instants, not ages: overview.ts turns them into "14m ago" at
         # page load, so a stale build cannot claim to be fresh.
         "last_query_lt": latest(e.last_query_date for e in lt_endpoints),

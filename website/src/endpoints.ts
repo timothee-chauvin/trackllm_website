@@ -22,8 +22,9 @@ export async function init(): Promise<void> {
   const rows = DATA.endpoints;
 
   document.getElementById("lede")!.innerHTML =
-    `<b>${fmtInt(rows.length)} endpoints</b> in the catalog, ${fmtInt(S.active)} of them under active tracking` +
-    ` — <b style="color:var(--changed)">${fmtInt(S.changes_total)} changes</b> detected across ${S.changed_endpoints} of them.` +
+    `<b>${fmtInt(rows.length)} endpoints</b> in the OpenRouter catalog: ${fmtInt(S.endpoints)} monitored at some point,` +
+    ` ${fmtInt(S.active)} under active tracking` +
+    ` — <b style="color:var(--changed)">${fmtInt(S.changes_total)} changes</b> detected across ${S.changed_endpoints} endpoints.` +
     ` The status column says whether and why each is tracked.`;
 
   // provider pages only exist for providers with tracked endpoints; a row whose
