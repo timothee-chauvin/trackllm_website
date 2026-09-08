@@ -3,6 +3,7 @@
 import json
 import re
 import shutil
+from datetime import datetime, timezone
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -14,6 +15,7 @@ from trackllm_website.generate_site.render import render_site
 
 ATOM = "{http://www.w3.org/2005/Atom}"
 DATES = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 25)]
+NOW = datetime(2026, 6, 25, tzinfo=timezone.utc)  # the build clock, just after DATES
 CHANGE_DATE = "2026-06-20T00:00:00Z"
 
 
@@ -48,7 +50,7 @@ def _scaffold(website: Path) -> None:
 def site(tmp_path_factory) -> Path:
     root = tmp_path_factory.mktemp("site")
     _scaffold(root)
-    render_site(root, None, empty_status_inputs())
+    render_site(root, None, empty_status_inputs(), NOW)
     return root
 
 
@@ -57,10 +59,48 @@ def _md_links(text: str) -> list[str]:
 
 
 def test_every_html_page_has_a_markdown_twin(site: Path):
-    pages = [p for p in site.rglob("*.html") if "templates" not in p.parts]
+    # 404.html is served for every missing path: there is no page for a twin to mirror
+    pages = [
+        p
+        for p in site.rglob("*.html")
+        if "templates" not in p.parts and p.name != "404.html"
+    ]
     assert pages
     for html in pages:
         assert html.with_suffix(".md").exists(), html
+
+
+def test_404_page_has_no_twin_and_absolute_links(site: Path):
+    page = (site / "404.html").read_text()
+    assert not (site / "404.md").exists()
+    assert 'href="/endpoints.html"' in page and 'href="/style.css' in page
+    assert "markdown version" not in page
+
+
+def test_sitemap_lists_every_html_page_but_the_404(site: Path):
+    root = ET.parse(site / "sitemap.xml").getroot()
+    ns = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+    locs = {loc.text for loc in root.findall("s:url/s:loc", ns)}
+    pages = {
+        f"{SITE_URL}/{p.relative_to(site)}"
+        for p in site.rglob("*.html")
+        if "templates" not in p.parts and p.name != "404.html"
+    }
+    assert locs == pages
+    assert f"{SITE_URL}/404.html" not in locs
+
+
+def test_footer_names_each_json_by_what_it_is(site: Path):
+    endpoint = (site / "endpoints" / "m2fa23p.html").read_text()
+    assert ">model JSON</a>" in endpoint
+    assert "JSON 1" not in endpoint and "JSON 2" not in endpoint
+    assert ">overview JSON</a>" in (site / "index.html").read_text()
+
+
+def test_llms_txt_states_the_full_slug_rule(site: Path):
+    text = (site / "llms.txt").read_text()
+    assert "`:` → `3a`" in text and "`#` → `23`" in text and "`/` → `2f`" in text
+    assert "<model>#<provider>" in text
 
 
 def test_every_markdown_site_link_is_absolute_and_resolves(site: Path):
@@ -147,7 +187,7 @@ def test_stale_outputs_are_pruned(site: Path):
     stale_feed = site / "feeds" / "models" / "gone.xml"
     stale_md.write_text("x")
     stale_feed.write_text("x")
-    render_site(site, None, empty_status_inputs())
+    render_site(site, None, empty_status_inputs(), NOW)
     assert not stale_md.exists()
     assert not stale_feed.exists()
 

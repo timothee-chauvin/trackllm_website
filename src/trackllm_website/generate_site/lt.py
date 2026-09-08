@@ -186,6 +186,15 @@ class LTData:
     changes: list[dict]
     drift: list[tuple[datetime, float]]
 
+    @property
+    def obs_dates(self) -> list[datetime]:
+        """The days this endpoint was observed on. `dates` are the test statistic's
+        own instants, which start N_PER_TEST queries (about a day) after the first
+        observation and stop as early before the last; the drift series is one point
+        per observed day from the first. Falls back to `dates` for a series too
+        young to have a drift lane."""
+        return [d for d, _ in self.drift] or self.dates
+
 
 def load_lt_data(lt_dir: Path, slug: str) -> LTData | None:
     d = load_lt_scores(lt_dir, slug)
@@ -209,8 +218,3 @@ def load_all_lt_data(lt_dir: Path, slugs: Iterable[str]) -> dict[str, LTData]:
         if d is not None:
             out[slug] = d
     return out
-
-
-def latest_date(lt_data: dict[str, LTData]) -> datetime | None:
-    """The build's clock: the most recent observation across all LT endpoints."""
-    return max((d.dates[-1] for d in lt_data.values()), default=None)

@@ -9,7 +9,6 @@ from datetime import datetime
 from pathlib import Path
 
 from trackllm_website.generate_site.b3it import B3ITView
-from trackllm_website.generate_site.clock import site_now
 from trackllm_website.generate_site.feed import build_feed_items
 from trackllm_website.generate_site.lt import LTData
 
@@ -25,12 +24,13 @@ def build_changes_page(
     website_dir: Path,
     lt_data: dict[str, LTData],
     b3it_views: dict[str, B3ITView],
+    now: datetime,
 ) -> dict:
     data_dir = website_dir / "data"
 
     all_dates: list[str] = []
     for d in lt_data.values():
-        all_dates += [_day(d.dates[0]), _day(d.dates[-1])]
+        all_dates += [_day(d.obs_dates[0]), _day(d.obs_dates[-1])]
     for view in b3it_views.values():
         dates = view.tv_series["dates"]
         if dates:
@@ -39,9 +39,8 @@ def build_changes_page(
     changes_path = data_dir / "changes.json"
     changes = json.loads(changes_path.read_text()) if changes_path.exists() else []
 
-    now = site_now(lt_data, b3it_views)
     drift_by_slug = {slug: d.drift for slug, d in lt_data.items()}
-    items = build_feed_items(changes, drift_by_slug, b3it_views, now) if now else []
+    items = build_feed_items(changes, drift_by_slug, b3it_views, now)
 
     per_endpoint: dict[str, dict] = {}
     for item in items:  # items are newest first, so the first hit is the latest
@@ -78,7 +77,7 @@ def build_changes_page(
             "changes_30d": sum(1 for i in items if 0 <= i["daysAgo"] < RECENT_DAYS),
             "largest_lt_drift": max(lt_drifts, default=None),
             "since": min(all_dates) if all_dates else None,
-            "now": now.strftime("%Y-%m-%d") if now else None,
+            "now": now.strftime("%Y-%m-%d"),
         },
         "items": items,
         "top_endpoints": sorted(

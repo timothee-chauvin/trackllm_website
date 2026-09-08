@@ -267,7 +267,7 @@ def fake_site_feed_agreement(tmp_path):
     lt_data = load_all_lt_data(lt_dir, [e.slug for e in lt_endpoints])
     views = b3it_views_for(root)
     site = site_statuses_for(root, empty_status_inputs())
-    return build_overview(root, lt_data, lt_endpoints, views, None, site), changes
+    return build_overview(root, lt_data, lt_endpoints, views, None, site, NOW), changes
 
 
 def test_overview_feed_entries_come_from_changes_json(fake_site_feed_agreement):

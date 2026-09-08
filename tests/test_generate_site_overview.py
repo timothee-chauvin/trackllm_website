@@ -23,18 +23,22 @@ from trackllm_website.generate_site.overview import build_overview
 from trackllm_website.generate_site.status import STATUS_COPY
 from trackllm_website.util import slugify
 
+# The build clock: the fixtures' last observed day, so a same-day observation
+# reads as 0 days old and the age expectations below stay exact.
+NOW = datetime(2026, 6, 30, tzinfo=timezone.utc)
 
-def _build_overview_with(root: Path, inputs) -> dict:
+
+def _build_overview_with(root: Path, inputs, now: datetime) -> dict:
     lt_dir = root / "data" / "lt"
     lt_endpoints = list(discover_lt_endpoints(lt_dir)) if lt_dir.exists() else []
     lt_data = load_all_lt_data(lt_dir, [e.slug for e in lt_endpoints])
     b3it_views = b3it_views_for(root)
     site = site_statuses_for(root, inputs)
-    return build_overview(root, lt_data, lt_endpoints, b3it_views, None, site)
+    return build_overview(root, lt_data, lt_endpoints, b3it_views, None, site, now)
 
 
 def _build_overview(root: Path) -> dict:
-    return _build_overview_with(root, empty_status_inputs())
+    return _build_overview_with(root, empty_status_inputs(), NOW)
 
 
 def test_downsample_trace_caps_length():
@@ -163,8 +167,8 @@ def test_feed_lt_item_has_drift_level_and_conf(fake_site):
     assert lt_item["primary"] == "drift 1.4"  # level 1.5 after, 0.1 before
     assert lt_item["secondary"] == "40σ conf"
     assert lt_item["sevKey"] == "alert"
-    assert (
-        lt_item["desc"] == "Logprob averages moved 1.4 nats from baseline"
+    assert lt_item["desc"] == (
+        "Logprob averages moved 1.4 nats from baseline (40σ on the detection statistic)"
     )
     assert len(lt_item["trace"]) > 0
     assert lt_item["model"] == "a"
@@ -220,7 +224,7 @@ def test_b3it_only_retired_endpoint_gets_retired_status(tmp_path):
     inputs.endpoints_lt = [
         Endpoint(api="openrouter", model="m/a", provider="p", cost=(1, 2))
     ]
-    ov = _build_overview_with(root, inputs)
+    ov = _build_overview_with(root, inputs, NOW)
     ep = next(e for e in ov["endpoints"] if e["slug"] == "m2fb23q")
     assert ep["methods"] == ["b3it"]
     assert ep["status"] == "retired"
@@ -259,7 +263,7 @@ def test_a_monitored_endpoint_without_a_series_is_active(tmp_path):
 
     # its view carries no series, so tracked.py withholds it from the fleet
     site = site_statuses_for(root, empty_status_inputs())
-    ov = build_overview(root, {}, [], {}, None, site)
+    ov = build_overview(root, {}, [], {}, None, site, NOW)
     row = next(e for e in ov["endpoints"] if e["slug"] == slugify("m/b#q"))
     assert (row["headline"], row["status"]) == ("tracked", None)
     assert ov["stats"]["active"] == 1
@@ -354,14 +358,32 @@ def test_b3it_row_status_counts_an_epoch_closure_change(tmp_path):
     assert ep["lastChange"] == "2026-06-20"
 
 
-def test_now_spans_b3it_observations_newer_than_the_last_lt_one(tmp_path):
-    """The site clock is the newest observation of either method. Taking LT alone
-    dated a newer B3IT change in the future: a negative age on the feed, and a
-    change missing from the 30-day count."""
+def test_ages_are_measured_against_the_build_clock(tmp_path):
+    """The site clock is the build's own, not the newest observation: an endpoint
+    nobody has sampled for three weeks is retired even if it is the freshest one
+    the build has, and the "as of" date is the build day."""
     root = tmp_path / "website"
-    dates = [f"2026-05-{d:02d}T00:00:00Z" for d in range(1, 11)]
+    dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 11)]
     write_lt_endpoint(
         root, "m2fa23p", "m/a", "p", dates=dates, changes=[], drift=[0.1] * 10
+    )
+    (root / "data" / "changes.json").write_text(json.dumps([]))
+
+    now = datetime(2026, 7, 1, tzinfo=timezone.utc)
+    ov = _build_overview_with(root, empty_status_inputs(), now)
+    assert ov["stats"]["now"] == "2026-07-01"
+    row = next(e for e in ov["endpoints"] if e["slug"] == "m2fa23p")
+    assert row["status"] == "retired"
+
+
+def test_stalled_lt_endpoint_with_fresh_b3it_sampling_is_not_retired(tmp_path):
+    """The row's pill and the B3IT status line share a page: an endpoint whose LT
+    queries stopped weeks ago but whose border inputs are sampled daily is still
+    being watched, and must not read Retired above "B3IT: actively monitored"."""
+    root = tmp_path / "website"
+    old_dates = [f"2026-05-{d:02d}T00:00:00Z" for d in range(1, 11)]
+    write_lt_endpoint(
+        root, "m2fb23q", "m/b", "q", dates=old_dates, changes=[], drift=[0.1] * 10
     )
     write_b3it_series(
         root,
@@ -370,18 +392,15 @@ def test_now_spans_b3it_observations_newer_than_the_last_lt_one(tmp_path):
         status="monitoring",
         retired=None,
         month="2026-06",
-        tokens=["A"] * 12 + ["B"] * 12,
+        tokens=["A"] * 24,
     )
-    views = b3it_views_for(root)
-    (root / "data" / "changes.json").write_text(
-        json.dumps(to_json(merge_changes({}, {}, views)))
-    )
+    (root / "data" / "changes.json").write_text(json.dumps([]))
 
-    ov = _build_overview(root)
-    assert ov["stats"]["now"] == "2026-06-24"
-    (item,) = [f for f in ov["feed"] if f["method"] == "b3it"]
-    assert item["daysAgo"] >= 0
-    assert ov["stats"]["changes_30d"] == 1
+    now = datetime(2026, 6, 25, tzinfo=timezone.utc)
+    ov = _build_overview_with(root, empty_status_inputs(), now)
+    row = next(e for e in ov["endpoints"] if e["slug"] == "m2fb23q")
+    assert row["methods"] == ["lt", "b3it"]
+    assert (row["status"], row["lastChange"], row["recent"]) == ("stable", None, False)
 
 
 def test_endpoint_rows_carry_model_slug(fake_site):
@@ -443,6 +462,7 @@ def test_stats_last_query_is_none_for_a_method_with_no_data(fake_site):
 def test_stats_counts_match_endpoint_and_changes_lists(fake_site):
     ov = _build_overview(fake_site)
     assert ov["stats"]["endpoints"] == len(ov["endpoints"])
+    assert ov["stats"]["catalog_endpoints"] == len(ov["endpoints"])
     assert ov["stats"]["lt_endpoints"] == 1
     assert ov["stats"]["b3it_endpoints"] == 1
     assert ov["stats"]["spend_cumulative"] == 1.23
@@ -463,7 +483,7 @@ def test_untracked_catalog_endpoint_gets_a_row_with_reason(fake_site):
             api="openrouter", model="openai/gpt-5.4", provider="openai", cost=(1, 2)
         )
     )
-    ov = _build_overview_with(fake_site, inputs)
+    ov = _build_overview_with(fake_site, inputs, NOW)
     row = next(
         r for r in ov["endpoints"] if r["slug"] == slugify("openai/gpt-5.4#openai")
     )
@@ -473,8 +493,9 @@ def test_untracked_catalog_endpoint_gets_a_row_with_reason(fake_site):
     assert row["headline"] == "untrackable"
     assert (row["ltStatus"], row["biStatus"]) == ("no_logprobs", "bad_temperature")
     assert row["reason"] == STATUS_COPY["untrackable"]
-    # untracked rows do not join the tracked-fleet stats
+    # untracked rows do not join the tracked-fleet stats, only the catalog count
     assert ov["stats"]["endpoints"] == 1
+    assert ov["stats"]["catalog_endpoints"] == 2
 
 
 def test_tracked_rows_carry_status_fields(fake_site):
@@ -482,7 +503,7 @@ def test_tracked_rows_carry_status_fields(fake_site):
     inputs.endpoints_lt = [
         Endpoint(api="openrouter", model="m/a", provider="p", cost=(1, 2))
     ]
-    ov = _build_overview_with(fake_site, inputs)
+    ov = _build_overview_with(fake_site, inputs, NOW)
     row = next(r for r in ov["endpoints"] if r["slug"] == "m2fa23p")
     assert row["headline"] == "tracked"
     assert (row["ltStatus"], row["biStatus"]) == ("tracked", "monitoring")
@@ -529,6 +550,7 @@ def test_pinned_hero_reaches_overview_json(tmp_path):
         {},
         pin,
         site_statuses_for(root, empty_status_inputs()),
+        NOW,
     )
 
     hero = ov["hero"]
@@ -563,6 +585,7 @@ def test_stale_hero_pin_fails_the_build(tmp_path):
             {},
             pin,
             site_statuses_for(root, empty_status_inputs()),
+            NOW,
         )
 
 

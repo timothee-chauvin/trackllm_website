@@ -13,6 +13,8 @@ BI-too-expensive), and one derived headline summarizes the endpoint. All
 user-facing status text lives in STATUS_COPY; templates never invent wording.
 """
 
+import re
+from collections import Counter
 from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime
@@ -78,6 +80,56 @@ HEADLINE_ORDER = [
     "pending",
     "free_excluded",
 ]
+
+# api.py raises the first form on a query billed over config.api.max_cost_per_query
+# and vetting records the second; the caches store them verbatim, but a guard trip
+# is a budget decision, not an error.
+_GUARD_TRIP = re.compile(r"\$[\d.]+/query > \$[\d.]+/query guard|^too_expensive: \$")
+# A stored detail is a raw error string, often a JSON blob (nested and truncated).
+# The reader-facing detail is the innermost message it carries.
+_DETAIL_PREFIX = re.compile(r"^(error: |(plain|cached): |openrouter#\S+: )+")
+_HTTP_CODE = re.compile(r"^(\d{3}) |\"code\"\s*:\s*(\d{3})")
+_LEADING_CODE = re.compile(
+    r"^\d{1,3} "
+)  # "plain: 400 ...", or "plain: 0 ..." for no HTTP reply
+_TRACE_ID = re.compile(r"\s*trace_id:.*$")
+_JSON_MESSAGE = re.compile(r"\"(?:message|msg|raw)\"\s*:\s*\"([^\"{][^\"]*)\"")
+_UNICODE_ESCAPE = re.compile(r"\\u([0-9a-fA-F]{4})")
+_GENERIC_MESSAGES = frozenset({"Provider returned error"})
+_TIMEOUT = re.compile(r"^Timeout after [\d.]+s$")
+_NO_USAGE = re.compile(r"^No usage in response")
+DETAIL_MAX_CHARS = 120
+
+
+def is_guard_trip(detail: str | None) -> bool:
+    return bool(detail and _GUARD_TRIP.search(detail))
+
+
+def humanize_detail(detail: str | None) -> str | None:
+    """One readable line from a stored probe error, or None when there is none."""
+    if not detail:
+        return None
+    text = _DETAIL_PREFIX.sub("", detail.strip())
+    code_match = _HTTP_CODE.search(text)
+    code = next((c for c in code_match.groups() if c), None) if code_match else None
+    text = _LEADING_CODE.sub("", text)
+    if _TIMEOUT.match(text):
+        return "the request timed out"
+    if _NO_USAGE.match(text):
+        return "the response carried no usage or cost data"
+    # unescape the nested JSON strings providers wrap their errors in
+    while (flat := text.replace('\\"', '"').replace("\\n", " ")) != text:
+        text = flat
+    text = _UNICODE_ESCAPE.sub(lambda m: chr(int(m.group(1), 16)), text)
+    messages = [m for m in _JSON_MESSAGE.findall(text) if m not in _GENERIC_MESSAGES]
+    if messages:
+        text = messages[-1]
+    elif text.startswith("{") or text.startswith('"'):
+        text = "the provider returned an error"
+    text = " ".join(_TRACE_ID.sub("", text).replace("\\", "").split())
+    if len(text) > DETAIL_MAX_CHARS:
+        text = text[:DETAIL_MAX_CHARS].rsplit(" ", 1)[0] + "…"
+    return f"HTTP {code}: {text}" if code else text
 
 
 class CatalogEntry(BaseModel):
@@ -149,8 +201,24 @@ def headline_for(lt: str, bi: str) -> str:
 
 
 def dominant_headline(headlines: Iterable[str]) -> str:
-    """The strongest headline in the chain's priority order (a model-level badge)."""
-    return min(headlines, key=HEADLINE_ORDER.index)
+    """A model-level badge: tracked if any endpoint is, retired if any was, else
+    the reason most of its endpoints share (ties broken by the chain's order) --
+    one untrackable endpoint must not label a model whose other fifteen are
+    merely too expensive."""
+    counts = Counter(headlines)
+    for h in ("tracked", "retired"):
+        if counts[h]:
+            return h
+    return max(counts, key=lambda h: (counts[h], -HEADLINE_ORDER.index(h)))
+
+
+def headline_breakdown(headlines: Iterable[str]) -> str:
+    """Every headline with its count, most common first: "11 tracked · 7 retired"."""
+    counts = Counter(headlines)
+    ordered = sorted(
+        counts.items(), key=lambda kv: (-kv[1], HEADLINE_ORDER.index(kv[0]))
+    )
+    return " · ".join(f"{n} {h.replace('_', ' ')}" for h, n in ordered)
 
 
 def _headline_of(status: str) -> str | None:
@@ -216,7 +284,9 @@ def _lt_status(
             return "tracked", None
         return "stalled", None
     if slug in failure_by_slug:
-        return "probe_failed", failure_by_slug[slug]
+        if is_guard_trip(failure_by_slug[slug]):
+            return "too_expensive", None
+        return "probe_failed", humanize_detail(failure_by_slug[slug])
     if entry is not None:
         if entry.supports_logprobs is False:
             return "no_logprobs", None
@@ -281,8 +351,9 @@ def resolve_statuses(
     # liars processed last so they win, matching EndpointCache.bucket_of
     bucket_by_slug: dict[str, tuple[str, str | None]] = {
         _slug(entry.endpoint.model, entry.endpoint.provider): (
-            f"unprobeable:{entry.reason}",
-            entry.detail,
+            ("too_expensive", None)
+            if is_guard_trip(entry.detail)
+            else (f"unprobeable:{entry.reason}", humanize_detail(entry.detail))
         )
         for entry in bi_cache.unprobeable
     }

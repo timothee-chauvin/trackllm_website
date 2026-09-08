@@ -34,8 +34,8 @@
     </div>
     {{ paper_ref(LT_PAPER) }}
     <div class="panel">
-      <p class="prose">When logprobs are returned by the API provider, we can use this for extremely sensitive and cost-effective change detection. LT is a simple statistical test on the average value of each token logprob, requesting only a single token of output.</p>
-      <p class="prose">Logprobs are non-deterministic, because inference on GPUs is non-deterministic, but we can still basically track logprob averages and this works great. The test detects changes as small as <b>one step of fine-tuning</b>, and is more sensitive than existing methods while being <b>1,000x cheaper</b> — logprobs can be used to monitor for changes at extremely low cost, e.g. $0.14/year for hourly sampling of GPT-4.1.</p>
+      <p class="prose">When the API returns logprobs, they make for extremely sensitive and cost-effective change detection. LT is a simple statistical test on the average value of each token's logprob, requesting only a single token of output.</p>
+      <p class="prose">Logprobs are noisy, because inference on GPUs is non-deterministic, but their averages over a few dozen queries are stable enough to track. The test detects changes as small as <b>one step of fine-tuning</b>, and is more sensitive than existing methods while being <b>1,000x cheaper</b> — logprobs can be used to monitor for changes at extremely low cost, e.g. $0.14/year for hourly sampling of GPT-4.1.</p>
     </div>
   </section>
 
@@ -48,6 +48,23 @@
     <div class="panel">
       <p class="prose">Where logprobs aren't exposed, we operate in a strict black box, observing only output tokens. The first phase identifies <b>border inputs</b>: inputs for which sampling at T=0 doesn't always give the same output, i.e. for which there exists more than one output top token. They can easily be found just from black-box sampling, trying thousands of short inputs and keeping the border inputs. These inputs are then sampled repeatedly, to check whether the endpoint has moved away from its borders.</p>
       <p class="prose">Optimal change detection depends on the model's Jacobian and the Fisher information of the output distribution; analyzing these in low-temperature regimes shows that border inputs enable powerful change detection tests. B3IT performs <b>on par with the best available gray-box approaches</b> while reducing costs by <b>30x</b>.</p>
+    </div>
+  </section>
+
+  {# The numbers here are the pipeline's own: lt_scores.py (N_PER_TEST, the running
+     window, exclusion zone and both thresholds), lt_drift.py (REFERENCE_DAYS) and
+     config.toml [bi.detection] / [bi.reinit] / [bi.phase_2]. Keep them in step. #}
+  <section class="block" id="detection">
+    <div class="sec-head">
+      <h2>How a change is called</h2>
+      <span class="hint">the detection rules, baselines and thresholds behind every entry in the change log</span>
+    </div>
+    <div class="panel">
+      <p class="prose"><b><span class="lt">LT</span> — the test.</b> Every endpoint is queried around the clock with the same short prompts, asking for one output token and its top-k logprobs. At each point in the series, the <b>24 queries before</b> it are compared with the <b>24 after</b>: the statistic is the mean absolute difference between the two windows' average logprob vectors, in nats. Each statistic is then measured against the endpoint's own noise — the running mean and standard deviation of the <b>previous 100 statistics</b>, skipping the 48 most recent so a change never contaminates its own baseline. That standardized score is the <b>σ</b> shown beside LT changes.</p>
+      <p class="prose"><b>The rule.</b> A change is called at a peak of the score where <b>σ &gt; 12</b> and the raw statistic exceeds <b>1.0 nat</b>; peaks closer than 48 points count as one change. σ says how surprising the move was given the endpoint's usual jitter, not how far it went — a quiet endpoint can score dozens of σ on a shift that is behaviorally tiny.</p>
+      <p class="prose"><b>Drift, the line on the charts.</b> How far a day's average logprob vector sits from a <b>reference period</b>: the 14 days before the endpoint's first detected change, or its first 14 days if it never changed. Mean absolute difference over tokens, in nats; 0 while the endpoint matches its reference, elevated after a real change. The "drift reached" of a change is the drift level in the days that follow it, and it is what the feed and change log report as magnitude.</p>
+      <p class="prose"><b><span class="b3">B3IT</span> — the signal.</b> After discovery, the <b>20 most balanced border inputs</b> are kept and each is sampled <b>10 times a day</b>. The first batch after (re)initialization is the <b>reference</b>; every later day's vote distribution per input is compared with it by <b>total variation distance</b> (0–1), averaged over the inputs. That is the line on the charts.</p>
+      <p class="prose"><b>The rule.</b> A day deviates when its TV differs from a trailing baseline — the <b>14 days</b> before the last 4, which are excluded, with at least 5 days in it — by more than <b>0.2</b> and by more than <b>4 baseline standard deviations</b>. A change is called after <b>3 consecutive deviating days</b> and dated at the first of them; in an epoch's first 30 batches a permutation test (α = 0.005) looks for an earlier split, held to the same 0.2 yardstick. A detected change re-initializes the endpoint: new border inputs, new reference, a new epoch on the chart.</p>
     </div>
   </section>
 

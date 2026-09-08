@@ -7,7 +7,8 @@ import { type TimelineData, hasTimeline, renderTimeline } from "./timeline";
 interface ModelData extends TimelineData {
   model: string;
   org: string;
-  n_endpoints: number;
+  n_endpoints: number; // every endpoint with a series, retired ones included
+  n_active: number; // ... of which still tracked
   n_providers: number;
   n_endpoints_total: number;
   n_changed: number;
@@ -52,19 +53,23 @@ export async function init(): Promise<void> {
   if (ledeEl) {
     // n_endpoints counts serving endpoints, n_providers the companies behind them:
     // saying "providers" for the larger number would contradict the groups below.
+    // "monitored", not "tracked": the count keeps every endpoint with a series,
+    // and the retired ones are named as such right after it.
     ledeEl.innerHTML = tracked.length
       ? `Served by <b>${D.n_providers}</b> ${D.n_providers === 1 ? "provider" : "providers"}` +
-        ` on ${plural(D.n_endpoints, "tracked endpoint")}. ` +
+        ` on ${plural(D.n_endpoints, "monitored endpoint")}` +
+        ` (${D.n_active} actively tracked, ${D.n_endpoints - D.n_active} no longer). ` +
         `<span class="hl">${D.n_changed}</span> of those ${D.n_changed === 1 ? "shows" : "show"}` +
         ` at least one detected change since launch.` +
-        ` ${esc(D.status_summary)} across the catalog.`
-      : `This model is not tracked: ${esc(D.status_summary)}. Each endpoint below says why.`;
+        ` All ${D.n_endpoints_total} catalog endpoints by status: ${esc(D.status_summary)}.`
+      : `This model is not tracked (${plural(D.n_endpoints_total, "catalog endpoint")}: ${esc(D.status_summary)}). Each endpoint below says why.`;
   }
   const summaryEl = document.getElementById("summary");
   if (summaryEl) {
     summaryEl.innerHTML = tracked.length
       ? `
-      <div class="s"><div class="v">${D.n_endpoints}</div><div class="k">Endpoints</div></div>
+      <div class="s"><div class="v">${D.n_endpoints}</div><div class="k">Monitored endpoints</div></div>
+      <div class="s"><div class="v">${D.n_active}</div><div class="k">Actively tracked</div></div>
       <div class="s"><div class="v" style="color:var(--changed)">${D.n_changed}</div><div class="k">With changes</div></div>
       <div class="s"><div class="v">${D.changes.length}</div><div class="k">Changes total</div></div>
       <div class="s"><div class="v">${prettyDate(D.date_min)} – ${prettyDate(D.date_max)}</div><div class="k">Monitored</div></div>`

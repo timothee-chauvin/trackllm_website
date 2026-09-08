@@ -20,6 +20,9 @@ from trackllm_website.util import format_cost, format_price, slugify
 SITE_URL = "https://www.trackllm.net"
 CODE_REPO_URL = "https://github.com/timothee-chauvin/trackllm_website"
 DATA_REPO_URL = "https://github.com/timothee-chauvin/trackllm_data"
+# The characters util.slugify keeps as they are; everything else in a slug is that
+# character's two-digit hex code. llms.txt spells this out for agents.
+SLUG_KEPT_CHARS = "A-Z a-z 0-9 . _ - + = @ ~ ,"
 GLOBAL_FEED_CAP = 200
 # The front page's slices of the Providers and Endpoints pages: twins of
 # overview.ts::PLOT_SIZE / DIR_SIZE, so index.md shows the same rows index.html does.
@@ -37,6 +40,22 @@ _PAGE_DIRS = {
     "org": "orgs",
 }
 FEED_SCOPES = ("endpoint", "model", "provider", "org")
+# What a page's JSON link is called: by the directory the file lives in, else by
+# its name -- "JSON 1 · JSON 2" told a reader nothing.
+_JSON_LABELS = {
+    "models": "model JSON",
+    "providers": "provider JSON",
+    "b3it": "B3IT JSON",
+    "overview.json": "overview JSON",
+    "changes.json": "changes JSON",
+    "changes_page.json": "change log JSON",
+}
+
+
+def _json_link(path: str) -> dict:
+    parts = path.split("/")
+    label = _JSON_LABELS.get(parts[1]) or _JSON_LABELS.get(parts[-1]) or parts[-1]
+    return {"path": path, "label": label}
 
 
 def _scope_slugs(item: dict) -> dict[str, str]:
@@ -53,7 +72,8 @@ def links(kind: str, slug: str, json_paths: list[str]) -> dict:
 
     `kind` is a scope kind or a top-level page name ("index", "changes", ...).
     Top-level pages have no feed of their own except the index, which carries the
-    global feed.
+    global feed. The 404 page is served for every missing path, so it has no
+    markdown twin: there is no page for one to mirror.
     """
     if kind in _PAGE_DIRS:
         page = f"{_PAGE_DIRS[kind]}/{slug}"
@@ -68,11 +88,11 @@ def links(kind: str, slug: str, json_paths: list[str]) -> dict:
         subscribe_label = "Subscribe to all changes" if feed else None
     return {
         "html": f"{page}.html",
-        "md": f"{page}.md",
+        "md": None if kind == "404" else f"{page}.md",
         "feed": feed,
         "scope": scope,
         "subscribe_label": subscribe_label,
-        "json": json_paths,
+        "json": [_json_link(p) for p in json_paths],
     }
 
 
@@ -291,6 +311,7 @@ def render_markdown(
         SITE_URL=SITE_URL,
         CODE_REPO_URL=CODE_REPO_URL,
         DATA_REPO_URL=DATA_REPO_URL,
+        SLUG_KEPT_CHARS=SLUG_KEPT_CHARS,
         built_at=built_at.strftime("%Y-%m-%d %H:%M UTC"),
         FEED_CAP=GLOBAL_FEED_CAP,
         PLOT_PREVIEW=PLOT_PREVIEW,
@@ -377,6 +398,20 @@ def render_feeds(
         _write_dir(feeds_dir / _PAGE_DIRS[kind], ".xml", files)
         n += len(files)
     print(f"Generated {n} Atom feeds in feeds/")
+
+
+def render_sitemap(website_dir: Path, built_at: datetime, pages: list[str]) -> None:
+    """sitemap.xml over every HTML page, site-root-relative paths in."""
+    day = built_at.strftime("%Y-%m-%d")
+    urls = "\n".join(
+        f"  <url><loc>{SITE_URL}/{p}</loc><lastmod>{day}</lastmod></url>"
+        for p in sorted(pages)
+    )
+    (website_dir / "sitemap.xml").write_text(
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        f"{urls}\n</urlset>\n"
+    )
 
 
 def now_utc() -> datetime:

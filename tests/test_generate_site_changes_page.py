@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timezone
 
 import pytest
 
@@ -12,6 +13,9 @@ from trackllm_website.generate_site.changes_page import build_changes_page
 from trackllm_website.generate_site.lt import discover_lt_endpoints, load_all_lt_data
 
 TOP_N = 5
+# The build clock: the fixture's last observed day (a test that adds later
+# observations passes its own).
+NOW = datetime(2026, 6, 10, tzinfo=timezone.utc)
 
 
 @pytest.fixture
@@ -84,19 +88,15 @@ def fake_site_with_b3it(fake_site):
     return fake_site
 
 
-def _build(root):
+def _build(root, now: datetime):
     lt_dir = root / "data" / "lt"
     lt_endpoints = list(discover_lt_endpoints(lt_dir))
     lt_data = load_all_lt_data(lt_dir, [e.slug for e in lt_endpoints])
-    return build_changes_page(
-        root,
-        lt_data,
-        b3it_views_for(root),
-    )
+    return build_changes_page(root, lt_data, b3it_views_for(root), now)
 
 
 def test_every_change_appears_exactly_once(fake_site):
-    page = _build(fake_site)
+    page = _build(fake_site, NOW)
     assert len(page["items"]) == 3
     assert page["stats"]["total"] == 3
     assert page["stats"]["lt"] == 3
@@ -104,22 +104,22 @@ def test_every_change_appears_exactly_once(fake_site):
 
 
 def test_items_sorted_newest_first(fake_site):
-    dates = [i["date"] for i in _build(fake_site)["items"]]
+    dates = [i["date"] for i in _build(fake_site, NOW)["items"]]
     assert dates == sorted(dates, reverse=True)
 
 
 def test_top_endpoints_ranked_by_change_count(fake_site):
-    top = _build(fake_site)["top_endpoints"]
+    top = _build(fake_site, NOW)["top_endpoints"]
     assert len(top) <= TOP_N
     assert top[0]["slug"] == "a23p"
     assert top[0]["n"] == 2
     assert top[0]["last"] == max(
-        i["date"] for i in _build(fake_site)["items"] if i["slug"] == "a23p"
+        i["date"] for i in _build(fake_site, NOW)["items"] if i["slug"] == "a23p"
     )
 
 
 def test_stats_report_affected_endpoints_and_providers(fake_site):
-    stats = _build(fake_site)["stats"]
+    stats = _build(fake_site, NOW)["stats"]
     assert stats["endpoints_affected"] == 2
     assert stats["providers_involved"] == 2
     assert stats["largest_lt_drift"] == pytest.approx(1.39)  # level shift, not peak
@@ -143,14 +143,14 @@ def test_providers_involved_ignores_changes_with_no_provider(fake_site):
     )
     changes_path.write_text(json.dumps(changes))
 
-    stats = _build(fake_site)["stats"]
+    stats = _build(fake_site, NOW)["stats"]
     assert stats["total"] == 4
     assert stats["providers_involved"] == 2
 
 
-def test_changes_30d_spans_b3it_observations_newer_than_the_last_lt_one(fake_site):
-    """The window is measured against the newest observation of either method, so
-    a B3IT change after the last logprob observation is not dated in the future."""
+def test_changes_30d_counts_a_b3it_change_after_the_last_lt_observation(fake_site):
+    """The window is measured against the build clock, so a B3IT change after the
+    last logprob observation is neither dated in the future nor left out."""
     write_b3it_series(
         fake_site,
         "org/c",
@@ -175,7 +175,7 @@ def test_changes_30d_spans_b3it_observations_newer_than_the_last_lt_one(fake_sit
     )
     changes_path.write_text(json.dumps(changes))
 
-    page = _build(fake_site)
+    page = _build(fake_site, datetime(2026, 7, 24, tzinfo=timezone.utc))
     assert page["stats"]["now"] == "2026-07-24"
     assert min(i["daysAgo"] for i in page["items"]) >= 0
     assert page["stats"]["changes_30d"] == 1
@@ -200,13 +200,13 @@ def test_changes_30d_excludes_changes_dated_after_the_last_observation(fake_site
     )
     changes_path.write_text(json.dumps(changes))
 
-    page = _build(fake_site)
+    page = _build(fake_site, NOW)
     assert min(i["daysAgo"] for i in page["items"]) < 0
     assert page["stats"]["changes_30d"] == 1  # the 2026-06-23 one, not the future one
 
 
 def test_b3it_changes_are_counted_alongside_lt(fake_site_with_b3it):
-    page = _build(fake_site_with_b3it)
+    page = _build(fake_site_with_b3it, NOW)
     assert page["stats"]["total"] == 4
     assert page["stats"]["lt"] == 3
     assert page["stats"]["b3it"] == 1

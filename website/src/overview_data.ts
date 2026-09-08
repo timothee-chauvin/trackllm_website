@@ -7,6 +7,7 @@ export interface Stats {
   // headline counts, so they agree with the directory's status chips: `endpoints`
   // is the fleet we ever tracked (tracked + retired) and `active` its tracked half
   endpoints: number;
+  catalog_endpoints: number; // every row of the directory, series or not
   providers: number;
   provider_companies: number;
   models: number;

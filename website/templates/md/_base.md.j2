@@ -9,7 +9,7 @@
 - **Atom feed** of this page's detected changes: [{{ machine.feed }}]({{ nav_prefix }}{{ machine.feed }})
 {% endif %}
 {% if machine.json %}
-- **JSON** this page is rendered from: {% for j in machine.json %}[{{ j }}]({{ nav_prefix }}{{ j }}){{ " · " if not loop.last }}{% endfor %}
+- **JSON** this page is rendered from: {% for j in machine.json %}[{{ j.path }}]({{ nav_prefix }}{{ j.path }}) ({{ j.label }}){{ " · " if not loop.last }}{% endfor %}
 
 {% endif %}
 - **Raw data** (every collected response): {{ DATA_REPO_URL }} · Built {{ built_at }}

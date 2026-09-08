@@ -377,6 +377,7 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 .changes-tbl { width: 100%; border-collapse: collapse; }
 .changes-tbl th { text-align: left; font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-dim); font-weight: 600; padding: 0.6rem 1.1rem; border-bottom: 1px solid var(--border); }
 .changes-tbl th .tipline { text-transform: none; letter-spacing: normal; }
+.changes-tbl th .sym { text-transform: none; }  /* σ, not Σ */
 .changes-tbl th.r, .changes-tbl td.r { text-align: right; }
 .changes-tbl td { padding: 0.6rem 1.1rem; border-bottom: 1px solid var(--border-soft); font-size: 0.88rem; }
 .changes-tbl tr:last-child td { border-bottom: none; }
@@ -567,7 +568,8 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 .board > h3 { margin: 0; padding: 0.85rem 1.1rem 0.4rem; font-size: 0.95rem; font-weight: 620; letter-spacing: -0.01em; display: flex; align-items: baseline; gap: 0.55rem; }
 .board > h3 em { font-style: normal; font-family: var(--mono); font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; }
 .board > p { margin: 0; padding: 0 1.1rem 0.7rem; font-size: 0.79rem; color: var(--text-dim); }
-.brow { display: grid; grid-template-columns: 20px 128px 1fr 84px; align-items: center; gap: 0.7rem; padding: 0.42rem 1.1rem; border-top: 1px solid var(--border-soft); }
+/* the name column grows to its content (up to 40% of the row) before it truncates */
+.brow { display: grid; grid-template-columns: 20px minmax(128px, 40%) 1fr 84px; align-items: center; gap: 0.7rem; padding: 0.42rem 1.1rem; border-top: 1px solid var(--border-soft); }
 .brow:hover { background: var(--surface-2); }
 .brow .rk { font-family: var(--mono); font-size: 0.75rem; color: var(--text-dim); text-align: right; }
 .brow .pv { font-weight: 550; font-size: 0.87rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -626,8 +628,8 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 
 /* methodology page */
 .sec-head h2 .badge { margin-right: 0.5rem; vertical-align: 0.12em; }
-body.about .lede a, body.about .prose a, body.github .prose a { color: var(--accent); }
-body.about .lede a:hover, body.about .prose a:hover, body.github .prose a:hover { text-decoration: underline; }
+body.about .lede a, body.about .prose a, body.github .prose a, body.notfound .lede a, body.notfound .prose a { color: var(--accent); }
+body.about .lede a:hover, body.about .prose a:hover, body.github .prose a:hover, body.notfound .lede a:hover, body.notfound .prose a:hover { text-decoration: underline; }
 
 /* Institutional logos are drawn for white paper, so they sit on white in both themes. */
 .affil { display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap; margin-top: 1.6rem; }

@@ -2,7 +2,7 @@
 {% set S = overview.stats %}
 {{ b.header("All endpoints", machine, nav_prefix) }}
 {{ b.crumb([("Home", "index.md"), ("Endpoints", "")]) }}
-{{ overview.endpoints | length }} endpoints in the catalog, {{ S.active }} of them under active tracking — {{ S.changes_total }} changes detected across {{ S.changed_endpoints }} of them. `Status` says whether and why each is tracked. Sorted as the HTML directory: most changes first.
+{{ S.catalog_endpoints }} endpoints in the OpenRouter catalog: {{ S.endpoints }} monitored at some point, {{ S.active }} under active tracking — {{ S.changes_total }} changes detected across {{ S.changed_endpoints }} endpoints. `Status` says whether and why each is tracked. Sorted as the HTML directory: most changes first.
 
 {{ b.table(["Model", "Provider", "Org", "Status", "Changes", "Methods", "Last change"],
   overview.endpoints | map("dir_row", nav_prefix) | list) }}

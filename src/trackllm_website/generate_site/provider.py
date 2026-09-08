@@ -15,7 +15,6 @@ from pathlib import Path
 
 from trackllm_website.generate_site.b3it import B3ITView
 from trackllm_website.generate_site.brands import brand_json, load_brands
-from trackllm_website.generate_site.clock import site_now
 from trackllm_website.generate_site.feed import build_feed_items
 from trackllm_website.generate_site.lt import EndpointInfo, LTData
 from trackllm_website.generate_site.months import month_range
@@ -100,6 +99,7 @@ def build_provider_views(
     b3it_views: dict[str, B3ITView],
     endpoint_rows: list[dict],
     site: SiteStatuses,
+    now: datetime,
 ) -> dict[str, dict]:
     data_dir = website_dir / "data"
     lt_by_slug = {e.slug: e for e in lt_endpoints}
@@ -110,7 +110,8 @@ def build_provider_views(
     canonical = changes_by_slug(changes)
 
     lt_span = {
-        slug: (_day(d.dates[0]), _day(d.dates[-1])) for slug, d in lt_data.items()
+        slug: (_day(d.obs_dates[0]), _day(d.obs_dates[-1]))
+        for slug, d in lt_data.items()
     }
 
     b3it_span: dict[str, tuple[str, str]] = {}
@@ -119,9 +120,8 @@ def build_provider_views(
         if dates:
             b3it_span[slug] = (dates[0][:10], dates[-1][:10])
 
-    now = site_now(lt_data, b3it_views)
     drift_by_slug = {slug: d.drift for slug, d in lt_data.items()}
-    items = build_feed_items(changes, drift_by_slug, b3it_views, now) if now else []
+    items = build_feed_items(changes, drift_by_slug, b3it_views, now)
     # Only changes from endpoints still in the fleet. A departed endpoint brings
     # no exposure to divide its changes by, and its serving variant may have no
     # row at all: counting it there would mint a variant with 0 endpoints and 0
