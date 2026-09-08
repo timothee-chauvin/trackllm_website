@@ -95,6 +95,8 @@ emails when one fails.
 
 ## License
 
-Code: [AGPL-3.0-or-later](LICENSE). The collected data in
-[trackllm_data](https://github.com/timothee-chauvin/trackllm_data) is
-[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+Copyright (C) 2025-2026 Inria. Written by Timothée Chauvin.
+TrackLLM is free software under the [AGPL-3.0-or-later](LICENSE).
+
+The collected data in [trackllm_data](https://github.com/timothee-chauvin/trackllm_data)
+is [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
