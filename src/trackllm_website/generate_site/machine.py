@@ -18,6 +18,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from trackllm_website.util import format_cost, format_price, slugify
 
 SITE_URL = "https://www.trackllm.net"
+CODE_REPO_URL = "https://github.com/timothee-chauvin/trackllm_website"
 DATA_REPO_URL = "https://github.com/timothee-chauvin/trackllm_data"
 GLOBAL_FEED_CAP = 200
 # The front page's slices of the Providers and Endpoints pages: twins of
@@ -288,6 +289,7 @@ def render_markdown(
     env = _md_env(website_dir / "templates")
     env.globals.update(
         SITE_URL=SITE_URL,
+        CODE_REPO_URL=CODE_REPO_URL,
         DATA_REPO_URL=DATA_REPO_URL,
         built_at=built_at.strftime("%Y-%m-%d %H:%M UTC"),
         FEED_CAP=GLOBAL_FEED_CAP,

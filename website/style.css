@@ -203,7 +203,7 @@ h1.title em { font-style: normal; color: var(--accent); }
 @media (max-width: 860px) { .telemetry { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 460px) { .telemetry { grid-template-columns: 1fr; } }
 
-section.block { padding: 2.6rem 0 0.6rem; }
+section.block { padding: 2.6rem 0 0.6rem; scroll-margin-top: var(--nav-h); }
 .sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 1.1rem; flex-wrap: wrap; }
 .sec-head h2 { font-size: 1.18rem; font-weight: 640; letter-spacing: -0.015em; margin: 0; }
 .sec-head .hint { color: var(--text-dim); font-size: 0.82rem; flex: 1; min-width: 220px; }

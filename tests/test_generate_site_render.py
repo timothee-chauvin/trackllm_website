@@ -15,6 +15,7 @@ from conftest import (
     write_month_dir,
 )
 from trackllm_website.config import Endpoint
+from trackllm_website.generate_site.machine import CODE_REPO_URL, DATA_REPO_URL
 from trackllm_website.generate_site.papers import PAPERS
 from trackllm_website.generate_site.render import render_site
 from trackllm_website.update_endpoints import LTFailure, LTFailureCache
@@ -291,8 +292,13 @@ def test_render_emits_about_page_and_front_page_logos(tmp_path):
     page = (tmp_path / "about.html").read_text()
     assert 'href="https://tchauvin.com"' in page
     assert "INESIA" in page
+    assert 'id="github"' in page
+    for url in (CODE_REPO_URL, DATA_REPO_URL):
+        assert f'href="{url}"' in page
     index = (tmp_path / "index.html").read_text()
     assert 'href="about.html"' in index
+    # nav and footer both point at the About page's GitHub section
+    assert index.count('href="about.html#github">GitHub</a>') == 2
     for logo in ("inria", "irisa", "cnrs"):
         assert f'src="logos/{logo}.' in index
         assert f'src="logos/{logo}.' in page

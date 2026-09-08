@@ -81,6 +81,8 @@ def render_site(
     env.globals["STATUS_COPY"] = STATUS_COPY
     env.globals["PAPERS"] = PAPERS
     env.globals["SITE_URL"] = machine_mod.SITE_URL
+    env.globals["CODE_REPO_URL"] = machine_mod.CODE_REPO_URL
+    env.globals["DATA_REPO_URL"] = machine_mod.DATA_REPO_URL
     # Cache busting: GitHub Pages serves with max-age=600, so without this a
     # visitor loading freshly deployed HTML keeps rendering it against a stale
     # cached stylesheet or entrypoint for up to 10 minutes. bun's shared chunks
