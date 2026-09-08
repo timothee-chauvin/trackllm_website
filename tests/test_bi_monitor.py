@@ -63,6 +63,25 @@ def test_scan_split_below_tv_threshold_is_not_a_change(monkeypatch):
     assert decision.action == "none"
 
 
+def test_suppressed_scan_split_is_logged(monkeypatch, caplog):
+    # "none" after a suppressed split must be distinguishable in the run log
+    # from a scan that found nothing.
+    import logging
+
+    from trackllm_website.bi.scan import ScanEvent
+
+    state, results = open_state_from_fixture("openai2fgpt-4o-mini23azure")
+    split = sorted({ts for b in results.values() for ts in b})[3]
+    monkeypatch.setattr(
+        monitor_mod,
+        "changepoint_scan",
+        lambda *_: ScanEvent(split_ts=split, p_value=0.001),
+    )
+    with caplog.at_level(logging.INFO, logger="trackllm-website"):
+        decide(state, results, datetime(2026, 2, 15, tzinfo=timezone.utc))
+    assert any("suppressed" in r.message for r in caplog.records)
+
+
 def test_stable_endpoint_no_action():
     state, results = open_state_from_fixture("openai2fgpt-4o-mini23azure")
     decision = decide(state, results, datetime(2026, 2, 15, tzinfo=timezone.utc))

@@ -118,11 +118,17 @@ def decide(state: EndpointBIState, results: dict, now: datetime) -> Decision:
     # baseline, then absorbs whatever level it finds); the changepoint scan
     # covers that window.
     scan_event = changepoint_scan(epoch_results)
-    if scan_event is not None and scan_clears_tv_threshold(tv, scan_event):
-        return Decision(
-            action="reinit",
-            change_date=datetime.fromisoformat(scan_event.split_ts),
-            detector="scan",
+    if scan_event is not None:
+        if scan_clears_tv_threshold(tv, scan_event):
+            return Decision(
+                action="reinit",
+                change_date=datetime.fromisoformat(scan_event.split_ts),
+                detector="scan",
+            )
+        # Otherwise "none" would be indistinguishable from "scan found nothing".
+        logger.info(
+            f"{state.endpoint}: scan split at {scan_event.split_ts} "
+            f"(p={scan_event.p_value}) suppressed: TV shift under abs_delta"
         )
     return Decision(action="none")
 
