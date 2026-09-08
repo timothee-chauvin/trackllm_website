@@ -8,6 +8,7 @@ __pycache__
 /website/endpoints.html
 /website/methodology.html
 /website/about.html
+/website/github.html
 /website/*.md
 /website/llms.txt
 /website/feeds/

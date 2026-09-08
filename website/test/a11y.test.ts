@@ -286,6 +286,7 @@ describe("navigation", () => {
       ["providers.html", "providers.html"],
       ["endpoints.html", "endpoints.html"],
       ["methodology.html", "methodology.html"],
+      ["github.html", "github.html"],
       ["about.html", "about.html"],
     ];
     for (const [page, href] of cases) {

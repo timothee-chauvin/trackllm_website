@@ -30,8 +30,9 @@
             {% for page, label in [('changes', 'Changes'), ('providers', 'Providers'), ('endpoints', 'Endpoints'), ('methodology', 'Methodology')] %}
             <a href="{{ nav_prefix }}{{ page }}.html"{% if body_class == page %} class="active" aria-current="page"{% endif %}>{{ label }}</a>
             {% endfor %}
-            <a href="https://github.com/timothee-chauvin/trackllm_website" target="_blank" rel="noopener">GitHub</a>
-            <a href="{{ nav_prefix }}about.html"{% if body_class == 'about' %} class="active" aria-current="page"{% endif %}>About</a>
+            {% for page, label in [('github', 'GitHub'), ('about', 'About')] %}
+            <a href="{{ nav_prefix }}{{ page }}.html"{% if body_class == page %} class="active" aria-current="page"{% endif %}>{{ label }}</a>
+            {% endfor %}
         </div>
         <div class="nav-right">
             <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle color theme"></button>
@@ -43,7 +44,7 @@
         <footer class="site">
             {% block footer %}
             <span>Data collected via the OpenRouter API.{% for j in machine.json %} · <a href="{{ nav_prefix }}{{ j }}">JSON{{ "" if loop.length == 1 else " " ~ loop.index }}</a>{% endfor %}</span>
-            <span>{% if machine.feed %}<a href="{{ nav_prefix }}{{ machine.feed }}" type="application/atom+xml" data-goatcounter-click="subscribe/{{ machine.scope }}">{{ machine.subscribe_label }} {{ rss_icon() }}</a> · {% endif %}<a href="{{ nav_prefix }}methodology.html">Methodology</a> · <a href="https://github.com/timothee-chauvin/trackllm_website">GitHub</a> · <a href="{{ nav_prefix }}about.html">About</a></span>
+            <span>{% if machine.feed %}<a href="{{ nav_prefix }}{{ machine.feed }}" type="application/atom+xml" data-goatcounter-click="subscribe/{{ machine.scope }}">{{ machine.subscribe_label }} {{ rss_icon() }}</a> · {% endif %}<a href="{{ nav_prefix }}methodology.html">Methodology</a> · <a href="{{ nav_prefix }}github.html">GitHub</a> · <a href="{{ nav_prefix }}about.html">About</a></span>
             {% endblock %}
             {# Visible text on purpose: HTML-to-text converters -- what agents
                read -- drop attributes, so a <link rel=alternate> alone never

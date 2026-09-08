@@ -81,6 +81,8 @@ def render_site(
     env.globals["STATUS_COPY"] = STATUS_COPY
     env.globals["PAPERS"] = PAPERS
     env.globals["SITE_URL"] = machine_mod.SITE_URL
+    env.globals["CODE_REPO_URL"] = machine_mod.CODE_REPO_URL
+    env.globals["DATA_REPO_URL"] = machine_mod.DATA_REPO_URL
     # Cache busting: GitHub Pages serves with max-age=600, so without this a
     # visitor loading freshly deployed HTML keeps rendering it against a stale
     # cached stylesheet or entrypoint for up to 10 minutes. bun's shared chunks
@@ -93,8 +95,6 @@ def render_site(
     provider_template = env.get_template("provider.html.j2")
     org_template = env.get_template("org.html.j2")
     changes_template = env.get_template("changes.html.j2")
-    methodology_template = env.get_template("methodology.html.j2")
-    about_template = env.get_template("about.html.j2")
 
     # Every page's render context is kept: machine.py renders the .md twin from
     # the same context, so the two can never show different data.
@@ -219,28 +219,15 @@ def render_site(
     )
     print("Generated changes.html")
 
-    (website_dir / "methodology.html").write_text(
-        methodology_template.render(
-            **page(
-                "methodology",
-                "",
-                [],
-                css_path="style.css",
-                body_class="methodology",
-                nav_prefix="",
+    for name in ("methodology", "about", "github"):
+        (website_dir / f"{name}.html").write_text(
+            env.get_template(f"{name}.html.j2").render(
+                **page(
+                    name, "", [], css_path="style.css", body_class=name, nav_prefix=""
+                )
             )
         )
-    )
-    print("Generated methodology.html")
-
-    (website_dir / "about.html").write_text(
-        about_template.render(
-            **page(
-                "about", "", [], css_path="style.css", body_class="about", nav_prefix=""
-            )
-        )
-    )
-    print("Generated about.html")
+        print(f"Generated {name}.html")
 
     model_views = model_mod.build_model_views(website_dir, endpoints, b3it_views, site)
     write_json_dir(website_dir / "data" / "models", model_views)

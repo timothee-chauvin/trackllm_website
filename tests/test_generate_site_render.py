@@ -15,6 +15,7 @@ from conftest import (
     write_month_dir,
 )
 from trackllm_website.config import Endpoint
+from trackllm_website.generate_site.machine import CODE_REPO_URL, DATA_REPO_URL
 from trackllm_website.generate_site.papers import PAPERS
 from trackllm_website.generate_site.render import render_site
 from trackllm_website.update_endpoints import LTFailure, LTFailureCache
@@ -239,7 +240,7 @@ def test_nav_marks_only_the_current_page(tmp_path):
     with no nav entry of its own (the Overview) marks none."""
     _scaffold(tmp_path)
     render_site(tmp_path, None, empty_status_inputs())
-    for page in ("changes", "methodology", "about"):
+    for page in ("changes", "methodology", "github", "about"):
         html = (tmp_path / f"{page}.html").read_text()
         assert f'<a href="{page}.html" class="active" aria-current="page">' in html
         assert html.count("aria-current") == 1
@@ -291,8 +292,15 @@ def test_render_emits_about_page_and_front_page_logos(tmp_path):
     page = (tmp_path / "about.html").read_text()
     assert 'href="https://tchauvin.com"' in page
     assert "INESIA" in page
+    assert 'id="github"' in page
+    github = (tmp_path / "github.html").read_text()
+    for url in (CODE_REPO_URL, DATA_REPO_URL):
+        assert f'href="{url}"' in page
+        assert f'href="{url}"' in github
     index = (tmp_path / "index.html").read_text()
     assert 'href="about.html"' in index
+    # nav and footer both point at the GitHub page
+    assert index.count('href="github.html">GitHub</a>') == 2
     for logo in ("inria", "irisa", "cnrs"):
         assert f'src="logos/{logo}.' in index
         assert f'src="logos/{logo}.' in page
