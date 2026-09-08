@@ -159,11 +159,11 @@ def test_render_emits_spend(tmp_path):
     assert "$0.050" in spend_section
     assert "LT" in spend_section
     # the first ledger day is in the hint, not a stat tile
-    assert "Only tracked since 2026-06-24</span>" in spend_section
+    assert "Spend recorded since 2026-06-24</span>" in spend_section
     assert ">Since<" not in spend_section
     assert "border-input search; <b>B3IT (monitoring)</b>" in spend_section
     md = (tmp_path / "endpoints" / "m2fa23p.md").read_text()
-    assert "Only tracked since 2026-06-24." in md
+    assert "Spend recorded since 2026-06-24." in md
 
     # Zero-billed: still a spend section (total + LT line read $0.00), but no
     # share bar, which would have nothing to divide by

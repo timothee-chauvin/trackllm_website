@@ -79,7 +79,7 @@
 
   {% if spend %}
   <section class="block">
-    <div class="sec-head"><h2>Spend</h2><span class="hint">what OpenRouter billed for tracking this endpoint. Only tracked since {{ spend.since }}</span></div>
+    <div class="sec-head"><h2>Spend</h2><span class="hint">what OpenRouter billed for tracking this endpoint. Spend recorded since {{ spend.since }}</span></div>
     <div class="panel">
       <div class="spend-stats">
         <div><div class="k">Total to date</div><div class="v">${{ spend.total|fmt_cost }}</div></div>

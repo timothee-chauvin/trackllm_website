@@ -53,7 +53,7 @@ From the OpenRouter catalog snapshot.
 {% if spend %}
 ## Spend
 
-What OpenRouter billed for tracking this endpoint. Only tracked since {{ spend.since }}.
+What OpenRouter billed for tracking this endpoint. Spend recorded since {{ spend.since }}.
 
 {{ b.table(["Total to date", "Last 30 days", "Queries"],
   [("$" ~ (spend.total | fmt_cost), "$" ~ (spend.last_30d | fmt_cost), spend.n_queries)]) }}
