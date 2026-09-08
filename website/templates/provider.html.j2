@@ -31,19 +31,6 @@
 
   <section class="block">
     <div class="sec-head">
-      <h2>Monitoring &amp; changes over time</h2>
-      <span class="hint">the gray area is how many endpoints were under monitoring each month &mdash; the exposure the rate divides by; dots are detected changes, sized by how far the endpoint moved</span>
-    </div>
-    <div class="panel" id="timeline"></div>
-    <div class="legend">
-      <span class="k"><i class="bar" style="background:var(--text-dim);opacity:0.4"></i> endpoints under monitoring</span>
-      <span class="k"><i style="background:var(--accent)"></i> LT change (size = drift in nats)</span>
-      <span class="k"><i style="background:var(--b3it)"></i> B3IT change (size = peak TV)</span>
-    </div>
-  </section>
-
-  <section class="block">
-    <div class="sec-head">
       <h2>Serving variants</h2>
       <span class="hint">a provider's quantizations are separate serving stacks and drift separately</span>
     </div>
@@ -62,8 +49,7 @@
       {{ search_box("epq", "Search model or org…", "Search this provider's endpoints by model or org") }}
       <div class="chips" id="epChips">
         {{ chip("Ever changed", "f", "changed") }}
-        {{ chip("Retired", "f", "retired") }}
-        {{ chip("B3IT", "f", "b3it") }}
+        {{ chip("Tracked", "f", "tracked") }}
       </div>
     </div>
     <div class="table-wrap"><div class="table-scroll"><table class="dir">

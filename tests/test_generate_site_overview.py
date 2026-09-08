@@ -226,7 +226,7 @@ def test_feed_is_the_head_of_the_merged_change_list(tmp_path):
     lt_dir = root / "data" / "lt"
     lt_data = load_all_lt_data(lt_dir, ["m2fa23p"])
     drift_by_slug = {slug: d.drift for slug, d in lt_data.items()}
-    merged = build_feed_items(changes, drift_by_slug, views, NOW)
+    merged = build_feed_items(changes, drift_by_slug, views, {}, NOW)
     assert len(merged) > FEED_SIZE
     assert ov["feed"] == merged[:FEED_SIZE]
     assert {i["method"] for i in ov["feed"]} == {"lt"}

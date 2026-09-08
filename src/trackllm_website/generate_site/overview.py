@@ -14,6 +14,7 @@ from pathlib import Path
 
 from trackllm_website.config import HeroConfig
 from trackllm_website.generate_site.b3it import B3ITView
+from trackllm_website.generate_site.brands import load_brands
 from trackllm_website.generate_site.feed import (
     TRACE_LEN,
     build_feed_items,
@@ -223,7 +224,9 @@ def build_overview(
     drift_by_slug = {slug: d.drift for slug, d in lt_data.items()}
     # The newest FEED_SIZE of the same merged list changes_page.py publishes, so
     # the front page's "Latest changes" is exactly the head of /changes.
-    feed = build_feed_items(changes, drift_by_slug, b3it_views, now)[:FEED_SIZE]
+    feed = build_feed_items(
+        changes, drift_by_slug, b3it_views, load_brands(website_dir), now
+    )[:FEED_SIZE]
     # None only where a caller has no hero to draw (fixtures); the site build always
     # passes config.hero, and a pin that cannot resolve raises rather than blanking.
     hero = (

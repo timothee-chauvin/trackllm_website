@@ -17,7 +17,6 @@ from trackllm_website.generate_site.b3it import B3ITView
 from trackllm_website.generate_site.brands import brand_json, load_brands
 from trackllm_website.generate_site.feed import build_feed_items
 from trackllm_website.generate_site.lt import EndpointInfo, LTData
-from trackllm_website.generate_site.months import month_range
 from trackllm_website.generate_site.naming import base_provider, variant_name
 from trackllm_website.generate_site.rates import drift_rate, poisson_interval
 from trackllm_website.generate_site.status_io import SiteStatuses
@@ -121,7 +120,7 @@ def build_provider_views(
             b3it_span[slug] = (dates[0][:10], dates[-1][:10])
 
     drift_by_slug = {slug: d.drift for slug, d in lt_data.items()}
-    items = build_feed_items(changes, drift_by_slug, b3it_views, now)
+    items = build_feed_items(changes, drift_by_slug, b3it_views, brands, now)
     # Only changes from endpoints still in the fleet. A departed endpoint brings
     # no exposure to divide its changes by, and its serving variant may have no
     # row at all: counting it there would mint a variant with 0 endpoints and 0
@@ -166,7 +165,6 @@ def build_provider_views(
         spans = [s for acc in accs for s in acc.spans]
         first = min((s[0] for s in spans), default=None)
         last = max((s[1] for s in spans), default=None)
-        months = month_range(first, last) if first and last else []
         slugs = {s for acc in accs for s in acc.slugs}
 
         variant_out = [
@@ -175,10 +173,6 @@ def build_provider_views(
                 "n_endpoints": len(acc.slugs),
                 "lt": acc.block("lt"),
                 "b3it": acc.block("b3it"),
-                "monitoring": [
-                    sum(1 for lo, hi in acc.spans if lo[:7] <= m <= hi[:7])
-                    for m in months
-                ],
             }
             for name, acc in sorted(
                 variants.items(), key=lambda kv: (-len(kv[1].slugs), kv[0])
@@ -210,7 +204,6 @@ def build_provider_views(
             "n_variants": len(variants),
             "first": first,
             "last": last,
-            "months": months,
             "lt": _total_block(accs, "lt"),
             "b3it": _total_block(accs, "b3it"),
             "variants": variant_out,

@@ -197,13 +197,26 @@ export function untrackedDirCells(
 /** A provider's logo and name, as the Jinja macro brand_title draws it (twins).
  *  `root` is the page's prefix back to the site root ("" or "../"). The name is
  *  always written out: a wordmark logo is only sized differently. */
-export function brandHtml(b: { name: string; logo: string | null; kind: string; mono: boolean; dark: string | null }, root: string): string {
+export interface Brand {
+  name: string;
+  logo: string | null;
+  kind: "icon" | "wordmark";
+  mono: boolean; // a flat dark mark: inverted in the dark theme
+  dark: string | null; // a light-on-dark variant, shown in the dark theme instead
+}
+
+export function brandHtml(b: Brand, root: string): string {
   if (!b.logo) return `<span class="pbrand">${esc(b.name)}</span>`;
   const cls = `${b.kind === "wordmark" ? "brand-wordmark" : "brand-logo"}${b.mono ? " mono" : ""}`;
   const img = (file: string, theme: string): string =>
     `<img class="${cls} ${theme}" src="${root}logos/providers/${esc(file)}" alt="" loading="lazy">`;
   const logos = b.dark ? img(b.logo, "logo-light") + img(b.dark, "logo-dark") : img(b.logo, "");
   return `<span class="pbrand">${logos}${esc(b.name)}</span>`;
+}
+
+/** "<logo> Atlas Cloud (fp8)": the serving company as the endpoint head names it. */
+export function providerLabel(brand: Brand, variant: string, root: string): string {
+  return brandHtml(brand, root) + (variant ? ` (${esc(variant)})` : "");
 }
 
 export function methodBadges(methods: string[]): string {
@@ -657,6 +670,8 @@ export interface FeedItem {
   modelSlug: string;
   provider: string;
   providerSlug: string;
+  brand: Brand;
+  variant: string;
   method: "lt" | "b3it";
   desc: string;
   primary: string;
@@ -674,9 +689,10 @@ export function eventRow(e: FeedItem, now = Date.now()): string {
   const isLT = e.method === "lt";
   const color = isLT ? "var(--accent)" : "var(--b3it)";
   // no endpointSlug: the endpoint has left the fleet and no page was generated for
-  // it (feed.py leaves its page slugs empty), so the name is text, not a 404 link
-  const names = `<span class="model">${esc(e.model)}</span>
-        <span class="at">served by ${esc(e.provider)}</span>`;
+  // it (feed.py leaves its page slugs empty and its brand nameless), so the name is
+  // text, not a 404 link, and no company is named
+  const names = `<span class="model">${esc(e.model)}</span>` +
+    (e.brand.name ? ` <span class="at">served by ${providerLabel(e.brand, e.variant, "")}</span>` : "");
   return `<div class="event">
     <div class="when" title="${esc(e.date)} · ${relDays(e.daysAgo)}">${shortDate(e.date, now)}</div>
     <div class="what">

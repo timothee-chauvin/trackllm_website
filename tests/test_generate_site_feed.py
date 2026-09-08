@@ -67,7 +67,7 @@ def test_lt_item_carries_drift_magnitude_and_link_slugs():
             "magnitude": 1.1,
         }
     ]
-    items = build_feed_items(changes, {"m2fa23p": _drift(20, 14)}, {}, NOW)
+    items = build_feed_items(changes, {"m2fa23p": _drift(20, 14)}, {}, {}, NOW)
     (item,) = items
     assert item["method"] == "lt"
     assert item["magnitude"] == 1.1  # level 1.2 after, 0.1 before
@@ -92,7 +92,7 @@ def test_lt_item_without_drift_series():
             "magnitude": None,
         }
     ]
-    (item,) = build_feed_items(changes, {}, {}, NOW)
+    (item,) = build_feed_items(changes, {}, {}, {}, NOW)
     assert item["magnitude"] is None
     assert item["primary"] == "shift —"
     assert item["sevKey"] == "stable"
@@ -110,7 +110,7 @@ def test_b3it_item_uses_the_level_shift_from_the_view():
             "magnitude": None,
         }
     ]
-    items = build_feed_items(changes, {}, {"s1": _b3it_view("s1")}, NOW)
+    items = build_feed_items(changes, {}, {"s1": _b3it_view("s1")}, {}, NOW)
     (item,) = items
     assert item["method"] == "b3it"
     assert item["magnitude"] == 0.75  # the view's change_mags level shift
@@ -134,7 +134,7 @@ def test_change_frac_lands_on_the_drawn_point():
     # one point-width early (visible as a rule left of the peak it dates).
     view = _b3it_view("s1")
     (item,) = build_feed_items(
-        [_b3it_change(view.tv_series["dates"][-1])], {}, {"s1": view}, NOW
+        [_b3it_change(view.tv_series["dates"][-1])], {}, {"s1": view}, {}, NOW
     )
     assert item["changeFrac"] == 1.0
 
@@ -148,7 +148,7 @@ def test_change_frac_lands_on_the_drawn_point_after_downsampling():
         "values": [0.05] * 99 + [0.8],
     }
     (item,) = build_feed_items(
-        [_b3it_change(view.tv_series["dates"][-1])], {}, {"s1": view}, NOW
+        [_b3it_change(view.tv_series["dates"][-1])], {}, {"s1": view}, {}, NOW
     )
     assert len(item["trace"]) == 40
     assert item["changeFrac"] == 1.0
@@ -167,7 +167,7 @@ def test_b3it_item_without_a_view_reports_no_magnitude():
             "magnitude": None,
         }
     ]
-    (item,) = build_feed_items(changes, {}, {}, NOW)
+    (item,) = build_feed_items(changes, {}, {}, {}, NOW)
     assert item["magnitude"] is None
     assert item["primary"] == "TV —"
     assert "(total variation —)" in item["desc"]
@@ -188,7 +188,7 @@ def test_change_without_a_fleet_entry_gets_no_page_slugs():
             "magnitude": 5.0,
         }
     ]
-    (item,) = build_feed_items(changes, {}, {}, NOW)
+    (item,) = build_feed_items(changes, {}, {}, {}, NOW)
     assert item["modelSlug"] == ""
     assert item["providerSlug"] == ""
     assert item["endpointSlug"] == ""
@@ -208,7 +208,7 @@ def test_unrecognised_method_raises():
         }
     ]
     with pytest.raises(ValueError, match="SOMETHING_NEW"):
-        build_feed_items(changes, {}, {}, NOW)
+        build_feed_items(changes, {}, {}, {}, NOW)
 
 
 def test_items_sorted_newest_first():
@@ -223,7 +223,7 @@ def test_items_sorted_newest_first():
         }
         for d in (3, 20, 11)
     ]
-    items = build_feed_items(changes, {"m2fa23p": _drift(20, 14)}, {}, NOW)
+    items = build_feed_items(changes, {"m2fa23p": _drift(20, 14)}, {}, {}, NOW)
     assert [i["date"] for i in items] == ["2026-06-20", "2026-06-11", "2026-06-03"]
 
 
@@ -268,3 +268,36 @@ def test_overview_feed_entries_come_from_changes_json(fake_site_feed_agreement):
     assert ov["feed"], "no feed to compare against"
     for item in ov["feed"]:
         assert (item["date"], item["slug"], item["method"]) in canonical
+
+
+def test_item_names_the_serving_company_by_brand_and_variant():
+    from trackllm_website.generate_site.brands import Brand
+
+    changes = [
+        {
+            "date": "2026-06-15T00:00:00Z",
+            "slug": "m2fa23p",
+            "model": "org/model-x",
+            "provider": "atlas-cloud/fp8",
+            "method": "LT",
+            "magnitude": 1.1,
+        }
+    ]
+    brands = {"atlas-cloud": Brand(name="Atlas Cloud", logo="atlas.svg")}
+    (item,) = build_feed_items(changes, {}, {}, brands, NOW)
+    assert item["brand"]["name"] == "Atlas Cloud"
+    assert item["brand"]["logo"] == "atlas.svg"
+    assert item["variant"] == "fp8"
+    # unlisted provider: the slug stands in, with no logo
+    (item,) = build_feed_items([{**changes[0], "provider": "p"}], {}, {}, {}, NOW)
+    assert item["brand"] == {
+        "name": "p",
+        "logo": None,
+        "kind": "icon",
+        "mono": False,
+        "dark": None,
+    }
+    assert item["variant"] == ""
+    # departed endpoint: no provider, so nothing to name
+    (item,) = build_feed_items([{**changes[0], "provider": None}], {}, {}, brands, NOW)
+    assert item["brand"]["name"] == ""

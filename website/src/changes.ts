@@ -3,6 +3,7 @@
 // program) and lets the tests re-render a fresh document without busting the
 // module cache -- exactly as overview.ts does.
 import {
+  Brand,
   FeedItem,
   bindFilterChips,
   esc,
@@ -10,6 +11,7 @@ import {
   monthLabel,
   plural,
   prettyDate,
+  providerLabel,
   showLoadError,
 } from "./components";
 
@@ -29,6 +31,8 @@ interface TopEndpoint {
   slug: string;
   model: string;
   provider: string;
+  brand: Brand;
+  variant: string;
   providerSlug: string;
   modelSlug: string;
   n: number;
@@ -85,7 +89,7 @@ export async function init(): Promise<void> {
     topEl.innerHTML = D.top_endpoints
       .map((e, i) => {
         const cells = `<span class="rk">${i + 1}</span>
-        <span class="pv">${esc(e.model)}<small>@ ${esc(e.provider)}</small></span>
+        <span class="pv">${esc(e.model)}<small>@ ${providerLabel(e.brand, e.variant, "")}</small></span>
         <span class="rbar"><span style="width:${((e.n / most) * 100).toFixed(0)}%"></span><b>${e.n}</b></span>
         <span class="meta">last<br><b>${esc(e.last)}</b></span>`;
         // no modelSlug: the endpoint has left the fleet and has no model page

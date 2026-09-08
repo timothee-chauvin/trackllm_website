@@ -236,12 +236,6 @@ export function renderTimeline(panel: HTMLElement, D: TimelineData, labels: Time
 
   function row(ep: TimelineEndpoint): string {
     if (!ep.methods.length) return untrackedRow(ep);
-    // on the points, not on the lane: Math.max of an empty lane is -Infinity
-    const peak = ep.lt?.drift.length
-      ? `${Math.max(...ep.lt.drift.map((p) => p[1])).toFixed(2)} nats`
-      : ep.b3it?.tv.length
-        ? `TV ${Math.max(...ep.b3it.tv.map((p) => p[1])).toFixed(2)}`
-        : "—";
     const last = [
       ...(ep.lt ? ep.lt.changes.map((c) => c.date) : []),
       ...(ep.b3it ? ep.b3it.changes.map((c) => c.date) : []),
@@ -257,8 +251,8 @@ export function renderTimeline(panel: HTMLElement, D: TimelineData, labels: Time
       <div class="pv"><a href="${epHref}">${esc(labels.name(ep))}</a>
         <div class="mm">${methodBadges(ep.methods)}${headlineBadge(ep.status.headline)}<a href="${epHref}">endpoint →</a></div></div>
       <div class="spark">${strip(ep)}</div>
-      <div class="meta"><div class="static"><span class="${ep.n_changes ? "some" : "zero"}">${ep.n_changes || "—"} chg</span>
-        <div class="peak">${ep.n_changes && last ? "last " + esc(last) : peak}</div></div>
+      <div class="meta"><div class="static"><span class="${ep.n_changes ? "some" : "zero"}">${ep.n_changes} chg</span>
+        <div class="peak">${last ? "last " + esc(last) : ""}</div></div>
         <div class="read" hidden aria-hidden="true"></div></div>
     </div>`;
   }

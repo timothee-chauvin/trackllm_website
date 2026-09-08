@@ -67,7 +67,7 @@ const PAGES: Page[] = [
     html: "providers/chutes.html",
     entry: "../src/provider.ts",
     ready: "#epBody tr",
-    mounts: ["lede", "summary", "ratecards", "cmp", "timeline", "variantBody", "epBody"],
+    mounts: ["lede", "summary", "ratecards", "cmp", "variantBody", "epBody"],
   },
   {
     // Chosen for its provider mix: one company serving two variants, nine serving
