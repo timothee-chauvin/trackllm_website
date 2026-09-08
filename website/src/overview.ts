@@ -5,6 +5,7 @@ import {
   bindTips,
   esc,
   eventRow,
+  providerLabel,
   magnitudeLabel,
   methodBadges,
   relDays,
@@ -15,6 +16,7 @@ import {
   HERO_CLEAR_GAP,
   HERO_HIT_WIDTH,
   HERO_TIP_DX,
+  HERO_TIP_LINGER_MS,
   HERO_TIP_DY,
   HERO_TOP,
   HERO_VB_H,
@@ -69,17 +71,18 @@ export async function init(): Promise<void> {
     // Its only content is an invisible path, so the link needs a name of its own --
     // the same thing the hover card says, for anyone who never sees the hover card.
     hitLayer.innerHTML = `<a href="endpoints/${esc(h.slug)}.html" class="hero-hit"
-      aria-label="Open ${esc(h.model)} @ ${esc(h.provider)} — the endpoint this curve is drawn from">
+      aria-label="Open ${esc(h.model)} served by ${esc(h.brand.name)}${h.variant ? ` (${esc(h.variant)})` : ""} — the endpoint this curve is drawn from">
       <path d="${line}" fill="none" stroke="transparent" stroke-width="${HERO_HIT_WIDTH}"/></a>`;
 
     const method = h.method === "lt" ? "LT" : "B3IT";
+    const epHref = `endpoints/${esc(h.slug)}.html`;
     tip.innerHTML = `<div class="who">${methodBadges([h.method])}
-        <b>${esc(h.model)}</b><span class="at">@ ${esc(h.provider)}</span></div>
+        <a href="${epHref}"><b>${esc(h.model)}</b></a><span class="at">served by ${providerLabel(h.brand, h.variant, "")}</span></div>
       <div class="what">Real data from this endpoint — ${method} detected a change on
         ${esc(h.date)} (${relDays(h.daysAgo)}), moving from
         ${magnitudeLabel(h.method, h.baseline)} to ${magnitudeLabel(h.method, h.magnitude)}.
         Showing ${esc(h.start)} to <span class="drawn-to">${esc(h.end)}</span>, one point per day.</div>
-      <div class="go">Open the endpoint →</div>`;
+      <a class="go" href="${epHref}">Open the endpoint →</a>`;
 
     // Both layers stop where the stat cards begin, so no part of the curve is drawn
     // behind them and no pointer event over a card reaches the hit stroke.
@@ -103,16 +106,25 @@ export async function init(): Promise<void> {
     fitLayers();
     new ResizeObserver(fitLayers).observe(hero);
 
+    // The card follows the pointer along the curve, then stays put once the pointer
+    // leaves it: hiding waits HERO_TIP_LINGER_MS, long enough to move into the card
+    // and click its links, which is the only way the card's "open" ever gets used.
     const hit = hitLayer.querySelector(".hero-hit")!;
+    let hideTimer: ReturnType<typeof setTimeout> | null = null;
+    const cancelHide = (): void => { if (hideTimer !== null) { clearTimeout(hideTimer); hideTimer = null; } };
+    const hideSoon = (): void => { cancelHide(); hideTimer = setTimeout(() => { tip.hidden = true; }, HERO_TIP_LINGER_MS); };
     hit.addEventListener("pointermove", ev => {
       const e = ev as PointerEvent;
       const box = hero.getBoundingClientRect();
+      cancelHide();
       tip.hidden = false;
       const left = e.clientX - box.left + HERO_TIP_DX;
       tip.style.left = Math.max(0, Math.min(left, box.width - tip.offsetWidth)) + "px";
       tip.style.top = e.clientY - box.top + HERO_TIP_DY + "px";
     });
-    hit.addEventListener("pointerleave", () => { tip.hidden = true; });
+    hit.addEventListener("pointerleave", hideSoon);
+    tip.addEventListener("pointerenter", cancelHide);
+    tip.addEventListener("pointerleave", hideSoon);
   }
 
   document.getElementById("eyebrow")!.innerHTML = `<span class="dot"></span> Continuously monitoring ${S.active} active endpoints`;

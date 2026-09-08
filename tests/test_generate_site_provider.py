@@ -172,13 +172,6 @@ def test_rate_published_once_exposure_clears_threshold(tmp_path):
     assert variant["lt"]["ci"] == view["lt"]["ci"]
 
 
-def test_monthly_monitoring_counts_match_endpoint_spans(fake_site):
-    view = _views(fake_site)["p"]
-    assert view["months"] == ["2026-06"]
-    for variant in view["variants"]:
-        assert variant["monitoring"] == [1]
-
-
 def test_provider_carries_its_changes_and_endpoint_rows(fake_site):
     view = _views(fake_site)["p"]
     assert [c["date"] for c in view["changes"]] == ["2026-06-25"]

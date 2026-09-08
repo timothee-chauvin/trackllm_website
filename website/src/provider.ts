@@ -2,20 +2,14 @@
 // with other bundler entrypoints when type-checked as one tsc program) and lets the
 // smoke tests re-render a fresh document without busting the module cache.
 import {
-  B3IT_CAP,
-  LT_CAP,
   MIN_ENDPOINT_YEARS,
   bindFilterChips,
   bindTips,
   esc,
-  magnitudeLabel,
-  methodBadges,
-  monthLabel,
   monitoredSpan,
   plural,
   rateBar,
   showLoadError,
-  stripTip,
   volGrid,
 } from "./components";
 import { EndpointRow, endpointCell, initDirectory } from "./directory";
@@ -34,7 +28,6 @@ interface Variant {
   n_endpoints: number;
   lt: MethodBlock;
   b3it: MethodBlock;
-  monitoring: number[];
 }
 
 interface ProviderChange {
@@ -55,7 +48,6 @@ interface ProviderData {
   n_variants: number;
   first: string | null;
   last: string | null;
-  months: string[];
   lt: MethodBlock;
   b3it: MethodBlock;
   variants: Variant[];
@@ -64,8 +56,6 @@ interface ProviderData {
   // null when no endpoint has an observed span: the section is omitted, not empty
   timeline: TimelineData | null;
 }
-
-const LANE_W = 600;
 
 export async function init(): Promise<void> {
   const slugEl = document.getElementById("providerData");
@@ -189,76 +179,8 @@ export async function init(): Promise<void> {
     }
   }
 
-  // monitoring lanes: gray area = endpoints under monitoring per month, dots = changes
-  const MONTHS = D.months;
-  const NM = Math.max(1, MONTHS.length - 1);
-  const laneX = (i: number): number => (i / NM) * LANE_W;
-
-  function laneSvg(v: Variant, changes: ProviderChange[]): string {
-    const W = LANE_W, H = 46, base = H - 9;
-    const max = Math.max(...v.monitoring, 1);
-    const pts = v.monitoring.map((c, i): [number, number] => [laneX(i), base - (c / max) * (base - 6)]);
-    // one month is a band, not a run: hold it flat across the lane, or the closing
-    // segment would draw a wedge sloping to zero that the data does not say
-    if (pts.length === 1) pts.push([W, pts[0][1]]);
-    const line = pts
-      .map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1))
-      .join(" ");
-    const area = pts.length
-      ? `<path d="${line} L${W} ${base} L0 ${base} Z" fill="var(--text-dim)" opacity="0.16"/>
-         <path d="${line}" fill="none" stroke="var(--text-dim)" stroke-width="1" opacity="0.5" vector-effect="non-scaling-stroke"/>`
-      : "";
-    const title = (c: ProviderChange): string => {
-      const mag = magnitudeLabel(c.method, c.magnitude);
-      return `${c.date} · ${c.model} · ${c.method === "lt" ? "LT" : "B3IT"}${mag ? " · " + mag : ""}`;
-    };
-    const dots = changes
-      .map((c) => {
-        const isLT = c.method === "lt";
-        const col = isLT ? "var(--accent)" : "var(--b3it)";
-        const r = 2.6 + Math.min(1, (c.magnitude ?? 0) / (isLT ? LT_CAP : B3IT_CAP)) * 3.2;
-        const idx = MONTHS.indexOf(c.date.slice(0, 7));
-        const cx = laneX(idx < 0 ? MONTHS.length - 1 : idx).toFixed(1);
-        return `<line x1="${cx}" y1="${base}" x2="${cx}" y2="6" stroke="${col}" stroke-width="1" opacity="0.22"/>
-          <circle cx="${cx}" cy="${base - 14}" r="${r.toFixed(1)}" fill="${col}" fill-opacity="0.75" stroke="${col}" stroke-width="1">
-          <title>${esc(title(c))}</title></circle>`;
-      })
-      .join("");
-    return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"${stripTip(variantName(v.name), changes.map(title))}>
-      <line x1="0" y1="${base}" x2="${W}" y2="${base}" stroke="var(--border)" stroke-width="1"/>
-      ${area}${dots}</svg>`;
-  }
-
-  const timelineEl = document.getElementById("timeline");
-  if (timelineEl) {
-    if (!MONTHS.length) {
-      timelineEl.innerHTML = `<div class="empty">No monitoring recorded yet for this provider.</div>`;
-    } else {
-      const lanes = variants
-        .map((v) => {
-          const vc = D.changes.filter((c) => variantOf(c.provider) === v.name);
-          return `<div class="tlrow">
-            <div class="lane-k">${variantLabel(v.name)}<small>${plural(v.n_endpoints, "endpoint")}</small></div>
-            <div class="lane">${laneSvg(v, vc)}</div>
-            <div class="lane-m"><b class="${vc.length ? "" : "zero"}">${vc.length}</b>${vc.length === 1 ? "change" : "changes"}</div>
-          </div>`;
-        })
-        .join("");
-      // Every third month, plus the last one -- but only when the last one is not
-      // already on the grid or the month right after it, where the two labels land
-      // on top of each other (and the right-hand one wraps mid-label).
-      const lastIdx = MONTHS.length - 1;
-      const ticks = MONTHS.map((m, i) =>
-        i % 3 === 0 || (i === lastIdx && lastIdx % 3 === 2)
-          ? `<span style="left:${((i / NM) * 100).toFixed(1)}%">${monthLabel(m)}</span>`
-          : ""
-      ).join("");
-      timelineEl.innerHTML = `<div class="tl">${lanes}</div>
-        <div class="tlaxis"><div class="ticks">${ticks}</div></div>`;
-    }
-  }
-  // document.body, not timelineEl: the directory table further down the page
-  // carries the same popover on its status pills and badges (directory.ts).
+  // document.body: the directory table further down the page carries the same
+  // popover on its status pills and badges (directory.ts).
   bindTips(document.body);
 
   const variantBody = document.getElementById("variantBody");
@@ -297,8 +219,7 @@ export async function init(): Promise<void> {
       return rows.filter((r) => {
         if (ql && !`${r.model} ${r.org} ${r.provider}`.toLowerCase().includes(ql)) return false;
         if (filters.has("changed") && r.nChanges === 0) return false;
-        if (filters.has("retired") && r.status !== "retired") return false;
-        if (filters.has("b3it") && !r.methods.includes("b3it")) return false;
+        if (filters.has("tracked") && r.status === null) return false;
         return true;
       });
     },

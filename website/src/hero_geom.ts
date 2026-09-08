@@ -12,6 +12,9 @@ export const HERO_TOP = 14;
 export const HERO_HIT_WIDTH = 18; // invisible fat stroke: the curve is 1.6 units thin
 export const HERO_TIP_DX = 16;
 export const HERO_TIP_DY = 18;
+// how long the card stays after the pointer leaves the curve: the DX/DY gap above is
+// what the pointer has to cross to reach it
+export const HERO_TIP_LINGER_MS = 350;
 
 // On a wide page the changepoint rise lands in the middle of the lede. Stretching the
 // full-bleed layers past the right edge slides the rise clear of the text -- the baseline

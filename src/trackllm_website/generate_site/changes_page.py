@@ -9,6 +9,7 @@ from datetime import datetime
 from pathlib import Path
 
 from trackllm_website.generate_site.b3it import B3ITView
+from trackllm_website.generate_site.brands import load_brands
 from trackllm_website.generate_site.feed import build_feed_items
 from trackllm_website.generate_site.lt import LTData
 
@@ -40,7 +41,9 @@ def build_changes_page(
     changes = json.loads(changes_path.read_text()) if changes_path.exists() else []
 
     drift_by_slug = {slug: d.drift for slug, d in lt_data.items()}
-    items = build_feed_items(changes, drift_by_slug, b3it_views, now)
+    items = build_feed_items(
+        changes, drift_by_slug, b3it_views, load_brands(website_dir), now
+    )
 
     per_endpoint: dict[str, dict] = {}
     for item in items:  # items are newest first, so the first hit is the latest
@@ -50,6 +53,8 @@ def build_changes_page(
                 "slug": item["slug"],
                 "model": item["model"],
                 "provider": item["provider"],
+                "brand": item["brand"],
+                "variant": item["variant"],
                 "providerSlug": item["providerSlug"],
                 "modelSlug": item["modelSlug"],
                 "n": 0,

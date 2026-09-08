@@ -1,6 +1,6 @@
 // data/overview.json is the one file the Overview, Providers and Endpoints pages
 // all render from, so its shape and its loading live here.
-import { FeedItem, showLoadError } from "./components";
+import { Brand, FeedItem, showLoadError } from "./components";
 import { EndpointRow } from "./directory";
 
 export interface Stats {
@@ -56,13 +56,7 @@ export interface ProviderRate {
 
 /** How a provider is shown (brands.py / provider_brands.yaml): its display name
  *  and, when one was found, its logo. A wordmark logo *is* the name. */
-export interface Brand {
-  name: string;
-  logo: string | null;
-  kind: "icon" | "wordmark";
-  mono: boolean; // a flat dark mark: inverted in the dark theme
-  dark: string | null; // a light-on-dark variant, shown in the dark theme instead
-}
+export type { Brand };
 
 /** The one real change event the hero draws, chosen at build time (hero.py). */
 export interface Hero {
@@ -70,6 +64,8 @@ export interface Hero {
   model: string;
   org: string;
   provider: string;
+  brand: Brand;
+  variant: string;
   method: "lt" | "b3it";
   date: string;
   daysAgo: number;

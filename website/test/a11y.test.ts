@@ -250,7 +250,7 @@ describe("accessible names", () => {
     const hit = document.querySelector(".hero-hit")!;
     const href = hit.getAttribute("href")!;
     const label = hit.getAttribute("aria-label") ?? "";
-    expect(label, "the hero link has no name of its own").toContain("@");
+    expect(label, "the hero link has no name of its own").toContain("served by");
     expect(hit.textContent!.trim(), "the link's own content is an invisible path").toBe("");
     expect(href).toMatch(/^endpoints\/.+\.html$/);
   });

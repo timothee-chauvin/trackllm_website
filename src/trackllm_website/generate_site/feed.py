@@ -7,7 +7,8 @@ the two never disagree about what a change looked like.
 from datetime import datetime
 
 from trackllm_website.generate_site.b3it import B3ITView
-from trackllm_website.generate_site.naming import base_provider
+from trackllm_website.generate_site.brands import Brand, brand_json
+from trackllm_website.generate_site.naming import base_provider, variant_name
 from trackllm_website.lt_drift import LT_SHIFT_WINDOW_DAYS
 from trackllm_website.util import slugify
 
@@ -88,6 +89,19 @@ def change_links(change: dict) -> dict:
     }
 
 
+def brand_fields(change: dict, brands: dict[str, Brand]) -> dict:
+    """How a feed row names the serving company: "served by <brand> (<variant>)",
+    as the endpoint head shows it. A departed endpoint has no provider and gets
+    a nameless brand, which the row leaves out."""
+    provider = change["provider"] or ""
+    return {
+        "brand": brand_json(brands, slugify(base_provider(provider)))
+        if provider
+        else Brand(name="").model_dump(),
+        "variant": variant_name(provider),
+    }
+
+
 def _lt_item(change: dict, drift: list[tuple[datetime, float]], now: datetime) -> dict:
     cd = datetime.fromisoformat(change["date"])
     # The magnitude is the event's own level shift (lt_events), the number its
@@ -157,20 +171,23 @@ def build_feed_items(
     changes: list[dict],
     drift_by_slug: dict[str, list[tuple[datetime, float]]],
     b3it_by_slug: dict[str, B3ITView],
+    brands: dict[str, Brand],
     now: datetime,
 ) -> list[dict]:
     """Enrich merged change events (changes.json shape) for display, newest first."""
     items = []
     for change in changes:
+        fields = brand_fields(change, brands)
         # No fallback branch: a method this file does not know how to enrich would
         # otherwise be published as B3IT, wrong scale and wrong badge included.
         if change["method"] == "LT":
-            items.append(_lt_item(change, drift_by_slug.get(change["slug"], []), now))
+            item = _lt_item(change, drift_by_slug.get(change["slug"], []), now)
         elif change["method"] == "B3IT":
-            items.append(_b3it_item(change, b3it_by_slug.get(change["slug"]), now))
+            item = _b3it_item(change, b3it_by_slug.get(change["slug"]), now)
         else:
             raise ValueError(
                 f"unknown change method {change['method']!r} for {change['slug']}"
             )
+        items.append({**item, **fields})
     items.sort(key=lambda i: i["iso"], reverse=True)
     return items

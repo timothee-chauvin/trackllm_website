@@ -57,7 +57,7 @@ def _view(slug: str, series) -> B3ITView:
 
 def test_draws_the_pinned_endpoint_over_the_pinned_window():
     drift = {"ep": _series(41, 20, 0.05, 1.2)}
-    hero = build_hero([_change()], drift, {}, NOW, _pin("2026-01-01", "2026-02-10"))
+    hero = build_hero([_change()], drift, {}, {}, NOW, _pin("2026-01-01", "2026-02-10"))
     assert hero["slug"] == "ep"
     assert hero["start"] == "2026-01-01"
     assert hero["end"] == "2026-02-10"
@@ -68,7 +68,7 @@ def test_window_clips_to_the_configured_dates():
     """Points outside the vetted range must not reach the page -- the whole point of
     pinning is that the picture cannot drift as new data lands."""
     drift = {"ep": _series(60, 20, 0.05, 1.2)}
-    hero = build_hero([_change()], drift, {}, NOW, _pin("2026-01-06", "2026-01-25"))
+    hero = build_hero([_change()], drift, {}, {}, NOW, _pin("2026-01-06", "2026-01-25"))
     assert hero["start"] == "2026-01-06"
     assert hero["end"] == "2026-01-25"
     assert len(hero["values"]) == 20
@@ -76,7 +76,7 @@ def test_window_clips_to_the_configured_dates():
 
 def test_changefrac_lands_on_the_step():
     drift = {"ep": _series(41, 20, 0.05, 1.2)}
-    hero = build_hero([_change()], drift, {}, NOW, _pin("2026-01-01", "2026-02-10"))
+    hero = build_hero([_change()], drift, {}, {}, NOW, _pin("2026-01-01", "2026-02-10"))
     k = round(hero["changeFrac"] * (len(hero["values"]) - 1))
     assert hero["values"][k - 1] == 0.05
     assert hero["values"][k] == 1.2
@@ -85,7 +85,7 @@ def test_changefrac_lands_on_the_step():
 def test_unknown_slug_raises_rather_than_dropping_the_hero():
     """A stale pin must break the build, not quietly blank the site's first claim."""
     with pytest.raises(ValueError, match="no lt series"):
-        build_hero([_change()], {}, {}, NOW, _pin("2026-01-01", "2026-02-10"))
+        build_hero([_change()], {}, {}, {}, NOW, _pin("2026-01-01", "2026-02-10"))
 
 
 def test_window_with_too_few_points_raises():
@@ -94,6 +94,7 @@ def test_window_with_too_few_points_raises():
         build_hero(
             [_change()],
             drift,
+            {},
             {},
             NOW,
             _pin(
@@ -108,7 +109,7 @@ def test_pin_without_a_matching_change_raises():
     would have to invent one."""
     drift = {"ep": _series(41, 20, 0.05, 1.2)}
     with pytest.raises(ValueError, match="no LT change"):
-        build_hero([], drift, {}, NOW, _pin("2026-01-01", "2026-02-10"))
+        build_hero([], drift, {}, {}, NOW, _pin("2026-01-01", "2026-02-10"))
 
 
 def test_b3it_pin_reads_the_view_series():
@@ -118,6 +119,7 @@ def test_b3it_pin_reads_the_view_series():
         [change],
         {},
         {"ep": _view("ep", series)},
+        {},
         NOW,
         _pin("2026-01-01", "2026-02-10", "b3it"),
     )
@@ -127,7 +129,7 @@ def test_b3it_pin_reads_the_view_series():
 
 def test_payload_carries_links_baseline_and_peak():
     drift = {"ep": _series(41, 20, 0.05, 1.2)}
-    hero = build_hero([_change()], drift, {}, NOW, _pin("2026-01-01", "2026-02-10"))
+    hero = build_hero([_change()], drift, {}, {}, NOW, _pin("2026-01-01", "2026-02-10"))
     assert hero["model"] == "model-x"
     assert hero["org"] == "org"
     assert hero["modelSlug"] == "org2fmodel-x"
@@ -144,7 +146,7 @@ def test_values_are_not_downsampled():
     """Downsampling averages neighbours, which is the smoothing we just removed."""
     drift = {"ep": [(DAY0 + timedelta(days=i), 0.1 + i * 0.01) for i in range(120)]}
     hero = build_hero(
-        [_change(day=60)], drift, {}, NOW, _pin("2026-01-01", "2026-04-30")
+        [_change(day=60)], drift, {}, {}, NOW, _pin("2026-01-01", "2026-04-30")
     )
     assert len(hero["values"]) == 120
     assert hero["values"] == [round(0.1 + i * 0.01, 4) for i in range(120)]
