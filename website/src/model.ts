@@ -1,7 +1,7 @@
 // The `init` export both makes this a module (so its top-level names don't collide
 // with other bundler entrypoints when type-checked as one tsc program) and lets the
 // smoke tests re-render a fresh document without busting the module cache.
-import { esc, headlineBadge, bindTips, plural, prettyDate, showLoadError } from "./components";
+import { esc, headlineBadge, bindTips, monitoredSpan, plural, showLoadError } from "./components";
 import { type TimelineData, hasTimeline, renderTimeline } from "./timeline";
 
 interface ModelData extends TimelineData {
@@ -66,13 +66,14 @@ export async function init(): Promise<void> {
   }
   const summaryEl = document.getElementById("summary");
   if (summaryEl) {
+    const span = monitoredSpan(D.date_min, D.date_max, D.n_active > 0);
     summaryEl.innerHTML = tracked.length
       ? `
       <div class="s"><div class="v">${D.n_endpoints}</div><div class="k">Monitored endpoints</div></div>
       <div class="s"><div class="v">${D.n_active}</div><div class="k">Actively tracked</div></div>
       <div class="s"><div class="v" style="color:var(--changed)">${D.n_changed}</div><div class="k">With changes</div></div>
       <div class="s"><div class="v">${D.changes.length}</div><div class="k">Changes total</div></div>
-      <div class="s"><div class="v">${prettyDate(D.date_min)} – ${prettyDate(D.date_max)}</div><div class="k">Monitored</div></div>`
+      <div class="s"><div class="v">${span[0].toUpperCase()}${span.slice(1)}</div><div class="k">Monitored</div></div>`
       : `
       <div class="s"><div class="v">${D.n_endpoints_total}</div><div class="k">Catalog endpoints</div></div>
       <div class="s"><div class="v">${headlineBadge(D.headline)}</div><div class="k">Status</div></div>`;

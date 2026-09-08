@@ -25,6 +25,7 @@ interface FleetRow {
   lastChange: string | null;
   recent: boolean;
   headline: string;
+  headlines: string[];
   reason: string;
 }
 
@@ -102,8 +103,8 @@ const chip = (st: string): HTMLElement => {
 const shownCount = (): number =>
   Number(/^(\d+) of /.exec(document.getElementById("dirFoot")!.textContent ?? "")?.[1]);
 
-const byHeadline = (h: string): FleetRow[] => ROWS.filter((r) => r.headline === h);
-const STATUSES = [...new Set(ROWS.map((r) => r.headline))];
+const byHeadline = (h: string): FleetRow[] => ROWS.filter((r) => r.headlines.includes(h));
+const STATUSES = [...new Set(ROWS.flatMap((r) => r.headlines))];
 
 describe("endpoint directory chips", () => {
   // The status row is a radio: exactly one headline shows, and the one that is
@@ -131,29 +132,45 @@ describe("endpoint directory chips", () => {
   // The change row is exclusive but optional, and combines with the status row.
   test("change-history chips are exclusive and combine with the status row", async () => {
     const retiredChanged = rowWith(
-      (r) => r.headline === "retired" && r.nChanges > 0,
+      (r) => r.headlines.includes("retired") && r.nChanges > 0,
       "retired-headline row with changes",
     );
     await renderEndpoints();
     click(chipF("c", "everchanged"));
     const changed = ROWS.filter((r) => r.nChanges > 0);
-    expect(shownCount()).toBe(changed.filter((r) => r.headline === "tracked").length);
+    expect(shownCount()).toBe(changed.filter((r) => r.headlines.includes("tracked")).length);
     expect(
       document.querySelector(`#dirBody a[href="endpoints/${retiredChanged.slug}.html"]`),
     ).toBeNull();
 
     click(chip("retired"));
-    expect(shownCount()).toBe(changed.filter((r) => r.headline === "retired").length);
+    expect(shownCount()).toBe(changed.filter((r) => r.headlines.includes("retired")).length);
     expect(
       document.querySelector(`#dirBody a[href="endpoints/${retiredChanged.slug}.html"]`),
     ).not.toBeNull();
 
     click(chipF("c", "recent")); // switches, never adds
     expect(chipF("c", "everchanged").classList.contains("on")).toBe(false);
-    expect(shownCount()).toBe(ROWS.filter((r) => r.headline === "retired" && r.recent).length);
+    expect(shownCount()).toBe(ROWS.filter((r) => r.headlines.includes("retired") && r.recent).length);
 
     click(chipF("c", "recent")); // off again: no change constraint
     expect(shownCount()).toBe(byHeadline("retired").length);
+  });
+
+  // A row carries every headline that happened to it (retired and too expensive
+  // both, say), and each status chip lists it. The data churns, so the case is
+  // discovered; a fleet with no such row skips rather than fakes one.
+  const multi = ROWS.find((r) => r.headlines.length > 1);
+  test.skipIf(!multi)("a row shows under every headline it carries", async () => {
+    await renderEndpoints();
+    for (const h of multi!.headlines) {
+      click(chip(h));
+      expect(shownCount()).toBe(byHeadline(h).length);
+      expect(
+        document.querySelector(`#dirBody a.model-cell[href="endpoints/${multi!.slug}.html"]`),
+      ).not.toBeNull();
+    }
+    expect(new Set(multi!.headlines).size).toBe(multi!.headlines.length);
   });
 
   test("method chips conjoin: both on means tracked by both", async () => {
@@ -180,8 +197,8 @@ describe("endpoint directory chips", () => {
   });
 
   test("the last-change column is a date, or a dash when never changed", async () => {
-    const never = rowWith((r) => r.headline === "tracked" && r.nChanges === 0, "never-changed row");
-    const once = rowWith((r) => r.headline === "tracked" && r.lastChange !== null, "changed row");
+    const never = rowWith((r) => r.headlines.includes("tracked") && r.nChanges === 0, "never-changed row");
+    const once = rowWith((r) => r.headlines.includes("tracked") && r.lastChange !== null, "changed row");
     await renderEndpoints();
     const cell = (slug: string): string =>
       document
@@ -214,9 +231,9 @@ describe("endpoint directory search", () => {
     await renderEndpoints();
     search("gpt-5");
     const matches = matching("gpt-5");
-    expect(shownCount()).toBe(matches.filter((r) => r.headline === "tracked").length);
+    expect(shownCount()).toBe(matches.filter((r) => r.headlines.includes("tracked")).length);
     click(chip("untrackable")); // the untracked matches, with their badges
-    expect(shownCount()).toBe(matches.filter((r) => r.headline === "untrackable").length);
+    expect(shownCount()).toBe(matches.filter((r) => r.headlines.includes("untrackable")).length);
     const body = document.getElementById("dirBody")!;
     expect(body.innerHTML).toContain("<mark>gpt-5</mark>");
     expect(body.querySelectorAll(".badge.st").length).toBeGreaterThan(0);
@@ -225,7 +242,7 @@ describe("endpoint directory search", () => {
   test("finds alibaba by provider name, with <mark>", async () => {
     await renderEndpoints();
     search("alibaba");
-    const matches = matching("alibaba").filter((r) => r.headline === "tracked");
+    const matches = matching("alibaba").filter((r) => r.headlines.includes("tracked"));
     expect(matches.length).toBeGreaterThan(0);
     expect(shownCount()).toBe(matches.length);
     const prov = document.querySelector("#dirBody .prov-cell mark");
@@ -236,13 +253,13 @@ describe("endpoint directory search", () => {
     await renderEndpoints();
     search("gpt-5");
     search("");
-    expect(shownCount()).toBe(ROWS.filter((r) => r.headline === "tracked").length);
+    expect(shownCount()).toBe(ROWS.filter((r) => r.headlines.includes("tracked")).length);
   });
 });
 
 describe("untracked endpoint page", () => {
   const row = rowWith(
-    (r) => untracked(r) && r.headline === "untrackable",
+    (r) => untracked(r) && r.headlines.includes("untrackable"),
     "untrackable endpoint",
   );
   const html = readFileSync(requireBuilt(`endpoints/${row.slug}.html`), "utf8");

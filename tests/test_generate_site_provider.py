@@ -103,6 +103,7 @@ def test_variants_group_under_one_provider(fake_site):
     view = views["p"]
     assert view["name"] == "p"
     assert view["n_endpoints"] == 2
+    assert view["n_active"] == 2  # both fixtures observed on the build day
     assert view["n_models"] == 2
     assert view["n_variants"] == 2
     assert {v["name"] for v in view["variants"]} == {"", "fp8"}
@@ -212,6 +213,20 @@ def test_tied_same_model_variant_rows_order_by_slug(tmp_path):
     (root / "data" / "spend.json").write_text(json.dumps({"cumulative": {}}))
     slugs = [e["slug"] for e in _views(root)["p"]["endpoints"]]
     assert slugs == sorted(slugs)
+
+
+def test_n_active_is_zero_once_every_series_is_dead(tmp_path):
+    """The page says "monitored since" only while n_active is nonzero: a provider
+    whose only endpoint last answered months before the build is a closed range."""
+    root = tmp_path / "website"
+    old = [f"2026-03-{d:02d}T00:00:00Z" for d in range(1, 11)]
+    write_lt_endpoint(
+        root, "m2fa23p", "m/a", "p", dates=old, changes=[], drift=[0.1] * 10
+    )
+    (root / "data" / "changes.json").write_text(json.dumps([]))
+    view = _views(root)["p"]
+    assert (view["n_endpoints"], view["n_active"]) == (1, 0)
+    assert (view["first"], view["last"]) == ("2026-03-01", "2026-03-10")
 
 
 def test_untracked_catalog_endpoints_join_their_provider_page(fake_site):

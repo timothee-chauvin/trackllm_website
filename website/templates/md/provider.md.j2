@@ -2,7 +2,7 @@
 {% set D = view %}
 {{ b.header("Provider: " ~ D.name, machine, nav_prefix) }}
 {{ b.crumb([("Home", nav_prefix ~ "index.md"), (D.name, "")]) }}
-{{ D.n_endpoints }} endpoint{{ "s" if D.n_endpoints != 1 }} across {{ D.n_models }} model{{ "s" if D.n_models != 1 }} and {{ D.n_variants }} serving variant{{ "s" if D.n_variants != 1 }}, {% if D.first and D.last %}monitored {{ D.first }} – {{ D.last }}{% else %}with no monitoring recorded yet{% endif %}. {{ D.changes | length }} change{{ "s" if D.changes | length != 1 }} detected across {{ D.endpoints | selectattr("nChanges") | list | length }} endpoint{{ "s" if D.endpoints | selectattr("nChanges") | list | length != 1 }}.
+{{ D.n_endpoints }} endpoint{{ "s" if D.n_endpoints != 1 }} across {{ D.n_models }} model{{ "s" if D.n_models != 1 }} and {{ D.n_variants }} serving variant{{ "s" if D.n_variants != 1 }}, {% if D.first and D.last %}monitored {% if D.n_active %}since {{ D.first }}{% else %}{{ D.first }} – {{ D.last }}{% endif %}{% else %}with no monitoring recorded yet{% endif %}. {{ D.changes | length }} change{{ "s" if D.changes | length != 1 }} detected across {{ D.endpoints | selectattr("nChanges") | list | length }} endpoint{{ "s" if D.endpoints | selectattr("nChanges") | list | length != 1 }}.
 
 ## Drift rate
 

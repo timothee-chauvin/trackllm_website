@@ -32,8 +32,10 @@ export async function init(): Promise<void> {
   const providerPages = new Set(DATA.providers.map(p => p.slug));
 
   // Three chip rows, AND-ed with each other and with the search. Status is a
-  // radio: exactly one headline shows. Method chips conjoin: both on means
-  // endpoints tracked by both. The change row is one filter at a time, or none.
+  // radio: exactly one headline shows, and a row shows under every headline it
+  // carries (retired and too expensive, when both happened). Method chips
+  // conjoin: both on means endpoints tracked by both. The change row is one
+  // filter at a time, or none.
   const status = new Set<string>(["tracked"]);
   const methods = new Set<string>();
   const change = new Set<string>();
@@ -48,7 +50,7 @@ export async function init(): Promise<void> {
       const ql = q.toLowerCase();
       return rows.filter(r => {
         if (ql && !`${r.model} ${r.provider} ${r.org}`.toLowerCase().includes(ql)) return false;
-        if (!status.has(r.headline)) return false;
+        if (!r.headlines.some(h => status.has(h))) return false;
         for (const m of methods) if (!r.methods.includes(m)) return false;
         if (change.has("everchanged") && r.nChanges === 0) return false;
         if (change.has("recent") && !r.recent) return false;

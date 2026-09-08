@@ -199,6 +199,13 @@ def build_provider_views(
             "brand": brand_json(brands, slugify(base)),
             "timeline": timeline if timeline["date_min"] else None,
             "n_endpoints": len(slugs),
+            # still answering, by the directory row's lane-derived status: the
+            # page says "monitored since" only while this is nonzero
+            "n_active": sum(
+                1
+                for s in slugs
+                if s in rows_by_slug and rows_by_slug[s]["status"] != "retired"
+            ),
             "n_models": len(models[base]),
             "n_variants": len(variants),
             "first": first,

@@ -2,15 +2,18 @@
 
 `tracked.py` decides who gets charts; this module decides what every page says.
 Its universe is the catalog snapshot plus every endpoint we ever tracked (LT
-observations or a BI state file), so a delisted endpoint we monitored stays
-explained instead of vanishing. Everything here is derivation over parsed
-inputs the caller loads — no file IO, no network, no re-run of selection
-(monitoring/retired come from state files; selection needs the live popularity
-feed).
+observations or a BI state file), so an endpoint we monitored stays explained
+after it leaves the catalog or our selection instead of vanishing. Everything
+here is derivation over parsed inputs the caller loads — no file IO, no network,
+no re-run of selection (monitoring/retired come from state files; selection
+needs the live popularity feed).
 
 Statuses are per-method: LT and BI are independent (grok-4.5 is LT-tracked and
-BI-too-expensive), and one derived headline summarizes the endpoint. All
-user-facing status text lives in STATUS_COPY; templates never invent wording.
+BI-too-expensive). One derived headline summarizes the endpoint for badges and
+counts, and `headlines` keeps every headline either method contributes, so the
+directory's status chips can show an endpoint under each thing that happened to
+it. All user-facing status text lives in STATUS_COPY; templates never invent
+wording.
 """
 
 import re
@@ -24,7 +27,7 @@ from pydantic import BaseModel
 from trackllm_website.bi.selection import SelectionPolicy, _matches_any
 from trackllm_website.bi.state import EndpointBIState
 from trackllm_website.bi.vetting import EndpointCache
-from trackllm_website.config import Endpoint
+from trackllm_website.config import Endpoint, config
 from trackllm_website.update_endpoints import LTFailureCache
 from trackllm_website.util import slugify
 
@@ -36,7 +39,15 @@ STATUS_COPY: dict[str, str] = {
     "monitoring": "This endpoint is actively monitored through its border inputs.",
     "retired:no_bis": "Monitoring was retired: we could not find enough border inputs for this endpoint.",
     "retired:unreachable": "Monitoring was retired: the endpoint stopped answering our queries.",
-    "retired:delisted": "Monitoring was retired: the endpoint left the OpenRouter catalog.",
+    # The stored reason literal says "delisted", but the lifecycle retires under it
+    # whenever a monitored endpoint stays out of the selected set for the grace
+    # period -- the selection policy (bi_selection.toml: flagships, popularity,
+    # provider coverage, budget) dropping it, not only the catalog losing it.
+    "retired:delisted": (
+        "Monitoring was retired: the endpoint dropped out of our B3IT selection "
+        "(flagships, the most popular models, the cheapest endpoints per provider, "
+        f"within budget) for {config.bi.reinit.deselection_grace_days} days."
+    ),
     "retired:stalled": "Monitoring was retired: the endpoint stopped yielding usable samples.",
     "retired:reinit_timeout": "Monitoring was retired: re-initialization after a detected change repeatedly ran out of time.",
     "retired:too_expensive": "Monitoring was retired: a single query costs more than our per-query guard allows.",
@@ -168,6 +179,7 @@ class EndpointStatus:
     lt: str
     bi: str
     headline: str
+    headlines: list[str]  # every headline either method contributes, chain order
     lt_detail: str | None
     bi_detail: str | None
 
@@ -221,35 +233,62 @@ def headline_breakdown(headlines: Iterable[str]) -> str:
     return " · ".join(f"{n} {h.replace('_', ' ')}" for h, n in ordered)
 
 
-def _headline_of(status: str) -> str | None:
-    """What this one method status alone contributes to the headline; None for
-    statuses (no_logprobs, bad_temperature) that only matter jointly."""
+def _headlines_of(status: str) -> list[str]:
+    """What this one method status alone contributes. Every retirement is
+    "retired", and some carry a second finding besides (retired:too_expensive is
+    also too expensive, retired:unreachable also errors out); statuses that only
+    matter jointly (no_logprobs, bad_temperature) contribute nothing."""
+    found = []
+    if status == "stalled" or status.startswith("retired:"):
+        found.append("retired")
     if status in ("tracked", "monitoring"):
-        return "tracked"
-    if status == "stalled" or status in _RETIRED_HEADLINE:
-        return "retired"
-    if status in ("too_expensive", "retired:too_expensive"):
-        return "too_expensive"
-    if status == "unprobeable:batch":
-        return "untrackable"
-    if status in ("not_selected", "excluded"):
-        return "not_selected"
-    if status in ERRORS_OUT:
-        return "errors_out"
-    if status in ("pending", "free_excluded"):
-        return status
-    return None
+        found.append("tracked")
+    elif status in ("too_expensive", "retired:too_expensive"):
+        found.append("too_expensive")
+    elif status == "unprobeable:batch":
+        found.append("untrackable")
+    elif status in ("not_selected", "excluded"):
+        found.append("not_selected")
+    elif status in ERRORS_OUT:
+        found.append("errors_out")
+    elif status in ("pending", "free_excluded"):
+        found.append(status)
+    return found
+
+
+def headlines_for(lt: str, bi: str) -> list[str]:
+    """Every headline the endpoint carries, in HEADLINE_ORDER. A tracked endpoint
+    is just that: what its other method could not do is not held against it. An
+    untracked one carries what each method contributes on its own plus the joint
+    headline (untrackable); "pending" is the absence of a verdict, so it only
+    stays when nothing else was found."""
+    headline = headline_for(lt, bi)
+    if headline == "tracked":
+        return [headline]
+    found = set(_headlines_of(lt)) | set(_headlines_of(bi)) | {headline}
+    if len(found) > 1:
+        found.discard("pending")
+    return [h for h in HEADLINE_ORDER if h in found]
 
 
 def one_line_reason(st: EndpointStatus) -> str:
-    """The fleet row's single line: the copy of the method status that drove the
-    headline (with its recorded detail), or the headline's own copy when the
-    headline is a joint conclusion (untrackable)."""
-    for status, detail in ((st.lt, st.lt_detail), (st.bi, st.bi_detail)):
-        if _headline_of(status) == st.headline:
+    """The fleet row's single line: the copy of every method status behind the
+    endpoint's headlines (with its recorded detail), the one that drove the
+    dominant headline first; or the headline's own copy when the headline is a
+    joint conclusion (untrackable)."""
+    methods = [(st.lt, st.lt_detail), (st.bi, st.bi_detail)]
+    parts: list[str] = []
+    covered: set[str] = set()
+    for status, detail in sorted(
+        methods, key=lambda sd: st.headline not in _headlines_of(sd[0])
+    ):
+        # one sentence per headline: tracked+monitoring is not said twice
+        new = set(_headlines_of(status)) & set(st.headlines) - covered
+        if new:
+            covered |= new
             copy = STATUS_COPY[status]
-            return f"{copy.rstrip('.')} ({detail})." if detail else copy
-    return STATUS_COPY[st.headline]
+            parts.append(f"{copy.rstrip('.')} ({detail})." if detail else copy)
+    return " ".join(parts) or STATUS_COPY[st.headline]
 
 
 def status_json(st: EndpointStatus) -> dict:
@@ -258,6 +297,7 @@ def status_json(st: EndpointStatus) -> dict:
         "lt": st.lt,
         "bi": st.bi,
         "headline": st.headline,
+        "headlines": st.headlines,
         "ltCopy": STATUS_COPY[st.lt],
         "biCopy": STATUS_COPY[st.bi],
         "ltDetail": st.lt_detail,
@@ -392,6 +432,7 @@ def resolve_statuses(
             lt=lt,
             bi=bi,
             headline=headline_for(lt, bi),
+            headlines=headlines_for(lt, bi),
             lt_detail=lt_detail,
             bi_detail=bi_detail,
         )
