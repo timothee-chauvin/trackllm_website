@@ -270,15 +270,15 @@ class TestHeadline:
         "lt,bi,expected",
         [
             ("tracked", "monitoring", ["tracked"]),
-            # grok: LT-tracked, BI too expensive -- it shows under both chips
-            ("tracked", "too_expensive", ["tracked", "too_expensive"]),
+            # grok: LT-tracked, BI too expensive -- tracked is all it carries
+            ("tracked", "too_expensive", ["tracked"]),
             # a retirement is always retired, and keeps its second finding
             ("pending", "retired:too_expensive", ["retired", "too_expensive"]),
             ("too_expensive", "retired:too_expensive", ["retired", "too_expensive"]),
             ("stalled", "too_expensive", ["retired", "too_expensive"]),
             ("pending", "retired:unreachable", ["retired", "errors_out"]),
             ("pending", "retired:delisted", ["retired"]),
-            ("stalled", "monitoring", ["tracked", "retired"]),
+            ("stalled", "monitoring", ["tracked"]),
             ("no_logprobs", "bad_temperature", ["untrackable"]),
             # pending is the absence of a verdict: only alone
             ("tracked", "pending", ["tracked"]),

@@ -257,10 +257,15 @@ def _headlines_of(status: str) -> list[str]:
 
 
 def headlines_for(lt: str, bi: str) -> list[str]:
-    """Every headline the endpoint carries, in HEADLINE_ORDER: what each method
-    contributes on its own plus the joint headline (untrackable). "pending" is
-    the absence of a verdict, so it only stays when nothing else was found."""
-    found = set(_headlines_of(lt)) | set(_headlines_of(bi)) | {headline_for(lt, bi)}
+    """Every headline the endpoint carries, in HEADLINE_ORDER. A tracked endpoint
+    is just that: what its other method could not do is not held against it. An
+    untracked one carries what each method contributes on its own plus the joint
+    headline (untrackable); "pending" is the absence of a verdict, so it only
+    stays when nothing else was found."""
+    headline = headline_for(lt, bi)
+    if headline == "tracked":
+        return [headline]
+    found = set(_headlines_of(lt)) | set(_headlines_of(bi)) | {headline}
     if len(found) > 1:
         found.discard("pending")
     return [h for h in HEADLINE_ORDER if h in found]

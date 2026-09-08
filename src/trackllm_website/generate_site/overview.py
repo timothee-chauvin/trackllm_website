@@ -112,11 +112,12 @@ def _lanes(info: LTData | None, view: B3ITView | None) -> list[Lane]:
 
 
 def _status_fields(st: EndpointStatus, status: str | None) -> dict:
-    """`status` is the row's lane-derived display state: a row whose every series
-    went dead is retired whatever its methods' verdicts say, so it joins the
-    Retired chip too (a too_expensive endpoint that stopped answering is both)."""
+    """`status` is the row's lane-derived display state: an untracked row whose
+    every series went dead is retired whatever its methods' verdicts say, so it
+    joins the Retired chip too (a too_expensive endpoint that stopped answering
+    is both). A tracked row stays just tracked (headlines_for)."""
     headlines = st.headlines
-    if status == "retired" and "retired" not in headlines:
+    if status == "retired" and headlines != ["tracked"] and "retired" not in headlines:
         headlines = [h for h in HEADLINE_ORDER if h in {*headlines, "retired"}]
     return {
         "headline": st.headline,
