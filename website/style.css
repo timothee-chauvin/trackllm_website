@@ -284,13 +284,16 @@ table.dir tbody tr:last-child td { border-bottom: none; }
 table.dir tbody tr:hover { background: var(--surface-2); }
 /* components.sparkline emits a bare <svg>; the cell fixes the column, the rule the glyph */
 table.dir tbody td.spark-cell { width: 130px; }
-table.dir tbody td.spark-cell a, table.dir tbody td.spark-cell svg { width: 100%; height: 26px; display: block; }
+/* direct children only: the strip nests an <svg> per change disc (components.ts::sparkline) */
+table.dir tbody td.spark-cell > a, table.dir tbody td.spark-cell > a > svg { width: 100%; height: 26px; display: block; }
 td .model-cell { font-weight: 560; letter-spacing: -0.01em; }
 td .model-cell:hover { color: var(--accent); }
 td .org-cell { color: var(--text-dim); font-size: 0.74rem; white-space: nowrap; }
 td .prov-cell { color: var(--text-muted); font-family: var(--mono); font-size: 0.79rem; }
 /* untracked directory rows: the one-line reason sits where the sparkline would */
-td.reason-cell { max-width: 340px; }
+/* width is a preference, max-width: 0 lets the column give way (the span clips), so
+   a long reason never pushes the table past its box */
+td.reason-cell { width: 340px; max-width: 0; }
 td.reason-cell .reason { display: block; max-width: 340px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-dim); font-size: 0.78rem; }
 /* Status/trace cell: the badge or pill is its own popover tap target (bindTips),
    so the link to the endpoint page cannot wrap it (a button inside an <a> is
