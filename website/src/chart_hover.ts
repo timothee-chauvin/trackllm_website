@@ -7,7 +7,7 @@
 // targets of their own: they explain the mark, not the nearest day. The block
 // keeps the last readout until something else is read or a press lands off every
 // target, so a hand can leave the curve, move down into it and copy a line.
-import { MARK_R, tipHTML } from "./chart_tip";
+import { type Cell, MARK_R, tipHTML } from "./chart_tip";
 import {
   type RawLoaders,
   b3itChangeDetail,
@@ -118,40 +118,52 @@ export function bindHover(
     tipEl.classList.remove("idle");
   };
 
+  /** One sample of a lane as a readout: its value cell, the marker on the curve,
+   *  and the raw data behind it once that has loaded ("" when there is none). */
+  const daySample = (lane: LaneGeom, i: number): { date: string; cell: Cell; detail: () => Promise<string> } => {
+    const [date, v] = lane.series[i];
+    mark.innerHTML = `<circle cx="${axis.fx(date).toFixed(1)}" cy="${laneY(lane, v).toFixed(1)}" r="${MARK_R}" fill="${lane.col}" stroke="var(--surface-2)" stroke-width="1.5"/>`;
+    const detail = async (): Promise<string> => {
+      if (lane.key === "b3it") {
+        const k = b3it!.daily.findIndex(([d]) => d === date);
+        const votes = k < 0 ? null : await raw.b3it();
+        return votes ? b3itDayDetail(b3it!, votes, k) : "";
+      }
+      const logprobs = await raw.lt();
+      return logprobs ? ltDayDetail(logprobs, date) : "";
+    };
+    return { date, cell: { text: lane.fmt(v), col: lane.col }, detail };
+  };
+
   const showDay = (lane: LaneGeom, ev: PointerEvent): void => {
     const box = svg.getBoundingClientRect();
     // the SVG is drawn in the container's own pixels, so its user units and its CSS
     // pixels differ only by whatever `.chart svg { width: 100% }` had to scale
     const scale = box.width ? axis.vw / box.width : 1;
-    const i = nearestPoint(lane.series, (ev.clientX - box.left) * scale, axis.fx);
-    const [date, v] = lane.series[i];
-    const x = axis.fx(date);
-    mark.innerHTML = `<circle cx="${x.toFixed(1)}" cy="${laneY(lane, v).toFixed(1)}" r="${MARK_R}" fill="${lane.col}" stroke="var(--surface-2)" stroke-width="1.5"/>`;
-    const head = tipHTML(date.slice(0, 10), [{ text: lane.fmt(v), col: lane.col }]);
-    const key = `${lane.key}:${date}`;
+    const day = daySample(lane, nearestPoint(lane.series, (ev.clientX - box.left) * scale, axis.fx));
+    const head = tipHTML(day.date.slice(0, 10), [day.cell]);
+    const key = `${lane.key}:${day.date}`;
     render(key, head, "");
-    if (lane.key === "b3it" && b3it) {
-      const k = b3it.daily.findIndex(([d]) => d === date);
-      if (k < 0) return;
-      void raw.b3it().then((votes) => {
-        if (votes && current === key) render(key, head, b3itDayDetail(b3it, votes, k));
-      });
-    } else {
-      void raw.lt().then((logprobs) => {
-        if (logprobs && current === key) render(key, head, ltDayDetail(logprobs, date));
-      });
-    }
+    void day.detail().then((html) => {
+      if (html && current === key) render(key, head, html);
+    });
   };
 
-  const showMark = (laneKey: LaneGeom["key"], i: number, ev: PointerEvent): void => {
+  /** A change mark reads as the change -- and as the day it fell on, when the lane
+   *  sampled that day: the level shift and the raw data it was read from, together. */
+  const showMark = (laneKey: LaneGeom["key"], i: number): void => {
+    const lane = lanes.get(laneKey)!;
+    const c = laneKey === "lt" ? lt!.changes[i] : b3it!.changes[i];
+    const why = laneKey === "lt" ? ltChangeDetail(lt!, lt!.changes[i]) : b3itChangeDetail(b3it!, b3it!.changes[i]);
     mark.innerHTML = "";
-    const col = lanes.get(laneKey)!.col;
-    const head = (date: string): string => tipHTML(date, [{ text: "Change detected", col }]);
-    if (laneKey === "lt" && lt) {
-      render(`cp:lt:${i}`, head(lt.changes[i].date), ltChangeDetail(lt, lt.changes[i]));
-    } else if (laneKey === "b3it" && b3it) {
-      render(`cp:b3it:${i}`, head(b3it.changes[i].date), b3itChangeDetail(b3it, b3it.changes[i]));
-    }
+    const j = lane.series.length ? nearestPoint(lane.series, axis.fx(c.date), axis.fx) : -1;
+    const day = j >= 0 && lane.series[j][0].slice(0, 10) === c.date ? daySample(lane, j) : null;
+    const head = tipHTML(c.date, [{ text: "Change detected", col: lane.col }, ...(day ? [day.cell] : [])]);
+    const key = `cp:${laneKey}:${i}`;
+    render(key, head, why);
+    void day?.detail().then((html) => {
+      if (html && current === key) render(key, head, why + html);
+    });
   };
 
   const showEpoch = (i: number, ev: PointerEvent): void => {
@@ -173,7 +185,7 @@ export function bindHover(
     if (!el) return null;
     const lane = el.getAttribute("data-lane") as LaneGeom["key"] | null;
     if (el.classList.contains("cp-hit") && lane) {
-      return () => showMark(lane, +el.getAttribute("data-cp")!, ev);
+      return () => showMark(lane, +el.getAttribute("data-cp")!);
     }
     if (el.classList.contains("epoch-hit")) return () => showEpoch(+el.getAttribute("data-epoch")!, ev);
     const geom = lane ? lanes.get(lane) : undefined;

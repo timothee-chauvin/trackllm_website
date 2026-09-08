@@ -238,6 +238,17 @@ describe("readout wiring", () => {
     expect(tip.querySelector(".tip-detail")).not.toBeNull();
   });
 
+  test("a change mark also reads the day it fell on, once its votes load", async () => {
+    const { chart, tip } = await mount(null, B3IT);
+    point(chart.querySelector(".cp-hit")!, "pointermove", dayX(21), "mouse");
+    expect(tip.textContent).toContain("Change detected");
+    expect(tip.textContent).toContain("TV 0.");
+    await tick();
+    expect(tip.textContent).toContain("TV shift 0.4");
+    expect(tip.querySelector(".tip-grid"), "the day's votes table").not.toBeNull();
+    expect(chart.querySelector(".hover-mark circle"), "the day's marker on the curve").not.toBeNull();
+  });
+
   test("an epoch rule reads as the epoch, and its votes fill in when loaded", async () => {
     const { chart, tip } = await mount(null, B3IT);
     point(chart.querySelectorAll(".epoch-hit")[1], "pointermove", dayX(22), "mouse");
