@@ -520,8 +520,10 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 .rbar.nd > b { position: static; transform: none; color: var(--text-dim); font-weight: 500; padding-top: 3px; }
 
 /* Provider drift-rate dot plot (rate_plot.ts): name | dot with its 95% interval on
-   a shared axis | rate. One series, so the LT accent carries it; the gridlines are
-   per row and recessive, the dot wears a surface ring so it reads over its whisker. */
+   a shared axis | rate. The LT accent carries a mark by default and a .b3it mark
+   wears the B3IT purple; the gridlines are per row and recessive, the dot wears a
+   surface ring so it reads over its whisker. In .both the two series stack in
+   one row, LT above B3IT, and the value column lists both with a colour dot. */
 .rplot { padding: 0.5rem 1.2rem 0.6rem; }
 .rrow, .raxis { display: grid; grid-template-columns: 150px 1fr 56px; align-items: center; gap: 1rem; }
 .rrow { padding: 0.38rem 0; border-top: 1px solid var(--border-soft); }
@@ -536,12 +538,30 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 .rtrack .dot { position: absolute; top: 50%; width: 10px; height: 10px; transform: translate(-50%, -50%); border-radius: 50%;
   background: var(--accent); box-shadow: 0 0 0 2px var(--surface); }
 .rrow:hover .rtrack .dot { box-shadow: 0 0 0 2px var(--surface-2); }
+.rtrack .ci.b3it, .rtrack .dot.b3it { background: var(--b3it); }
 .rval { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 0.82rem; font-weight: 600; }
+.rplot.both .rrow, .rplot.both .raxis { grid-template-columns: 172px 1fr 56px; } /* room for "N ep · LT / B3IT ep-yr" */
+.rplot.both .rtrack { height: 30px; }
+.rplot.both .rtrack .ci, .rplot.both .rtrack .dot { top: 33%; }
+.rplot.both .rtrack .ci.b3it, .rplot.both .rtrack .dot.b3it { top: 67%; }
+.rplot.both .rval { display: flex; flex-direction: column; align-items: flex-end; gap: 0.1rem; }
+.rval span::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 0.35rem; vertical-align: middle; background: var(--accent); }
+.rval span.b3it::before { background: var(--b3it); }
+.rval span.none { color: var(--text-dim); font-weight: 400; }
+.rval span.none::before { content: none; }
+/* the method toggle above the plot: a radio chip row with the tally beside it */
+.rmode { margin-bottom: 0.9rem; }
+.rmode .chip.on[data-m="b3it"] { color: var(--b3it); border-color: var(--b3it); background: var(--b3it-quiet); }
+.rstat { font-family: var(--mono); font-size: 0.76rem; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+.rstat b { color: var(--text); font-weight: 600; }
+.rnote { color: var(--text-dim); font-size: 0.8rem; margin: 0.8rem 0 0; max-width: 78ch; }
+.rnote b { color: var(--text-muted); }
 .raxis { padding-top: 0.35rem; border-top: 1px solid var(--border); }
 .raxis .ticks { position: relative; height: 14px; font-family: var(--mono); font-size: 0.66rem; color: var(--text-dim); }
 .raxis .ticks span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
 @media (max-width: 560px) {
-  .rrow, .raxis { grid-template-columns: 96px 1fr 44px; gap: 0.6rem; }
+  .rrow, .raxis, .rplot.both .rrow, .rplot.both .raxis { grid-template-columns: 96px 1fr 44px; gap: 0.6rem; }
+  .rplot.both .rrow, .rplot.both .raxis { grid-template-columns: 96px 1fr 52px; }
   .rname small { display: none; }
 }
 

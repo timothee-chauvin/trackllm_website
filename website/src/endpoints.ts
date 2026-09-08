@@ -1,20 +1,9 @@
 // The All-endpoints page: the full directory with search, status / method /
 // change-history chips and sortable columns. The `init` export lets the smoke
 // tests re-render a fresh document without busting the module cache.
-import { bindActivation, bindTips, toggleChip } from "./components";
+import { bindActivation, bindTips, pickChip, toggleChip } from "./components";
 import { initDirectory, overviewLeadCells } from "./directory";
 import { fmtInt, loadOverview } from "./overview_data";
-
-/** One chip at most per row: picking one switches its siblings off. With
- *  `required` the picked chip cannot be switched off again (a radio group). */
-function pickChip(chip: HTMLElement, attr: "st" | "c", set: Set<string>, required: boolean): void {
-  const value = chip.dataset[attr]!;
-  if (required && set.has(value)) return;
-  for (const other of chip.parentElement!.querySelectorAll<HTMLElement>(".chip.on")) {
-    if (other !== chip) toggleChip(other, set, other.dataset[attr]!);
-  }
-  toggleChip(chip, set, value);
-}
 
 export async function init(): Promise<void> {
   const DATA = await loadOverview("lede");

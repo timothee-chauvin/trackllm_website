@@ -32,7 +32,7 @@ export interface Stats {
 }
 
 /** One provider *company*, with its serving variants pooled (provider.py::overview_rows).
- *  `lt_rate` and `lt_ci` are null together, and that null is the "not enough
+ *  A method's `rate` and `ci` are null together, and that null is the "not enough
  *  monitoring" state — never a rate of zero, and never recomputed here. */
 export interface ProviderRate {
   name: string;
@@ -41,12 +41,16 @@ export interface ProviderRate {
   n_endpoints: number;
   n_models: number;
   n_variants: number;
+  lt_endpoints: number;
   lt_years: number;
   lt_changes: number;
   lt_rate: number | null;
   lt_ci: [number, number] | null;
   b3it_endpoints: number;
   b3it_years: number;
+  b3it_changes: number;
+  b3it_rate: number | null;
+  b3it_ci: [number, number] | null;
   last_change: string | null;
 }
 

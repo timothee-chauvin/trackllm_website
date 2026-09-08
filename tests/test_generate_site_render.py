@@ -223,6 +223,7 @@ def test_overview_providers_are_base_provider_rows(tmp_path):
     assert row["name"] == "p"
     assert row["slug"] == "p"
     assert "lt_ci" in row
+    assert "b3it_ci" in row
 
 
 def test_render_emits_changes_page(tmp_path):

@@ -407,3 +407,19 @@ def test_overview_rows_are_one_per_provider_with_last_change(fake_site):
     assert row["n_variants"] == 2
     assert row["lt_rate"] is None
     assert row["last_change"] == "2026-06-25"
+
+
+def test_overview_rows_flatten_both_method_blocks(fake_site):
+    """The Providers page plots either method, so the row carries the same
+    fields for B3IT as for LT, copied verbatim from the per-provider view."""
+    views = _views(fake_site)
+    (row,) = overview_rows(views)
+    view = views["p"]
+    for method in ("lt", "b3it"):
+        for field in ("endpoints", "years", "changes", "rate", "ci"):
+            assert row[f"{method}_{field}"] == view[method][field]
+    assert row["lt_endpoints"] == 2
+    assert row["b3it_endpoints"] == 1
+    assert row["b3it_changes"] == 0
+    assert row["b3it_rate"] is None
+    assert row["b3it_ci"] is None

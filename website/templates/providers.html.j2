@@ -1,5 +1,5 @@
 {% extends "base.html.j2" %}
-{% from "_macros.html.j2" import search_box %}
+{% from "_macros.html.j2" import chip, search_box %}
 
 {% block title %}Providers | TrackLLM{% endblock %}
 
@@ -17,15 +17,26 @@
   <section class="block">
     <div class="sec-head">
       <h2>Drift rate</h2>
-      <span class="hint">detected changes per <b>endpoint-year</b> of LT monitoring — normalized for fleet size &amp; monitoring length — with a 95% Poisson interval. Providers are grouped by company; their serving variants (fp8, fp4, …) are compared on the provider page</span>
+      <span class="hint">detected changes per <b>endpoint-year</b> of LT or B3IT monitoring — normalized for fleet size &amp; monitoring length — with a 95% Poisson interval. Providers are grouped by company; their serving variants (fp8, fp4, …) are compared on the provider page</span>
+    </div>
+    {# the method toggle is a radio chip row (providers.ts::show); the mode is mirrored into the URL hash #}
+    <div class="chip-row rmode">
+      <div class="chips" id="rateMode" role="group" aria-label="Rate method">
+        {{ chip("LT", "m", "lt", on=true) }}
+        {{ chip("B3IT", "m", "b3it") }}
+        {{ chip("Both", "m", "both") }}
+      </div>
+      <span class="rstat" id="provStat"></span>
     </div>
     <div class="panel rplot" id="provPlot"></div>
+    <div class="legend" id="provLegend"></div>
+    <p class="rnote" id="provNote"></p>
   </section>
 
   <section class="block">
     <div class="sec-head">
       <h2>All providers</h2>
-      <span class="hint">including the ones without enough monitoring for a rate yet; 1 square = one endpoint-month of LT monitoring</span>
+      <span class="hint">including the ones without enough monitoring for a rate yet, with both methods' rates side by side; 1 square = one endpoint-month of LT monitoring</span>
     </div>
     <div class="toolbar">
       {{ search_box("provQ", "Search provider…", "Search providers") }}
@@ -39,7 +50,8 @@
               <th scope="col" data-psort="n_endpoints" class="r">Endpoints <span class="arr"></span></th>
               <th scope="col" data-psort="lt_rate">LT drift rate <span class="arr"></span></th>
               <th scope="col" class="col-hide">LT monitoring</th>
-              <th scope="col" class="col-hide">B3IT</th>
+              <th scope="col" data-psort="b3it_rate">B3IT drift rate <span class="arr"></span></th>
+              <th scope="col" class="col-hide">B3IT monitoring</th>
               <th scope="col" data-psort="last_change" class="r col-hide">Last change <span class="arr"></span></th>
             </tr>
           </thead>

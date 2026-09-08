@@ -157,7 +157,7 @@ export async function init(): Promise<void> {
   document.getElementById("allChanges")!.textContent = `All ${S.changes_total} changes →`;
 
   // ---- providers and endpoints: the slices home.py selected, drawn as given ----
-  document.getElementById("provPlot")!.innerHTML = ratePlot(DATA.providers, "");
+  document.getElementById("provPlot")!.innerHTML = ratePlot(DATA.providers, "", "lt");
   document.getElementById("allProviders")!.textContent = `All ${S.provider_companies} providers →`;
 
   document.getElementById("dirBody")!.innerHTML =
