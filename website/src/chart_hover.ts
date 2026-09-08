@@ -21,7 +21,6 @@ import {
   type FocusLT,
   type LaneGeom,
   LANE_H,
-  TOP1,
   TOP2,
   chartAxis,
   laneGeoms,
@@ -56,7 +55,7 @@ export interface Targets {
 const STRIP_W = 8; // a rule is one pixel wide; its target is this wide
 
 /** A transparent target over each lane that has a trace, a strip over every
- *  change mark and epoch rule, plus the group the readout marker is drawn into.
+ *  change mark (on its lane) and epoch rule, plus the group the readout marker is drawn into.
  *  Emitted last so nothing in the chart is above them, the strips last of all.
  *  aria-hidden: the changes table below the chart is the keyboard and screen-reader
  *  path, and these would otherwise add nameless tab stops. */
@@ -72,10 +71,13 @@ export function hitRects(lanes: LaneGeom[], pl: number, pw: number, targets: Tar
       .map((l) => rect("lane-hit", `data-lane="${l.key}"`, pl, l.topY, pw, LANE_H))
       .join("") +
     targets.epochs.map((e) => strip("epoch-hit", `data-epoch="${e.i}"`, e.x, TOP2, LANE_H)).join("") +
+    // a change mark's rule spans both lanes, its target only its own: the other
+    // lane at that date still reads as that lane's day
     targets.marks
-      .map((m) =>
-        strip("cp-hit", `data-lane="${m.lane}" data-cp="${m.i}"`, m.x, TOP1 - 4, TOP2 + LANE_H - (TOP1 - 4))
-      )
+      .map((m) => {
+        const topY = lanes.find((l) => l.key === m.lane)!.topY;
+        return strip("cp-hit", `data-lane="${m.lane}" data-cp="${m.i}"`, m.x, topY, LANE_H);
+      })
       .join("")
   );
 }

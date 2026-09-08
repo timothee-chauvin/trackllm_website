@@ -125,6 +125,11 @@ describe("epoch boundaries", () => {
     expect(+attr(rules[1], "x1")).toBeCloseTo(dayX(22), 0);
     expect(svg.querySelectorAll(".epoch-hit").length).toBe(2);
     expect(svg.querySelectorAll(".cp-hit").length).toBe(1);
+    // the strip covers its own lane only: the other lane at that date reads as a day
+    const cp = svg.querySelector(".cp-hit")!;
+    expect(cp.getAttribute("data-lane")).toBe("b3it");
+    expect(+cp.getAttribute("y")!).toBe(TOP2);
+    expect(+cp.getAttribute("height")!).toBe(LANE_H);
   });
 });
 
