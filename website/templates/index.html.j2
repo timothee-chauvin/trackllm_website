@@ -19,7 +19,8 @@
 
 <main class="wrap">
   {# Each section is a slice of a page of its own: the heading links there, and
-     so does the More button under the block. #}
+     so do the "All …" link at the head's right edge and the More button under
+     the block. #}
   <section class="block">
     <div class="sec-head">
       <h2><a href="changes.html">Latest changes</a></h2>
@@ -33,6 +34,7 @@
     <div class="sec-head">
       <h2><a href="providers.html">Providers</a></h2>
       <span class="hint">detected changes per <b>endpoint-year</b> of LT monitoring — normalized for fleet size &amp; monitoring length — with a 95% Poisson interval. The most drift-prone providers; each is a company with its serving variants (fp8, fp4, …) pooled</span>
+      <a class="more" href="providers.html" id="allProviders"></a>
     </div>
     <div class="panel rplot" id="provPlot"></div>
     {{ more_link("providers.html", "every provider") }}
@@ -42,6 +44,7 @@
     <div class="sec-head">
       <h2><a href="endpoints.html">Endpoints</a></h2>
       <span class="hint" id="dirCount"></span>
+      <a class="more" href="endpoints.html">All endpoints →</a>
     </div>
     {{ dir_table(sortable=false) }}
     {{ more_link("endpoints.html", "all endpoints") }}

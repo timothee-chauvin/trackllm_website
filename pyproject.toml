@@ -7,6 +7,8 @@ authors = [
     { name = "Timothee Chauvin", email = "timothee.chauvin28@gmail.com" },
 ]
 requires-python = ">=3.13"
+license = "AGPL-3.0-or-later"
+license-files = ["LICENSE"]
 dependencies = [
     "aiohttp>=3.13.2",
     "aiolimiter>=1.2.1",

@@ -135,40 +135,56 @@ describe("filter chips", () => {
 
 /** A chip's explanation used to be inserted into the chip row itself, which
  *  reflowed every chip after it on each hover. It is a floating tooltip now: on
- *  the body, out of the flow, and gone again when the pointer leaves. */
+ *  the body, out of the flow, and gone again when the pointer leaves. And a chip
+ *  is a toggle first: its tap flips the filter, never the caption -- the caption
+ *  is a hover / keyboard-focus affordance there (Chromium-verified: happy-dom
+ *  answers false to both the hover media query and :focus-visible). */
 describe("chip tooltips", () => {
   const tapped = (el: Element): void => {
     for (const type of ["pointerdown", "pointerup"]) el.dispatchEvent(new Event(type, { bubbles: true }));
   };
+  const touchend = (el: Element): boolean => {
+    const ev = new Event("touchend", { bubbles: true, cancelable: true });
+    el.dispatchEvent(ev);
+    return ev.defaultPrevented;
+  };
 
-  test("float over the page instead of joining the chip row", async () => {
+  test("a status badge floats over the page, so the row keeps its height", async () => {
     await renderEndpoints();
-    const chip = document.querySelector<HTMLElement>('#chips .chip[data-st="retired"]')!;
-    const row = chip.parentElement!;
-    const before = row.children.length;
-    tapped(chip);
-    const tip = document.querySelector(".tipline")!;
-    expect(tip, "no tooltip opened").not.toBeNull();
-    expect(tip.classList.contains("tip-float")).toBe(true);
-    expect(tip.parentElement).toBe(document.body);
-    expect(tip.textContent).toBe(chip.dataset.tip!);
-    expect(row.children.length, "the chip row gained an element").toBe(before);
-    // the badge's own words describe it to assistive tech while it is open
-    expect(chip.getAttribute("aria-describedby")).toBe(tip.id);
-    tapped(chip);
-    expect(document.querySelector(".tipline")).toBeNull();
-    expect(chip.hasAttribute("aria-describedby")).toBe(false);
-  });
-
-  test("a status badge in the table floats too, so the row keeps its height", async () => {
-    await renderEndpoints();
-    document.querySelector<HTMLElement>('#chips .chip[data-st="tracked"]')!.click();
+    document.querySelector<HTMLElement>('#chips .chip[data-st="tracked"]')!.click(); // untracked rows carry the badge
     const badge = document.querySelector<HTMLElement>("#dirBody .badge.st")!;
     const cell = badge.parentElement!;
     const before = cell.children.length;
     tapped(badge);
-    expect(document.querySelector("body > .tipline.tip-float")).not.toBeNull();
-    expect(cell.children.length).toBe(before);
+    const tip = document.querySelector("body > .tipline.tip-float")!;
+    expect(tip, "no tooltip opened").not.toBeNull();
+    expect(tip.textContent).toBe(badge.dataset.tip!);
+    expect(cell.children.length, "the cell gained an element").toBe(before);
+    // the badge's own words describe it to assistive tech while it is open
+    expect(badge.getAttribute("aria-describedby")).toBe(tip.id);
+    // a phone's follow-up click would land on the row's stretched link
+    expect(touchend(badge)).toBe(true);
+    tapped(badge);
+    expect(document.querySelector(".tipline")).toBeNull();
+    expect(badge.hasAttribute("aria-describedby")).toBe(false);
+  });
+
+  test("a tap on a status chip toggles the filter, not the caption", async () => {
+    await renderEndpoints();
+    const chip = document.querySelector<HTMLElement>('#chips .chip[data-st="retired"]')!;
+    const before = shownCount();
+    tapped(chip);
+    expect(document.querySelector(".tipline"), "the tap opened a caption").toBeNull();
+    // the touch click must survive: it is what toggles the chip
+    expect(touchend(chip)).toBe(false);
+    chip.click();
+    expect(chip.getAttribute("aria-pressed")).toBe("true");
+    expect(shownCount()).not.toBe(before);
+    // Enter toggles the chip alone, without pinning a caption under it
+    press(chip, "Enter");
+    expect(chip.getAttribute("aria-pressed")).toBe("false");
+    expect(shownCount()).toBe(before);
+    expect(document.querySelector(".tipline")).toBeNull();
   });
 });
 

@@ -212,6 +212,11 @@ section.block { padding: 2.6rem 0 0.6rem; scroll-margin-top: var(--nav-h); }
 .sec-head h2 a::after { content: " ›"; color: var(--text-dim); font-weight: 500; }
 .sec-head h2 a:hover { color: var(--accent); }
 .sec-head h2 a:hover::after { color: var(--accent); }
+/* the "All …" link keeps the head's right edge even once a hint has wrapped it onto its own line */
+.sec-head .more { margin-left: auto; white-space: nowrap; font-size: 0.9rem; }
+.sec-head .more:hover { color: var(--accent); }
+/* on a phone the link shares the heading's line and the hint drops under both */
+@media (max-width: 560px) { .sec-head .hint { order: 1; flex-basis: 100%; } }
 .more-btn { display: block; margin: 0.7rem auto 0; width: fit-content; padding: 0.45rem 1.4rem; border-radius: 20px;
   font-size: 0.85rem; font-weight: 550; color: var(--text-muted); background: var(--surface); border: 1px solid var(--border); transition: all .13s; }
 .more-btn:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-quiet); }

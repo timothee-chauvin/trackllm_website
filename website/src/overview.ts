@@ -162,6 +162,7 @@ export async function init(): Promise<void> {
   const provs = DATA.providers;
   document.getElementById("provPlot")!.innerHTML =
     ratePlot(rateablePlotRows(provs).slice(0, PLOT_SIZE), "");
+  document.getElementById("allProviders")!.textContent = `All ${S.provider_companies} providers →`;
 
   // ---- endpoints: the most-changed actively tracked rows ----
   const rows = DATA.endpoints;

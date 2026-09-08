@@ -102,10 +102,11 @@
 </div>
 {% endmacro %}
 
-{# The two repositories; shared by the GitHub page and the About page's GitHub section. #}
+{# The two repositories and their licenses; shared by the GitHub page and the
+   About page's GitHub section. #}
 {% macro repo_links() %}
-<p class="prose">Code: <a href="{{ CODE_REPO_URL }}" target="_blank" rel="noopener">{{ CODE_REPO_URL }}</a><br>
-Data: <a href="{{ DATA_REPO_URL }}" target="_blank" rel="noopener">{{ DATA_REPO_URL }}</a></p>
+<p class="prose">Code: <a href="{{ CODE_REPO_URL }}" target="_blank" rel="noopener">{{ CODE_REPO_URL }}</a> (<a href="{{ CODE_REPO_URL }}/blob/main/LICENSE" target="_blank" rel="noopener">AGPL-3.0</a>)<br>
+Data: <a href="{{ DATA_REPO_URL }}" target="_blank" rel="noopener">{{ DATA_REPO_URL }}</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>)</p>
 {% endmacro %}
 
 {# The Cite pill opens the site-wide #citeDialog (base.html.j2). Icon: Lucide
