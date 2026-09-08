@@ -79,7 +79,8 @@ export function hitRects(lanes: LaneGeom[], pl: number, pw: number, targets: Tar
 
 /** Wire the readout to an already-rendered chart. Called after every draw, so the
  *  resize redraw does not leave the chart inert. A readout whose raw data has not
- *  arrived yet shows the value at once and fills in when it lands. */
+ *  arrived yet (endpoint.ts fetches it as soon as the page is idle) shows the value
+ *  at once and fills in when it lands. */
 export function bindHover(
   chartEl: HTMLElement,
   tipEl: HTMLElement,
@@ -109,13 +110,16 @@ export function bindHover(
     current = null;
   };
 
+  // Placed once per readout: a pointer drifting within one point's range, or a
+  // detail block landing late, must not move a tip the reader is heading into.
   const render = (key: string, head: string, detail: string, ev: PointerEvent): void => {
+    const moved = key !== current;
     current = key;
     tipEl.innerHTML = head + detail;
     tipEl.classList.toggle("has-detail", !!detail);
     tipEl.classList.toggle("pinned", pinned);
     tipEl.hidden = false;
-    placeTip(tipEl, chartEl, ev);
+    if (moved) placeTip(tipEl, chartEl, ev);
   };
 
   const showDay = (lane: LaneGeom, ev: PointerEvent): void => {
@@ -194,16 +198,9 @@ export function bindHover(
     pinned = e.pointerType === "touch";
     show();
   });
-  chartEl.addEventListener("pointerleave", () => {
+  // The tip is the chart's sibling: leaving the chart for the tip (to select a
+  // line of it) is not leaving the readout, so the box holding both is what hides.
+  (tipEl.parentElement ?? chartEl).addEventListener("pointerleave", () => {
     if (!pinned) hide();
   });
-  // a pointer arriving over the chart is about to read it: fetch ahead of the first hover
-  chartEl.addEventListener(
-    "pointerenter",
-    () => {
-      if (lt) void raw.lt();
-      if (b3it) void raw.b3it();
-    },
-    { once: true }
-  );
 }

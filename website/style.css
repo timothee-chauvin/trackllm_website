@@ -373,13 +373,12 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
    the empty box sat in the chart's corner, shadow and all */
 .chart-tip[hidden] { display: none; }
 /* The endpoint chart's readout carries the raw data under the value: a block on its
-   own row, wrapping the sentences and scrolling the tables. Pinned by a tap it takes
-   pointer events, so the block can be scrolled by finger; under a mouse it stays
-   inert and the pointer keeps reading the chart through it. */
-.chart-tip.has-detail { flex-wrap: wrap; max-width: min(460px, calc(100% - 8px)); }
+   own row, wrapping the sentences, as tall as its tables (chart_tip.placeTip keeps
+   it in the viewport). It takes the pointer, so a reader can move into it and
+   select a line to copy; the model page's plain tip stays inert. */
+.chart-tip.has-detail { flex-wrap: wrap; max-width: min(460px, calc(100% - 8px)); pointer-events: auto; user-select: text; cursor: auto; }
 .chart-tip.pinned { pointer-events: auto; }
-.chart-tip .tip-detail { flex-basis: 100%; max-height: 260px; overflow: auto; font-size: 0.7rem;
-  line-height: 1.4; color: var(--text); white-space: normal; }
+.chart-tip .tip-detail { flex-basis: 100%; font-size: 0.7rem; line-height: 1.4; color: var(--text); white-space: normal; }
 .chart-tip .tip-detail p { margin: 0.15rem 0 0; }
 .chart-tip .tip-detail .badge { margin-right: 0.25rem; }
 .chart-tip .tip-h { margin-top: 0.4rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

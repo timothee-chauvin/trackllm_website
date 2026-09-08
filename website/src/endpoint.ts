@@ -77,6 +77,7 @@ type Status = "stable" | "changed" | "retired";
 
 const TRACE_LEN = 110;
 const RESIZE_DEBOUNCE_MS = 150;
+const IDLE_FALLBACK_MS = 200;
 
 const fmtMon = (s: string): string => {
   const d = new Date(td(s));
@@ -387,7 +388,7 @@ export async function init(): Promise<void> {
   const lt = buildLT(scores, manifest.changes.lt);
   const b3it = buildB3IT(b3itData, manifest.changes.b3it);
 
-  // each raw file fetched once, on the readout's first request (chart_hover.bindHover)
+  // each raw file fetched once, whichever asks first: the idle prefetch below or a readout
   const once = <T,>(url: string): (() => Promise<T | null>) => {
     let p: Promise<T | null> | null = null;
     return () => (p ??= fetchJSON<T>(url));
@@ -400,6 +401,19 @@ export async function init(): Promise<void> {
   renderStatusCard(lt, b3it, manifest.state);
   renderChart(lt, b3it, raw);
   renderChangesTable(lt, b3it);
+  prefetchRaw(lt, b3it, raw);
+}
+
+/** The raw files behind the readouts (up to ~180 KB each) fetched after the chart
+ *  is on screen and the browser is idle, so the first hover already has them and
+ *  the page's own load never waits on them. */
+function prefetchRaw(lt: FocusLT | null, b3it: FocusB3IT | null, raw: RawLoaders): void {
+  const load = (): void => {
+    if (lt) void raw.lt();
+    if (b3it) void raw.b3it();
+  };
+  if ("requestIdleCallback" in window) window.requestIdleCallback(load);
+  else setTimeout(load, IDLE_FALLBACK_MS);
 }
 
 init();
