@@ -18,7 +18,7 @@ import {
   stripTip,
   volGrid,
 } from "./components";
-import { EndpointRow, initDirectory } from "./directory";
+import { EndpointRow, endpointCell, initDirectory } from "./directory";
 import { type TimelineData, renderTimeline } from "./timeline";
 
 interface MethodBlock {
@@ -291,8 +291,7 @@ export async function init(): Promise<void> {
     q: qEl,
     body: bodyEl,
     foot: footEl,
-    descending: ["status", "nChanges", "stableDays"],
-    providerValue: (r) => variantOf(r.provider),
+    descending: ["status", "nChanges", "lastChange"],
     list: (q) => {
       const ql = q.toLowerCase();
       return rows.filter((r) => {
@@ -303,15 +302,12 @@ export async function init(): Promise<void> {
         return true;
       });
     },
-    leadCells: (r) => `
-        <td><a class="model-cell" href="../models/${esc(r.modelSlug)}.html">${esc(r.model)}</a><div class="org-cell">${esc(r.org)}</div></td>
-        <td class="col-hide"><span class="prov-cell">${variantOf(r.provider) ? esc(variantOf(r.provider)) : "—"}</span></td>`,
+    leadCells: (r) => endpointCell(r, "../", esc(r.model),
+      `<span class="prov-cell">${variantOf(r.provider) ? esc(variantOf(r.provider)) : esc(NAME)}</span>`),
   });
 
   const countEl = document.getElementById("epCount");
-  if (countEl) {
-    countEl.textContent = `${rows.length} endpoints from ${NAME} · model names link to the model page, the status pill to the endpoint page`;
-  }
+  if (countEl) countEl.textContent = `${rows.length} endpoints from ${NAME}`;
   const chipsEl = document.getElementById("epChips");
   if (chipsEl) bindFilterChips(chipsEl, filters, render);
 }

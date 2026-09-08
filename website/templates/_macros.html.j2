@@ -12,8 +12,8 @@
    for the status group). A "st" chip's value is a headline name, so its meaning
    is the same STATUS_COPY lookup the badge above uses -- "f" chips are feature
    filters with no single-status meaning, so they get no tip. #}
-{% macro chip(label, attr, value, state="", on=false) -%}
-<span class="chip{{ " " ~ state if state }}{{ " on" if on }}" data-{{ attr }}="{{ value }}"
+{% macro chip(label, attr, value, on=false) -%}
+<span class="chip{{ " on" if on }}" data-{{ attr }}="{{ value }}"
   role="button" tabindex="0" aria-pressed="{{ "true" if on else "false" }}"{% if attr == "st" %} data-tip="{{ STATUS_COPY[value] }}"{% endif %}>{{ label }}</span>
 {%- endmacro %}
 
@@ -63,8 +63,8 @@
    preview on the front page. #}
 {% macro dir_table(sortable) -%}
 {# a sortable table is the page; a preview shows its few rows whole #}
-{% set cols = [("model", "Model", ""), ("provider", "Provider", "col-hide"), ("status", "Status", ""),
-               ("nChanges", "Changes", "r"), (none, "Methods", "col-hide"), ("stableDays", "Stable for", "r col-hide"),
+{% set cols = [("model", "Endpoint", ""), ("status", "Status", ""),
+               ("nChanges", "Changes", "r"), (none, "Methods", "col-hide"), ("lastChange", "Last change", "r col-hide"),
                (none, "Drift from baseline", "col-hide")] %}
 <div class="table-wrap{{ "" if sortable else " preview" }}">
   <div class="table-scroll">
@@ -102,10 +102,11 @@
 </div>
 {% endmacro %}
 
-{# The two repositories; shared by the GitHub page and the About page's GitHub section. #}
+{# The two repositories and their licenses; shared by the GitHub page and the
+   About page's GitHub section. #}
 {% macro repo_links() %}
-<p class="prose">Code: <a href="{{ CODE_REPO_URL }}" target="_blank" rel="noopener">{{ CODE_REPO_URL }}</a><br>
-Data: <a href="{{ DATA_REPO_URL }}" target="_blank" rel="noopener">{{ DATA_REPO_URL }}</a></p>
+<p class="prose">Code: <a href="{{ CODE_REPO_URL }}" target="_blank" rel="noopener">{{ CODE_REPO_URL }}</a> (<a href="{{ CODE_REPO_URL }}/blob/main/LICENSE" target="_blank" rel="noopener">AGPL-3.0</a>)<br>
+Data: <a href="{{ DATA_REPO_URL }}" target="_blank" rel="noopener">{{ DATA_REPO_URL }}</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>)</p>
 {% endmacro %}
 
 {# The Cite pill opens the site-wide #citeDialog (base.html.j2). Icon: Lucide

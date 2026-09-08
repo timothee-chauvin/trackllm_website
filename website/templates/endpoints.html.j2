@@ -17,7 +17,6 @@
   <section class="block">
     <div class="sec-head">
       <h2>Endpoints</h2>
-      <span class="hint">chips within a row are alternatives (any of them matches); rows combine, and so does the search</span>
     </div>
     <div class="toolbar">
       {{ search_box("q", "Search model, provider, or org…", "Search endpoints by model, provider, or org") }}
@@ -25,7 +24,7 @@
     <div class="chip-groups" id="chips">
       <div class="chip-row"><span class="k">Status</span><div class="chips">
         {{ chip("Tracked", "st", "tracked", on=true) }}
-        {{ chip("Retired", "st", "retired", state="state-retired") }}
+        {{ chip("Retired", "st", "retired") }}
         {{ chip("Untrackable", "st", "untrackable") }}
         {{ chip("Too expensive", "st", "too_expensive") }}
         {{ chip("Not selected", "st", "not_selected") }}
@@ -38,8 +37,8 @@
         {{ chip("B3IT", "f", "b3it") }}
       </div></div>
       <div class="chip-row"><span class="k">Changes</span><div class="chips">
-        {{ chip("Ever changed", "c", "everchanged", state="state-changed") }}
-        {{ chip("Recent (60d)", "c", "recent", state="state-changed") }}
+        {{ chip("Ever changed", "c", "everchanged") }}
+        {{ chip("Recent (60d)", "c", "recent") }}
       </div></div>
     </div>
     {{ dir_table(sortable=true) }}

@@ -212,6 +212,11 @@ section.block { padding: 2.6rem 0 0.6rem; scroll-margin-top: var(--nav-h); }
 .sec-head h2 a::after { content: " ›"; color: var(--text-dim); font-weight: 500; }
 .sec-head h2 a:hover { color: var(--accent); }
 .sec-head h2 a:hover::after { color: var(--accent); }
+/* the "All …" link keeps the head's right edge even once a hint has wrapped it onto its own line */
+.sec-head .more { margin-left: auto; white-space: nowrap; font-size: 0.9rem; }
+.sec-head .more:hover { color: var(--accent); }
+/* on a phone the link shares the heading's line and the hint drops under both */
+@media (max-width: 560px) { .sec-head .hint { order: 1; flex-basis: 100%; } }
 .more-btn { display: block; margin: 0.7rem auto 0; width: fit-content; padding: 0.45rem 1.4rem; border-radius: 20px;
   font-size: 0.85rem; font-weight: 550; color: var(--text-muted); background: var(--surface); border: 1px solid var(--border); transition: all .13s; }
 .more-btn:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-quiet); }
@@ -260,8 +265,6 @@ section.block { padding: 2.6rem 0 0.6rem; scroll-margin-top: var(--nav-h); }
   color: var(--text-muted); background: var(--surface-2); border: 1px solid var(--border); transition: all .13s; }
 .chip:hover { color: var(--text); border-color: var(--text-dim); }
 .chip.on { color: var(--accent); border-color: var(--accent); background: var(--accent-quiet); }
-.chip.on.state-changed { color: var(--changed); border-color: var(--changed); background: var(--changed-bg); }
-.chip.on.state-retired { color: var(--retired); border-color: var(--retired); background: var(--retired-bg); }
 /* the Endpoints page's chips, one labeled row per filter group (endpoints.ts) */
 .chip-groups { display: grid; gap: 0.45rem; margin-bottom: 0.9rem; }
 .chip-row { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
@@ -281,13 +284,19 @@ table.dir tbody tr:last-child td { border-bottom: none; }
 table.dir tbody tr:hover { background: var(--surface-2); }
 /* components.sparkline emits a bare <svg>; the cell fixes the column, the rule the glyph */
 table.dir tbody td.spark-cell { width: 130px; }
-table.dir tbody td.spark-cell > svg { width: 100%; height: 26px; display: block; }
-td .model-cell { font-weight: 560; letter-spacing: -0.01em; }
+/* direct children only: the strip nests an <svg> per change disc (components.ts::sparkline) */
+table.dir tbody td.spark-cell > a, table.dir tbody td.spark-cell > a > svg { width: 100%; height: 26px; display: block; }
+/* anywhere: a phone's Endpoint column must be able to shrink below the longest
+   unbreakable name ("gpt-4o-2024-08-06" has no break before a digit) */
+td .model-cell { font-weight: 560; letter-spacing: -0.01em; overflow-wrap: anywhere; }
 td .model-cell:hover { color: var(--accent); }
 td .org-cell { color: var(--text-dim); font-size: 0.74rem; white-space: nowrap; }
-td .prov-cell { color: var(--text-muted); font-family: var(--mono); font-size: 0.79rem; }
+td .prov-cell { display: block; width: fit-content; color: var(--text-muted); font-family: var(--mono); font-size: 0.76rem; overflow-wrap: anywhere; }
+td a.prov-cell:hover { color: var(--accent); }
 /* untracked directory rows: the one-line reason sits where the sparkline would */
-td.reason-cell { max-width: 340px; }
+/* width is a preference, max-width: 0 lets the column give way (the span clips), so
+   a long reason never pushes the table past its box */
+td.reason-cell { width: 340px; max-width: 0; }
 td.reason-cell .reason { display: block; max-width: 340px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-dim); font-size: 0.78rem; }
 /* Status/trace cell: the badge or pill is its own popover tap target (bindTips),
    so the link to the endpoint page cannot wrap it (a button inside an <a> is
@@ -302,7 +311,10 @@ td .cc.zero { color: var(--text-dim); }
 td .cc.some { color: var(--changed); font-weight: 600; }
 td .methods { display: flex; gap: 0.3rem; }
 .dir-foot { padding: 0.7rem 1.1rem; color: var(--text-dim); font-size: 0.78rem; border-top: 1px solid var(--border); font-family: var(--mono); }
-@media (max-width: 820px) { table.dir .col-hide { display: none; } }
+@media (max-width: 820px) {
+  table.dir .col-hide { display: none; }
+  table.dir thead th, table.dir tbody td { padding-left: 0.7rem; padding-right: 0.7rem; }
+}
 /* the org page's table is server-rendered: no sorting, so no affordance for it */
 body.org table.dir thead th { cursor: default; }
 body.org table.dir thead th:hover { color: var(--text-dim); }

@@ -217,8 +217,8 @@ export function methodBadges(methods: string[]): string {
  *  observation is more than RETIRED_GAP_DAYS (14) old; otherwise "changed" if
  *  its last detected change is within RECENT_CHANGE_DAYS (60d), else "stable". */
 const TRACE_COPY: Record<string, string> = {
-  changed: "This endpoint is actively tracked and moved within the last 60 days.",
-  stable: "This endpoint is actively tracked and has shown no change in the last 60 days.",
+  changed: "This endpoint is actively tracked and has at least one detected change.",
+  stable: "This endpoint is actively tracked and has never shown a detected change.",
   retired:
     "This endpoint was tracked, but has gone quiet: either the pipeline retired it, or it hasn't answered in over 14 days.",
 };
@@ -450,6 +450,13 @@ function floatTip(line: HTMLElement, el: Element): void {
 /** How far a press may travel and still count as a tap rather than a scroll. */
 const TAP_SLOP = 10;
 
+/** A [data-tip] that is also a toggle (the status chips, aria-pressed) keeps its
+ *  tap for the toggle: bindTips claims neither the pointer gesture nor the touch
+ *  click there -- suppressing that click is what left the status chips dead on a
+ *  phone -- nor Enter/Space, and the caption stays a hover / keyboard-focus
+ *  affordance that leaves with the pointer instead of pinning under a click. */
+const TAP_TIP = "[data-tip]:not([aria-pressed])";
+
 /** How a caption got opened, ranked by how deliberate the gesture was. A mouse
  *  moving onto a hover-capable element opens it "hover"-cheap, and a real click
  *  on that same element arrives right after (the browser fires mouseover before
@@ -504,7 +511,7 @@ export function bindTips(root: Element): void {
   root.addEventListener("pointerdown", (e) => {
     const p = e as PointerEvent;
     press = {
-      el: (p.target as Element).closest?.("[data-tip]") ?? null,
+      el: (p.target as Element).closest?.(TAP_TIP) ?? null,
       x: p.clientX,
       y: p.clientY,
     };
@@ -539,11 +546,11 @@ export function bindTips(root: Element): void {
   root.addEventListener(
     "touchend",
     (e) => {
-      if ((e.target as Element).closest?.("[data-tip]")) e.preventDefault();
+      if ((e.target as Element).closest?.(TAP_TIP)) e.preventDefault();
     },
     { passive: false }
   );
-  bindKeyActivation(root, "[data-tip]", activate);
+  bindKeyActivation(root, TAP_TIP, activate);
   // :focus-visible, because a pointer focuses too: a tap that dismisses a caption
   // reflows the page, and the strip that slides under the finger would otherwise
   // catch the focus the browser hands out afterwards and caption itself again.

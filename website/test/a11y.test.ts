@@ -98,17 +98,28 @@ describe("filter chips", () => {
 
   test("Enter and Space toggle a chip, and aria-pressed follows", async () => {
     await renderEndpoints();
-    const tracked = document.querySelector<HTMLElement>('#chips .chip[data-st="tracked"]')!;
+    const lt = document.querySelector<HTMLElement>('#chips .chip[data-f="lt"]')!;
     const all = shownCount();
 
-    press(tracked, "Enter"); // tracked off: no status constraint left
-    expect(tracked.getAttribute("aria-pressed")).toBe("false");
-    expect(tracked.classList.contains("on")).toBe(false);
-    expect(shownCount()).toBeGreaterThan(all);
+    press(lt, "Enter");
+    expect(lt.getAttribute("aria-pressed")).toBe("true");
+    expect(lt.classList.contains("on")).toBe(true);
+    expect(shownCount()).toBeLessThan(all);
 
-    press(tracked, " ");
-    expect(tracked.getAttribute("aria-pressed")).toBe("true");
+    press(lt, " ");
+    expect(lt.getAttribute("aria-pressed")).toBe("false");
     expect(shownCount()).toBe(all);
+  });
+
+  test("Enter moves the status radio, and the pressed state follows", async () => {
+    await renderEndpoints();
+    const tracked = document.querySelector<HTMLElement>('#chips .chip[data-st="tracked"]')!;
+    const retired = document.querySelector<HTMLElement>('#chips .chip[data-st="retired"]')!;
+    press(retired, "Enter");
+    expect(retired.getAttribute("aria-pressed")).toBe("true");
+    expect(tracked.getAttribute("aria-pressed")).toBe("false");
+    press(retired, "Enter"); // a radio's active choice stays
+    expect(retired.getAttribute("aria-pressed")).toBe("true");
   });
 
   test("Space activates rather than scrolling the page", async () => {
@@ -135,40 +146,57 @@ describe("filter chips", () => {
 
 /** A chip's explanation used to be inserted into the chip row itself, which
  *  reflowed every chip after it on each hover. It is a floating tooltip now: on
- *  the body, out of the flow, and gone again when the pointer leaves. */
+ *  the body, out of the flow, and gone again when the pointer leaves. And a chip
+ *  is a toggle first: its tap flips the filter, never the caption -- the caption
+ *  is a hover / keyboard-focus affordance there (Chromium-verified: happy-dom
+ *  answers false to both the hover media query and :focus-visible). */
 describe("chip tooltips", () => {
   const tapped = (el: Element): void => {
     for (const type of ["pointerdown", "pointerup"]) el.dispatchEvent(new Event(type, { bubbles: true }));
   };
+  const touchend = (el: Element): boolean => {
+    const ev = new Event("touchend", { bubbles: true, cancelable: true });
+    el.dispatchEvent(ev);
+    return ev.defaultPrevented;
+  };
 
-  test("float over the page instead of joining the chip row", async () => {
+  test("a status badge floats over the page, so the row keeps its height", async () => {
     await renderEndpoints();
-    const chip = document.querySelector<HTMLElement>('#chips .chip[data-st="retired"]')!;
-    const row = chip.parentElement!;
-    const before = row.children.length;
-    tapped(chip);
-    const tip = document.querySelector(".tipline")!;
-    expect(tip, "no tooltip opened").not.toBeNull();
-    expect(tip.classList.contains("tip-float")).toBe(true);
-    expect(tip.parentElement).toBe(document.body);
-    expect(tip.textContent).toBe(chip.dataset.tip!);
-    expect(row.children.length, "the chip row gained an element").toBe(before);
-    // the badge's own words describe it to assistive tech while it is open
-    expect(chip.getAttribute("aria-describedby")).toBe(tip.id);
-    tapped(chip);
-    expect(document.querySelector(".tipline")).toBeNull();
-    expect(chip.hasAttribute("aria-describedby")).toBe(false);
-  });
-
-  test("a status badge in the table floats too, so the row keeps its height", async () => {
-    await renderEndpoints();
-    document.querySelector<HTMLElement>('#chips .chip[data-st="tracked"]')!.click();
+    document.querySelector<HTMLElement>('#chips .chip[data-st="untrackable"]')!.click(); // untracked rows carry the badge
     const badge = document.querySelector<HTMLElement>("#dirBody .badge.st")!;
     const cell = badge.parentElement!;
     const before = cell.children.length;
     tapped(badge);
-    expect(document.querySelector("body > .tipline.tip-float")).not.toBeNull();
-    expect(cell.children.length).toBe(before);
+    const tip = document.querySelector("body > .tipline.tip-float")!;
+    expect(tip, "no tooltip opened").not.toBeNull();
+    expect(tip.textContent).toBe(badge.dataset.tip!);
+    expect(cell.children.length, "the cell gained an element").toBe(before);
+    // the badge's own words describe it to assistive tech while it is open
+    expect(badge.getAttribute("aria-describedby")).toBe(tip.id);
+    // a phone's follow-up click would land on the row's stretched link
+    expect(touchend(badge)).toBe(true);
+    tapped(badge);
+    expect(document.querySelector(".tipline")).toBeNull();
+    expect(badge.hasAttribute("aria-describedby")).toBe(false);
+  });
+
+  test("a tap on a status chip toggles the filter, not the caption", async () => {
+    await renderEndpoints();
+    const chip = document.querySelector<HTMLElement>('#chips .chip[data-st="retired"]')!;
+    const before = shownCount();
+    tapped(chip);
+    expect(document.querySelector(".tipline"), "the tap opened a caption").toBeNull();
+    // the touch click must survive: it is what toggles the chip
+    expect(touchend(chip)).toBe(false);
+    chip.click();
+    expect(chip.getAttribute("aria-pressed")).toBe("true");
+    expect(shownCount()).not.toBe(before);
+    // Enter on another status chip moves the choice, without pinning a caption
+    const other = document.querySelector<HTMLElement>('#chips .chip[data-st="tracked"]')!;
+    press(other, "Enter");
+    expect(chip.getAttribute("aria-pressed")).toBe("false");
+    expect(shownCount()).toBe(before);
+    expect(document.querySelector(".tipline")).toBeNull();
   });
 });
 

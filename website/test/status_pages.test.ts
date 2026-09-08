@@ -22,6 +22,8 @@ interface FleetRow {
   providerSlug: string;
   methods: string[];
   nChanges: number;
+  lastChange: string | null;
+  recent: boolean;
   headline: string;
   reason: string;
 }
@@ -100,18 +102,25 @@ const chip = (st: string): HTMLElement => {
 const shownCount = (): number =>
   Number(/^(\d+) of /.exec(document.getElementById("dirFoot")!.textContent ?? "")?.[1]);
 
+const byHeadline = (h: string): FleetRow[] => ROWS.filter((r) => r.headline === h);
+const STATUSES = [...new Set(ROWS.map((r) => r.headline))];
+
 describe("endpoint directory chips", () => {
-  test("default shows only tracked-headline rows, chips reveal the rest", async () => {
+  // The status row is a radio: exactly one headline shows, and the one that is
+  // on cannot be switched off.
+  test("one status at a time, tracked by default", async () => {
     await renderEndpoints();
-    const byHeadline = (h: string): number => ROWS.filter((r) => r.headline === h).length;
     expect(chip("tracked").classList.contains("on")).toBe(true);
-    expect(shownCount()).toBe(byHeadline("tracked"));
+    expect(shownCount()).toBe(byHeadline("tracked").length);
 
-    chip("untrackable").dispatchEvent(new Event("click", { bubbles: true }));
-    expect(shownCount()).toBe(byHeadline("tracked") + byHeadline("untrackable"));
+    click(chip("untrackable"));
+    expect(chip("tracked").classList.contains("on")).toBe(false);
+    expect(chip("untrackable").getAttribute("aria-pressed")).toBe("true");
+    expect(shownCount()).toBe(byHeadline("untrackable").length);
 
-    chip("tracked").dispatchEvent(new Event("click", { bubbles: true }));
-    expect(shownCount()).toBe(byHeadline("untrackable"));
+    click(chip("untrackable")); // the active status stays active
+    expect(chip("untrackable").classList.contains("on")).toBe(true);
+    expect(shownCount()).toBe(byHeadline("untrackable").length);
 
     // untracked rows show a status badge and their one-line reason
     const body = document.getElementById("dirBody")!;
@@ -119,9 +128,8 @@ describe("endpoint directory chips", () => {
     expect(body.textContent).toContain("no tracking method can work");
   });
 
-  // The three chip rows are facets: OR inside a row, AND across rows. Nothing
-  // bypasses anything, so what the footer counts is always what the chips say.
-  test("change-history chips combine with the status row", async () => {
+  // The change row is exclusive but optional, and combines with the status row.
+  test("change-history chips are exclusive and combine with the status row", async () => {
     const retiredChanged = rowWith(
       (r) => r.headline === "retired" && r.nChanges > 0,
       "retired-headline row with changes",
@@ -134,41 +142,67 @@ describe("endpoint directory chips", () => {
       document.querySelector(`#dirBody a[href="endpoints/${retiredChanged.slug}.html"]`),
     ).toBeNull();
 
-    click(chip("tracked")); // no status constraint: every changed row, whatever its fate
-    expect(shownCount()).toBe(changed.length);
+    click(chip("retired"));
+    expect(shownCount()).toBe(changed.filter((r) => r.headline === "retired").length);
     expect(
       document.querySelector(`#dirBody a[href="endpoints/${retiredChanged.slug}.html"]`),
     ).not.toBeNull();
+
+    click(chipF("c", "recent")); // switches, never adds
+    expect(chipF("c", "everchanged").classList.contains("on")).toBe(false);
+    expect(shownCount()).toBe(ROWS.filter((r) => r.headline === "retired" && r.recent).length);
+
+    click(chipF("c", "recent")); // off again: no change constraint
+    expect(shownCount()).toBe(byHeadline("retired").length);
   });
 
-  test("method chips are alternatives, not a conjunction", async () => {
+  test("method chips conjoin: both on means tracked by both", async () => {
     await renderEndpoints();
-    const tracked = ROWS.filter((r) => r.headline === "tracked");
-    const has = (m: string): number => tracked.filter((r) => r.methods.includes(m)).length;
+    const tracked = byHeadline("tracked");
+    const has = (...ms: string[]): number =>
+      tracked.filter((r) => ms.every((m) => r.methods.includes(m))).length;
     click(chipF("f", "lt"));
     expect(shownCount()).toBe(has("lt"));
     click(chipF("f", "b3it"));
-    expect(shownCount()).toBe(
-      tracked.filter((r) => r.methods.includes("lt") || r.methods.includes("b3it")).length,
-    );
-    expect(shownCount()).toBeGreaterThanOrEqual(Math.max(has("lt"), has("b3it")));
+    expect(shownCount()).toBe(has("lt", "b3it"));
+    expect(has("lt", "b3it")).toBeLessThan(has("lt"));
   });
 
-  test("no status chip active means no status constraint", async () => {
+  test("model names and drift strips link to the endpoint page", async () => {
     await renderEndpoints();
-    chip("tracked").dispatchEvent(new Event("click", { bubbles: true }));
-    expect(shownCount()).toBe(ROWS.length);
+    const row = byHeadline("tracked")[0];
+    const body = document.getElementById("dirBody")!;
+    const links = body.querySelectorAll(`a[href="endpoints/${row.slug}.html"]`);
+    // model name, status pill's stretched link, and the strip
+    expect(links.length).toBe(3);
+    expect(body.querySelector(".model-cell")!.getAttribute("href")).toMatch(/^endpoints\//);
+    expect(body.querySelector(".spark-cell a svg")).not.toBeNull();
+  });
+
+  test("the last-change column is a date, or a dash when never changed", async () => {
+    const never = rowWith((r) => r.headline === "tracked" && r.nChanges === 0, "never-changed row");
+    const once = rowWith((r) => r.headline === "tracked" && r.lastChange !== null, "changed row");
+    await renderEndpoints();
+    const cell = (slug: string): string =>
+      document
+        .querySelector(`#dirBody a.model-cell[href="endpoints/${slug}.html"]`)!
+        .closest("tr")!
+        .querySelectorAll("td")[4].textContent!;
+    expect(cell(never.slug)).toBe("—");
+    expect(cell(once.slug)).toMatch(/^\d{1,2} [A-Z][a-z]{2}/);
   });
 
   test("provider names without a provider page are not linked", async () => {
     await renderEndpoints();
-    chip("tracked").dispatchEvent(new Event("click", { bubbles: true })); // show all
-    const hrefs = document
-      .getElementById("dirBody")!
-      .querySelectorAll('a[href^="providers/"]');
-    expect(hrefs.length).toBeGreaterThan(0);
-    for (const a of hrefs) {
-      const href = a.getAttribute("href")!;
+    const hrefs = new Set<string>();
+    for (const st of STATUSES) {
+      click(chip(st));
+      for (const a of document.getElementById("dirBody")!.querySelectorAll('a[href^="providers/"]')) {
+        hrefs.add(a.getAttribute("href")!);
+      }
+    }
+    expect(hrefs.size).toBeGreaterThan(0);
+    for (const href of hrefs) {
       expect(existsSync(join(SITE, href)), `dead link: ${href}`).toBe(true);
     }
   });
@@ -181,8 +215,8 @@ describe("endpoint directory search", () => {
     search("gpt-5");
     const matches = matching("gpt-5");
     expect(shownCount()).toBe(matches.filter((r) => r.headline === "tracked").length);
-    click(chip("tracked")); // every match, untracked ones included
-    expect(shownCount()).toBe(matches.length);
+    click(chip("untrackable")); // the untracked matches, with their badges
+    expect(shownCount()).toBe(matches.filter((r) => r.headline === "untrackable").length);
     const body = document.getElementById("dirBody")!;
     expect(body.innerHTML).toContain("<mark>gpt-5</mark>");
     expect(body.querySelectorAll(".badge.st").length).toBeGreaterThan(0);
@@ -190,9 +224,8 @@ describe("endpoint directory search", () => {
 
   test("finds alibaba by provider name, with <mark>", async () => {
     await renderEndpoints();
-    click(chip("tracked"));
     search("alibaba");
-    const matches = matching("alibaba");
+    const matches = matching("alibaba").filter((r) => r.headline === "tracked");
     expect(matches.length).toBeGreaterThan(0);
     expect(shownCount()).toBe(matches.length);
     const prov = document.querySelector("#dirBody .prov-cell mark");

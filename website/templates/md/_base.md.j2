@@ -36,8 +36,8 @@
 {% macro org_link(nav_prefix, org) %}[{{ org }}]({{ nav_prefix }}orgs/{{ org | slug }}.md){% endmacro %}
 
 {% macro repo_links() %}
-- Code: {{ CODE_REPO_URL }}
-- Data: {{ DATA_REPO_URL }}
+- Code: {{ CODE_REPO_URL }} (AGPL-3.0)
+- Data: {{ DATA_REPO_URL }} (CC BY 4.0)
 {% endmacro %}
 
 {% macro footer(nav_prefix) %}
