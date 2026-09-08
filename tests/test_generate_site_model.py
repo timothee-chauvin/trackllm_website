@@ -33,7 +33,12 @@ def _write_changes_json(root: Path) -> None:
         if data is None:
             continue
         lt_changes[slug] = [
-            {"date": data.dates[c["index"]].isoformat(), "sigma": c["sigma"]}
+            {
+                "date": data.dates[c["index"]].isoformat(),
+                "sigma": c["sigma"],
+                "level_shift": 1.1,
+                "published": True,
+            }
             for c in data.changes
         ]
     b3it_views = b3it_views_for(root)
@@ -126,8 +131,7 @@ def test_build_model_views_groups_two_providers_of_one_model(tmp_path):
     # the model page rows link to ../endpoints/<slug>.html
     assert ep1["slug"] == "m2fa23p1"
     assert ep1["lt"] is not None
-    assert ep1["lt"]["changes"][0]["sigma"] == "12σ"
-    assert ep1["lt"]["changes"][0]["drift"] == 1.1  # level 1.2 after, 0.1 before
+    assert ep1["lt"]["changes"][0]["shift"] == 1.1
     assert ep1["n_changes"] == 1
     assert ep1["b3it"] is None
 
@@ -305,8 +309,7 @@ def test_change_count_follows_changes_json_not_the_recomputed_scores(tmp_path):
                     "model": "m/a",
                     "provider": "p1",
                     "method": "LT",
-                    "magnitude": 12.0,
-                    "magnitude_display": "12σ",
+                    "magnitude": 1.1,
                 }
             ]
         )
@@ -315,8 +318,7 @@ def test_change_count_follows_changes_json_not_the_recomputed_scores(tmp_path):
     view = _build_model_views(root)[slugify("m/a")]
     ep = view["endpoints"][0]
     assert [c["date"] for c in ep["lt"]["changes"]] == [dates[15][:10]]
-    assert ep["lt"]["changes"][0]["sigma"] == "12σ"
-    assert ep["lt"]["changes"][0]["drift"] == 1.1  # level 1.2 after, 0.1 before
+    assert ep["lt"]["changes"][0]["shift"] == 1.1
     assert ep["n_changes"] == 1
     assert view["n_changed"] == 1
     assert len(view["changes"]) == 1
@@ -340,8 +342,7 @@ def test_lt_change_after_the_last_series_point_has_no_level(tmp_path):
                     "model": "m/a",
                     "provider": "p1",
                     "method": "LT",
-                    "magnitude": 12.0,
-                    "magnitude_display": "12σ",
+                    "magnitude": None,
                 }
             ]
         )
@@ -349,7 +350,7 @@ def test_lt_change_after_the_last_series_point_has_no_level(tmp_path):
 
     view = _build_model_views(root)[slugify("m/a")]
     ep = view["endpoints"][0]
-    assert ep["lt"]["changes"][0]["drift"] is None
+    assert ep["lt"]["changes"][0]["shift"] is None
     assert ep["n_changes"] == 1
     # the unknown level joins neither the model's peak nor its scale
     assert view["max_drift"] == 0.1
@@ -375,8 +376,7 @@ def test_lt_changes_survive_an_empty_drift_lane(tmp_path):
                     "model": "m/a",
                     "provider": "p1",
                     "method": "LT",
-                    "magnitude": 12.0,
-                    "magnitude_display": "12σ",
+                    "magnitude": None,
                 }
             ]
         )
@@ -386,7 +386,7 @@ def test_lt_changes_survive_an_empty_drift_lane(tmp_path):
     ep = view["endpoints"][0]
     assert ep["lt"]["drift"] == []
     assert [c["date"] for c in ep["lt"]["changes"]] == [dates[5][:10]]
-    assert ep["lt"]["changes"][0]["drift"] is None
+    assert ep["lt"]["changes"][0]["shift"] is None
     assert ep["n_changes"] == 1
     assert len(view["changes"]) == 1
 
@@ -404,7 +404,6 @@ def test_b3it_change_after_the_last_series_point_has_no_peak(tmp_path):
                     "provider": "p2",
                     "method": "B3IT",
                     "magnitude": None,
-                    "magnitude_display": "",
                 }
             ]
         )

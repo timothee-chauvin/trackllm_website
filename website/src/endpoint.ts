@@ -57,6 +57,7 @@ interface B3ITData {
   retired_reason: string | null;
   n_bis: number;
   unstable: boolean;
+  epochs: { start: string; end: string | null; end_reason: string | null; change_date: string | null }[];
   tv_series: { dates: string[]; values: number[] };
 }
 
@@ -116,6 +117,7 @@ export function buildB3IT(data: B3ITData | null, changes: B3ITChange[]): FocusB3
     tv: series,
     breaks,
     changes,
+    epochs: data.epochs.map((e) => ({ start: e.start.slice(0, 10), end: e.end ? e.end.slice(0, 10) : null })),
     firstDate: data.tv_series.dates.length ? data.tv_series.dates[0].slice(0, 10) : "",
     lastDate: data.tv_series.dates.length ? last(data.tv_series.dates)!.slice(0, 10) : "",
   };
@@ -224,6 +226,21 @@ export function chartSvg(lt: FocusLT | null, b3it: FocusB3IT | null, vw: number)
   const b3Svg = b3Geom.series.length
     ? lane(b3Geom, b3Title)
     : placeholder(TOP2, b3it ? say("B3IT · no reference data in this window", "B3IT · no reference data") : say("B3IT · not monitored for this endpoint", "B3IT · not monitored"));
+  // Every other epoch is shaded so the reader sees where the reference was
+  // re-initialised: a TV lane that drops back to 0 there is not a revert.
+  const bands =
+    b3it && b3Geom.series.length && b3it.epochs.length > 1
+      ? b3it.epochs
+          .map((e, i) => {
+            const x0 = Math.max(PL, fx(e.start));
+            const x1 = Math.min(VW - PR, fx(e.end ?? b3it.lastDate));
+            if (x1 <= x0) return "";
+            const shade = i % 2 ? `<rect x="${x0.toFixed(1)}" y="${TOP2}" width="${(x1 - x0).toFixed(1)}" height="${LANE_H}" fill="var(--b3it-quiet)"/>` : "";
+            const label = narrow ? "" : `<text x="${(x0 + 4).toFixed(1)}" y="${TOP2 + LANE_H - 5}" fill="var(--text-dim)" font-size="9.5" font-family="var(--mono)">epoch ${i + 1}</text>`;
+            return shade + label;
+          })
+          .join("")
+      : "";
 
   // A change mark's dot sits on its lane's curve at the change date, so the reader
   // can see the level the label is quoting. Only when the curve cannot answer -- an
@@ -233,7 +250,7 @@ export function chartSvg(lt: FocusLT | null, b3it: FocusB3IT | null, vw: number)
     {
       lane: ltGeom,
       title: ltGeom.series.length ? ltTitle : "",
-      changes: (lt?.changes ?? []).map((c) => ({ date: c.date, lab: c.sigma })),
+      changes: (lt?.changes ?? []).map((c) => ({ date: c.date, lab: fmtDrift(c.shift) })),
     },
     {
       lane: b3Geom,
@@ -261,7 +278,7 @@ export function chartSvg(lt: FocusLT | null, b3it: FocusB3IT | null, vw: number)
     .join("");
 
   return `<svg viewBox="0 0 ${VW} ${VH}" preserveAspectRatio="xMidYMid meet">
-    ${ltSvg}${b3Svg}${cpSvg}${xlabels}
+    ${ltSvg}${bands}${b3Svg}${cpSvg}${xlabels}
     <line x1="${PL}" y1="${TOP2 + LANE_H}" x2="${VW - PR}" y2="${TOP2 + LANE_H}" stroke="var(--border)" stroke-width="1"/>
     ${hitRects([ltGeom, b3Geom], PL, PW)}</svg>`;
 }
@@ -297,6 +314,9 @@ function renderChart(lt: FocusLT | null, b3it: FocusB3IT | null): void {
     if (lt?.drift.length && b3it?.tv.length && b3it.tv[0][0] > lt.drift[0][0]) {
       note += ` B3IT only has reference data from ${b3it.tv[0][0]} onward, so its lane starts there.`;
     }
+    if (b3it && b3it.tv.length && b3it.epochs.length > 1) {
+      note += " Shaded bands are B3IT epochs: after a detected change the border inputs and the reference are re-initialised, so TV restarts near 0 in the next epoch.";
+    }
     footEl.innerHTML = note;
   }
 }
@@ -304,25 +324,18 @@ function renderChart(lt: FocusLT | null, b3it: FocusB3IT | null): void {
 function renderChangesTable(lt: FocusLT | null, b3it: FocusB3IT | null): void {
   const el = document.getElementById("changerows");
   if (!el) return;
-  const rows: { date: string; method: "lt" | "b3it"; mag: string; conf: string }[] = [];
-  (lt?.changes ?? []).forEach((c) =>
-    rows.push({ date: c.date, method: "lt", mag: fmtDrift(c.drift), conf: c.sigma })
-  );
-  (b3it?.changes ?? []).forEach((c) =>
-    rows.push({ date: c.date, method: "b3it", mag: fmtTV(c.shiftTV), conf: "—" })
-  );
-  // The template renders the section only with changes to list (and the σ
-  // header only with LT ones, σ being LT's detection score); the rows follow it.
+  const rows: { date: string; method: "lt" | "b3it"; mag: string }[] = [];
+  (lt?.changes ?? []).forEach((c) => rows.push({ date: c.date, method: "lt", mag: fmtDrift(c.shift) }));
+  (b3it?.changes ?? []).forEach((c) => rows.push({ date: c.date, method: "b3it", mag: fmtTV(c.shiftTV) }));
+  // The template renders the section only with changes to list; the rows follow it.
   if (!rows.length) return;
   rows.sort((a, b) => td(b.date) - td(a.date));
-  const withSigma = rows.some((r) => r.method === "lt");
   el.innerHTML = rows
     .map(
       (r) => `<tr>
     <td class="date">${esc(r.date)}</td>
     <td><span class="badge ${r.method}">${r.method}</span></td>
-    <td class="r mag" style="color:${r.method === "lt" ? "var(--accent)" : "var(--b3it)"}">${r.mag}</td>
-    ${withSigma ? `<td class="r num" style="color:var(--text-muted)">${esc(r.conf)}</td>` : ""}</tr>`
+    <td class="r mag" style="color:${r.method === "lt" ? "var(--accent)" : "var(--b3it)"}">${r.mag}</td></tr>`
     )
     .join("");
 }

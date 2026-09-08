@@ -1,15 +1,17 @@
 from trackllm_website.generate_site.changes import merge_changes
 
-# --- magnitude_display tests (TDD RED first) ---
+# --- the publication gate ---
 
 
-def _lt_event(sigma):
+def _lt_event(published, level_shift):
     return {
         "endpoint": "s1",
         "index": 1,
         "date": "2026-01-01T00:00:00Z",
-        "sigma": sigma,
+        "sigma": 14.0,
         "first_detected": "2026-06-01T00:00:00Z",
+        "level_shift": level_shift,
+        "published": published,
     }
 
 
@@ -18,22 +20,19 @@ class _LT:
     provider = "p"
 
 
-def test_lt_null_sigma_shows_inf():
-    events = merge_changes({"s1": [_lt_event(None)]}, {"s1": _LT()}, {})
-    assert events[0].magnitude_display == "∞σ"
+def test_unpublished_lt_events_are_not_merged():
+    """lt_events logs every detected changepoint; only those whose level shift
+    cleared the gate reach the site."""
+    assert merge_changes({"s1": [_lt_event(False, 0.05)]}, {"s1": _LT()}, {}) == []
+    assert merge_changes({"s1": [_lt_event(False, None)]}, {"s1": _LT()}, {}) == []
 
 
-def test_lt_huge_sigma_shows_inf():
-    events = merge_changes({"s1": [_lt_event(2.0e38)]}, {"s1": _LT()}, {})
-    assert events[0].magnitude_display == "∞σ"
+def test_published_lt_event_carries_its_level_shift_as_magnitude():
+    (ev,) = merge_changes({"s1": [_lt_event(True, 0.42)]}, {"s1": _LT()}, {})
+    assert ev.magnitude == 0.42 and ev.method == "LT"
 
 
-def test_lt_normal_sigma_shows_rounded():
-    events = merge_changes({"s1": [_lt_event(12.0)]}, {"s1": _LT()}, {})
-    assert events[0].magnitude_display == "12σ"
-
-
-def test_b3it_change_detected_magnitude_display_blank():
+def test_b3it_change_detected_has_no_magnitude_yet():
     class V:
         gated_dates = set()
         model = "m/b"
@@ -48,7 +47,7 @@ def test_b3it_change_detected_magnitude_display_blank():
         ]
 
     events = merge_changes({}, {}, {"s2": V()})
-    assert events[0].magnitude_display == ""
+    assert events[0].magnitude is None
 
 
 def test_b3it_derived_onsets_surface_in_feed():
@@ -107,6 +106,8 @@ def test_merge_sorts_newest_first_across_methods():
                 "date": "2026-03-01T00:00:00Z",
                 "sigma": 12.0,
                 "first_detected": "2026-06-01T00:00:00Z",
+                "level_shift": 0.9,
+                "published": True,
             }
         ]
     }
@@ -131,7 +132,7 @@ def test_merge_sorts_newest_first_across_methods():
     events = merge_changes(lt_changes, {"s1": LT()}, {"s2": V()})
     assert [e.method for e in events] == ["B3IT", "LT"]  # 2026-04-15 > 2026-03-01
     assert events[0].slug == "s2"
-    assert events[1].magnitude == 12.0
+    assert events[1].magnitude == 0.9
 
 
 def test_empty_inputs_yield_empty_feed():
@@ -147,10 +148,12 @@ def test_lt_event_missing_slug_falls_back_to_slug():
                 "date": "2026-02-01T00:00:00Z",
                 "sigma": 5.0,
                 "first_detected": "2026-06-01T00:00:00Z",
+                "level_shift": 0.5,
+                "published": True,
             }
         ]
     }
     events = merge_changes(lt_changes, {}, {})
     assert events[0].model == "unknown2fslug"
     assert events[0].provider == ""
-    assert events[0].magnitude == 5.0
+    assert events[0].magnitude == 0.5

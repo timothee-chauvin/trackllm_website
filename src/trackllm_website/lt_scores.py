@@ -2,10 +2,13 @@
 
 Implements a permutation-free two-sample test on logprob vectors. At each time
 point, two adjacent windows of size N_PER_TEST are compared using the L1 norm
-of their mean logprob difference, averaged over tokens. When multiple prompts
-are present, the score is the mean of per-prompt statistics.
+of their mean logprob difference, averaged over the tokens either window
+actually returned (CORE_PRESENCE). When multiple prompts are present, the score
+is the mean of per-prompt statistics.
 
-Change detection uses running mean/std normalization + peak detection.
+Change detection uses running mean/std normalization + peak detection; each
+changepoint then carries the drift level shift across it (lt_drift.level_shift),
+which lt_events uses to decide publication.
 """
 
 import numpy as np
@@ -18,10 +21,20 @@ from scipy.signal import find_peaks
 from pydantic import BaseModel, Field
 
 from trackllm_website.config import config, logger
-from trackllm_website.lt_drift import compute_drift_series
+from trackllm_website.lt_drift import (
+    LOGPROB_FLOOR,
+    LT_MIN_POST_DAYS,
+    LT_SHIFT_WINDOW_DAYS,
+    compute_drift_series,
+    level_shift,
+)
 from trackllm_website.storage import MonthlyData
 
 N_PER_TEST = 24
+# A token enters the statistic only if at least this fraction of the rows of one of
+# the two windows returned it. The rest is censoring noise: a window that happens
+# to return a different top-k tail reads as a shift on every token it lacks.
+CORE_PRESENCE = 0.5
 STAT_SIGMA_THRESHOLD = 12.0
 STAT_RUNNING_STD_WINDOW = 100
 STAT_EXCLUSION_ZONE = 2 * N_PER_TEST
@@ -47,6 +60,9 @@ def normalize_sigma(value: float) -> float | None:
 class ChangePoint(BaseModel):
     index: int
     sigma: float | None  # None when the running std is 0 (deviation undefined)
+    # Drift level shift across the change (lt_drift.level_shift); None while fewer
+    # than LT_MIN_POST_DAYS of drift exist after it.
+    level_shift: float | None
 
 
 class LTScores(BaseModel):
@@ -81,42 +97,55 @@ def load_prompt_logprobs(
     return results
 
 
-def build_tensor(logprob_dicts: list[dict[str, float]]) -> np.ndarray:
-    """Build (N, n_tokens) array with left censoring for missing tokens."""
+def build_tensor(
+    logprob_dicts: list[dict[str, float]],
+) -> tuple[np.ndarray, np.ndarray]:
+    """(values, present), both (N, n_tokens). Logprobs are floored at
+    LOGPROB_FLOOR; a row's missing tokens are censored at that row's (floored)
+    minimum; `present` marks the tokens the row actually returned."""
     # sorted, not set order: column order sets the summation order of the means
     # below, so hash-seed ordering would change the last ULP of every score and
     # make each recompute rewrite every lt_scores.json with pure churn.
     all_tokens = sorted({tok for d in logprob_dicts for tok in d})
     tok_idx = {tok: i for i, tok in enumerate(all_tokens)}
-    tensor = np.empty((len(logprob_dicts), len(all_tokens)), dtype=np.float64)
+    values = np.empty((len(logprob_dicts), len(all_tokens)), dtype=np.float64)
+    present = np.zeros(values.shape, dtype=bool)
     for i, d in enumerate(logprob_dicts):
-        min_val = min(d.values())
-        tensor[i, :] = min_val
+        values[i, :] = max(LOGPROB_FLOOR, min(d.values()))
         for tok, lp in d.items():
-            tensor[i, tok_idx[tok]] = lp
-    return tensor
+            values[i, tok_idx[tok]] = max(LOGPROB_FLOOR, lp)
+            present[i, tok_idx[tok]] = True
+    return values, present
 
 
-def compute_statistics(tensor: np.ndarray, n_per_test: int) -> np.ndarray:
+def compute_statistics(
+    values: np.ndarray, present: np.ndarray, n_per_test: int
+) -> np.ndarray:
     """Compute two-sample test statistics for all consecutive window pairs.
 
     At index i (ranging from n_per_test to N - n_per_test), compares
-    tensor[i-n_per_test:i] vs tensor[i:i+n_per_test].
+    values[i-n_per_test:i] vs values[i:i+n_per_test]: the mean over core tokens
+    (present in at least CORE_PRESENCE of the rows of either window) of the
+    absolute difference of the two window means. 0 where no token is core.
 
     Returns array of length max(0, N - 2*n_per_test + 1).
     """
-    N = tensor.shape[0]
+    N = values.shape[0]
     if N < 2 * n_per_test:
         return np.array([], dtype=np.float32)
 
     # sliding_window_view on (N, nt) with axis=0, window=w → (N-w+1, nt, w)
-    windows = sliding_window_view(tensor, window_shape=n_per_test, axis=0)
-    window_means = windows.mean(axis=2)  # (N-n_per_test+1, nt)
+    window_means = sliding_window_view(values, n_per_test, axis=0).mean(axis=2)
+    window_present = sliding_window_view(present, n_per_test, axis=0).sum(axis=2)
 
     n_stats = N - 2 * n_per_test + 1
-    t1_means = window_means[:n_stats]
-    t2_means = window_means[n_per_test : n_per_test + n_stats]
-    return np.abs(t1_means - t2_means).mean(axis=1)
+    before = slice(0, n_stats)
+    after = slice(n_per_test, n_per_test + n_stats)
+    min_rows = CORE_PRESENCE * n_per_test
+    core = (window_present[before] >= min_rows) | (window_present[after] >= min_rows)
+    diff = np.abs(window_means[before] - window_means[after]) * core
+    n_core = core.sum(axis=1)
+    return np.divide(diff.sum(axis=1), n_core, out=np.zeros(n_stats), where=n_core > 0)
 
 
 def detect_changes(
@@ -154,7 +183,8 @@ def detect_changes(
     # A zero-variance window yields an infinite deviation; orjson serializes inf
     # (and NaN) to JSON `null`, so never let a non-finite value into a ChangePoint.
     return [
-        ChangePoint(index=p, sigma=normalize_sigma(float(sigmas[p]))) for p in peaks
+        ChangePoint(index=p, sigma=normalize_sigma(float(sigmas[p])), level_shift=None)
+        for p in peaks
     ], sigmas
 
 
@@ -174,8 +204,7 @@ def compute_endpoint_scores(endpoint_dir: Path) -> LTScores | None:
             continue
         logprob_dicts = [d for _, d in data]
         dates = [dt for dt, _ in data]
-        tensor = build_tensor(logprob_dicts)
-        stats = compute_statistics(tensor, N_PER_TEST)
+        stats = compute_statistics(*build_tensor(logprob_dicts), N_PER_TEST)
         per_prompt_stats.append(stats)
         per_prompt_dates.append(dates[N_PER_TEST : N_PER_TEST + len(stats)])
         per_prompt_data.append(data)
@@ -198,6 +227,14 @@ def compute_endpoint_scores(endpoint_dir: Path) -> LTScores | None:
     changes, sigmas = detect_changes(avg_scores)
     first_change = ref_dates[changes[0].index] if changes else None
     drift_series = compute_drift_series(per_prompt_data[longest], first_change)
+    day_pairs = [(dt.date().isoformat(), v) for dt, v in drift_series]
+    for cp in changes:
+        cp.level_shift = level_shift(
+            day_pairs,
+            ref_dates[cp.index].date().isoformat(),
+            LT_SHIFT_WINDOW_DAYS,
+            LT_MIN_POST_DAYS,
+        )
 
     return LTScores(
         n_per_test=N_PER_TEST,

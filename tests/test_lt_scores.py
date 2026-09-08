@@ -7,6 +7,7 @@ from pathlib import Path
 
 import numpy as np
 import orjson
+import pytest
 
 import trackllm_website.lt_scores as lt_scores
 from trackllm_website.config import Endpoint
@@ -14,6 +15,8 @@ from trackllm_website.lt_scores import (
     N_PER_TEST,
     SIGMA_INF_THRESHOLD,
     ChangePoint,
+    build_tensor,
+    compute_statistics,
     LTScores,
     compute_endpoint_scores,
     detect_changes,
@@ -68,7 +71,7 @@ def test_lt_scores_survive_json_roundtrip_with_nonfinite_sigma():
 
 
 def test_change_point_accepts_none_sigma():
-    assert ChangePoint(index=10, sigma=None).sigma is None
+    assert ChangePoint(index=10, sigma=None, level_shift=None).sigma is None
 
 
 def test_normalize_sigma():
@@ -102,7 +105,7 @@ toks = [f"tok{i}" for i in range(40)]
 dicts = [{t: -0.5 - (i * 0.017 + j * 0.003) for j, t in enumerate(toks)} for i in range(60)]
 start = datetime(2026, 1, 1, tzinfo=timezone.utc)
 obs = [(start + timedelta(hours=i), d) for i, d in enumerate(dicts)]
-payload = repr(build_tensor(dicts).tolist()) + repr(compute_drift_series(obs, None))
+payload = repr(build_tensor(dicts)[0].tolist()) + repr(compute_drift_series(obs, None))
 print(hashlib.sha256(payload.encode()).hexdigest())
 """
 
@@ -221,3 +224,67 @@ def test_compute_endpoint_scores_populates_drift(tmp_path, monkeypatch):
     assert s is not None and len(s.drift) == len(s.drift_dates) > 0
     assert s.drift[0] < 0.3 and max(s.drift) > 1.0
 
+
+# --- logprob floor and core tokens ---
+
+
+def test_sentinel_logprobs_are_floored_and_missing_tokens_censored_at_the_row_min():
+    """Providers return -9999.0 or float32-min (-inf) in place of a logprob; one
+    such value used to put a whole row 10^4..10^38 nats below every other."""
+    from trackllm_website.lt_drift import LOGPROB_FLOOR
+
+    values, present = build_tensor([{"a": -0.1, "b": -9999.0}, {"a": -0.1}])
+    assert values.tolist() == [[-0.1, LOGPROB_FLOOR], [-0.1, -0.1]]
+    assert present.tolist() == [[True, True], [True, False]]
+    values, _ = build_tensor([{"a": float(np.finfo(np.float32).min)}])
+    assert values[0, 0] == LOGPROB_FLOOR
+
+
+def test_one_sentinel_response_does_not_dominate_the_statistic():
+    rows = [{"a": -0.1, "b": -2.0} for _ in range(2 * N_PER_TEST)]
+    rows[N_PER_TEST] = {"a": -0.1, "b": -9999.0}
+    stats = compute_statistics(*build_tensor(rows), N_PER_TEST)
+    assert stats.max() < 1.0  # was 9999 / 24 ~ 416 nats
+
+
+def test_tokens_returned_by_a_single_row_do_not_enter_the_statistic():
+    """A window that returns one extra tail token once would otherwise read as a
+    shift on that token for every row that lacks it (censoring noise)."""
+    rows = [{"a": -0.1, "b": -2.0} for _ in range(2 * N_PER_TEST)]
+    rows[N_PER_TEST + 1] = {"a": -0.1, "b": -2.0, "zzz": -30.0}
+    stats = compute_statistics(*build_tensor(rows), N_PER_TEST)
+    assert stats.max() < 1e-9
+
+
+def test_statistic_is_zero_when_no_token_is_core():
+    rows = [{f"t{i}": -1.0} for i in range(2 * N_PER_TEST)]  # every token once
+    stats = compute_statistics(*build_tensor(rows), N_PER_TEST)
+    assert stats.tolist() == [0.0]
+
+
+def test_real_shift_on_a_core_token_still_registers():
+    rows = [{"a": -0.1, "b": -2.0}] * N_PER_TEST + [{"a": -0.1, "b": -5.0}] * N_PER_TEST
+    stats = compute_statistics(*build_tensor(rows), N_PER_TEST)
+    assert stats[0] == pytest.approx(1.5)  # (0 + 3) / 2 tokens
+
+
+def test_compute_endpoint_scores_fills_the_level_shift_of_each_change(
+    tmp_path, monkeypatch
+):
+    ep = tmp_path / "endpoint"
+    prompt = ep / "prompt1"
+    prompt.mkdir(parents=True)
+    (prompt / "info.json").write_text("{}")
+    base = datetime(2026, 1, 1, tzinfo=timezone.utc)
+    data = [
+        (
+            base + timedelta(days=day, hours=3 * k),
+            {"A": -0.02, "B": -4.0} if day < 25 else {"A": -4.0, "B": -0.02},
+        )
+        for day in range(40)
+        for k in range(8)
+    ]
+    monkeypatch.setattr(lt_scores, "load_prompt_logprobs", lambda _dir: data)
+    s = compute_endpoint_scores(ep)
+    assert s is not None and len(s.changes) == 1
+    assert s.changes[0].level_shift == pytest.approx(3.98, abs=0.1)

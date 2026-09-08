@@ -17,12 +17,11 @@ import {
 import { areaPath, sampleAt, segments, strokePath } from "./chart_geom";
 import { type StripRow, STRIP_VW, bindSharedHover, dayAt, readCells } from "./model_hover";
 
-// drift/shiftTV are null when the level the change reached is unknown: the series
-// has no point on or after it (timeline.py, mirroring feed.py and endpoint.ts).
+// shift/shiftTV are null when the level the change reached is unknown
+// (timeline.py, mirroring feed.py and endpoint.ts).
 export interface LTChange {
   date: string;
-  sigma: string;
-  drift: number | null;
+  shift: number | null;
 }
 
 export interface B3ITChange {
@@ -126,7 +125,7 @@ export function renderTimeline(panel: HTMLElement, D: TimelineData, labels: Time
       .flatMap((e) =>
         e.lt!.drift
           .map((p) => p[1])
-          .concat(e.lt!.changes.map((c) => c.drift).filter((d) => d !== null))
+          .concat(e.lt!.changes.map((c) => c.shift).filter((d) => d !== null))
       )
   );
 
@@ -175,9 +174,9 @@ export function renderTimeline(panel: HTMLElement, D: TimelineData, labels: Time
         ? ep.lt.changes.map(
             (c): Mark => ({
               date: c.date,
-              y: c.drift === null ? null : stripY(c.drift, LT_MAX),
+              y: c.shift === null ? null : stripY(c.shift, LT_MAX),
               color: "var(--accent)",
-              title: `LT ${c.date} · ${c.sigma}, drift ${c.drift === null ? "—" : `${c.drift} nats`}`,
+              title: `LT ${c.date} · level shift ${c.shift === null ? "—" : `${c.shift} nats`}`,
             })
           )
         : []),
@@ -187,7 +186,7 @@ export function renderTimeline(panel: HTMLElement, D: TimelineData, labels: Time
               date: c.date,
               y: c.shiftTV === null ? null : stripY(c.shiftTV, B3IT_CAP),
               color: "var(--b3it)",
-              title: `B3IT ${c.date} · peak TV ${c.shiftTV === null ? "—" : c.shiftTV}`,
+              title: `B3IT ${c.date} · TV shift ${c.shiftTV === null ? "—" : c.shiftTV}`,
             })
           )
         : []),

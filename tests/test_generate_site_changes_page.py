@@ -47,13 +47,12 @@ def fake_site(tmp_path):
             "model": model,
             "provider": provider,
             "method": "LT",
-            "magnitude": 20.0,
-            "magnitude_display": "20σ",
+            "magnitude": magnitude,
         }
-        for i, slug, model, provider in (
-            (5, "a23p", "org/a", "p"),
-            (22, "a23p", "org/a", "p"),
-            (12, "b23q", "org/b", "q"),
+        for i, slug, model, provider, magnitude in (
+            (5, "a23p", "org/a", "p", 1.39),
+            (22, "a23p", "org/a", "p", 0.8),
+            (12, "b23q", "org/b", "q", 0.8),
         )
     ]
     (root / "data" / "changes.json").write_text(json.dumps(changes))
@@ -81,7 +80,6 @@ def fake_site_with_b3it(fake_site):
             "provider": "r",
             "method": "B3IT",
             "magnitude": None,
-            "magnitude_display": "",
         }
     )
     changes_path.write_text(json.dumps(changes))
@@ -122,7 +120,7 @@ def test_stats_report_affected_endpoints_and_providers(fake_site):
     stats = _build(fake_site, NOW)["stats"]
     assert stats["endpoints_affected"] == 2
     assert stats["providers_involved"] == 2
-    assert stats["largest_lt_drift"] == pytest.approx(1.39)  # level shift, not peak
+    assert stats["largest_lt_drift"] == pytest.approx(1.39)
 
 
 def test_providers_involved_ignores_changes_with_no_provider(fake_site):
@@ -138,7 +136,6 @@ def test_providers_involved_ignores_changes_with_no_provider(fake_site):
             "provider": "",
             "method": "LT",
             "magnitude": 5.0,
-            "magnitude_display": "5σ",
         }
     )
     changes_path.write_text(json.dumps(changes))
@@ -170,7 +167,6 @@ def test_changes_30d_counts_a_b3it_change_after_the_last_lt_observation(fake_sit
             "provider": "r",
             "method": "B3IT",
             "magnitude": None,
-            "magnitude_display": "",
         }
     )
     changes_path.write_text(json.dumps(changes))
@@ -195,7 +191,6 @@ def test_changes_30d_excludes_changes_dated_after_the_last_observation(fake_site
             "provider": "p",
             "method": "LT",
             "magnitude": 5.0,
-            "magnitude_display": "5σ",
         }
     )
     changes_path.write_text(json.dumps(changes))

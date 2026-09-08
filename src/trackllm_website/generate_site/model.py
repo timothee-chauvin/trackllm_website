@@ -48,11 +48,11 @@ def build_model_views(
         drift_values = [
             v for e in endpoints if e["lt"] for _, v in e["lt"]["drift"]
         ] + [
-            c["drift"]
+            c["shift"]
             for e in endpoints
             if e["lt"]
             for c in e["lt"]["changes"]
-            if c["drift"] is not None
+            if c["shift"] is not None
         ]
         max_drift = round(max(drift_values, default=0.0), 2)
 

@@ -5,23 +5,23 @@ describe("readingCaption", () => {
   test("names both methods when both lanes carry data", () => {
     const note = readingCaption(true, true);
     expect(note).toContain("both lanes share the time axis");
-    expect(note).toContain("LT: σ");
+    expect(note).toContain("LT: nats");
     expect(note).toContain("B3IT: TV");
   });
 
-  test("mentions only sigma on an LT-only endpoint", () => {
+  test("mentions only nats on an LT-only endpoint", () => {
     const note = readingCaption(true, false);
     expect(note).not.toContain("both lanes");
     expect(note).not.toContain("B3IT");
     expect(note).not.toContain("TV");
-    expect(note).toContain("σ");
+    expect(note).toContain("nats");
   });
 
   test("mentions only total variation on a B3IT-only endpoint", () => {
     const note = readingCaption(false, true);
     expect(note).not.toContain("both lanes");
     expect(note).not.toContain("LT");
-    expect(note).not.toContain("σ");
+    expect(note).not.toContain("nats");
     expect(note).toContain("TV");
   });
 

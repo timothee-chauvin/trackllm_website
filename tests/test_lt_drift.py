@@ -1,6 +1,12 @@
 from datetime import datetime, timedelta, timezone
 
-from trackllm_website.lt_drift import REFERENCE_DAYS, compute_drift_series
+import pytest
+
+from trackllm_website.lt_drift import (
+    REFERENCE_DAYS,
+    compute_drift_series,
+    level_shift,
+)
 
 
 def _obs(day, dist):
@@ -8,11 +14,15 @@ def _obs(day, dist):
 
 
 def test_too_few_days_returns_empty():
-    assert compute_drift_series([_obs(0, {"A": -0.1}), _obs(1, {"A": -0.1})], None) == []
+    assert (
+        compute_drift_series([_obs(0, {"A": -0.1}), _obs(1, {"A": -0.1})], None) == []
+    )
 
 
 def test_stable_series_stays_near_zero():
-    s = compute_drift_series([_obs(d, {"A": -0.02, "B": -4.0}) for d in range(30)], None)
+    s = compute_drift_series(
+        [_obs(d, {"A": -0.02, "B": -4.0}) for d in range(30)], None
+    )
     assert len(s) == 30 and max(v for _, v in s) < 0.05
 
 
@@ -102,3 +112,30 @@ def test_fewer_returned_tokens_than_the_reference_is_not_drift():
     obs = [_obs(d, five) for d in range(6)] + [_obs(6, {**five, "F": -14.0})]
     s = {dt.day: v for dt, v in compute_drift_series(obs, None)}
     assert s[2] < 0.05
+
+
+# --- level shift (the publication gate and the published magnitude) ---
+
+
+def _pairs(values):
+    return [(f"2026-01-{i + 1:02d}", v) for i, v in enumerate(values)]
+
+
+def test_level_shift_is_the_mean_difference_across_the_day():
+    pairs = _pairs([0.1] * 5 + [1.1] * 7)
+    assert level_shift(pairs, "2026-01-06", 7, 3) == pytest.approx(1.0)
+
+
+def test_level_shift_uses_at_most_window_days_each_side():
+    pairs = _pairs([5.0] * 10 + [0.1] * 7 + [1.1] * 20)
+    assert level_shift(pairs, "2026-01-18", 7, 3) == pytest.approx(1.0)
+
+
+def test_level_shift_is_pending_with_too_few_post_days():
+    pairs = _pairs([0.1, 0.1, 1.0, 1.0])
+    assert level_shift(pairs, "2026-01-03", 7, 3) is None
+    assert level_shift(pairs, "2026-01-03", 7, 2) == pytest.approx(0.9)
+
+
+def test_level_shift_is_unknown_without_pre_days():
+    assert level_shift(_pairs([1.0, 1.0, 1.0]), "2026-01-01", 7, 1) is None

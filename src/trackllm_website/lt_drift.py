@@ -10,7 +10,34 @@ from collections import defaultdict
 from datetime import datetime, timezone
 
 REFERENCE_DAYS = 14
-LOGPROB_FLOOR = -30.0
+# Every logprob is clipped here before anything else sees it. Some providers return
+# a sentinel in place of a logprob (-9999.0; the float32 minimum for -inf), and one
+# such response used to make the detection statistic astronomically large and its
+# σ infinite. -40 sits below 99.995% of genuine top-20 logprobs (0.01% quantile
+# -37.5 over 14M values) and far above every sentinel.
+LOGPROB_FLOOR = -40.0
+
+# Publication gate. A detected changepoint is published once the drift level
+# after it differs from the level before it: |mean of the first
+# LT_SHIFT_WINDOW_DAYS days on/after the change - mean of the last
+# LT_SHIFT_WINDOW_DAYS days before| >= LT_MIN_SHIFT, decided as soon as
+# LT_MIN_POST_DAYS post days exist. This is also the magnitude every page shows.
+LT_SHIFT_WINDOW_DAYS = 7
+LT_MIN_POST_DAYS = 3
+LT_MIN_SHIFT = 0.1
+
+
+def level_shift(
+    day_pairs: list[tuple[str, float]], day: str, window: int, min_post: int
+) -> float | None:
+    """|mean of the `window` daily values on/after `day` - mean of the `window`
+    before|. None while fewer than `min_post` post days exist (or no pre days):
+    the level reached is then unknown, never 0."""
+    before = [v for d, v in day_pairs if d < day][-window:]
+    after = [v for d, v in day_pairs if d >= day][:window]
+    if not before or len(after) < min_post:
+        return None
+    return abs(statistics.mean(after) - statistics.mean(before))
 
 
 def _mean_vector(

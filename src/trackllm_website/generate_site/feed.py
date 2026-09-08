@@ -8,10 +8,7 @@ from datetime import datetime
 
 from trackllm_website.generate_site.b3it import B3ITView
 from trackllm_website.generate_site.naming import base_provider
-from trackllm_website.generate_site.peaks import (
-    LT_PEAK_WINDOW,
-    shift_from,
-)
+from trackllm_website.lt_drift import LT_SHIFT_WINDOW_DAYS
 from trackllm_website.util import slugify
 
 TRACE_LEN = 28
@@ -93,34 +90,24 @@ def change_links(change: dict) -> dict:
 
 def _lt_item(change: dict, drift: list[tuple[datetime, float]], now: datetime) -> dict:
     cd = datetime.fromisoformat(change["date"])
-    magnitude = None
+    # The magnitude is the event's own level shift (lt_events), the number its
+    # publication gate passed on -- not re-levelled here, so the feed and the
+    # gate can never disagree.
+    magnitude = change["magnitude"]
     trace: list[float] = []
     frac = FEED_DEFAULT_CHANGE_FRAC
     if drift:
-        day_pairs = [(d.date().isoformat(), v) for d, v in drift]
-        level = shift_from(change["date"][:10], day_pairs, LT_PEAK_WINDOW)
-        magnitude = round(level, 2) if level is not None else None
         trace, frac = _window(drift, _nearest_index(drift, cd))
-    # A level that rounds to 0.00 is a real but tiny move, never "0.0 nats": the
-    # detector fires on the statistic (in σ), which can be huge for a small shift.
-    if magnitude is None:
-        display = "—"
-    elif magnitude < 0.01:
-        display = "<0.01"
-    else:
-        display = f"{magnitude}"
+    display = "—" if magnitude is None else f"{magnitude:.2f}"
     return {
         "date": change["date"][:10],
         "iso": change["date"],
         "daysAgo": (now - cd).days,
         "method": "lt",
         "magnitude": magnitude,
-        "desc": (
-            f"Logprob averages moved {display} nats from baseline "
-            f"({change['magnitude_display']} on the detection statistic)"
-        ),
-        "primary": f"drift {display}",
-        "secondary": f"{change['magnitude_display']} conf",
+        "desc": f"Logprob averages moved {display} nats from baseline",
+        "primary": f"shift {display}",
+        "secondary": f"±{LT_SHIFT_WINDOW_DAYS}-day level shift",
         "sevKey": _severity(magnitude or 0.0, LT_ALERT_THRESHOLD),
         "trace": trace,
         "changeFrac": frac,

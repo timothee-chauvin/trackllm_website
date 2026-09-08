@@ -63,6 +63,7 @@ const GAPPED = {
   tv: series([...days("2026-07-01", 5), ...days("2026-07-11", 5)]),
   breaks: [5],
   changes: [],
+  epochs: [],
   firstDate: "2026-07-01",
   lastDate: "2026-07-15",
 };

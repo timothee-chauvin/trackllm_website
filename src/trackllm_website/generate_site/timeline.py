@@ -1,10 +1,10 @@
 """The shared timeline: every endpoint in a group (a model's providers, a
 provider's models) as one strip per endpoint on one date axis.
 
-Which changes exist comes from changes.json, the canonical merged list; how far
-each one moved comes from the series (lt_scores.json's drift/drift_dates, the B3IT
-build-time views) -- LT drift is already smoothed upstream (lt_drift.py); B3IT tv
-comes straight from the view's tv_series.
+Which changes exist, and how far each LT one moved, comes from changes.json, the
+canonical merged list (an LT magnitude is the level shift its publication gate
+passed on); B3IT magnitudes come from the build-time views. The series drawn under
+them are lt_scores.json's drift/drift_dates and the view's tv_series.
 """
 
 import json
@@ -16,10 +16,6 @@ from trackllm_website.generate_site.b3it import B3ITView
 from trackllm_website.generate_site.freshness import latest
 from trackllm_website.generate_site.lt import EndpointInfo, load_lt_data
 from trackllm_website.generate_site.naming import base_provider
-from trackllm_website.generate_site.peaks import (
-    LT_PEAK_WINDOW,
-    shift_from,
-)
 from trackllm_website.generate_site.status import EndpointStatus, status_json
 from trackllm_website.generate_site.status_io import SiteStatuses
 from trackllm_website.util import slugify
@@ -87,25 +83,13 @@ def _by_method(changes: list[dict], method: str) -> list[dict]:
     )
 
 
-# Both helpers below publish None, never 0.0, for a change the series has no point
-# on or after (one dated after the last observation): the level it reached is
-# unknown, and a published 0.00 would read as a change that moved nothing. feed.py
-# publishes the same null; timeline.ts and endpoint.ts render it as an em dash.
-def _lt_changes(
-    canonical: list[dict], drift_pairs: list[tuple[str, float]]
-) -> list[dict]:
-    out = []
-    for c in canonical:
-        day = c["date"][:10]
-        level = shift_from(day, drift_pairs, LT_PEAK_WINDOW)
-        out.append(
-            {
-                "date": day,
-                "sigma": c["magnitude_display"],
-                "drift": round(level, 2) if level is not None else None,
-            }
-        )
-    return out
+# Both helpers below pass None through, never 0.0: a magnitude the series could
+# not level (B3IT: no point on or after the change; LT: an event published before
+# its level was known) is unknown, and a published 0.00 would read as a change
+# that moved nothing. feed.py does the same; timeline.ts and endpoint.ts render
+# None as an em dash.
+def _lt_changes(canonical: list[dict]) -> list[dict]:
+    return [{"date": c["date"][:10], "shift": c["magnitude"]} for c in canonical]
 
 
 def _b3it_changes(canonical: list[dict], change_mags: dict) -> list[dict]:
@@ -180,7 +164,7 @@ def _build_endpoint(
         lt_out = {
             "drift": [list(p) for p in kept],
             "breaks": breaks,
-            "changes": _lt_changes(_by_method(canonical, "LT"), drift_pairs),
+            "changes": _lt_changes(_by_method(canonical, "LT")),
         }
 
     b3it_out = None

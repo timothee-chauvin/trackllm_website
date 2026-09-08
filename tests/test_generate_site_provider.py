@@ -68,8 +68,7 @@ def fake_site(tmp_path):
             "model": "org/a",
             "provider": "p",
             "method": "LT",
-            "magnitude": 40.0,
-            "magnitude_display": "40σ",
+            "magnitude": 1.4,
         }
     ]
     (root / "data" / "changes.json").write_text(json.dumps(changes))
@@ -157,7 +156,6 @@ def test_rate_published_once_exposure_clears_threshold(tmp_path):
                     "provider": "q",
                     "method": "LT",
                     "magnitude": 30.0,
-                    "magnitude_display": "30σ",
                 }
             ]
         )
@@ -259,7 +257,6 @@ def test_change_from_a_departed_endpoint_mints_no_phantom_variant(fake_site):
             "provider": "p/fp4",
             "method": "LT",
             "magnitude": 20.0,
-            "magnitude_display": "20σ",
         }
     )
     changes_path.write_text(json.dumps(changes))
@@ -299,8 +296,7 @@ def test_change_links_use_the_slug_the_provider_view_is_keyed_by(tmp_path):
                     "model": "org/a",
                     "provider": provider,
                     "method": "LT",
-                    "magnitude": 40.0,
-                    "magnitude_display": "40σ",
+                    "magnitude": 1.4,
                 }
             ]
         )
@@ -321,7 +317,7 @@ def test_provider_view_carries_the_shared_timeline(fake_site):
     ep = next(e for e in tl["endpoints"] if e["slug"] == "org2fa23p")
     assert ep["model"] == "org/a" and ep["modelSlug"] == slugify("org/a")
     assert set(ep["methods"]) == {"lt", "b3it"}
-    assert ep["lt"]["changes"][0]["drift"] == 1.4  # level 1.5 after, 0.1 before
+    assert ep["lt"]["changes"][0]["shift"] == 1.4
     assert [(c["date"], c["model"]) for c in tl["changes"]] == [("2026-06-25", "org/a")]
 
 
@@ -353,7 +349,6 @@ def test_provider_timeline_rows_sort_by_last_successful_query(tmp_path):
                     "provider": "p",
                     "method": "LT",
                     "magnitude": 12.0,
-                    "magnitude_display": "12σ",
                 }
             ]
         )

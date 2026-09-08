@@ -64,8 +64,7 @@ def test_lt_item_carries_drift_magnitude_and_link_slugs():
             "model": "org/model-x",
             "provider": "chutes/fp8",
             "method": "LT",
-            "magnitude": 40.0,
-            "magnitude_display": "40σ",
+            "magnitude": 1.1,
         }
     ]
     items = build_feed_items(changes, {"m2fa23p": _drift(20, 14)}, {}, NOW)
@@ -78,7 +77,7 @@ def test_lt_item_carries_drift_magnitude_and_link_slugs():
     assert item["modelSlug"] == "org2fmodel-x"
     assert item["slug"] == "m2fa23p"
     assert item["endpointSlug"] == "m2fa23p"
-    assert item["secondary"] == "40σ conf"
+    assert item["secondary"] == "±7-day level shift"
     assert item["trace"]
 
 
@@ -90,13 +89,12 @@ def test_lt_item_without_drift_series():
             "model": "org/model-x",
             "provider": "chutes/fp8",
             "method": "LT",
-            "magnitude": 40.0,
-            "magnitude_display": "40σ",
+            "magnitude": None,
         }
     ]
     (item,) = build_feed_items(changes, {}, {}, NOW)
     assert item["magnitude"] is None
-    assert item["primary"] == "drift —"
+    assert item["primary"] == "shift —"
     assert item["sevKey"] == "stable"
     assert item["trace"] == []
 
@@ -110,7 +108,6 @@ def test_b3it_item_uses_the_level_shift_from_the_view():
             "provider": "p/fp8",
             "method": "B3IT",
             "magnitude": None,
-            "magnitude_display": "",
         }
     ]
     items = build_feed_items(changes, {}, {"s1": _b3it_view("s1")}, NOW)
@@ -128,7 +125,6 @@ def _b3it_change(date: str) -> dict:
         "provider": "p/fp8",
         "method": "B3IT",
         "magnitude": None,
-        "magnitude_display": "",
     }
 
 
@@ -169,7 +165,6 @@ def test_b3it_item_without_a_view_reports_no_magnitude():
             "provider": "p/fp8",
             "method": "B3IT",
             "magnitude": None,
-            "magnitude_display": "",
         }
     ]
     (item,) = build_feed_items(changes, {}, {}, NOW)
@@ -191,7 +186,6 @@ def test_change_without_a_fleet_entry_gets_no_page_slugs():
             "provider": "",
             "method": "LT",
             "magnitude": 5.0,
-            "magnitude_display": "5σ",
         }
     ]
     (item,) = build_feed_items(changes, {}, {}, NOW)
@@ -211,7 +205,6 @@ def test_unrecognised_method_raises():
             "provider": "p",
             "method": "SOMETHING_NEW",
             "magnitude": None,
-            "magnitude_display": "",
         }
     ]
     with pytest.raises(ValueError, match="SOMETHING_NEW"):
@@ -227,7 +220,6 @@ def test_items_sorted_newest_first():
             "provider": "p",
             "method": "LT",
             "magnitude": 10.0,
-            "magnitude_display": "10σ",
         }
         for d in (3, 20, 11)
     ]
@@ -256,8 +248,7 @@ def fake_site_feed_agreement(tmp_path):
             "model": "m/a",
             "provider": "p",
             "method": "LT",
-            "magnitude": 40.0,
-            "magnitude_display": "40σ",
+            "magnitude": 1.1,
         }
     ]
     (root / "data" / "changes.json").write_text(json.dumps(changes))
