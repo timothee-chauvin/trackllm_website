@@ -14,11 +14,15 @@ def _obs(day, dist):
 
 
 def test_too_few_days_returns_empty():
-    assert compute_drift_series([_obs(0, {"A": -0.1}), _obs(1, {"A": -0.1})], None) == []
+    assert (
+        compute_drift_series([_obs(0, {"A": -0.1}), _obs(1, {"A": -0.1})], None) == []
+    )
 
 
 def test_stable_series_stays_near_zero():
-    s = compute_drift_series([_obs(d, {"A": -0.02, "B": -4.0}) for d in range(30)], None)
+    s = compute_drift_series(
+        [_obs(d, {"A": -0.02, "B": -4.0}) for d in range(30)], None
+    )
     assert len(s) == 30 and max(v for _, v in s) < 0.05
 
 
@@ -111,7 +115,6 @@ def test_fewer_returned_tokens_than_the_reference_is_not_drift():
 
 
 # --- level shift (the publication gate and the published magnitude) ---
-
 
 
 def _pairs(values):

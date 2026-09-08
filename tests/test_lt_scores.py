@@ -225,9 +225,7 @@ def test_compute_endpoint_scores_populates_drift(tmp_path, monkeypatch):
     assert s.drift[0] < 0.3 and max(s.drift) > 1.0
 
 
-
 # --- logprob floor and core tokens ---
-
 
 
 def test_sentinel_logprobs_are_floored_and_missing_tokens_censored_at_the_row_min():

@@ -15,7 +15,9 @@ DATES = [datetime(2026, 1, 1, tzinfo=timezone.utc)] * 300  # placeholder indexâ†
 
 
 def test_new_change_appended():
-    events = merge_events("slug", [], [ChangePoint(index=150, sigma=14.0, level_shift=1.0)], DATES, NOW)
+    events = merge_events(
+        "slug", [], [ChangePoint(index=150, sigma=14.0, level_shift=1.0)], DATES, NOW
+    )
     assert len(events) == 1
     assert events[0].first_detected == NOW
 
@@ -27,7 +29,11 @@ def test_recomputed_change_near_existing_is_same_event():
         )
     ]
     events = merge_events(
-        "slug", existing, [ChangePoint(index=160, sigma=15.0, level_shift=1.0)], DATES, NOW
+        "slug",
+        existing,
+        [ChangePoint(index=160, sigma=15.0, level_shift=1.0)],
+        DATES,
+        NOW,
     )
     assert len(events) == 1
     assert events[0].first_detected == NOW  # original detection date kept
@@ -46,7 +52,11 @@ def test_event_with_no_corresponding_change_is_dropped():
         ),
     ]
     events = merge_events(
-        "slug", existing, [ChangePoint(index=150, sigma=14.0, level_shift=1.0)], DATES, NOW
+        "slug",
+        existing,
+        [ChangePoint(index=150, sigma=14.0, level_shift=1.0)],
+        DATES,
+        NOW,
     )
     assert [e.index for e in events] == [150]
 
@@ -62,7 +72,10 @@ def test_two_changes_cannot_claim_the_same_event():
     events = merge_events(
         "slug",
         existing,
-        [ChangePoint(index=150, sigma=14.0, level_shift=1.0), ChangePoint(index=190, sigma=15.0, level_shift=1.0)],
+        [
+            ChangePoint(index=150, sigma=14.0, level_shift=1.0),
+            ChangePoint(index=190, sigma=15.0, level_shift=1.0),
+        ],
         DATES,
         NOW,
     )
