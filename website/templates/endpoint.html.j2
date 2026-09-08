@@ -1,5 +1,5 @@
 {% extends "base.html.j2" %}
-{% from "_macros.html.j2" import headline_badge, subscribe_icon %}
+{% from "_macros.html.j2" import headline_badge, subscribe_icon, brand_title %}
 
 {% block title %}{{ model }} @ {{ provider }} | TrackLLM{% endblock %}
 
@@ -7,11 +7,10 @@
 <div class="wrap">
   <div class="head">
     <div>
-      {# every name here is a page: the model, the company serving it, the company that trained it #}
-      <h1>{% if model_slug %}<a href="{{ nav_prefix }}models/{{ model_slug }}.html">{{ model_name }}</a>{% else %}{{ model_name }}{% endif %} {{ subscribe_icon(machine, nav_prefix) }}</h1>
+      {# every name here is a page: the company that trained the model, the model, the company serving it #}
+      <h1><a class="org" href="{{ nav_prefix }}orgs/{{ org_slug }}.html">{{ org }}</a>/{% if model_slug %}<a href="{{ nav_prefix }}models/{{ model_slug }}.html">{{ model_name }}</a>{% else %}{{ model_name }}{% endif %} {{ subscribe_icon(machine, nav_prefix) }}</h1>
       {# a provider without tracked endpoints has no page, so its name is not a link #}
-      <div class="prov">@ {% if provider_has_page %}<a href="{{ nav_prefix }}providers/{{ provider_slug }}.html">{{ provider }}</a>{% else %}{{ provider }}{% endif %}
-        <span style="color:var(--text-dim)">· <a href="{{ nav_prefix }}orgs/{{ org_slug }}.html">{{ org }}</a></span></div>
+      <div class="prov">Served by {% if provider_has_page %}<a href="{{ nav_prefix }}providers/{{ provider_slug }}.html">{{ brand_title(brand, nav_prefix) }}</a>{% else %}{{ brand_title(brand, nav_prefix) }}{% endif %}{% if variant %} ({{ variant }}){% endif %}</div>
       <div class="badges">{% for m in methods %}<span class="badge {{ m|lower }}">{{ m|lower }}</span>{% endfor %}{% if not methods %}{{ headline_badge(status.headline) }}{% endif %}</div>
     </div>
     {% if methods %}<div class="statuscard" id="statuscard"></div>{% endif %}
@@ -39,7 +38,7 @@
   {% if methods %}
   <section class="block">
     <div class="sec-head"><h2>Drift from baseline</h2></div>
-    <p class="sec-desc">Both signals measure how far this endpoint's behavior has moved from its <b>reference period</b> (the two weeks before its first detected change, or its first two weeks). <span class="lt">LT</span> tracks the average change in the returned tokens' log-probabilities (nats); <span class="b3">B3IT</span> tracks the total-variation distance of the border-input votes (0–1). Both read <b>0 when the endpoint matches its baseline</b> and rise — staying elevated — after a real change. Dashed lines mark published changes, labeled with the <b>level shift</b> across them: for LT the mean drift over the 7 days after minus the 7 days before; for B3IT the total-variation shift its detector measured.</p>
+    <p class="sec-desc">Both signals measure how far this endpoint's behavior has moved from its <b>reference period</b>. <span class="lt">LT</span> tracks the average change in the returned tokens' log-probabilities (nats); <span class="b3">B3IT</span> tracks the total-variation distance of the border-input votes (0–1). Both should ideally be as close to 0 as possible. Dashed lines mark published changes, labeled with the <b>level shift</b> across them: for LT the mean drift over the 7 days after minus the 7 days before; for B3IT the total-variation shift its detector measured.</p>
     <div class="panel">
       {# the tip is a sibling of the chart, not a child: every redraw replaces #mainchart's contents #}
       <div class="chartbox">
@@ -80,13 +79,12 @@
 
   {% if spend %}
   <section class="block">
-    <div class="sec-head"><h2>Spend</h2><span class="hint">what OpenRouter billed for tracking this endpoint</span></div>
+    <div class="sec-head"><h2>Spend</h2><span class="hint">what OpenRouter billed for tracking this endpoint. Only tracked since {{ spend.since }}</span></div>
     <div class="panel">
       <div class="spend-stats">
         <div><div class="k">Total to date</div><div class="v">${{ spend.total|fmt_cost }}</div></div>
         <div><div class="k">Last 30 days</div><div class="v">${{ spend.last_30d|fmt_cost }}</div></div>
         <div><div class="k">Queries</div><div class="v">{{ "{:,}".format(spend.n_queries) }}</div></div>
-        <div><div class="k">Since</div><div class="v">{{ spend.since }}</div></div>
       </div>
       {% if spend.total > 0 %}
       <div class="spend-bar" aria-hidden="true">
@@ -98,7 +96,7 @@
         {% endfor %}
       </ul>
       {% endif %}
-      <div class="footnote"><b>Vetting</b> is the one-off probe that checks the endpoint's billed cost against its advertised price. <b>B3IT (onboarding)</b> is the initial border-input search, by far the most expensive step; <b>B3IT (monitoring)</b> and <b>LT</b> are the recurring daily checks.</div>
+      <div class="footnote"><b>Vetting</b> is the one-off probe that checks the endpoint's billed cost against its advertised price. <b>B3IT (onboarding)</b> is the initial border-input search; <b>B3IT (monitoring)</b> and <b>LT</b> are the recurring daily checks.</div>
     </div>
   </section>
   {% endif %}

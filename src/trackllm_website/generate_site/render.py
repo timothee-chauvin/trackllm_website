@@ -18,7 +18,8 @@ from trackllm_website.generate_site import org as org_mod
 from trackllm_website.generate_site import overview as overview_mod
 from trackllm_website.generate_site import provider as provider_mod
 from trackllm_website.generate_site import spend as spend_mod
-from trackllm_website.generate_site.naming import base_provider
+from trackllm_website.generate_site.brands import brand_json, load_brands
+from trackllm_website.generate_site.naming import base_provider, variant_name
 from trackllm_website.generate_site.papers import PAPERS
 from trackllm_website.generate_site.status import STATUS_COPY, status_json
 from trackllm_website.generate_site.status_io import (
@@ -367,6 +368,10 @@ def render_site(
     for f in endpoints_dir.glob("*.html"):
         f.unlink()
 
+    # the endpoint head shows the serving company as the provider page does; a
+    # provider without a page still gets its brand (the slug, when unlisted)
+    brands = load_brands(website_dir)
+
     # One page per status universe entry: tracked ones with their series, the
     # rest with the status + catalog metadata explaining why there is no chart.
     for slug in sorted(site.statuses):
@@ -405,6 +410,8 @@ def render_site(
                 org_slug=slugify(model.split("/")[0]),
                 model_name=model.split("/")[-1],
                 provider=provider,
+                brand=brand_json(brands, provider_slug),
+                variant=variant_name(provider),
                 methods=methods,
                 status=status_json(site.statuses[slug]),
                 meta=entry.as_meta() if entry else None,
