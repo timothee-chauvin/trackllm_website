@@ -23,8 +23,9 @@ const B3IT = {
     ["2026-07-29", 0.4825],
   ] as [string, number][],
   breaks: [], // already thinned: these fixtures are what the chart draws
+  daily: [] as [string, number][], // the day readouts' raw data is chart_detail.test's subject
   epochs: [],
-  changes: [{ date: "2026-07-26", shiftTV: 0.535 }],
+  changes: [{ date: "2026-07-26", shiftTV: 0.535, detector: null }],
   firstDate: "2026-07-17",
   lastDate: "2026-07-29",
 };
@@ -34,6 +35,7 @@ const LT = {
     ["2026-07-17", 0.02], ["2026-07-22", 0.05], ["2026-07-26", 0.81], ["2026-07-29", 0.78],
   ] as [string, number][],
   breaks: [], // already thinned: these fixtures are what the chart draws
+  daily: [] as [string, number][],
   changes: [{ date: "2026-07-26", shift: 0.81 }],
   firstDate: "2026-07-17",
   lastDate: "2026-07-29",
@@ -62,7 +64,8 @@ async function mount(
     ({ left: 0, top: 0, width: DESIGN_VW, height: VH, right: DESIGN_VW, bottom: VH, x: 0, y: 0 }) as DOMRect;
   chart.getBoundingClientRect = (): DOMRect =>
     ({ left: 0, top: 0, width: DESIGN_VW, height: VH, right: DESIGN_VW, bottom: VH, x: 0, y: 0 }) as DOMRect;
-  bindHover(chart, tip, lt, b3it, () => DESIGN_VW);
+  const none = (): Promise<null> => Promise.resolve(null);
+  bindHover(chart, tip, lt, b3it, () => DESIGN_VW, { lt: none, b3it: none });
   return { chart, tip, hits: [...chart.querySelectorAll(".lane-hit")] };
 }
 

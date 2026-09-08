@@ -31,20 +31,20 @@ describe("downsampleRuns", () => {
   test("a contiguous series is one run", async () => {
     const { downsampleRuns } = await import("../src/chart_geom");
     const pairs = series(days("2026-01-01", 10));
-    expect(downsampleRuns(pairs, 110)).toEqual({ series: pairs, breaks: [] });
+    expect(downsampleRuns(pairs, 110, [])).toEqual({ series: pairs, breaks: [] });
   });
 
   test("a missing day breaks the series where the hole is", async () => {
     const { downsampleRuns } = await import("../src/chart_geom");
     const pairs = series([...days("2026-01-01", 3), ...days("2026-01-05", 3)]);
-    expect(downsampleRuns(pairs, 110)).toEqual({ series: pairs, breaks: [3] });
+    expect(downsampleRuns(pairs, 110, [])).toEqual({ series: pairs, breaks: [3] });
   });
 
   test("thinning keeps both ends of every run", async () => {
     const { downsampleRuns } = await import("../src/chart_geom");
     const left = series(days("2026-01-01", 200));
     const right = series(days("2026-09-01", 200));
-    const { series: kept, breaks } = downsampleRuns([...left, ...right], 110);
+    const { series: kept, breaks } = downsampleRuns([...left, ...right], 110, []);
     expect(breaks.length).toBe(1);
     expect(kept.length).toBeLessThanOrEqual(110);
     expect(kept[0]).toEqual(left[0]);
@@ -55,13 +55,14 @@ describe("downsampleRuns", () => {
 
   test("an empty series has nothing to break", async () => {
     const { downsampleRuns } = await import("../src/chart_geom");
-    expect(downsampleRuns([], 110)).toEqual({ series: [], breaks: [] });
+    expect(downsampleRuns([], 110, [])).toEqual({ series: [], breaks: [] });
   });
 });
 
 const GAPPED = {
   tv: series([...days("2026-07-01", 5), ...days("2026-07-11", 5)]),
   breaks: [5],
+  daily: [] as [string, number][],
   changes: [],
   epochs: [],
   firstDate: "2026-07-01",

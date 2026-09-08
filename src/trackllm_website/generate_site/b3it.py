@@ -1,12 +1,17 @@
 """Build-time derivation of per-endpoint B3IT display data."""
 
+from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
 import orjson
 
-from trackllm_website.bi.results import load_phase2_results
+from trackllm_website.bi.results import (
+    compute_tv_distance,
+    get_distribution,
+    load_phase2_results,
+)
 from trackllm_website.bi.detection import (
     adaptive_transitions,
     epoch_tv_series,
@@ -29,6 +34,15 @@ class B3ITView:
     unstable: bool
     epochs: list[dict]
     tv_series: dict
+    # The raw votes behind the series, for the chart's hover readout (votes.json,
+    # see votes_json): `bis` is the vocabulary of border-input prompts that
+    # `references` (one entry per epoch: [[bi index, {token: count, ...}], ...])
+    # and `batches` (one per tv_series point: [[bi index, votes, TV vs the
+    # reference], ...]) index into, over the epoch's ranked border inputs,
+    # tokens by descending count.
+    bis: list[str]
+    references: list[list]
+    batches: list[list]
     changes: list[dict]
     # Change day -> the TV shift its detector gated on (tv_shift on the epoch's
     # full reference series), the headline every surface shows; days the gate
@@ -61,8 +75,8 @@ def _gate_shift(gate_tv: list[tuple], ts: str) -> float | None:
     return abs(level - sum(pre) / len(pre)) if pre else level
 
 
-def epoch_tv(epoch: Epoch, results: dict) -> list[tuple]:
-    """TV series for one epoch, restricted to its top-k ranked border inputs.
+def ranked_reference(epoch: Epoch) -> dict:
+    """The epoch's reference restricted to its top-k ranked border inputs.
 
     Production monitoring re-initialises every epoch to the top-k BIs
     (``bi.reinit.top_k_bis``); legacy epochs migrated from before the detector
@@ -71,11 +85,44 @@ def epoch_tv(epoch: Epoch, results: dict) -> list[tuple]:
     below the detection threshold across the full set, so ranking is what
     surfaces those historical changes on the site.
     """
-    if not epoch.reference:
-        return []
     top = select_top_bis(epoch.reference, config.bi.reinit.top_k_bis)
-    reference = {p: epoch.reference[p] for p in top}
-    return epoch_tv_series(reference, epoch.filter_results(results))
+    return {p: epoch.reference[p] for p in top}
+
+
+# A vote is shown, not analysed, in votes.json: a token longer than this is cut
+# (and merged with the others sharing its head). The per-input TV beside it is
+# computed on the full tokens first.
+TOKEN_CHARS = 40
+
+
+def _votes(samples: list, bi_index: dict[str, int], prompt: str) -> list:
+    shown: Counter = Counter()
+    for t, n in get_distribution(samples).items():
+        shown[t if len(t) <= TOKEN_CHARS else f"{t[:TOKEN_CHARS]}…"] += n
+    return [
+        bi_index.setdefault(prompt, len(bi_index)),
+        dict(sorted(shown.items(), key=lambda kv: (-kv[1], kv[0]))),
+    ]
+
+
+def _batch_votes(reference: dict, ep_results: dict, ts: str, bi_index: dict) -> list:
+    """[bi index, votes, TV vs the reference] per ranked border input sampled at `ts`."""
+    out = []
+    for p, ref_samples in reference.items():
+        samples = ep_results.get(p, {}).get(ts)
+        if not samples:
+            continue
+        tv = compute_tv_distance(
+            get_distribution(ref_samples), get_distribution(samples)
+        )
+        out.append(
+            [*_votes(samples, bi_index, p), round(tv, 3) if tv is not None else None]
+        )
+    return out
+
+
+def _detector(epoch: Epoch) -> str | None:
+    return (epoch.params or {}).get("detector")
 
 
 def derive_b3it(
@@ -88,19 +135,28 @@ def derive_b3it(
     the site.
     """
     tv: list[tuple] = []
+    bi_index: dict[str, int] = {}
+    batches: list[list] = []
+    references: list[list] = []
     changes: list = []
     change_mags: dict[str, float | None] = {}
     gated_dates: set[str] = set()
     abs_delta = config.bi.detection.abs_delta
     for epoch in state.epochs:
-        ep_tv = epoch_tv(epoch, results)
+        ep_results = epoch.filter_results(results)
+        reference = ranked_reference(epoch) if epoch.reference else {}
+        ep_tv = epoch_tv_series(reference, ep_results) if reference else []
         tv.extend(ep_tv)
+        references.append([_votes(s, bi_index, p) for p, s in reference.items()])
+        batches.extend(
+            _batch_votes(reference, ep_results, ts, bi_index) for ts, _ in ep_tv
+        )
         # Magnitudes come from the series the detectors scored, the epoch's full
         # reference (monitor.decide, backfill.py), not the ranked one the site
         # plots: what is published is the number the gate used.
-        gate_tv = epoch_tv_series(epoch.reference, epoch.filter_results(results))
+        gate_tv = epoch_tv_series(epoch.reference, ep_results)
         for ts in adaptive_transitions(ep_tv):
-            changes.append({"date": ts, "kind": "onset"})
+            changes.append({"date": ts, "kind": "onset", "detector": "adaptive"})
             change_mags[ts[:10]] = _gate_shift(gate_tv, ts)
         if epoch.end_reason == "change_detected" and epoch.change_date:
             cd = _iso(epoch.change_date)
@@ -109,9 +165,7 @@ def derive_b3it(
             # less than a visible change re-initialized the epoch but is not
             # published as a change.
             gate = _gate_shift(gate_tv, cd)
-            if (epoch.params or {}).get("detector") == "scan" and (
-                gate is None or gate <= abs_delta
-            ):
+            if _detector(epoch) == "scan" and (gate is None or gate <= abs_delta):
                 gated_dates.add(cd)
             else:
                 change_mags[cd[:10]] = gate
@@ -127,7 +181,7 @@ def derive_b3it(
     display_epoch = state.current_epoch or (state.epochs[-1] if state.epochs else None)
     unstable = False
     if display_epoch is not None and display_epoch.reference:
-        top = set(select_top_bis(display_epoch.reference, config.bi.reinit.top_k_bis))
+        top = set(ranked_reference(display_epoch))
         ep_results = display_epoch.filter_results(results)
         unstable = is_unstable({p: b for p, b in ep_results.items() if p in top})
     return B3ITView(
@@ -144,11 +198,17 @@ def derive_b3it(
                 "end": _iso(e.end),
                 "end_reason": e.end_reason,
                 "change_date": _iso(e.change_date),
+                "detector": _detector(e),
+                "n_ref": len(ref),
             }
-            for e in state.epochs
+            for e, ref in zip(state.epochs, references)
         ],
         tv_series={"dates": [ts for ts, _ in tv], "values": [v for _, v in tv]},
-        changes=changes + [{"date": ev["date"], "kind": "scan"} for ev in backfill],
+        bis=list(bi_index),
+        references=references,
+        batches=batches,
+        changes=changes
+        + [{"date": ev["date"], "kind": "scan", "detector": "scan"} for ev in backfill],
         change_mags=change_mags,
         gated_dates=gated_dates,
         # From the raw results, not the TV series: the series drops the epoch's
@@ -167,6 +227,12 @@ def to_json(view: B3ITView) -> dict:
         "tv_series": view.tv_series,
         "changes": view.changes,
     }
+
+
+def votes_json(view: B3ITView) -> dict:
+    """The raw votes (B3ITView.bis), a file of their own: fetched on the readout's
+    first request, since they outweigh the series many times over."""
+    return {"bis": view.bis, "reference": view.references, "batches": view.batches}
 
 
 def discover_b3it_views(

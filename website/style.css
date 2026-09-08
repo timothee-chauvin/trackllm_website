@@ -369,6 +369,26 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
   font-family: var(--mono); font-size: 0.74rem; }
 .chart-tip .d { color: var(--text-muted); }
 .chart-tip .v { font-weight: 600; }
+/* display:flex above beats the `hidden` attribute's UA display:none: without this
+   the empty box sat in the chart's corner, shadow and all */
+.chart-tip[hidden] { display: none; }
+/* The endpoint chart's readout carries the raw data under the value: a block on its
+   own row, wrapping the sentences and scrolling the tables. Pinned by a tap it takes
+   pointer events, so the block can be scrolled by finger; under a mouse it stays
+   inert and the pointer keeps reading the chart through it. */
+.chart-tip.has-detail { flex-wrap: wrap; max-width: min(460px, calc(100% - 8px)); }
+.chart-tip.pinned { pointer-events: auto; }
+.chart-tip .tip-detail { flex-basis: 100%; max-height: 260px; overflow: auto; font-size: 0.7rem;
+  line-height: 1.4; color: var(--text); white-space: normal; }
+.chart-tip .tip-detail p { margin: 0.15rem 0 0; }
+.chart-tip .tip-detail .badge { margin-right: 0.25rem; }
+.chart-tip .tip-h { margin-top: 0.4rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chart-tip .tip-tbl { border-collapse: collapse; white-space: nowrap; margin-top: 0.1rem; }
+.chart-tip .tip-tbl th { font-weight: 400; color: var(--text-dim); text-align: left; }
+.chart-tip .tip-tbl th, .chart-tip .tip-tbl td { padding: 0 0.7rem 0 0; }
+.chart-tip .tip-tbl .n { text-align: right; font-variant-numeric: tabular-nums; }
+.chart-tip .tip-tbl .p { max-width: 16ch; overflow: hidden; text-overflow: ellipsis; }
+.chart-tip .tip-detail .dim { color: var(--text-dim); }
 
 /* A table's min-content width is a floor: the changes table's four columns will not
    go below ~374px, so on a 375px phone `width: 100%` loses and the table pushed the

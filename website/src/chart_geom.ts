@@ -13,11 +13,15 @@ export interface LTChange {
 export interface B3ITChange {
   date: string;
   shiftTV: number | null;
+  // which rule called it (b3it.py): "scan" (permutation test) or "adaptive"
+  // (consecutive deviating days); null when the record never said
+  detector: string | null;
 }
 
 export interface FocusLT {
   drift: [string, number][];
   breaks: number[]; // see downsampleRuns: where the days the endpoint was not observed fall
+  daily: [string, number][]; // the whole series, one point per observed day, before thinning
   changes: LTChange[];
   // raw LT observation range from lt_scores.json's own `dates`, independent of the
   // drift trace (which may be empty/absent pre-backfill) -- see buildLT.
@@ -25,16 +29,49 @@ export interface FocusLT {
   lastDate: string;
 }
 
+/** One border input's votes: token -> count, tokens by descending count. */
+export type Counts = Record<string, number>;
+/** [index into B3ITRaw.bis, votes] */
+export type BICounts = [number, Counts];
+/** ... and, for a daily batch, its TV against the epoch reference (b3it.py scores
+ *  it on the whole tokens; the votes shown may have long ones cut) */
+export type BIVote = [number, Counts, number | null];
+
+export interface Epoch {
+  start: string; // full instant: the re-initialisation, which the closing batch of the epoch before shares the day of
+  end: string | null;
+  endReason: string | null;
+  changeDate: string | null;
+  detector: string | null;
+  nRef: number; // ranked border inputs in the reference; 0 when none was sampled
+}
+
 export interface FocusB3IT {
+  // dates are the batch instants, not days: two batches can fall on one UTC day,
+  // and the readout has to find each one's own votes (chart_detail.B3ITRaw)
   tv: [string, number][];
   breaks: number[];
+  daily: [string, number][]; // every batch, before thinning
   changes: B3ITChange[];
   // one entry per monitoring epoch (b3it.py): each detected change re-initialises
   // the reference, so the TV lane restarts near 0 at every boundary
-  epochs: { start: string; end: string | null }[];
+  epochs: Epoch[];
   // raw tv_series observation range, independent of the (possibly downsampled) `tv` trace.
   firstDate: string;
   lastDate: string;
+}
+
+/** Index of the epoch a batch at `ts` was scored in: the last one begun strictly
+ *  before it. A batch at an epoch's own start is its reference, not a series
+ *  point, and the batch that closed the previous epoch (Epoch.filter_results keeps
+ *  it) can share the instant. */
+export function epochOf(epochs: Epoch[], ts: string): number {
+  const t = Date.parse(ts);
+  let i = 0;
+  epochs.forEach((e, k) => {
+    if (Date.parse(e.start) < t) i = k;
+  });
+  return i;
 }
 
 export const last = <T,>(arr: T[]): T | undefined => arr[arr.length - 1];
@@ -93,18 +130,26 @@ function pick(run: [string, number][], k: number): [string, number][] {
   return Array.from({ length: k }, (_, i) => run[Math.round((i * (run.length - 1)) / (k - 1))]);
 }
 
-/** Thin a daily series to about `n` points, and say where its missing days are. */
+/** Thin a daily series to about `n` points, and say where its missing days are.
+ *  `boundaries` are instants a run may not cross (the B3IT epoch starts: the TV
+ *  after a re-initialisation is measured against a new reference, so the line
+ *  must not join the two epochs). The point at a boundary belongs to the run
+ *  before it, as in epochOf. */
 export function downsampleRuns(
   pairs: [string, number][],
-  n: number
+  n: number,
+  boundaries: number[]
 ): { series: [string, number][]; breaks: number[] } {
   const runs: [string, number][][] = [];
-  let prev: number | null = null;
+  let prev: [string, number] | null = null;
   for (const p of pairs) {
-    const t = td(p[0]);
-    if (prev === null || t - prev > DAY_MS) runs.push([]);
+    const crossed =
+      prev !== null &&
+      (td(p[0]) - td(prev[0]) > DAY_MS ||
+        boundaries.some((b) => Date.parse(prev![0]) <= b && b < Date.parse(p[0])));
+    if (prev === null || crossed) runs.push([]);
     last(runs)!.push(p);
-    prev = t;
+    prev = p;
   }
   const thinned =
     pairs.length > n
@@ -181,6 +226,9 @@ export function chartAxis(lt: FocusLT | null, b3it: FocusB3IT | null, vw: number
     b3it?.tv[0]?.[0], last(b3it?.tv ?? [])?.[0],
     ...(lt?.changes ?? []).map((c) => c.date),
     ...(b3it?.changes ?? []).map((c) => c.date),
+    // an epoch's reference batch is an observation of its start day, up to a day
+    // before its first TV point -- where the initialisation rule is drawn
+    ...(b3it?.epochs ?? []).filter((e) => e.nRef).map((e) => e.start),
   ]
     .filter((d): d is string => !!d)
     .sort();

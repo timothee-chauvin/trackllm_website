@@ -20,10 +20,13 @@ export function tipHTML(date: string, cells: Cell[]): string {
   );
 }
 
-/** Beside the pointer and inside `wrap`, the positioned box the tip is absolute in. */
+/** Beside the pointer and inside `wrap`, the positioned box the tip is absolute in.
+ *  Clamped on both axes: a tip carrying a detail block can be taller than the
+ *  room under the pointer. */
 export function placeTip(tip: HTMLElement, wrap: HTMLElement, ev: PointerEvent): void {
   const box = wrap.getBoundingClientRect();
   const left = ev.clientX - box.left + TIP_DX;
+  const top = ev.clientY - box.top + TIP_DY;
   tip.style.left = `${Math.max(0, Math.min(left, box.width - tip.offsetWidth))}px`;
-  tip.style.top = `${ev.clientY - box.top + TIP_DY}px`;
+  tip.style.top = `${Math.max(0, Math.min(top, box.height - tip.offsetHeight))}px`;
 }
