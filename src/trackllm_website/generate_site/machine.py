@@ -209,6 +209,9 @@ def _provider_row(p: dict, nav: str) -> tuple:
         _ci(p["lt_ci"]),
         p["b3it_endpoints"],
         p["b3it_years"],
+        p["b3it_changes"],
+        _rate(p["b3it_rate"]),
+        _ci(p["b3it_ci"]),
         p["last_change"],
     )
 

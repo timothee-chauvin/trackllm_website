@@ -235,7 +235,8 @@ def build_provider_views(
 
 
 def overview_rows(views: dict[str, dict]) -> list[dict]:
-    """Compact provider rows for the Overview's providers section."""
+    """Compact provider rows for the Overview's providers section: the per-method
+    blocks flattened to `<method>_<field>` (rate_plot.ts reads them by method)."""
     rows = [
         {
             "name": view["name"],
@@ -244,12 +245,7 @@ def overview_rows(views: dict[str, dict]) -> list[dict]:
             "n_endpoints": view["n_endpoints"],
             "n_models": view["n_models"],
             "n_variants": view["n_variants"],
-            "lt_years": view["lt"]["years"],
-            "lt_changes": view["lt"]["changes"],
-            "lt_rate": view["lt"]["rate"],
-            "lt_ci": view["lt"]["ci"],
-            "b3it_endpoints": view["b3it"]["endpoints"],
-            "b3it_years": view["b3it"]["years"],
+            **{f"{m}_{k}": v for m in METHODS for k, v in view[m].items()},
             "last_change": view["changes"][0]["date"] if view["changes"] else None,
         }
         for view in views.values()

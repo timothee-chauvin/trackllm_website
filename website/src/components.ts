@@ -390,6 +390,17 @@ export function toggleChip(chip: HTMLElement, set: Set<string>, f: string): void
   chip.setAttribute("aria-pressed", String(set.has(f)));
 }
 
+/** One chip at most per row: picking one switches its siblings off. With
+ *  `required` the picked chip cannot be switched off again (a radio group). */
+export function pickChip(chip: HTMLElement, attr: string, set: Set<string>, required: boolean): void {
+  const value = chip.dataset[attr]!;
+  if (required && set.has(value)) return;
+  for (const other of chip.parentElement!.querySelectorAll<HTMLElement>(".chip.on")) {
+    if (other !== chip) toggleChip(other, set, other.dataset[attr]!);
+  }
+  toggleChip(chip, set, value);
+}
+
 /** How many marks a strip spells out before it summarizes the rest. */
 const TIP_MAX = 6;
 
