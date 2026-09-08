@@ -145,7 +145,7 @@ describe("detail builders", () => {
       ["Pick a number", "3 6 · 7 4", "3 25 · 7 25", "0.20"],
     ]);
     expect(html.querySelector("td.p")!.getAttribute("title")).toBe(VOTES.bis[0]);
-    expect(html.querySelector("b"), "prompt markup was rendered, not escaped").toBeNull();
+    expect(html.querySelector("td.p b"), "prompt markup was rendered, not escaped").toBeNull();
     expect(html.textContent).toContain("Batch at 21:43 UTC");
   });
 
@@ -212,7 +212,7 @@ describe("readout wiring", () => {
     const { chartSvg } = await import("../src/endpoint");
     const { bindHover } = await import("../src/chart_hover");
     document.body.innerHTML = `<div class="chartwrap chart" id="mainchart"></div>
-      <div class="chart-tip" id="charttip" hidden></div>`;
+      <div class="chart-readout idle" id="charttip"><p>Hover to read.</p></div>`;
     const chart = document.getElementById("mainchart")!;
     const tip = document.getElementById("charttip")!;
     chart.innerHTML = chartSvg(lt, b3it, DESIGN_VW);
@@ -235,7 +235,7 @@ describe("readout wiring", () => {
     expect(tip.textContent).toContain("Change detected");
     expect(tip.textContent).toContain("2026-07-21");
     expect(tip.textContent).toContain("TV shift 0.4");
-    expect(tip.classList.contains("has-detail")).toBe(true);
+    expect(tip.querySelector(".tip-detail")).not.toBeNull();
   });
 
   test("an epoch rule reads as the epoch, and its votes fill in when loaded", async () => {
@@ -260,21 +260,19 @@ describe("readout wiring", () => {
     const { chart, tip } = await mount(LT, B3IT);
     const lane = [...chart.querySelectorAll(".lane-hit")].find((h) => attr(h, "data-lane") === "lt")!;
     point(lane, "pointermove", dayX(23), "mouse");
-    point(chart, "pointerleave", 0, "mouse");
+    point(chart, "pointerdown", 0, "mouse"); // off every target: back to idle
     await tick();
-    expect(tip.hidden).toBe(true);
+    expect(tip.classList.contains("idle")).toBe(true);
     expect(tip.textContent).not.toContain("Hello");
   });
 
-  test("a tap pins the readout with its detail scrollable", async () => {
+  test("a tap reads a day with its votes, and long tables run in columns", async () => {
     const { chart, tip } = await mount(null, B3IT);
     point(chart.querySelectorAll(".lane-hit")[0], "pointerdown", dayX(24), "touch");
     await tick();
-    expect(tip.hidden).toBe(false);
-    expect(tip.classList.contains("pinned")).toBe(true);
+    expect(tip.classList.contains("idle")).toBe(false);
     expect(tip.textContent).toContain("Nineveh 7 · Assur 3");
-    point(chart, "pointerdown", 5, "touch");
-    expect(tip.hidden).toBe(true);
+    expect(tip.querySelector(".tip-grid")).not.toBeNull();
   });
 });
 

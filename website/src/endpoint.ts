@@ -333,10 +333,7 @@ function renderChart(lt: FocusLT | null, b3it: FocusB3IT | null, raw: RawLoaders
     const svg = chartSvg(lt, b3it, chartWidth(chartEl));
     if (!svg) return false;
     chartEl.innerHTML = svg;
-    if (tipEl) {
-      tipEl.hidden = true;
-      bindHover(chartEl, tipEl, lt, b3it, () => chartWidth(chartEl), raw);
-    }
+    if (tipEl) bindHover(chartEl, tipEl, lt, b3it, () => chartWidth(chartEl), raw);
     return true;
   };
 

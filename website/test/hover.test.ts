@@ -55,7 +55,7 @@ async function mount(
   const { chartSvg } = await import("../src/endpoint");
   const { bindHover } = await import("../src/chart_hover");
   document.body.innerHTML = `<div class="chartwrap chart" id="mainchart"></div>
-    <div class="chart-tip" id="charttip" hidden></div>`;
+    <div class="chart-readout idle" id="charttip"><p>Hover to read.</p></div>`;
   const chart = document.getElementById("mainchart")!;
   const tip = document.getElementById("charttip")!;
   chart.innerHTML = chartSvg(lt, b3it, DESIGN_VW);
@@ -128,7 +128,7 @@ describe("readout", () => {
   test("a hover names the day and that lane's value", async () => {
     const { tip, hits } = await mount(null, B3IT);
     point(hits[0], "pointermove", dayX(26), "mouse");
-    expect(tip.hidden).toBe(false);
+    expect(tip.classList.contains("idle")).toBe(false);
     expect(tip.textContent).toContain("2026-07-26");
     expect(tip.textContent).toContain("TV 0.536");
   });
@@ -141,24 +141,22 @@ describe("readout", () => {
     expect(tip.textContent).not.toContain("TV");
   });
 
-  test("leaving the lane takes the readout away", async () => {
-    const { tip, hits } = await mount(null, B3IT);
+  test("leaving the lane keeps the last readout, so a hand can move down into it", async () => {
+    const { chart, tip, hits } = await mount(null, B3IT);
     point(hits[0], "pointermove", dayX(26), "mouse");
     point(hits[0], "pointerleave", dayX(26), "mouse");
-    expect(tip.hidden).toBe(true);
+    point(chart, "pointerleave", dayX(26), "mouse");
+    expect(tip.classList.contains("idle")).toBe(false);
+    expect(tip.textContent).toContain("2026-07-26");
   });
 
-  test("a tap pins the readout, and one outside dismisses it", async () => {
+  test("a tap reads, and one off every target returns the block to idle", async () => {
     const { chart, tip, hits } = await mount(null, B3IT);
     point(hits[0], "pointerdown", dayX(26), "touch");
-    expect(tip.hidden).toBe(false);
     expect(tip.textContent).toContain("2026-07-26");
-    // a touch never fires pointerleave on its own -- the tip must survive until
-    // something else is touched
-    point(hits[0], "pointerleave", dayX(26), "touch");
-    expect(tip.hidden).toBe(false);
     point(chart, "pointerdown", 5, "touch");
-    expect(tip.hidden).toBe(true);
+    expect(tip.classList.contains("idle")).toBe(true);
+    expect(tip.textContent).toBe("Hover to read.");
   });
 
   test("marks the read sample on the curve", async () => {

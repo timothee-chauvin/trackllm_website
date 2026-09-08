@@ -59,6 +59,15 @@ const promptCell = (text: string): string =>
   `<td class="p" title="${esc(text)}">${esc(clip(text, PROMPT_CHARS))}</td>`;
 const mean = (vs: number[]): number => vs.reduce((a, b) => a + b, 0) / vs.length;
 const block = (inner: string): string => `<div class="tip-detail">${inner}</div>`;
+/** Long tables in side-by-side columns of `per` rows, so the block stays shallow. */
+const columns = (head: string, rows: string[], per: number): string => {
+  const tables: string[] = [];
+  for (let i = 0; i < rows.length; i += per) {
+    tables.push(`<table class="tip-tbl">${head}${rows.slice(i, i + per).join("")}</table>`);
+  }
+  return `<div class="tip-grid">${tables.join("")}</div>`;
+};
+const TABLE_ROWS = 10;
 const humanize = (reason: string): string => reason.replace(/_/g, " ");
 
 /** "Yes 31 · No 19 · +2". Sorted here: an object's integer-like keys ("1", "42")
@@ -86,15 +95,15 @@ export function ltDayDetail(raw: LTRaw, date: string): string {
       return `<span class="dim">${p.floor.toFixed(3)}*</span>`;
     };
     const rows = day[2]
-      .map(([k, v]) => `<tr><td>${tok(p.tokens[k])}</td><td class="n">${v.toFixed(3)}</td><td class="n">${ref(k)}</td></tr>`)
+      .map(([k, v]) => `<tr><td class="t">${tok(p.tokens[k])}</td><td class="n lt">${v.toFixed(3)}</td><td class="n">${ref(k)}</td></tr>`)
       .join("");
-    return `<div class="tip-h">${who} · ${day[1]} queries</div><table class="tip-tbl"><tr><th>token</th><th class="n">day</th><th class="n">ref</th></tr>${rows}</table>`;
+    return `<div class="tip-sec"><div class="tip-h">${who} · <b>${day[1]}</b> queries</div><table class="tip-tbl"><tr><th>token</th><th class="n">day</th><th class="n">ref</th></tr>${rows}</table></div>`;
   });
   const note = floored
     ? `<p class="dim">* never returned in the reference period: scored at the series floor, as drift does.</p>`
     : "";
   return block(
-    `<p>Mean logprob per top token (nats): this day vs the reference period.</p>${sections.join("")}${note}`
+    `<p>Mean logprob per top token (nats): <b class="lt">this day</b> vs the reference period.</p><div class="tip-grid">${sections.join("")}</div>${note}`
   );
 }
 
@@ -104,14 +113,13 @@ export function b3itDayDetail(b3it: FocusB3IT, raw: B3ITRaw, i: number): string 
   const [ts] = b3it.daily[i];
   const reference = raw.reference[epochOf(b3it.epochs, ts)];
   const votes = new Map(raw.batches[i].map(([k, day, tv]) => [k, { day, tv }]));
-  const rows = reference
-    .map(([k, ref]) => {
-      const v = votes.get(k);
-      return `<tr>${promptCell(raw.bis[k])}<td>${v ? countsText(v.day) : "—"}</td><td>${countsText(ref)}</td><td class="n">${v?.tv == null ? "—" : v.tv.toFixed(2)}</td></tr>`;
-    })
-    .join("");
+  const rows = reference.map(([k, ref]) => {
+    const v = votes.get(k);
+    return `<tr>${promptCell(raw.bis[k])}<td class="b3">${v ? countsText(v.day) : "—"}</td><td>${countsText(ref)}</td><td class="n b3"><b>${v?.tv == null ? "—" : v.tv.toFixed(2)}</b></td></tr>`;
+  });
+  const head = `<tr><th>prompt</th><th>day</th><th>reference</th><th class="n">TV</th></tr>`;
   return block(
-    `<p>Batch at ${esc(ts.slice(11, 16))} UTC: each border input's votes vs the epoch reference; the lane's TV is the mean of the last column.</p><table class="tip-tbl"><tr><th>prompt</th><th>day</th><th>reference</th><th class="n">TV</th></tr>${rows}</table>`
+    `<p>Batch at ${esc(ts.slice(11, 16))} UTC: each border input's <b class="b3">votes this day</b> vs the epoch reference; the lane's TV is the mean of the <b class="b3">TV</b> column.</p>${columns(head, rows, TABLE_ROWS)}`
   );
 }
 
@@ -123,7 +131,7 @@ export function ltChangeDetail(lt: FocusLT, c: LTChange): string {
     before.length && after.length
       ? `mean drift ${level(after)} nats over the ${after.length} days after vs ${level(before)} over the ${before.length} days before.`
       : "its level could not be read off the plotted series.";
-  return block(`<p><span class="badge lt">lt</span> Level shift ${fmtDrift(c.shift)}: ${how}</p>`);
+  return block(`<p><span class="badge lt">lt</span> <b class="lt">Level shift ${fmtDrift(c.shift)}</b>: ${how}</p>`);
 }
 
 const DETECTOR_COPY: Record<string, string> = {
@@ -145,7 +153,7 @@ export function b3itChangeDetail(b3it: FocusB3IT, c: B3ITChange): string {
       : `mean TV ${level(after)} over the first days of epoch ${ei + 1}, which has no days before the split.`;
   const shift = c.shiftTV === null ? "—" : `${round(c.shiftTV, 3)}`;
   return block(
-    `<p><span class="badge b3it">b3it</span> TV shift ${shift}: ${how}${DETECTOR_COPY[c.detector ?? ""] ?? ""}</p>`
+    `<p><span class="badge b3it">b3it</span> <b class="b3">TV shift ${shift}</b>: ${how}${DETECTOR_COPY[c.detector ?? ""] ?? ""}</p>`
   );
 }
 
@@ -162,11 +170,11 @@ export function epochDetail(b3it: FocusB3IT, raw: B3ITRaw | null, i: number): st
     i === 0
       ? "Initialised: border inputs searched and the reference sampled on this date. Each later day's TV is its distance from these votes."
       : `Re-initialised after ${after}. Border inputs and reference re-sampled: TV restarts from 0 against the new reference.`;
-  const rows = (raw?.reference[i] ?? [])
-    .map(([k, ref]) => `<tr>${promptCell(raw!.bis[k])}<td>${countsText(ref)}</td></tr>`)
-    .join("");
+  const rows = (raw?.reference[i] ?? []).map(
+    ([k, ref]) => `<tr>${promptCell(raw!.bis[k])}<td class="b3">${countsText(ref)}</td></tr>`
+  );
   const table = ep.nRef
-    ? `<div class="tip-h">Reference votes · ${ep.nRef} border inputs</div><table class="tip-tbl">${rows}</table>`
+    ? `<div class="tip-h">Reference votes · <b>${ep.nRef}</b> border inputs</div>${columns("", rows, TABLE_ROWS)}`
     : `<div class="tip-h">No reference was sampled.</div>`;
   return block(`<p>${why}</p>${table}`);
 }

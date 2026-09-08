@@ -372,22 +372,28 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 /* display:flex above beats the `hidden` attribute's UA display:none: without this
    the empty box sat in the chart's corner, shadow and all */
 .chart-tip[hidden] { display: none; }
-/* The endpoint chart's readout carries the raw data under the value: a block on its
-   own row, wrapping the sentences, as tall as its tables (chart_tip.placeTip keeps
-   it in the viewport). It takes the pointer, so a reader can move into it and
-   select a line to copy; the model page's plain tip stays inert. */
-.chart-tip.has-detail { flex-wrap: wrap; max-width: min(460px, calc(100% - 8px)); pointer-events: auto; user-select: text; cursor: auto; }
-.chart-tip.pinned { pointer-events: auto; }
-.chart-tip .tip-detail { flex-basis: 100%; font-size: 0.7rem; line-height: 1.4; color: var(--text); white-space: normal; }
-.chart-tip .tip-detail p { margin: 0.15rem 0 0; }
-.chart-tip .tip-detail .badge { margin-right: 0.25rem; }
-.chart-tip .tip-h { margin-top: 0.4rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.chart-tip .tip-tbl { border-collapse: collapse; white-space: nowrap; margin-top: 0.1rem; }
-.chart-tip .tip-tbl th { font-weight: 400; color: var(--text-dim); text-align: left; }
-.chart-tip .tip-tbl th, .chart-tip .tip-tbl td { padding: 0 0.7rem 0 0; }
-.chart-tip .tip-tbl .n { text-align: right; font-variant-numeric: tabular-nums; }
-.chart-tip .tip-tbl .p { max-width: 16ch; overflow: hidden; text-overflow: ellipsis; }
-.chart-tip .tip-detail .dim { color: var(--text-dim); }
+/* The endpoint chart's readout (chart_hover.ts): a block right under the plot,
+   never over it, holding the value under the pointer and the raw data behind it.
+   Selectable, as tall as its tables; long tables run in side-by-side columns. */
+.chart-readout { margin: 0.2rem 1rem 0; padding: 0.55rem 0 0.2rem; border-top: 1px solid var(--border-soft);
+  min-height: 2.6rem; font-family: var(--mono); font-size: 0.72rem; line-height: 1.45; color: var(--text); user-select: text; }
+.chart-readout.idle { color: var(--text-dim); } .chart-readout.idle p { margin: 0; }
+.chart-readout .rh { display: flex; gap: 0.5rem; align-items: baseline; font-size: 0.78rem; }
+.chart-readout .rh .d { color: var(--text-muted); } .chart-readout .rh .v { font-weight: 600; }
+.chart-readout .tip-detail p { margin: 0.25rem 0 0; color: var(--text-muted); max-width: 90ch; }
+.chart-readout .tip-detail .badge { margin-right: 0.25rem; }
+.chart-readout .lt { color: var(--accent); } .chart-readout .b3 { color: var(--b3it); }
+.chart-readout .tip-detail b { color: var(--text); } .chart-readout .tip-detail b.lt { color: var(--accent); } .chart-readout .tip-detail b.b3 { color: var(--b3it); }
+.chart-readout .tip-grid { display: flex; flex-wrap: wrap; gap: 0.2rem 2.2rem; }
+.chart-readout .tip-h { margin-top: 0.45rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chart-readout .tip-tbl { border-collapse: collapse; white-space: nowrap; margin-top: 0.15rem; }
+.chart-readout .tip-tbl th { font-weight: 400; color: var(--text-dim); text-align: left; font-size: 0.66rem; letter-spacing: 0.04em; text-transform: uppercase; }
+.chart-readout .tip-tbl th, .chart-readout .tip-tbl td { padding: 0.05rem 0.9rem 0.05rem 0; }
+.chart-readout .tip-tbl tr + tr td { border-top: 1px solid var(--border-soft); }
+.chart-readout .tip-tbl .n { text-align: right; font-variant-numeric: tabular-nums; }
+.chart-readout .tip-tbl .t, .chart-readout .tip-tbl .p { font-weight: 600; }
+.chart-readout .tip-tbl .p { max-width: 18ch; overflow: hidden; text-overflow: ellipsis; }
+.chart-readout .tip-detail .dim { color: var(--text-dim); }
 
 /* A table's min-content width is a floor: the changes table's four columns will not
    go below ~374px, so on a 375px phone `width: 100%` loses and the table pushed the
