@@ -73,6 +73,10 @@ jobs:
       - name: Generate static site
         run: uv run python -m trackllm_website.generate_site
 
+      - name: Prerender the front page
+        working-directory: website
+        run: bun run prerender
+
       - name: Prune files the site never serves
         run: ./scripts/prune_pages_artifact.sh website
 

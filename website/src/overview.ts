@@ -10,7 +10,7 @@ import {
   relDays,
   relativeAge,
 } from "./components";
-import { dirRowsHtml, overviewLeadCells, sortEndpointRows } from "./directory";
+import { dirRowsHtml, overviewLeadCells } from "./directory";
 import {
   HERO_CLEAR_GAP,
   HERO_HIT_WIDTH,
@@ -23,17 +23,15 @@ import {
   heroDrawnTo,
   heroStretch,
 } from "./hero_geom";
-import { Hero, OverviewData, fmtInt, loadOverview } from "./overview_data";
-import { rateablePlotRows, ratePlot } from "./rate_plot";
+import { Hero, HomeData, fmtInt, readHome } from "./overview_data";
+import { ratePlot } from "./rate_plot";
 
-const PLOT_SIZE = 10; // the front page shows the most drift-prone slice
-const DIR_SIZE = 10; // ... and the most-changed endpoints
 const FRESH_TICK_MS = 60_000; // the line's own resolution, so no point ticking faster
 
 export async function init(): Promise<void> {
-  let DATA: OverviewData;
+  let DATA: HomeData;
   try {
-    DATA = await loadOverview("telemetry");
+    DATA = readHome("telemetry");
   } catch (err) {
     // no half-broken hero above the error card: drop its layers and the live dot
     document.getElementById("eyebrow")?.remove();
@@ -158,19 +156,12 @@ export async function init(): Promise<void> {
   document.getElementById("feed")!.innerHTML = DATA.feed.map(e => eventRow(e, now)).join("");
   document.getElementById("allChanges")!.textContent = `All ${S.changes_total} changes →`;
 
-  // ---- providers: the most drift-prone slice of the rate plot ----
-  const provs = DATA.providers;
-  document.getElementById("provPlot")!.innerHTML =
-    ratePlot(rateablePlotRows(provs).slice(0, PLOT_SIZE), "");
+  // ---- providers and endpoints: the slices home.py selected, drawn as given ----
+  document.getElementById("provPlot")!.innerHTML = ratePlot(DATA.providers, "");
   document.getElementById("allProviders")!.textContent = `All ${S.provider_companies} providers →`;
 
-  // ---- endpoints: the most-changed actively tracked rows ----
-  const rows = DATA.endpoints;
-  const providerPages = new Set(provs.map(p => p.slug));
-  const top = rows.filter(r => r.headline === "tracked");
-  sortEndpointRows(top, "nChanges", -1);
   document.getElementById("dirBody")!.innerHTML =
-    dirRowsHtml(top.slice(0, DIR_SIZE), "", overviewLeadCells(providerPages), "");
+    dirRowsHtml(DATA.endpoints, "", overviewLeadCells(new Set(DATA.providerPages)), "");
   document.getElementById("dirCount")!.innerHTML = `${fmtInt(S.endpoints)} endpoints monitored, of ${fmtInt(S.catalog_endpoints)} in the catalog · <b style="color:var(--changed)">${S.changes_total} changes</b> across ${S.changed_endpoints} endpoints`;
   // every directory badge/pill above carries a popover
   bindTips(document.body);

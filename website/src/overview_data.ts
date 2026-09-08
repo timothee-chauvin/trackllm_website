@@ -86,6 +86,31 @@ export interface OverviewData {
   endpoints: EndpointRow[];
 }
 
+/** The front page's own slice of the overview (home.py), inlined into index.html
+ *  so the sections fill without a second round trip. The plot's rows and the
+ *  directory preview arrive already selected and ordered by the build. */
+export interface HomeData {
+  stats: Stats;
+  hero: Hero | null;
+  feed: FeedItem[];
+  providers: ProviderRate[]; // the rateable slice the plot draws, most drift-prone first
+  providerPages: string[]; // every provider slug with a page, for the preview's links
+  endpoints: EndpointRow[]; // the most-changed tracked rows
+}
+
+/** Read the inlined #home block; a mangled or missing block renders the load-error
+ *  card into `mountId` before rethrowing, so the page never sits blank. */
+export function readHome(mountId: string): HomeData {
+  try {
+    const el = document.getElementById("home");
+    if (!el) throw new Error("index.html carries no #home data block");
+    return JSON.parse(el.textContent || "");
+  } catch (err) {
+    showLoadError(mountId, "the overview data");
+    throw err;
+  }
+}
+
 /** Fetch overview.json; a failure renders the load-error card into `mountId`
  *  before rethrowing, so the page never sits blank. */
 export async function loadOverview(mountId: string): Promise<OverviewData> {

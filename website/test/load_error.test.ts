@@ -113,7 +113,8 @@ describe("pages under a failed fetch", () => {
 
   test("overview shows the card and drops the hero shell", async () => {
     document.documentElement.innerHTML = readFileSync(requireBuilt("index.html"), "utf8");
-    stubNetworkFailure();
+    // the front page's data is inlined (home.py): a mangled block is its failure mode
+    document.getElementById("home")!.textContent = "{";
     const { init } = await import("../src/overview");
     await expect(init()).rejects.toThrow();
     expect(document.querySelector("#telemetry .load-error")).not.toBeNull();
