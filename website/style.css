@@ -265,8 +265,6 @@ section.block { padding: 2.6rem 0 0.6rem; scroll-margin-top: var(--nav-h); }
   color: var(--text-muted); background: var(--surface-2); border: 1px solid var(--border); transition: all .13s; }
 .chip:hover { color: var(--text); border-color: var(--text-dim); }
 .chip.on { color: var(--accent); border-color: var(--accent); background: var(--accent-quiet); }
-.chip.on.state-changed { color: var(--changed); border-color: var(--changed); background: var(--changed-bg); }
-.chip.on.state-retired { color: var(--retired); border-color: var(--retired); background: var(--retired-bg); }
 /* the Endpoints page's chips, one labeled row per filter group (endpoints.ts) */
 .chip-groups { display: grid; gap: 0.45rem; margin-bottom: 0.9rem; }
 .chip-row { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
@@ -286,7 +284,7 @@ table.dir tbody tr:last-child td { border-bottom: none; }
 table.dir tbody tr:hover { background: var(--surface-2); }
 /* components.sparkline emits a bare <svg>; the cell fixes the column, the rule the glyph */
 table.dir tbody td.spark-cell { width: 130px; }
-table.dir tbody td.spark-cell > svg { width: 100%; height: 26px; display: block; }
+table.dir tbody td.spark-cell a, table.dir tbody td.spark-cell svg { width: 100%; height: 26px; display: block; }
 td .model-cell { font-weight: 560; letter-spacing: -0.01em; }
 td .model-cell:hover { color: var(--accent); }
 td .org-cell { color: var(--text-dim); font-size: 0.74rem; white-space: nowrap; }

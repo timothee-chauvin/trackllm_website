@@ -38,6 +38,6 @@ Detected changes per endpoint-year of LT monitoring, with a 95% Poisson interval
 
 {{ overview.endpoints | length }} endpoints in the catalog; the {{ DIR_PREVIEW }} tracked ones with the most detected changes are below, every one of them on [endpoints.md]({{ nav_prefix }}endpoints.md).
 
-{{ b.table(["Model", "Provider", "Org", "Status", "Changes", "Methods", "Stable for (days)"],
+{{ b.table(["Model", "Provider", "Org", "Status", "Changes", "Methods", "Last change"],
   overview.endpoints | most_changed(DIR_PREVIEW) | map("dir_row", nav_prefix) | list) }}
 {{ b.footer(nav_prefix) }}

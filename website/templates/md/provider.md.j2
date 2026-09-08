@@ -28,7 +28,7 @@ A provider's quantizations are separate serving stacks and drift separately.
   D.variants | map("variant_row") | list) }}
 ## Endpoints
 
-{{ b.table(["Model", "Variant", "Org", "Status", "Changes", "Methods", "Stable for (days)"],
+{{ b.table(["Model", "Variant", "Org", "Status", "Changes", "Methods", "Last change"],
   D.endpoints | map("dir_row", nav_prefix) | list) }}
 ## Detected changes
 

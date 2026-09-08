@@ -9,6 +9,7 @@ import {
   esc,
   highlight,
   methodBadges,
+  shortDate,
   sparkline,
   statusPill,
   statusRank,
@@ -24,7 +25,8 @@ export interface EndpointRow {
   providerSlug: string;
   methods: string[];
   status: "stable" | "changed" | "retired" | null; // null on rows with no series (untracked)
-  stableDays: number | null;
+  lastChange: string | null; // YYYY-MM-DD of the latest change, null when never changed
+  recent: boolean; // ... and whether that change is within the build's recent window
   nChanges: number;
   trace: number[];
   changeFracs: number[]; // each change's position along `trace`, 0..1
@@ -32,7 +34,7 @@ export interface EndpointRow {
   reason: string;
 }
 
-export type DirSortKey = "model" | "provider" | "status" | "nChanges" | "stableDays";
+export type DirSortKey = "model" | "provider" | "status" | "nChanges" | "lastChange";
 
 /** Sortable column headers for one table: holds (key, dir), flips them on header
  *  clicks or Enter/Space, and paints the ▼/▲ arrows plus the aria-sort a screen
@@ -88,7 +90,7 @@ export function sortEndpointRows(
   list.sort((a, b) => {
     let av: string | number, bv: string | number;
     if (key === "status") { av = statusRank(a); bv = statusRank(b); }
-    else if (key === "stableDays") { av = a.stableDays ?? -1; bv = b.stableDays ?? -1; }
+    else if (key === "lastChange") { av = a.lastChange ?? ""; bv = b.lastChange ?? ""; }
     else if (key === "nChanges") { av = a.nChanges; bv = b.nChanges; }
     else if (key === "provider") { av = providerValue(a); bv = providerValue(b); }
     else { av = a.model.toLowerCase(); bv = b.model.toLowerCase(); }
@@ -98,22 +100,25 @@ export function sortEndpointRows(
   });
 }
 
-function stableCell(r: EndpointRow): string {
-  if (r.status === "retired" || r.stableDays === null) return `<span class="org-cell">—</span>`;
-  const d = r.stableDays;
-  return `<span class="cc">${d >= 365 ? (d / 365).toFixed(1) + "y" : d + "d"}</span>`;
+function lastChangeCell(r: EndpointRow, now: number): string {
+  return r.lastChange
+    ? `<span class="cc some">${shortDate(r.lastChange, now)}</span>`
+    : `<span class="cc zero">—</span>`;
 }
 
 /** The five directory cells after model/provider for a row with a series --
  *  the untracked counterpart is components.ts::untrackedDirCells, including the
- *  .cell-tip / .cell-go split that keeps the pill's own popover out of the link. */
-function trackedDirCells(r: EndpointRow, root: string): string {
+ *  .cell-tip / .cell-go split that keeps the pill's own popover out of the link.
+ *  The strip is a second link to the endpoint page, where the drift is read in
+ *  full; it is aria-hidden, so the link's name comes from its label. */
+function trackedDirCells(r: EndpointRow, root: string, now: number): string {
   const isLT = r.methods.includes("lt");
-  return `<td class="cell-tip">${statusPill(r.status!)}<a class="cell-go" href="${root}endpoints/${esc(r.slug)}.html" aria-label="View endpoint"></a></td>
+  const href = `${root}endpoints/${esc(r.slug)}.html`;
+  return `<td class="cell-tip">${statusPill(r.status!)}<a class="cell-go" href="${href}" aria-label="View endpoint"></a></td>
     <td class="r"><span class="cc ${r.nChanges ? "some" : "zero"}">${r.nChanges}</span></td>
     <td class="col-hide"><span class="methods">${methodBadges(r.methods)}</span></td>
-    <td class="r col-hide">${stableCell(r)}</td>
-    <td class="col-hide spark-cell">${sparkline(r.trace, isLT ? LT_CAP : B3IT_CAP, isLT ? "var(--accent)" : "var(--b3it)", r.changeFracs)}</td>`;
+    <td class="r col-hide">${lastChangeCell(r, now)}</td>
+    <td class="col-hide spark-cell"><a href="${href}" aria-label="View endpoint">${sparkline(r.trace, isLT ? LT_CAP : B3IT_CAP, isLT ? "var(--accent)" : "var(--b3it)", r.changeFracs, true)}</a></td>`;
 }
 
 export interface DirectoryConfig {
@@ -138,21 +143,23 @@ export function dirRowsHtml(
   leadCells: (r: EndpointRow, q: string) => string,
   q: string
 ): string {
+  const now = Date.now();
   return list.map((r) => {
-    const cells = r.methods.length ? trackedDirCells(r, root) : untrackedDirCells(r, root);
+    const cells = r.methods.length ? trackedDirCells(r, root, now) : untrackedDirCells(r, root);
     return `<tr>${leadCells(r, q)}${cells}</tr>`;
   }).join("") || '<tr><td colspan="7"><div class="empty">No endpoints match.</div></td></tr>';
 }
 
-/** The Overview and Endpoints pages' leading cells: model (linked to its page) over
- *  org, then the provider -- linked only when that provider has a page. */
+/** The Overview and Endpoints pages' leading cells: model name (linked to the
+ *  endpoint page, where its drift is read in full) over org, then the provider --
+ *  linked only when that provider has a page. */
 export function overviewLeadCells(providerPages: Set<string>): (r: EndpointRow, q: string) => string {
   return (r, q) => {
     const provCell = providerPages.has(r.providerSlug)
       ? `<a class="prov-cell" href="providers/${esc(r.providerSlug)}.html">${highlight(r.provider, q)}</a>`
       : `<span class="prov-cell">${highlight(r.provider, q)}</span>`;
     return `
-      <td><a class="model-cell" href="models/${esc(r.modelSlug)}.html">${highlight(r.model, q)}</a><div class="org-cell">${highlight(r.org, q)}</div></td>
+      <td><a class="model-cell" href="endpoints/${esc(r.slug)}.html">${highlight(r.model, q)}</a><div class="org-cell">${highlight(r.org, q)}</div></td>
       <td class="col-hide">${provCell}</td>`;
   };
 }

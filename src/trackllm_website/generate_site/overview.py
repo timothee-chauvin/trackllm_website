@@ -40,45 +40,41 @@ def _row_state(
     change_dates: list[datetime],
     values: list[float],
     retired: bool,
-) -> tuple[str, list[float], list[float], int | None]:
-    """Directory row (status/trace/changeFracs/stableDays) for one endpoint.
+) -> tuple[str, list[float], list[float], str | None, bool]:
+    """Directory row (status/trace/changeFracs/lastChange/recent) for one endpoint.
 
     `changeFracs` places each change on the trace as a fraction of the observed
     span, the way feed.py's changeFrac does for the feed window.
 
-    Mirrors endpoint.ts::computeStatus (date-gap based). `change_dates` is the
-    endpoint's slice of the canonical merged list -- the same one the row's
-    nChanges counts, so the row can never read "stable for N days" beside a
-    nonzero count. `retired` is the pipeline's own verdict, independent of the
-    observation gap.
+    "stable" is reserved for an endpoint that has never changed; any detected
+    change makes it "changed" for good, and `recent` says whether the last one
+    is within RECENT_CHANGE_DAYS. `change_dates` is the endpoint's slice of the
+    canonical merged list -- the same one the row's nChanges counts, so the row
+    can never read "stable" beside a nonzero count. `retired` is the pipeline's
+    own verdict, independent of the observation gap.
     """
     last_obs = obs_dates[-1] if obs_dates else None
     gap_retired = last_obs is not None and (now - last_obs).days > RETIRED_GAP_DAYS
+    last_change = change_dates[-1] if change_dates else None
     if retired or gap_retired:
         status = "retired"
     else:
-        last_change = change_dates[-1] if change_dates else None
-        recent = (
-            last_change is not None and (now - last_change).days <= RECENT_CHANGE_DAYS
-        )
-        status = "changed" if recent else "stable"
+        status = "changed" if last_change is not None else "stable"
+    recent = last_change is not None and (now - last_change).days <= RECENT_CHANGE_DAYS
 
-    stable_since = (
-        change_dates[-1] if change_dates else (obs_dates[0] if obs_dates else None)
-    )
-    stable_days = (now - stable_since).days if stable_since is not None else None
     span = (obs_dates[-1] - obs_dates[0]).total_seconds() if len(obs_dates) > 1 else 0
     fracs = [
         round(min(1.0, max(0.0, (cd - obs_dates[0]).total_seconds() / span)), 3)
         for cd in change_dates
         if span
     ]
-    return status, downsample_trace(values, TRACE_LEN), fracs, stable_days
+    last_change_day = last_change.date().isoformat() if last_change else None
+    return status, downsample_trace(values, TRACE_LEN), fracs, last_change_day, recent
 
 
 def _b3it_row_state(
     view: B3ITView, now: datetime, change_dates: list[datetime]
-) -> tuple[str, list[float], list[float], int | None]:
+) -> tuple[str, list[float], list[float], str | None, bool]:
     """Directory row for a B3IT-only endpoint: its tv_series is the trace.
 
     The view's own retired status is load-bearing -- a B3IT endpoint the pipeline
@@ -116,7 +112,8 @@ def _untracked_row(slug: str, site: SiteStatuses) -> dict:
         "providerSlug": slugify(base_provider(provider)),
         "methods": [],
         "status": None,
-        "stableDays": None,
+        "lastChange": None,
+        "recent": False,
         "nChanges": 0,
         "trace": [],
         "changeFracs": [],
@@ -141,7 +138,7 @@ def build_overview(
     changes_path = data_dir / "changes.json"
     changes = json.loads(changes_path.read_text()) if changes_path.exists() else []
     lt_changes = [c for c in changes if c["method"] == "LT"]
-    # Canonical per-endpoint changes -- both the count and the status/stableDays
+    # Canonical per-endpoint changes -- both the count and the status/lastChange
     # each row publishes. Never the changes recomputed into lt_scores.json: that
     # recompute double-detects some changes on adjacent days, and the directory
     # row sits on the same pages as the merged change list (the Overview feed,
@@ -173,11 +170,12 @@ def build_overview(
         trace: list[float] = []
         fracs: list[float] = []
         status = "stable"
-        stable_days: int | None = None
+        last_change: str | None = None
+        recent = False
 
         info = lt_data.get(slug)
         if info is not None and now is not None:
-            status, trace, fracs, stable_days = _row_state(
+            status, trace, fracs, last_change, recent = _row_state(
                 now,
                 info.dates,
                 change_dates[slug],
@@ -185,7 +183,7 @@ def build_overview(
                 retired=False,
             )
         elif view is not None and now is not None:
-            status, trace, fracs, stable_days = _b3it_row_state(
+            status, trace, fracs, last_change, recent = _b3it_row_state(
                 view, now, change_dates[slug]
             )
 
@@ -200,7 +198,8 @@ def build_overview(
                 "providerSlug": slugify(base_provider(provider)),
                 "methods": methods,
                 "status": status,
-                "stableDays": stable_days,
+                "lastChange": last_change,
+                "recent": recent,
                 "nChanges": len(change_dates[slug]),
                 "trace": trace,
                 "changeFracs": fracs,

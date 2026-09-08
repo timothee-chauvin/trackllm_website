@@ -119,7 +119,7 @@ def _dir_row(r: dict, nav: str) -> tuple:
         r["headline"].replace("_", " "),
         r["nChanges"],
         _methods(r["methods"]),
-        r["stableDays"],
+        r["lastChange"] or "—",
     )
 
 

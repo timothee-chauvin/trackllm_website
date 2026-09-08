@@ -98,17 +98,28 @@ describe("filter chips", () => {
 
   test("Enter and Space toggle a chip, and aria-pressed follows", async () => {
     await renderEndpoints();
-    const tracked = document.querySelector<HTMLElement>('#chips .chip[data-st="tracked"]')!;
+    const lt = document.querySelector<HTMLElement>('#chips .chip[data-f="lt"]')!;
     const all = shownCount();
 
-    press(tracked, "Enter"); // tracked off: no status constraint left
-    expect(tracked.getAttribute("aria-pressed")).toBe("false");
-    expect(tracked.classList.contains("on")).toBe(false);
-    expect(shownCount()).toBeGreaterThan(all);
+    press(lt, "Enter");
+    expect(lt.getAttribute("aria-pressed")).toBe("true");
+    expect(lt.classList.contains("on")).toBe(true);
+    expect(shownCount()).toBeLessThan(all);
 
-    press(tracked, " ");
-    expect(tracked.getAttribute("aria-pressed")).toBe("true");
+    press(lt, " ");
+    expect(lt.getAttribute("aria-pressed")).toBe("false");
     expect(shownCount()).toBe(all);
+  });
+
+  test("Enter moves the status radio, and the pressed state follows", async () => {
+    await renderEndpoints();
+    const tracked = document.querySelector<HTMLElement>('#chips .chip[data-st="tracked"]')!;
+    const retired = document.querySelector<HTMLElement>('#chips .chip[data-st="retired"]')!;
+    press(retired, "Enter");
+    expect(retired.getAttribute("aria-pressed")).toBe("true");
+    expect(tracked.getAttribute("aria-pressed")).toBe("false");
+    press(retired, "Enter"); // a radio's active choice stays
+    expect(retired.getAttribute("aria-pressed")).toBe("true");
   });
 
   test("Space activates rather than scrolling the page", async () => {
@@ -151,7 +162,7 @@ describe("chip tooltips", () => {
 
   test("a status badge floats over the page, so the row keeps its height", async () => {
     await renderEndpoints();
-    document.querySelector<HTMLElement>('#chips .chip[data-st="tracked"]')!.click(); // untracked rows carry the badge
+    document.querySelector<HTMLElement>('#chips .chip[data-st="untrackable"]')!.click(); // untracked rows carry the badge
     const badge = document.querySelector<HTMLElement>("#dirBody .badge.st")!;
     const cell = badge.parentElement!;
     const before = cell.children.length;
@@ -180,8 +191,9 @@ describe("chip tooltips", () => {
     chip.click();
     expect(chip.getAttribute("aria-pressed")).toBe("true");
     expect(shownCount()).not.toBe(before);
-    // Enter toggles the chip alone, without pinning a caption under it
-    press(chip, "Enter");
+    // Enter on another status chip moves the choice, without pinning a caption
+    const other = document.querySelector<HTMLElement>('#chips .chip[data-st="tracked"]')!;
+    press(other, "Enter");
     expect(chip.getAttribute("aria-pressed")).toBe("false");
     expect(shownCount()).toBe(before);
     expect(document.querySelector(".tipline")).toBeNull();

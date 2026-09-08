@@ -127,7 +127,8 @@ def test_status_changed_when_recent_change(fake_site):
     ep = next(e for e in ov["endpoints"] if e["slug"] == "m2fa23p")
     assert ep["status"] == "changed"
     assert ep["nChanges"] == 1
-    assert ep["stableDays"] is not None
+    assert ep["lastChange"] == "2026-06-25"
+    assert ep["recent"] is True
 
 
 def test_status_retired_when_no_recent_observation(tmp_path):
@@ -284,8 +285,8 @@ def test_change_count_follows_changes_json_not_the_recomputed_scores(fake_site):
 def test_directory_status_ignores_a_recompute_change_absent_from_changes_json(
     fake_site,
 ):
-    """status/stableDays read the same canonical list as nChanges. Reading them
-    from lt_scores.json instead put "stable for N days" next to a nonzero change
+    """status/lastChange read the same canonical list as nChanges. Reading them
+    from lt_scores.json instead put a last-change date next to a zero change
     count -- or "changed" next to a zero one -- on the very same row."""
     (fake_site / "data" / "changes.json").write_text(json.dumps([]))
 
@@ -293,8 +294,8 @@ def test_directory_status_ignores_a_recompute_change_absent_from_changes_json(
     ep = next(e for e in ov["endpoints"] if e["slug"] == "m2fa23p")
     assert ep["nChanges"] == 0
     assert ep["status"] == "stable"
-    # stable since the first observation (2026-06-01), not since the recompute's change
-    assert ep["stableDays"] == 29
+    assert ep["lastChange"] is None
+    assert ep["recent"] is False
 
 
 def test_directory_status_follows_a_canonical_change_absent_from_the_recompute(
@@ -309,7 +310,7 @@ def test_directory_status_follows_a_canonical_change_absent_from_the_recompute(
     ep = next(e for e in ov["endpoints"] if e["slug"] == "m2fa23p")
     assert ep["nChanges"] == 1
     assert ep["status"] == "changed"
-    assert ep["stableDays"] == 5  # 2026-06-25 -> 2026-06-30
+    assert ep["lastChange"] == "2026-06-25"
 
 
 def test_b3it_row_status_counts_an_epoch_closure_change(tmp_path):
@@ -350,7 +351,7 @@ def test_b3it_row_status_counts_an_epoch_closure_change(tmp_path):
     ep = next(e for e in ov["endpoints"] if e["slug"] == slug)
     assert ep["nChanges"] == 1
     assert ep["status"] == "changed"
-    assert ep["stableDays"] == 10  # 2026-06-20 -> 2026-06-30
+    assert ep["lastChange"] == "2026-06-20"
 
 
 def test_now_spans_b3it_observations_newer_than_the_last_lt_one(tmp_path):

@@ -217,8 +217,8 @@ export function methodBadges(methods: string[]): string {
  *  observation is more than RETIRED_GAP_DAYS (14) old; otherwise "changed" if
  *  its last detected change is within RECENT_CHANGE_DAYS (60d), else "stable". */
 const TRACE_COPY: Record<string, string> = {
-  changed: "This endpoint is actively tracked and moved within the last 60 days.",
-  stable: "This endpoint is actively tracked and has shown no change in the last 60 days.",
+  changed: "This endpoint is actively tracked and has at least one detected change.",
+  stable: "This endpoint is actively tracked and has never shown a detected change.",
   retired:
     "This endpoint was tracked, but has gone quiet: either the pipeline retired it, or it hasn't answered in over 14 days.",
 };

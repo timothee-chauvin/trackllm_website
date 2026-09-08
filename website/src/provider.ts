@@ -291,7 +291,7 @@ export async function init(): Promise<void> {
     q: qEl,
     body: bodyEl,
     foot: footEl,
-    descending: ["status", "nChanges", "stableDays"],
+    descending: ["status", "nChanges", "lastChange"],
     providerValue: (r) => variantOf(r.provider),
     list: (q) => {
       const ql = q.toLowerCase();
