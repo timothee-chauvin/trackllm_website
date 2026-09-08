@@ -200,9 +200,22 @@ describe("endpoint chart at a phone's width", () => {
   });
 });
 
+/** The model page of the newest LT change in the built site: the strips and their
+ *  captions need changes to name, and which model has them is the data's call --
+ *  a hardcoded model went quiet once the detector's gate held its changes back. */
+function modelPageWithChanges(): string {
+  const feed = JSON.parse(readFileSync(requireBuilt("data/overview.json"), "utf8")).feed as {
+    method: string;
+    modelSlug: string;
+  }[];
+  const lt = feed.find((f) => f.method === "lt" && f.modelSlug);
+  if (!lt) throw new Error("no LT change in the built site's feed");
+  return `models/${lt.modelSlug}.html`;
+}
+
 describe("chart marks answer a tap", () => {
   // each test taps, so each starts from a page nothing has been tapped on yet
-  beforeEach(() => renderPage("models/qwen2fqwen3-coder.html", "../src/model"));
+  beforeEach(() => renderPage(modelPageWithChanges(), "../src/model"));
   /** A press and a release on the same spot -- the pair the caption reads, since a
    *  `click` can be retargeted away from the strip by the reflow the caption causes
    *  (browser-verified; happy-dom has no layout to reflow). */
