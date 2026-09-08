@@ -1,6 +1,14 @@
 import { describe, expect, test } from "bun:test";
 
-import { HEADLINE_ORDER, headlineBadge, highlight, statusRank } from "../src/components";
+import {
+  HEADLINE_ORDER,
+  headlineBadge,
+  highlight,
+  monitoredSpan,
+  statusPill,
+  statusRank,
+  untrackedDirCells,
+} from "../src/components";
 
 describe("highlight", () => {
   test("wraps the matched substring in <mark>", () => {
@@ -53,5 +61,34 @@ describe("statusRank", () => {
       statusRank({ methods: [], status: null, headline: h }),
     );
     expect(ranks).toEqual([...ranks].sort((a, b) => a - b));
+  });
+});
+
+describe("untrackedDirCells", () => {
+  test("wears one badge per headline, in the order given", () => {
+    const html = untrackedDirCells(
+      { slug: "s", headlines: ["retired", "too_expensive"], reason: "why" },
+      "",
+    );
+    const badges = [...html.matchAll(/class="badge st st-([a-z-]+)"/g)].map((m) => m[1]);
+    expect(badges).toEqual(["retired", "too-expensive"]);
+    expect(html).toContain('title="why"');
+  });
+});
+
+describe("statusPill", () => {
+  test("a retired pill's popover carries the row's reason; a live one does not", () => {
+    const retired = statusPill("retired", "Monitoring was retired: too pricey.");
+    expect(retired).toContain("gone quiet");
+    expect(retired).toContain("Monitoring was retired: too pricey.");
+    const stable = statusPill("stable", "This endpoint is actively tracked.");
+    expect(stable).not.toContain("actively tracked.");
+  });
+});
+
+describe("monitoredSpan", () => {
+  test("open while anything is still monitored, a closed range once nothing is", () => {
+    expect(monitoredSpan("2026-01-15", "2026-06-30", true)).toBe("since Jan 2026");
+    expect(monitoredSpan("2026-01-15", "2026-06-30", false)).toBe("Jan 2026 – Jun 2026");
   });
 });

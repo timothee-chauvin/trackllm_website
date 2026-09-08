@@ -1,6 +1,6 @@
 """The status resolver: every catalog / previously-tracked endpoint gets a
-per-method (lt, bi) status plus one headline, derived purely from committed
-snapshots."""
+per-method (lt, bi) status, one dominant headline and the list of every headline
+it carries, derived purely from committed snapshots."""
 
 from datetime import datetime, timezone
 
@@ -9,7 +9,7 @@ import pytest
 from trackllm_website.bi.selection import SelectionPolicy
 from trackllm_website.bi.state import EndpointBIState, RetiredInfo
 from trackllm_website.bi.vetting import EndpointCache
-from trackllm_website.config import Endpoint
+from trackllm_website.config import Endpoint, config
 from trackllm_website.generate_site.status import (
     STATUS_COPY,
     CatalogEntry,
@@ -19,6 +19,7 @@ from trackllm_website.generate_site.status import (
     headline_breakdown,
     humanize_detail,
     headline_for,
+    headlines_for,
     one_line_reason,
     resolve_statuses,
     status_json,
@@ -263,6 +264,31 @@ class TestHeadline:
     )
     def test_priority_chain(self, lt, bi, expected):
         assert headline_for(lt, bi) == expected
+        assert expected in headlines_for(lt, bi)
+
+    @pytest.mark.parametrize(
+        "lt,bi,expected",
+        [
+            ("tracked", "monitoring", ["tracked"]),
+            # grok: LT-tracked, BI too expensive -- it shows under both chips
+            ("tracked", "too_expensive", ["tracked", "too_expensive"]),
+            # a retirement is always retired, and keeps its second finding
+            ("pending", "retired:too_expensive", ["retired", "too_expensive"]),
+            ("too_expensive", "retired:too_expensive", ["retired", "too_expensive"]),
+            ("stalled", "too_expensive", ["retired", "too_expensive"]),
+            ("pending", "retired:unreachable", ["retired", "errors_out"]),
+            ("pending", "retired:delisted", ["retired"]),
+            ("stalled", "monitoring", ["tracked", "retired"]),
+            ("no_logprobs", "bad_temperature", ["untrackable"]),
+            # pending is the absence of a verdict: only alone
+            ("tracked", "pending", ["tracked"]),
+            ("no_logprobs", "pending", ["pending"]),
+            ("pending", "pending", ["pending"]),
+            ("free_excluded", "free_excluded", ["free_excluded"]),
+        ],
+    )
+    def test_every_headline_carried(self, lt, bi, expected):
+        assert headlines_for(lt, bi) == expected
 
 
 class TestResolveUnion:
@@ -321,6 +347,7 @@ class TestReasonAndJson:
             lt="probe_failed",
             bi="pending",
             headline="errors_out",
+            headlines=["errors_out"],
             lt_detail="error: 404",
             bi_detail=None,
         )
@@ -334,19 +361,55 @@ class TestReasonAndJson:
             lt="pending",
             bi="retired:delisted",
             headline="retired",
+            headlines=["retired"],
             lt_detail=None,
             bi_detail="since 2026-07-30",
         )
+        grace = config.bi.reinit.deselection_grace_days
         assert one_line_reason(st) == (
-            "Monitoring was retired: the endpoint left the OpenRouter catalog "
-            "(since 2026-07-30)."
+            "Monitoring was retired: the endpoint dropped out of our B3IT selection "
+            "(flagships, the most popular models, the cheapest endpoints per "
+            f"provider, within budget) for {grace} days (since 2026-07-30)."
         )
+
+    def test_delisted_copy_says_deselected_not_gone_from_the_catalog(self):
+        """The lifecycle stores "delisted" for any monitored endpoint out of the
+        selected set past the grace period -- mythomax@mancer stayed in the
+        catalog and LT-tracked while its B3IT lane was retired this way."""
+        assert "catalog" not in STATUS_COPY["retired:delisted"]
+        assert "selection" in STATUS_COPY["retired:delisted"]
+
+    def test_reason_names_every_headline_once(self):
+        """A retired endpoint that was also too expensive says both; a tracked
+        one monitored by both methods does not say "tracked" twice."""
+        both = EndpointStatus(
+            lt="stalled",
+            bi="retired:too_expensive",
+            headline="retired",
+            headlines=["retired", "too_expensive"],
+            lt_detail=None,
+            bi_detail="since 2026-07-30",
+        )
+        assert one_line_reason(both) == (
+            f"{STATUS_COPY['stalled']} Monitoring was retired: a single query "
+            "costs more than our per-query guard allows (since 2026-07-30)."
+        )
+        tracked = EndpointStatus(
+            lt="tracked",
+            bi="monitoring",
+            headline="tracked",
+            headlines=["tracked"],
+            lt_detail=None,
+            bi_detail=None,
+        )
+        assert one_line_reason(tracked) == STATUS_COPY["tracked"]
 
     def test_reason_falls_back_to_headline_copy_for_joint_conclusions(self):
         st = EndpointStatus(
             lt="no_logprobs",
             bi="bad_temperature",
             headline="untrackable",
+            headlines=["untrackable"],
             lt_detail=None,
             bi_detail=None,
         )
@@ -357,6 +420,7 @@ class TestReasonAndJson:
             lt="tracked",
             bi="monitoring",
             headline="tracked",
+            headlines=["tracked"],
             lt_detail=None,
             bi_detail=None,
         )
@@ -364,6 +428,7 @@ class TestReasonAndJson:
             "lt": "tracked",
             "bi": "monitoring",
             "headline": "tracked",
+            "headlines": ["tracked"],
             "ltCopy": STATUS_COPY["tracked"],
             "biCopy": STATUS_COPY["monitoring"],
             "ltDetail": None,

@@ -4,7 +4,7 @@
 {{ b.crumb([("Home", nav_prefix ~ "index.md"), (D.org, nav_prefix ~ "orgs/" ~ org_slug ~ ".md"), (D.model.split("/")[-1], "")]) }}
 {% set tracked = D.endpoints | selectattr("methods") | list %}
 {% if tracked %}
-{{ D.n_endpoints }} monitored endpoint{{ "s" if D.n_endpoints != 1 }} ({{ D.n_active }} actively tracked, {{ D.n_endpoints - D.n_active }} no longer) across {{ D.n_providers }} provider{{ "s" if D.n_providers != 1 }}, monitored {{ D.date_min }} – {{ D.date_max }}. {{ D.n_changed }} of them show{{ "s" if D.n_changed == 1 }} at least one detected change ({{ D.changes | length }} changes total). All {{ D.n_endpoints_total }} catalog endpoints by status: {{ D.status_summary }}.
+{{ D.n_endpoints }} monitored endpoint{{ "s" if D.n_endpoints != 1 }} ({{ D.n_active }} actively tracked, {{ D.n_endpoints - D.n_active }} no longer) across {{ D.n_providers }} provider{{ "s" if D.n_providers != 1 }}, monitored {% if D.n_active %}since {{ D.date_min }}{% else %}{{ D.date_min }} – {{ D.date_max }}{% endif %}. {{ D.n_changed }} of them show{{ "s" if D.n_changed == 1 }} at least one detected change ({{ D.changes | length }} changes total). All {{ D.n_endpoints_total }} catalog endpoints by status: {{ D.status_summary }}.
 {% else %}
 This model is not tracked ({{ D.n_endpoints_total }} catalog endpoint{{ "s" if D.n_endpoints_total != 1 }}: {{ D.status_summary }}). Each endpoint below says why.
 {% endif %}

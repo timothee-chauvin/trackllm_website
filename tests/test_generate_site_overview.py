@@ -17,8 +17,8 @@ from trackllm_website.bi.state import RetiredInfo
 from trackllm_website.config import Endpoint, HeroConfig
 from trackllm_website.generate_site.changes import merge_changes, to_json
 from trackllm_website.generate_site.lt import discover_lt_endpoints, load_all_lt_data
-from trackllm_website.generate_site.feed import downsample_trace
-from trackllm_website.generate_site.overview import build_overview
+from trackllm_website.generate_site.feed import build_feed_items, downsample_trace
+from trackllm_website.generate_site.overview import FEED_SIZE, build_overview
 from trackllm_website.generate_site.status import STATUS_COPY
 from trackllm_website.util import slugify
 
@@ -194,6 +194,42 @@ def test_feed_includes_b3it_item_from_view_transition(tmp_path):
     assert item["sevKey"] in {"alert", "changed", "stable"}
     assert item["model"] == "b"
     assert item["provider"] == "q"
+
+
+def test_feed_is_the_head_of_the_merged_change_list(tmp_path):
+    """The front page's latest changes are the newest FEED_SIZE items of the same
+    merged list /changes shows, whatever their method -- no per-method quota, so
+    a B3IT change older than FEED_SIZE LT changes is not pulled in."""
+    root = tmp_path / "website"
+    dates = [f"2026-06-{d:02d}T00:00:00Z" for d in range(1, 31)]
+    write_lt_endpoint(
+        root, "m2fa23p", "m/a", "p", dates=dates, changes=[], drift=[0.1] * 30
+    )
+    _write_b3it_with_transition(root, "m/b", "q", status="monitoring")
+    views = b3it_views_for(root)
+    lt_changes = [
+        {
+            "date": dates[i],
+            "slug": "m2fa23p",
+            "model": "m/a",
+            "provider": "p",
+            "method": "LT",
+            "magnitude": 1.0,
+        }
+        for i in range(10, 10 + FEED_SIZE + 2)
+    ]
+    changes = to_json(merge_changes({}, {}, views)) + lt_changes
+    (root / "data" / "changes.json").write_text(json.dumps(changes))
+    (root / "data" / "spend.json").write_text(json.dumps({"cumulative": {}}))
+
+    ov = _build_overview(root)
+    lt_dir = root / "data" / "lt"
+    lt_data = load_all_lt_data(lt_dir, ["m2fa23p"])
+    drift_by_slug = {slug: d.drift for slug, d in lt_data.items()}
+    merged = build_feed_items(changes, drift_by_slug, views, NOW)
+    assert len(merged) > FEED_SIZE
+    assert ov["feed"] == merged[:FEED_SIZE]
+    assert {i["method"] for i in ov["feed"]} == {"lt"}
 
 
 def test_b3it_only_retired_endpoint_gets_retired_status(tmp_path):
@@ -486,6 +522,7 @@ def test_untracked_catalog_endpoint_gets_a_row_with_reason(fake_site):
     assert row["model"] == "gpt-5.4" and row["org"] == "openai"
     assert row["providerSlug"] == "openai"
     assert row["headline"] == "untrackable"
+    assert row["headlines"] == ["untrackable"]
     assert (row["ltStatus"], row["biStatus"]) == ("no_logprobs", "bad_temperature")
     assert row["reason"] == STATUS_COPY["untrackable"]
     # untracked rows do not join the tracked-fleet stats, only the catalog count
@@ -501,8 +538,38 @@ def test_tracked_rows_carry_status_fields(fake_site):
     ov = _build_overview_with(fake_site, inputs, NOW)
     row = next(r for r in ov["endpoints"] if r["slug"] == "m2fa23p")
     assert row["headline"] == "tracked"
+    assert row["headlines"] == ["tracked"]
     assert (row["ltStatus"], row["biStatus"]) == ("tracked", "monitoring")
     assert row["reason"] == STATUS_COPY["tracked"]
+
+
+def test_a_dead_too_expensive_endpoint_is_also_retired(tmp_path):
+    """An endpoint B3IT retired for cost, whose series then went quiet: its
+    dominant headline stays too_expensive (badges, model pages), but it carries
+    "retired" as well, so the Retired chip lists it, its reason says both, and
+    the fleet count counts it once."""
+    root = tmp_path / "website"
+    _write_b3it_with_transition(
+        root,
+        "m/b",
+        "q",
+        status="retired",
+        retired=RetiredInfo(
+            reason="too_expensive",
+            since=datetime(2026, 1, 25, tzinfo=timezone.utc),
+            last_recheck=datetime(2026, 1, 25, tzinfo=timezone.utc),
+        ),
+    )
+    (root / "data" / "changes.json").write_text(json.dumps([]))
+    (root / "data" / "spend.json").write_text(json.dumps({"cumulative": {}}))
+
+    ov = _build_overview(root)
+    row = next(r for r in ov["endpoints"] if r["slug"] == slugify("m/b#q"))
+    assert (row["status"], row["headline"]) == ("retired", "too_expensive")
+    assert row["headlines"] == ["retired", "too_expensive"]
+    assert row["reason"].startswith("Monitoring was retired: a single query costs")
+    assert ov["stats"]["endpoints"] == 1
+    assert ov["stats"]["active"] == 0
 
 
 def test_pinned_hero_reaches_overview_json(tmp_path):
@@ -581,4 +648,3 @@ def test_stale_hero_pin_fails_the_build(tmp_path):
             site_statuses_for(root, empty_status_inputs()),
             NOW,
         )
-

@@ -23,15 +23,18 @@ from trackllm_website.generate_site.freshness import latest
 from trackllm_website.generate_site.hero import build_hero
 from trackllm_website.generate_site.lt import EndpointInfo, LTData
 from trackllm_website.generate_site.naming import base_provider
-from trackllm_website.generate_site.status import EndpointStatus, one_line_reason
+from trackllm_website.generate_site.status import (
+    HEADLINE_ORDER,
+    EndpointStatus,
+    one_line_reason,
+)
 from trackllm_website.generate_site.status_io import SiteStatuses
 from trackllm_website.util import slugify
 
 RECENT_CHANGE_DAYS = 60
 RETIRED_GAP_DAYS = 14
 
-FEED_LT_SIZE = 6
-FEED_B3IT_SIZE = 4
+FEED_SIZE = 10
 
 
 @dataclass
@@ -108,9 +111,16 @@ def _lanes(info: LTData | None, view: B3ITView | None) -> list[Lane]:
     return lanes
 
 
-def _status_fields(st: EndpointStatus) -> dict:
+def _status_fields(st: EndpointStatus, status: str | None) -> dict:
+    """`status` is the row's lane-derived display state: a row whose every series
+    went dead is retired whatever its methods' verdicts say, so it joins the
+    Retired chip too (a too_expensive endpoint that stopped answering is both)."""
+    headlines = st.headlines
+    if status == "retired" and "retired" not in headlines:
+        headlines = [h for h in HEADLINE_ORDER if h in {*headlines, "retired"}]
     return {
         "headline": st.headline,
+        "headlines": headlines,
         "ltStatus": st.lt,
         "biStatus": st.bi,
         "reason": one_line_reason(st),
@@ -134,7 +144,7 @@ def _untracked_row(slug: str, site: SiteStatuses) -> dict:
         "nChanges": 0,
         "trace": [],
         "changeFracs": [],
-        **_status_fields(site.statuses[slug]),
+        **_status_fields(site.statuses[slug], None),
     }
 
 
@@ -205,15 +215,14 @@ def build_overview(
                 "nChanges": len(change_dates[slug]),
                 "trace": trace,
                 "changeFracs": fracs,
-                **_status_fields(site.statuses[slug]),
+                **_status_fields(site.statuses[slug], status),
             }
         )
 
     drift_by_slug = {slug: d.drift for slug, d in lt_data.items()}
-    all_items = build_feed_items(changes, drift_by_slug, b3it_views, now)
-    lt_items = [i for i in all_items if i["method"] == "lt"][:FEED_LT_SIZE]
-    b3it_items = [i for i in all_items if i["method"] == "b3it"][:FEED_B3IT_SIZE]
-    feed = sorted(lt_items + b3it_items, key=lambda i: i["iso"], reverse=True)
+    # The newest FEED_SIZE of the same merged list changes_page.py publishes, so
+    # the front page's "Latest changes" is exactly the head of /changes.
+    feed = build_feed_items(changes, drift_by_slug, b3it_views, now)[:FEED_SIZE]
     # None only where a caller has no hero to draw (fixtures); the site build always
     # passes config.hero, and a pin that cannot resolve raises rather than blanking.
     hero = (
@@ -249,18 +258,22 @@ def build_overview(
         _untracked_row(slug, site)
         for slug in sorted(set(site.statuses) - set(all_slugs))
     ]
-    # The headline (status.py) is what the directory's status chips filter on, so
+    # The headlines (status.py) are what the directory's status chips filter on, so
     # the headline numbers up top must be counted the same way -- over every row,
-    # including the ones with no series. A row's `status` is a display state read
-    # off the trace's date gaps: an endpoint whose queries have started failing
-    # still reads "stable" for two weeks, and one we monitor but have not plotted
-    # yet has no `status` at all, so counting it here would disagree with the
-    # "Tracked" chip right below.
-    headlines = Counter(r["headline"] for r in endpoint_recs + untracked_recs)
+    # including the ones with no series, under every headline a row carries. A
+    # row's `status` is a display state read off the trace's date gaps: an
+    # endpoint whose queries have started failing still reads "stable" for two
+    # weeks, and one we monitor but have not plotted yet has no `status` at all,
+    # so counting it here would disagree with the "Tracked" chip right below.
+    all_recs = endpoint_recs + untracked_recs
+    headlines = Counter(h for r in all_recs for h in r["headlines"])
 
     stats = {
-        # the fleet we have ever tracked: everything the two chips below cover
-        "endpoints": headlines["tracked"] + headlines["retired"],
+        # the fleet we have ever tracked: every row the two chips below cover (a
+        # row can be both, so this is a count of rows, not a sum of the chips)
+        "endpoints": sum(
+            1 for r in all_recs if {"tracked", "retired"} & set(r["headlines"])
+        ),
         "catalog_endpoints": len(endpoint_recs) + len(untracked_recs),
         "providers": len({r["provider"] for r in endpoint_recs}),
         "provider_companies": len(

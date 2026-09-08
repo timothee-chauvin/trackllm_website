@@ -30,7 +30,8 @@ export interface EndpointRow {
   nChanges: number;
   trace: number[];
   changeFracs: number[]; // each change's position along `trace`, 0..1
-  headline: string;
+  headline: string; // the dominant one (badges, counts, sort)
+  headlines: string[]; // every headline the row carries, in HEADLINE_ORDER: what the status chips match
   reason: string;
 }
 
@@ -107,7 +108,7 @@ function lastChangeCell(r: EndpointRow, now: number): string {
 function trackedDirCells(r: EndpointRow, root: string, now: number): string {
   const isLT = r.methods.includes("lt");
   const href = `${root}endpoints/${esc(r.slug)}.html`;
-  return `<td class="cell-tip">${statusPill(r.status!)}<a class="cell-go" href="${href}" aria-label="View endpoint"></a></td>
+  return `<td class="cell-tip">${statusPill(r.status!, r.reason)}<a class="cell-go" href="${href}" aria-label="View endpoint"></a></td>
     <td class="r"><span class="cc ${r.nChanges ? "some" : "zero"}">${r.nChanges}</span></td>
     <td class="col-hide"><span class="methods">${methodBadges(r.methods)}</span></td>
     <td class="r col-hide">${lastChangeCell(r, now)}</td>

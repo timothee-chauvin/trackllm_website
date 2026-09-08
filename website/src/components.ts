@@ -178,16 +178,16 @@ export function statusRank(r: {
 }
 
 /** The five directory cells after model/provider for a row with no series:
- *  headline badge in the status column, the one-line reason in the trace column.
+ *  a badge per headline in the status column, the one-line reason in the trace column.
  *  The badge is its own tap target (bindTips) and a real link to the endpoint page
  *  has to sit somewhere too -- an anchor cannot wrap a button, so .cell-go is a
  *  sibling stretched over the cell instead (.cell-tip in style.css), under the
  *  badge in z-order. See trackedDirCells (directory.ts) for the tracked twin. */
 export function untrackedDirCells(
-  r: { slug: string; headline: string; reason: string },
+  r: { slug: string; headlines: string[]; reason: string },
   root: string
 ): string {
-  return `<td class="cell-tip">${headlineBadge(r.headline)}<a class="cell-go" href="${root}endpoints/${esc(r.slug)}.html" aria-label="View endpoint"></a></td>
+  return `<td class="cell-tip">${r.headlines.map(headlineBadge).join("")}<a class="cell-go" href="${root}endpoints/${esc(r.slug)}.html" aria-label="View endpoint"></a></td>
     <td class="r"><span class="cc zero">—</span></td>
     <td class="col-hide"></td>
     <td class="r col-hide"><span class="org-cell">—</span></td>
@@ -223,8 +223,12 @@ const TRACE_COPY: Record<string, string> = {
     "This endpoint was tracked, but has gone quiet: either the pipeline retired it, or it hasn't answered in over 14 days.",
 };
 
-export function statusPill(status: string): string {
-  return `<span class="pill ${status}" role="button" tabindex="0" data-tip="${esc(TRACE_COPY[status])}"><span class="led"></span>${status}</span>`;
+/** `reason` (overview.py::one_line_reason) is appended to a retired pill's popover:
+ *  the generic "gone quiet" line alone hides why -- a retired row is often also
+ *  too expensive or erroring out, and the chips list it under both. */
+export function statusPill(status: string, reason: string): string {
+  const tip = status === "retired" ? `${TRACE_COPY[status]} ${reason}` : TRACE_COPY[status];
+  return `<span class="pill ${status}" role="button" tabindex="0" data-tip="${esc(tip)}"><span class="led"></span>${status}</span>`;
 }
 
 export function relDays(n: number): string {
@@ -623,6 +627,12 @@ export function shortDate(date: string, now: number): string {
 /** "2026-07-24" -> "Jul 2026"; null -> em dash. */
 export function prettyDate(date: string | null): string {
   return date ? MONTH_NAMES[+date.slice(5, 7) - 1] + " " + date.slice(0, 4) : "—";
+}
+
+/** A fleet's monitoring span: open ("since Jan 2026") while any of its endpoints
+ *  is still monitored, the closed range once every one of them is retired. */
+export function monitoredSpan(first: string | null, last: string | null, stillMonitored: boolean): string {
+  return stillMonitored ? `since ${prettyDate(first)}` : `${prettyDate(first)} – ${prettyDate(last)}`;
 }
 
 export function plural(n: number, word: string): string {

@@ -11,8 +11,8 @@ import {
   magnitudeLabel,
   methodBadges,
   monthLabel,
+  monitoredSpan,
   plural,
-  prettyDate,
   rateBar,
   showLoadError,
   stripTip,
@@ -50,6 +50,7 @@ interface ProviderData {
   name: string;
   slug: string;
   n_endpoints: number;
+  n_active: number; // tracked rows whose series is still alive (provider.py)
   n_models: number;
   n_variants: number;
   first: string | null;
@@ -124,7 +125,7 @@ export async function init(): Promise<void> {
       `<b>${D.n_endpoints}</b> ${D.n_endpoints === 1 ? "endpoint" : "endpoints"} across ` +
       `${plural(D.n_models, "model")} and ${plural(D.n_variants, "serving variant")}, ` +
       (D.first && D.last
-        ? `monitored ${prettyDate(D.first)} – ${prettyDate(D.last)}.`
+        ? `monitored ${monitoredSpan(D.first, D.last, D.n_active > 0)}.`
         : "with no monitoring recorded yet.") +
       spread;
   }
@@ -132,11 +133,10 @@ export async function init(): Promise<void> {
   const summaryEl = document.getElementById("summary");
   if (summaryEl) {
     // among tracked rows only, like every other number on this card
-    const active = D.endpoints.filter((e) => e.methods.length && e.status !== "retired").length;
     const affected = D.endpoints.filter((e) => e.nChanges > 0).length;
     summaryEl.innerHTML = `
       <div class="s"><div class="v">${D.n_endpoints}</div><div class="k">Endpoints</div></div>
-      <div class="s"><div class="v">${active}</div><div class="k">Still active</div></div>
+      <div class="s"><div class="v">${D.n_active}</div><div class="k">Still active</div></div>
       <div class="s"><div class="v"${D.changes.length ? ' style="color:var(--changed)"' : ""}>${D.changes.length}</div><div class="k">Changes detected</div></div>
       <div class="s"><div class="v">${affected}</div><div class="k">Endpoints affected</div></div>`;
   }
@@ -151,7 +151,7 @@ export async function init(): Promise<void> {
         <div class="exposure">${
           m.endpoints === 0
             ? "No endpoints run this method here yet."
-            : `${plural(m.changes, "change")} seen so far across ${plural(m.endpoints, "endpoint")}${FIRST ? ", monitored since " + prettyDate(FIRST) : ""}.`
+            : `${plural(m.changes, "change")} seen so far across ${plural(m.endpoints, "endpoint")}${FIRST && D.last ? ", monitored " + monitoredSpan(FIRST, D.last, D.n_active > 0) : ""}.`
         } The rate appears once the exposure does.</div>
       </div>`;
     }

@@ -138,7 +138,7 @@ def _dir_row(r: dict, nav: str) -> tuple:
         _ep(nav, r["slug"], r["model"]),
         _provider(nav, r["providerSlug"], r["provider"]),
         _org(nav, r["org"]),
-        r["headline"].replace("_", " "),
+        ", ".join(h.replace("_", " ") for h in r["headlines"]),
         r["nChanges"],
         _methods(r["methods"]),
         r["lastChange"] or "—",
