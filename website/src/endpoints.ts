@@ -43,7 +43,6 @@ export async function init(): Promise<void> {
     body: document.getElementById("dirBody")!,
     foot: document.getElementById("dirFoot")!,
     descending: ["lastChange", "nChanges"],
-    providerValue: r => r.provider.toLowerCase(),
     list: q => {
       const ql = q.toLowerCase();
       return rows.filter(r => {

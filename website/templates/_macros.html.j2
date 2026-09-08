@@ -63,7 +63,7 @@
    preview on the front page. #}
 {% macro dir_table(sortable) -%}
 {# a sortable table is the page; a preview shows its few rows whole #}
-{% set cols = [("model", "Model", ""), ("provider", "Provider", "col-hide"), ("status", "Status", ""),
+{% set cols = [("model", "Endpoint", ""), ("status", "Status", ""),
                ("nChanges", "Changes", "r"), (none, "Methods", "col-hide"), ("lastChange", "Last change", "r col-hide"),
                (none, "Drift from baseline", "col-hide")] %}
 <div class="table-wrap{{ "" if sortable else " preview" }}">

@@ -187,7 +187,7 @@ describe("endpoint directory chips", () => {
       document
         .querySelector(`#dirBody a.model-cell[href="endpoints/${slug}.html"]`)!
         .closest("tr")!
-        .querySelectorAll("td")[5].textContent!;
+        .querySelectorAll("td")[4].textContent!;
     expect(cell(never.slug)).toBe("—");
     expect(cell(once.slug)).toMatch(/^\d{1,2} [A-Z][a-z]{2}/);
   });

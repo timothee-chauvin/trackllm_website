@@ -10,11 +10,19 @@ Static website for tracking LLM API logprob responses.
 ## Development
 
 Raw monitoring data lives in [trackllm_data](https://github.com/timothee-chauvin/trackllm_data),
-expected at `website/data` (gitignored here). Clone it there once — or symlink an
-existing clone, one per worktree:
+expected at `website/data` (gitignored here). Clone it there once:
 
 ```bash
 git clone git@github.com:timothee-chauvin/trackllm_data website/data
+```
+
+The generator also writes its JSON (`overview.json`, `models/`, `providers/`, …)
+into that directory, so in a worktree link only the raw inputs rather than the
+whole clone — a symlinked `website/data` would share the generated files with
+every other checkout, and a build elsewhere would silently replace yours:
+
+```bash
+mkdir website/data && for f in lt b3it spend; do ln -s /path/to/main/website/data/$f website/data/$f; done
 ```
 
 ```bash

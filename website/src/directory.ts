@@ -1,7 +1,7 @@
 // The endpoint directory shared by the Overview and the provider pages: same row
 // shape (overview.py builds the dicts, provider.py reuses them), same sort rules,
-// same trailing cells. The pages differ only in how rows are filtered and how the
-// two leading cells (model, provider) are drawn.
+// same trailing cells. The pages differ only in how rows are filtered and what
+// the leading Endpoint cell says under the model name (provider, or variant).
 import {
   B3IT_CAP,
   LT_CAP,
@@ -34,7 +34,7 @@ export interface EndpointRow {
   reason: string;
 }
 
-export type DirSortKey = "model" | "provider" | "status" | "nChanges" | "lastChange";
+export type DirSortKey = "model" | "status" | "nChanges" | "lastChange";
 
 /** Sortable column headers for one table: holds (key, dir), flips them on header
  *  clicks or Enter/Space, and paints the ▼/▲ arrows plus the aria-sort a screen
@@ -78,21 +78,14 @@ export function initSortHeaders<K extends string>(
   return state;
 }
 
-/** In-place directory sort; `providerValue` supplies the provider column's
- *  comparable (full name on the Overview, bare variant on a provider page).
- *  Model name breaks every tie so equal rows keep a stable order. */
-export function sortEndpointRows(
-  list: EndpointRow[],
-  key: DirSortKey,
-  dir: number,
-  providerValue: (r: EndpointRow) => string
-): void {
+/** In-place directory sort; model name breaks every tie so equal rows keep a
+ *  stable order. */
+export function sortEndpointRows(list: EndpointRow[], key: DirSortKey, dir: number): void {
   list.sort((a, b) => {
     let av: string | number, bv: string | number;
     if (key === "status") { av = statusRank(a); bv = statusRank(b); }
     else if (key === "lastChange") { av = a.lastChange ?? ""; bv = b.lastChange ?? ""; }
     else if (key === "nChanges") { av = a.nChanges; bv = b.nChanges; }
-    else if (key === "provider") { av = providerValue(a); bv = providerValue(b); }
     else { av = a.model.toLowerCase(); bv = b.model.toLowerCase(); }
     if (av < bv) return -dir;
     if (av > bv) return dir;
@@ -106,7 +99,7 @@ function lastChangeCell(r: EndpointRow, now: number): string {
     : `<span class="cc zero">—</span>`;
 }
 
-/** The five directory cells after model/provider for a row with a series --
+/** The five directory cells after the Endpoint cell for a row with a series --
  *  the untracked counterpart is components.ts::untrackedDirCells, including the
  *  .cell-tip / .cell-go split that keeps the pill's own popover out of the link.
  *  The strip is a second link to the endpoint page, where the drift is read in
@@ -129,10 +122,9 @@ export interface DirectoryConfig {
   foot: HTMLElement;
   /** Sort keys whose first header click sorts high-to-low. */
   descending: readonly DirSortKey[];
-  providerValue: (r: EndpointRow) => string;
   /** Page-specific search + chip filtering, given the trimmed (uncased) query. */
   list: (q: string) => EndpointRow[];
-  /** The leading model and provider cells. */
+  /** The leading Endpoint cell. */
   leadCells: (r: EndpointRow, q: string) => string;
 }
 
@@ -147,20 +139,23 @@ export function dirRowsHtml(
   return list.map((r) => {
     const cells = r.methods.length ? trackedDirCells(r, root, now) : untrackedDirCells(r, root);
     return `<tr>${leadCells(r, q)}${cells}</tr>`;
-  }).join("") || '<tr><td colspan="7"><div class="empty">No endpoints match.</div></td></tr>';
+  }).join("") || '<tr><td colspan="6"><div class="empty">No endpoints match.</div></td></tr>';
 }
 
-/** The Overview and Endpoints pages' leading cells: model name (linked to the
- *  endpoint page, where its drift is read in full) over org, then the provider --
- *  linked only when that provider has a page. */
+/** The Endpoint cell: the model name, linked to the endpoint page (where its
+ *  drift is read in full), over `under` -- the provider, or a variant. */
+export function endpointCell(r: EndpointRow, root: string, name: string, under: string): string {
+  return `<td><a class="model-cell" href="${root}endpoints/${esc(r.slug)}.html">${name}</a>${under}</td>`;
+}
+
+/** The Overview and Endpoints pages' Endpoint cell: the provider goes under the
+ *  model name, linked only when that provider has a page. */
 export function overviewLeadCells(providerPages: Set<string>): (r: EndpointRow, q: string) => string {
   return (r, q) => {
-    const provCell = providerPages.has(r.providerSlug)
+    const prov = providerPages.has(r.providerSlug)
       ? `<a class="prov-cell" href="providers/${esc(r.providerSlug)}.html">${highlight(r.provider, q)}</a>`
       : `<span class="prov-cell">${highlight(r.provider, q)}</span>`;
-    return `
-      <td><a class="model-cell" href="endpoints/${esc(r.slug)}.html">${highlight(r.model, q)}</a><div class="org-cell">${highlight(r.org, q)}</div></td>
-      <td class="col-hide">${provCell}</td>`;
+    return endpointCell(r, "", highlight(r.model, q), prov);
   };
 }
 
@@ -171,7 +166,7 @@ export function initDirectory(cfg: DirectoryConfig): () => void {
   function render(): void {
     const q = cfg.q.value.trim();
     const list = cfg.list(q);
-    sortEndpointRows(list, sort.key, sort.dir, cfg.providerValue);
+    sortEndpointRows(list, sort.key, sort.dir);
     cfg.body.innerHTML = dirRowsHtml(list, cfg.root, cfg.leadCells, q);
     cfg.foot.textContent = `${list.length} of ${cfg.rows.length} endpoints`;
     sort.paintSort();

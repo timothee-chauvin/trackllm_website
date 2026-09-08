@@ -168,7 +168,7 @@ export async function init(): Promise<void> {
   const rows = DATA.endpoints;
   const providerPages = new Set(provs.map(p => p.slug));
   const top = rows.filter(r => r.headline === "tracked");
-  sortEndpointRows(top, "nChanges", -1, r => r.provider.toLowerCase());
+  sortEndpointRows(top, "nChanges", -1);
   document.getElementById("dirBody")!.innerHTML =
     dirRowsHtml(top.slice(0, DIR_SIZE), "", overviewLeadCells(providerPages), "");
   document.getElementById("dirCount")!.innerHTML = `${fmtInt(rows.length)} endpoints · <b style="color:var(--changed)">${S.changes_total} changes</b> across ${S.changed_endpoints} of them`;
