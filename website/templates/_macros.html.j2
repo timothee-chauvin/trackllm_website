@@ -86,7 +86,7 @@
 {# A provider's logo and name -- the Jinja twin of components.ts::brandHtml, for
    the server-rendered provider page title. #}
 {% macro brand_title(b, nav_prefix) -%}
-{% set cls = ("brand-wordmark" if b.kind == "wordmark" else "brand-logo") ~ (" mono" if b.mono) %}
+{% set cls = ("brand-wordmark" if b.kind == "wordmark" else "brand-logo") ~ (" mono" if b.mono) -%}
 <span class="pbrand">
 {%- if b.logo and b.dark %}<img class="{{ cls }} logo-light" src="{{ nav_prefix }}logos/providers/{{ b.logo }}" alt=""><img class="{{ cls }} logo-dark" src="{{ nav_prefix }}logos/providers/{{ b.dark }}" alt="">
 {%- elif b.logo %}<img class="{{ cls }}" src="{{ nav_prefix }}logos/providers/{{ b.logo }}" alt="">

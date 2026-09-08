@@ -158,6 +158,12 @@ def test_render_emits_spend(tmp_path):
     spend_section = page.split("<h2>Spend</h2>")[1].split("</section>")[0]
     assert "$0.050" in spend_section
     assert "LT" in spend_section
+    # the first ledger day is in the hint, not a stat tile
+    assert "Spend recorded since 2026-06-24</span>" in spend_section
+    assert ">Since<" not in spend_section
+    assert "border-input search; <b>B3IT (monitoring)</b>" in spend_section
+    md = (tmp_path / "endpoints" / "m2fa23p.md").read_text()
+    assert "Spend recorded since 2026-06-24." in md
 
     # Zero-billed: still a spend section (total + LT line read $0.00), but no
     # share bar, which would have nothing to divide by
@@ -258,7 +264,26 @@ def test_render_emits_methodology_page(tmp_path):
     assert "arxiv.org/abs/2512.03816" in page
     assert "arxiv.org/abs/2602.11083" in page
     assert "tchauvin.com/change-detection-llm-apis" in page
-    assert 'href="methodology.html"' in (tmp_path / "index.html").read_text()
+    assert "TrackLLM uses two methods, depending on what the API gives us back." in page
+    index = (tmp_path / "index.html").read_text()
+    assert 'href="methodology.html"' in index
+    # the threshold walkthrough is gone from both twins, and nothing links its anchor
+    for name in ("methodology.html", "methodology.md", "index.html", "index.md"):
+        text = (tmp_path / name).read_text()
+        assert "How a change is called" not in text, name
+        assert "#detection" not in text, name
+
+
+def test_endpoint_drift_copy(tmp_path):
+    _scaffold(tmp_path)
+    render_site(tmp_path, None, empty_status_inputs(), NOW)
+    html = (tmp_path / "endpoints" / "m2fa23p.html").read_text()
+    md = (tmp_path / "endpoints" / "m2fa23p.md").read_text()
+    assert "<b>reference period</b>. <span" in html
+    assert "reference period. LT tracks" in md
+    for text in (html, md):
+        assert "Both should ideally be as close to 0 as possible." in text
+        assert "two weeks" not in text
 
 
 def test_cite_pill_on_front_methodology_and_about_and_dialog_has_both_papers(
@@ -336,14 +361,50 @@ def _head(html: str) -> str:
 
 
 def test_endpoint_head_links_model_provider_and_org(tmp_path):
-    """The h1 names a model, the @ names a provider, the trailing tag names an org:
-    each is a page, so each is a link."""
+    """The h1 is the full model id, org/model, the line under it names who serves
+    it: each is a page, so each is a link."""
     _scaffold(tmp_path)
     render_site(tmp_path, None, empty_status_inputs(), NOW)
     head = _head((tmp_path / "endpoints" / "m2fa23p.html").read_text())
-    assert f'href="../models/{slugify("m/a")}.html"' in head
-    assert 'href="../providers/p.html"' in head
-    assert f'href="../orgs/{slugify("m")}.html"' in head
+    assert (
+        f'<h1><a class="org" href="../orgs/{slugify("m")}.html">m</a>/'
+        f'<a href="../models/{slugify("m/a")}.html">a</a> ' in head
+    )
+    assert (
+        '<div class="prov">Served by <a href="../providers/p.html">'
+        '<span class="pbrand">p</span></a></div>' in head
+    )
+
+
+def test_endpoint_head_shows_provider_brand_and_variant(tmp_path):
+    """The serving line carries the provider's brand (logo + display name) and
+    its serving variant; a provider without a page is named, never linked."""
+    _scaffold(tmp_path)
+    (tmp_path / "logos" / "providers").mkdir(parents=True)
+    (tmp_path / "logos" / "providers" / "p.svg").write_text("<svg/>")
+    (tmp_path / "provider_brands.yaml").write_text(
+        'p:\n  name: "Pee"\n  logo: "p.svg"\n  kind: "icon"\n  mono: true\n'
+    )
+    _lt_endpoint(tmp_path, "m2fa23p2ffp8", "m/a", "p/fp8")
+    inputs = empty_status_inputs()
+    inputs.catalog = [catalog_entry("m/a", "nopage", supports_logprobs=False)]
+
+    render_site(tmp_path, None, inputs, NOW)
+
+    head = _head((tmp_path / "endpoints" / "m2fa23p2ffp8.html").read_text())
+    assert (
+        'Served by <a href="../providers/p.html"><span class="pbrand">'
+        '<img class="brand-logo mono" src="../logos/providers/p.svg" alt="">'
+        "Pee</span></a> (fp8)</div>" in head
+    )
+    nopage = _head(
+        (tmp_path / "endpoints" / f"{slugify('m/a#nopage')}.html").read_text()
+    )
+    assert 'Served by <span class="pbrand">nopage</span></div>' in nopage
+    assert "providers/nopage" not in nopage
+    md = (tmp_path / "endpoints" / "m2fa23p2ffp8.md").read_text()
+    assert "# m/a @ p/fp8" in md
+    assert "Served by: [Pee](https://www.trackllm.net/providers/p.md) (fp8)" in md
 
 
 def test_endpoint_and_model_heads_link_the_org(tmp_path):

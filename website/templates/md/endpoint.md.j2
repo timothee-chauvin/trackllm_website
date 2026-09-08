@@ -1,7 +1,7 @@
 {% import "_base.md.j2" as b %}
-{{ b.header(model_name ~ " @ " ~ provider, machine, nav_prefix) }}
+{{ b.header(model ~ " @ " ~ provider, machine, nav_prefix) }}
 {{ b.crumb([("Home", nav_prefix ~ "index.md"), (org, nav_prefix ~ "orgs/" ~ org_slug ~ ".md"), (model_name, nav_prefix ~ "models/" ~ model_slug ~ ".md" if model_slug else ""), ("@ " ~ provider, "")]) }}
-Model: {{ b.model_link(nav_prefix, model_slug, model) }} · Provider: {{ b.provider_link(nav_prefix, provider_slug if provider_has_page else "", provider) }} · Organization: {{ b.org_link(nav_prefix, org) }} · Methods: {{ b.methods(methods) if methods else "none (" ~ status.headline ~ ")" }}
+Model: {{ b.model_link(nav_prefix, model_slug, model) }} · Served by: {{ b.provider_link(nav_prefix, provider_slug if provider_has_page else "", brand.name) }}{{ " (" ~ variant ~ ")" if variant }} · Organization: {{ b.org_link(nav_prefix, org) }} · Methods: {{ b.methods(methods) if methods else "none (" ~ status.headline ~ ")" }}
 {% if model_slug and n_providers > 0 %}
 
 {{ model_name }} is served by {{ n_providers }} provider{{ "s" if n_providers != 1 }} (see the model page).
@@ -20,7 +20,7 @@ Model: {{ b.model_link(nav_prefix, model_slug, model) }} · Provider: {{ b.provi
 
 ## Drift from baseline
 
-Both signals measure how far this endpoint's behavior has moved from its reference period (its first two weeks). LT tracks the average change in the returned tokens' log-probabilities (nats); B3IT tracks the total-variation distance of the border-input votes (0–1). Both read 0 when the endpoint matches its baseline and rise — staying elevated — after a real change.
+Both signals measure how far this endpoint's behavior has moved from its reference period. LT tracks the average change in the returned tokens' log-probabilities (nats); B3IT tracks the total-variation distance of the border-input votes (0–1). Both should ideally be as close to 0 as possible.
 
 {% for j in machine.json %}
 Full series: [{{ j.path }}]({{ nav_prefix }}{{ j.path }}){{ "" if loop.last }}
@@ -53,10 +53,10 @@ From the OpenRouter catalog snapshot.
 {% if spend %}
 ## Spend
 
-What OpenRouter billed for tracking this endpoint.
+What OpenRouter billed for tracking this endpoint. Spend recorded since {{ spend.since }}.
 
-{{ b.table(["Total to date", "Last 30 days", "Queries", "Since"],
-  [("$" ~ (spend.total | fmt_cost), "$" ~ (spend.last_30d | fmt_cost), spend.n_queries, spend.since)]) }}
+{{ b.table(["Total to date", "Last 30 days", "Queries"],
+  [("$" ~ (spend.total | fmt_cost), "$" ~ (spend.last_30d | fmt_cost), spend.n_queries)]) }}
 {% endif %}
 ## Methods
 
