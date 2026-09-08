@@ -55,5 +55,7 @@
 {% endblock %}
 
 {% block scripts %}
+    {# the page's data, inlined (home.py): overview.ts reads it here, no fetch #}
+    <script type="application/json" id="home">{{ home | tojson }}</script>
     <script type="module" src="js/overview.js?v={{ ASSET_V }}"></script>
 {% endblock %}

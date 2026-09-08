@@ -94,7 +94,8 @@ def test_footer_names_each_json_by_what_it_is(site: Path):
     endpoint = (site / "endpoints" / "m2fa23p.html").read_text()
     assert ">model JSON</a>" in endpoint
     assert "JSON 1" not in endpoint and "JSON 2" not in endpoint
-    assert ">overview JSON</a>" in (site / "index.html").read_text()
+    assert ">home JSON</a>" in (site / "index.html").read_text()
+    assert ">overview JSON</a>" in (site / "endpoints.html").read_text()
 
 
 def test_llms_txt_states_the_full_slug_rule(site: Path):

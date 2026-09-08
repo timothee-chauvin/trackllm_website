@@ -15,6 +15,11 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
+from trackllm_website.generate_site.home import (
+    DIR_PREVIEW,
+    PLOT_PREVIEW,
+    rateable_rows,
+)
 from trackllm_website.util import format_cost, format_price, slugify
 
 SITE_URL = "https://www.trackllm.net"
@@ -24,10 +29,6 @@ DATA_REPO_URL = "https://github.com/timothee-chauvin/trackllm_data"
 # character's two-digit hex code. llms.txt spells this out for agents.
 SLUG_KEPT_CHARS = "A-Z a-z 0-9 . _ - + = @ ~ ,"
 GLOBAL_FEED_CAP = 200
-# The front page's slices of the Providers and Endpoints pages: twins of
-# overview.ts::PLOT_SIZE / DIR_SIZE, so index.md shows the same rows index.html does.
-PLOT_PREVIEW = 10
-DIR_PREVIEW = 10
 # Links in the .md twins are absolute: the pages are made to be copied into an
 # LLM context, where a relative link points nowhere.
 _BASE = f"{SITE_URL}/"
@@ -47,6 +48,7 @@ _JSON_LABELS = {
     "providers": "provider JSON",
     "b3it": "B3IT JSON",
     "overview.json": "overview JSON",
+    "home.json": "home JSON",
     "changes.json": "changes JSON",
     "changes_page.json": "change log JSON",
 }
@@ -215,15 +217,6 @@ def _top_row(t: dict, nav: str) -> tuple:
     return (_ep(nav, t["slug"], f"{t['model']} @ {t['provider']}"), t["n"], t["last"])
 
 
-# The drift-rate plot's rows (rate_plot.ts::rateablePlotRows): providers with a
-# rate at all, most drift-prone first, a zero rate ordered by its upper bound.
-def _rateable(provs: list[dict]) -> list[dict]:
-    return sorted(
-        (p for p in provs if p["lt_rate"] is not None),
-        key=lambda p: (-p["lt_rate"], -p["lt_ci"][1], p["name"]),
-    )
-
-
 def _plot_row(p: dict, nav: str) -> tuple:
     return (
         _provider(nav, p["slug"], p["brand"]["name"]),
@@ -233,12 +226,6 @@ def _plot_row(p: dict, nav: str) -> tuple:
         _rate(p["lt_rate"]),
         _ci(p["lt_ci"]),
     )
-
-
-# The front page's endpoint preview (overview.ts): actively tracked rows, most changes first.
-def _most_changed(rows: list[dict], n: int) -> list[dict]:
-    tracked = [r for r in rows if r["headline"] == "tracked"]
-    return sorted(tracked, key=lambda r: (-r["nChanges"], r["model"].lower()))[:n]
 
 
 def _spend_group_row(item: tuple, labels: dict) -> tuple:
@@ -263,9 +250,8 @@ _ROW_FILTERS = {
     "org_model_row": _org_model_row,
     "provider_row": _provider_row,
     "top_row": _top_row,
-    "rateable": _rateable,
     "plot_row": _plot_row,
-    "most_changed": _most_changed,
+    "rateable": rateable_rows,  # providers.md: the plot's rows, as home.py selects them
     "spend_group_row": _spend_group_row,
     "spend_endpoint_row": _spend_endpoint_row,
     "label": lambda g, labels: labels[g],

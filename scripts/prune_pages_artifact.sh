@@ -31,6 +31,7 @@ find "$site/data/lt" -mindepth 2 -maxdepth 2 ! -name lt_scores.json -exec rm -rf
 # Fail the deploy loudly if pruning ever removes something the site fetches.
 test -f "$site/index.html"
 test -f "$site/data/overview.json"
+test -f "$site/data/home.json"
 test -f "$site/data/spend.json"
 test -f "$site/data/changes_page.json"
 test -n "$(find "$site/data/models" -name '*.json' -print -quit)"

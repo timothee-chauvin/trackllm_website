@@ -10,6 +10,7 @@ from trackllm_website.config import HeroConfig
 from trackllm_website.generate_site import b3it as b3it_mod
 from trackllm_website.generate_site import changes as changes_mod
 from trackllm_website.generate_site import changes_page as changes_page_mod
+from trackllm_website.generate_site import home as home_mod
 from trackllm_website.generate_site import machine as machine_mod
 from trackllm_website.generate_site import manifest as manifest_mod
 from trackllm_website.generate_site import model as model_mod
@@ -326,9 +327,9 @@ def render_site(
             slug_to_n_providers[e["slug"]] = n_providers
             slug_to_status_summary[e["slug"]] = view["status_summary"]
 
-    # The front page, and the two pages its provider and endpoint sections are
-    # slices of; all three render from overview.json.
-    for kind in ("index", "providers", "endpoints"):
+    # The two pages the front page's provider and endpoint sections are slices
+    # of; both render from overview.json.
+    for kind in ("providers", "endpoints"):
         (website_dir / f"{kind}.html").write_text(
             env.get_template(f"{kind}.html.j2").render(
                 **page(
@@ -343,6 +344,25 @@ def render_site(
             )
         )
         print(f"Generated {kind}.html")
+
+    # The front page renders from its own slice, inlined into the HTML (home.py);
+    # `bun run prerender` then fills its sections in place (website/tools/prerender.ts).
+    home = home_mod.build_home(overview)
+    (website_dir / "data" / "home.json").write_text(json.dumps(home))
+    (website_dir / "index.html").write_text(
+        env.get_template("index.html.j2").render(
+            **page(
+                "index",
+                "",
+                ["data/home.json"],
+                home=home,
+                css_path="style.css",
+                body_class="index",
+                nav_prefix="",
+            )
+        )
+    )
+    print("Generated index.html")
 
     for f in endpoints_dir.glob("*.html"):
         f.unlink()
