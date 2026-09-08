@@ -171,14 +171,17 @@ footer.site .rss-i { width: 11px; height: 11px; vertical-align: -1px; }
 .hero-hit-layer { position: absolute; inset: 0 0 auto 0; width: 100%; z-index: 2; pointer-events: none; }
 .hero-hit-layer .hero-hit { pointer-events: stroke; cursor: pointer; }
 @media (hover: none) { .hero-hit-layer { display: none; } }
-.hero:has(.hero-hit:hover) .hero-trace { opacity: 1; }
-.hero-tip { position: absolute; z-index: 2; pointer-events: none; max-width: min(24rem, 80vw);
+.hero:has(.hero-hit:hover, .hero-tip:hover) .hero-trace { opacity: 1; }
+/* Takes the pointer: overview.ts keeps the card open long enough to move into it,
+   so its name and "open" links can be clicked. */
+.hero-tip { position: absolute; z-index: 2; max-width: min(24rem, 80vw);
   background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius);
   box-shadow: 0 10px 30px rgba(0,0,0,0.28); padding: 0.7rem 0.85rem; font-size: 0.8rem; line-height: 1.45; }
 .hero-tip .who { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.3rem; }
 .hero-tip .who .at { color: var(--text-dim); }
 .hero-tip .what { color: var(--text-muted); }
-.hero-tip .go { margin-top: 0.35rem; font-size: 0.76rem; color: var(--accent); }
+.hero-tip .go { display: block; margin-top: 0.35rem; font-size: 0.76rem; color: var(--accent); }
+.hero-tip a:hover { text-decoration: underline; }
 .hero-inner { position: relative; z-index: 1; }
 .eyebrow { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent);
   margin-bottom: 0.9rem; display: flex; align-items: center; gap: 0.5rem; }
@@ -552,7 +555,7 @@ body.org table.dir thead th:hover { color: var(--text-dim); }
 .pbrand { display: inline-flex; align-items: center; gap: 0.4em; min-width: 0; }
 /* inline in running text, the flex box's baseline is its logo's bottom edge, which
    floats the name above the words around it */
-.event .pbrand, .brow .pbrand { vertical-align: middle; }
+.event .pbrand, .brow .pbrand, .hero-tip .pbrand { vertical-align: middle; }
 .brand-logo { width: 1.15em; height: 1.15em; flex: none; object-fit: contain; }
 .brand-wordmark { height: 1em; width: auto; max-width: 4.5em; object-fit: contain; }
 .head h1 .brand-logo { width: 1.25em; height: 1.25em; }

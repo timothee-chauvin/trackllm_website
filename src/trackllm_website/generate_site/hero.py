@@ -16,7 +16,8 @@ from datetime import datetime
 
 from trackllm_website.config import HeroConfig
 from trackllm_website.generate_site.b3it import B3ITView
-from trackllm_website.generate_site.feed import change_links
+from trackllm_website.generate_site.brands import Brand
+from trackllm_website.generate_site.feed import brand_fields, change_links
 
 HERO_MIN_POINTS = 20  # below this the window cannot show a baseline and an after
 HERO_HEADROOM = 1.12  # top of the drawn band, above the peak
@@ -35,6 +36,7 @@ def build_hero(
     changes: list[dict],
     drift_by_slug: dict[str, list[tuple[datetime, float]]],
     b3it_by_slug: dict[str, B3ITView],
+    brands: dict[str, Brand],
     now: datetime,
     pin: HeroConfig,
 ) -> dict:
@@ -96,4 +98,5 @@ def build_hero(
         "changeFrac": round(k / (len(values) - 1), 4),
         "yMax": round(max(values) * HERO_HEADROOM, 3),
         **change_links(change),
+        **brand_fields(change, brands),
     }

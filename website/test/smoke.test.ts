@@ -218,7 +218,7 @@ describe.each(PAGES)("$name page", (page) => {
     const href = document.querySelector(".hero-hit")?.getAttribute("href");
     expect(href, "the curve is not attributed to an endpoint").toMatch(/^endpoints\/.+\.html$/);
     const tip = document.getElementById("heroTip")!.textContent ?? "";
-    expect(tip, "the hover card names no endpoint").toMatch(/\S+\s*@\s*\S+/);
+    expect(tip, "the hover card names no endpoint").toMatch(/\S+\s*served by\s*\S+/);
     expect(tip, "the hover card gives no change date").toMatch(/\d{4}-\d{2}-\d{2}/);
   });
 

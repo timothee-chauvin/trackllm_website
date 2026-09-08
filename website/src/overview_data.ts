@@ -60,6 +60,8 @@ export interface Hero {
   model: string;
   org: string;
   provider: string;
+  brand: Brand;
+  variant: string;
   method: "lt" | "b3it";
   date: string;
   daysAgo: number;
