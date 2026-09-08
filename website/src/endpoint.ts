@@ -4,12 +4,13 @@
 export {};
 
 import { showLoadError } from "./components";
-import { readingCaption } from "./caption";
 import { MONTH_NAMES, esc, td, timeTicks } from "./components";
+import { type B3ITRaw, type LTRaw, type RawLoaders } from "./chart_detail";
 import { bindHover, hitRects } from "./chart_hover";
 import {
   type B3ITChange,
   type CpLane,
+  type Epoch,
   type FocusB3IT,
   type FocusLT,
   type LTChange,
@@ -41,8 +42,11 @@ interface ManifestData {
   // are the merged list's own -- not the changepoints lt_scores.json recomputes,
   // which double-detect some changes on adjacent days.
   state: Status | null;
-  changes: { lt: LTChange[]; b3it: B3ITChange[] };
+  changes: { lt: LTChange[]; b3it: ManifestB3ITChange[] };
 }
+
+// the manifest names the change; which detector called it is b3it.json's to say
+type ManifestB3ITChange = Omit<B3ITChange, "detector">;
 
 interface LTScoresData {
   n_per_test: number;
@@ -57,14 +61,23 @@ interface B3ITData {
   retired_reason: string | null;
   n_bis: number;
   unstable: boolean;
-  epochs: { start: string; end: string | null; end_reason: string | null; change_date: string | null }[];
+  epochs: {
+    start: string;
+    end: string | null;
+    end_reason: string | null;
+    change_date: string | null;
+    detector: string | null;
+    n_ref: number;
+  }[];
   tv_series: { dates: string[]; values: number[] };
+  changes: { date: string; kind: string; detector: string }[];
 }
 
 type Status = "stable" | "changed" | "retired";
 
 const TRACE_LEN = 110;
 const RESIZE_DEBOUNCE_MS = 150;
+const IDLE_FALLBACK_MS = 200;
 
 const fmtMon = (s: string): string => {
   const d = new Date(td(s));
@@ -91,7 +104,7 @@ export function buildLT(scores: LTScoresData | null, changes: LTChange[]): Focus
   const driftDates = scores.drift_dates ?? [];
   const drift = scores.drift ?? [];
   const pairs: [string, number][] = driftDates.map((d, i) => [d.slice(0, 10), round(drift[i], 3)]);
-  const { series, breaks } = downsampleRuns(pairs, TRACE_LEN);
+  const { series, breaks } = downsampleRuns(pairs, TRACE_LEN, []);
   // The observed span is the drift lane's: `dates` are the test statistic's own
   // instants, which start 24 queries (about a day) after the first observation
   // and stop as early before the last -- "Monitored Aug 2026" for an endpoint
@@ -100,32 +113,46 @@ export function buildLT(scores: LTScoresData | null, changes: LTChange[]): Focus
   return {
     drift: series,
     breaks,
+    daily: pairs,
     changes,
     firstDate: obsDates[0].slice(0, 10),
     lastDate: last(obsDates)!.slice(0, 10),
   };
 }
 
-export function buildB3IT(data: B3ITData | null, changes: B3ITChange[]): FocusB3IT | null {
+export function buildB3IT(data: B3ITData | null, changes: ManifestB3ITChange[]): FocusB3IT | null {
   if (!data) return null;
-  const pairs: [string, number][] = data.tv_series.dates.map((d, i) => [
-    d.slice(0, 10),
-    round(data.tv_series.values[i], 3),
-  ]);
-  const { series, breaks } = downsampleRuns(pairs, TRACE_LEN);
+  // batch instants, not days: see FocusB3IT.tv
+  const pairs: [string, number][] = data.tv_series.dates.map((d, i) => [d, round(data.tv_series.values[i], 3)]);
+  const epochs: Epoch[] = data.epochs.map((e) => ({
+    start: e.start,
+    end: e.end,
+    endReason: e.end_reason,
+    changeDate: e.change_date,
+    detector: e.detector,
+    nRef: e.n_ref,
+  }));
+  const { series, breaks } = downsampleRuns(pairs, TRACE_LEN, epochs.map((e) => Date.parse(e.start)));
+  // A change the manifest lists was called either by a detector run over the series
+  // (b3it.json's own changes) or by the one that closed an epoch on that day.
+  const detectorOf = (day: string): string | null =>
+    data.changes.find((c) => c.date.slice(0, 10) === day)?.detector ??
+    data.epochs.find((e) => e.change_date?.slice(0, 10) === day)?.detector ??
+    null;
   return {
     tv: series,
     breaks,
-    changes,
-    epochs: data.epochs.map((e) => ({ start: e.start.slice(0, 10), end: e.end ? e.end.slice(0, 10) : null })),
-    firstDate: data.tv_series.dates.length ? data.tv_series.dates[0].slice(0, 10) : "",
-    lastDate: data.tv_series.dates.length ? last(data.tv_series.dates)!.slice(0, 10) : "",
+    daily: pairs,
+    changes: changes.map((c) => ({ ...c, detector: detectorOf(c.date) })),
+    epochs,
+    firstDate: pairs.length ? pairs[0][0].slice(0, 10) : "",
+    lastDate: pairs.length ? last(pairs)![0].slice(0, 10) : "",
   };
 }
 
 /** The observed span is the one thing here the series alone can answer; the verdict
  *  and the change counts are the build's (see ManifestData). */
-function renderStatusCard(lt: FocusLT | null, b3it: FocusB3IT | null, state: Status | null): void {
+export function renderStatusCard(lt: FocusLT | null, b3it: FocusB3IT | null, state: Status | null): void {
   const el = document.getElementById("statuscard");
   if (!el) return;
 
@@ -137,7 +164,13 @@ function renderStatusCard(lt: FocusLT | null, b3it: FocusB3IT | null, state: Sta
   const LABEL: Record<Status, string> = { stable: "Stable", changed: "Changed", retired: "Retired" };
   const nLT = lt?.changes.length ?? 0;
   const nB3 = b3it?.changes.length ?? 0;
-  const monitored = first && lastObserved ? `${fmtMon(first)} – ${fmtMon(lastObserved)}` : "—";
+  // an endpoint still monitored has no end to name; only a retired one's span is closed
+  const monitored =
+    !first || !lastObserved
+      ? "—"
+      : state === "retired"
+        ? `${fmtMon(first)} – ${fmtMon(lastObserved)}`
+        : `Since ${fmtMon(first)}`;
 
   el.innerHTML = `
     ${state ? `<div><div class="k">Status</div><div class="v"><span class="pill ${esc(state)}"><span class="led"></span>${LABEL[state]}</span></div></div>` : ""}
@@ -226,21 +259,23 @@ export function chartSvg(lt: FocusLT | null, b3it: FocusB3IT | null, vw: number)
   const b3Svg = b3Geom.series.length
     ? lane(b3Geom, b3Title)
     : placeholder(TOP2, b3it ? say("B3IT · no reference data in this window", "B3IT · no reference data") : say("B3IT · not monitored for this endpoint", "B3IT · not monitored"));
-  // Every other epoch is shaded so the reader sees where the reference was
-  // re-initialised: a TV lane that drops back to 0 there is not a revert.
-  const bands =
-    b3it && b3Geom.series.length && b3it.epochs.length > 1
+  // A rule at every epoch start -- the initialisation, then each re-initialisation --
+  // so the reader sees where the reference was re-sampled: a TV lane that drops
+  // back to 0 there is not a revert. Its readout (chart_hover) says so and shows
+  // the reference votes.
+  const epochXs =
+    b3it && b3Geom.series.length
       ? b3it.epochs
-          .map((e, i) => {
-            const x0 = Math.max(PL, fx(e.start));
-            const x1 = Math.min(VW - PR, fx(e.end ?? b3it.lastDate));
-            if (x1 <= x0) return "";
-            const shade = i % 2 ? `<rect x="${x0.toFixed(1)}" y="${TOP2}" width="${(x1 - x0).toFixed(1)}" height="${LANE_H}" fill="var(--b3it-quiet)"/>` : "";
-            const label = narrow ? "" : `<text x="${(x0 + 4).toFixed(1)}" y="${TOP2 + LANE_H - 5}" fill="var(--text-dim)" font-size="9.5" font-family="var(--mono)">epoch ${i + 1}</text>`;
-            return shade + label;
-          })
-          .join("")
-      : "";
+          .map((e, i) => ({ i, x: fx(e.start) }))
+          .filter(({ x }) => x >= PL && x <= VW - PR)
+      : [];
+  const epochSvg = epochXs
+    .map(
+      ({ x }) =>
+        `<line x1="${x.toFixed(1)}" y1="${TOP2}" x2="${x.toFixed(1)}" y2="${TOP2 + LANE_H}" stroke="var(--text)" stroke-width="1.2"/>
+        <path d="M${(x - 3.5).toFixed(1)} ${TOP2 - 1} L${(x + 3.5).toFixed(1)} ${TOP2 - 1} L${x.toFixed(1)} ${TOP2 + 4} Z" fill="var(--text)"/>`
+    )
+    .join("");
 
   // A change mark's dot sits on its lane's curve at the change date, so the reader
   // can see the level the label is quoting. Only when the curve cannot answer -- an
@@ -258,6 +293,10 @@ export function chartSvg(lt: FocusLT | null, b3it: FocusB3IT | null, vw: number)
       changes: (b3it?.changes ?? []).map((c) => ({ date: c.date, lab: fmtTV(c.shiftTV) })),
     },
   ];
+  // the changes' own hit targets, in manifest order so a target names its change
+  const cpTargets = cpLanes.flatMap((l) =>
+    l.changes.map((c, i) => ({ lane: l.lane.key, i, x: fx(c.date) }))
+  );
   const cpSvg = cpLanes
     .flatMap((l) => packMarks(l, fx, VW, PL))
     .map(
@@ -278,15 +317,14 @@ export function chartSvg(lt: FocusLT | null, b3it: FocusB3IT | null, vw: number)
     .join("");
 
   return `<svg viewBox="0 0 ${VW} ${VH}" preserveAspectRatio="xMidYMid meet">
-    ${ltSvg}${bands}${b3Svg}${cpSvg}${xlabels}
+    ${ltSvg}${epochSvg}${b3Svg}${cpSvg}${xlabels}
     <line x1="${PL}" y1="${TOP2 + LANE_H}" x2="${VW - PR}" y2="${TOP2 + LANE_H}" stroke="var(--border)" stroke-width="1"/>
-    ${hitRects([ltGeom, b3Geom], PL, PW)}</svg>`;
+    ${hitRects([ltGeom, b3Geom], PL, PW, { marks: cpTargets, epochs: epochXs })}</svg>`;
 }
 
-function renderChart(lt: FocusLT | null, b3it: FocusB3IT | null): void {
+function renderChart(lt: FocusLT | null, b3it: FocusB3IT | null, raw: RawLoaders): void {
   const chartEl = document.getElementById("mainchart");
   const tipEl = document.getElementById("charttip");
-  const footEl = document.getElementById("footnote");
   if (!chartEl) return;
 
   // Draw and wire together: the resize redraw replaces the SVG, and a readout bound
@@ -295,30 +333,15 @@ function renderChart(lt: FocusLT | null, b3it: FocusB3IT | null): void {
     const svg = chartSvg(lt, b3it, chartWidth(chartEl));
     if (!svg) return false;
     chartEl.innerHTML = svg;
-    if (tipEl) {
-      tipEl.hidden = true;
-      bindHover(chartEl, tipEl, lt, b3it, () => chartWidth(chartEl));
-    }
+    if (tipEl) bindHover(chartEl, tipEl, lt, b3it, () => chartWidth(chartEl), raw);
     return true;
   };
 
   if (!draw()) {
     chartEl.innerHTML = `<div style="padding:2rem 1rem;color:var(--text-dim);font-size:0.85rem">No monitoring data available yet for this endpoint.</div>`;
-    if (footEl) footEl.innerHTML = "";
     return;
   }
   onWidthChange(chartEl, draw);
-
-  if (footEl) {
-    let note = readingCaption(!!lt, !!b3it);
-    if (lt?.drift.length && b3it?.tv.length && b3it.tv[0][0] > lt.drift[0][0]) {
-      note += ` B3IT only has reference data from ${b3it.tv[0][0]} onward, so its lane starts there.`;
-    }
-    if (b3it && b3it.tv.length && b3it.epochs.length > 1) {
-      note += " Shaded bands are B3IT epochs: after a detected change the border inputs and the reference are re-initialised, so TV restarts near 0 in the next epoch.";
-    }
-    footEl.innerHTML = note;
-  }
 }
 
 function renderChangesTable(lt: FocusLT | null, b3it: FocusB3IT | null): void {
@@ -362,9 +385,32 @@ export async function init(): Promise<void> {
   const lt = buildLT(scores, manifest.changes.lt);
   const b3it = buildB3IT(b3itData, manifest.changes.b3it);
 
+  // each raw file fetched once, whichever asks first: the idle prefetch below or a readout
+  const once = <T,>(url: string): (() => Promise<T | null>) => {
+    let p: Promise<T | null> | null = null;
+    return () => (p ??= fetchJSON<T>(url));
+  };
+  const raw: RawLoaders = {
+    lt: once<LTRaw>(`../data/lt/${manifest.slug}/daily.json`),
+    b3it: once<B3ITRaw>(`../data/b3it/${manifest.slug}/votes.json`),
+  };
+
   renderStatusCard(lt, b3it, manifest.state);
-  renderChart(lt, b3it);
+  renderChart(lt, b3it, raw);
   renderChangesTable(lt, b3it);
+  prefetchRaw(lt, b3it, raw);
+}
+
+/** The raw files behind the readouts (up to ~180 KB each) fetched after the chart
+ *  is on screen and the browser is idle, so the first hover already has them and
+ *  the page's own load never waits on them. */
+function prefetchRaw(lt: FocusLT | null, b3it: FocusB3IT | null, raw: RawLoaders): void {
+  const load = (): void => {
+    if (lt) void raw.lt();
+    if (b3it) void raw.b3it();
+  };
+  if ("requestIdleCallback" in window) window.requestIdleCallback(load);
+  else setTimeout(load, IDLE_FALLBACK_MS);
 }
 
 init();

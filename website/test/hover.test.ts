@@ -23,8 +23,9 @@ const B3IT = {
     ["2026-07-29", 0.4825],
   ] as [string, number][],
   breaks: [], // already thinned: these fixtures are what the chart draws
+  daily: [] as [string, number][], // the day readouts' raw data is chart_detail.test's subject
   epochs: [],
-  changes: [{ date: "2026-07-26", shiftTV: 0.535 }],
+  changes: [{ date: "2026-07-26", shiftTV: 0.535, detector: null }],
   firstDate: "2026-07-17",
   lastDate: "2026-07-29",
 };
@@ -34,6 +35,7 @@ const LT = {
     ["2026-07-17", 0.02], ["2026-07-22", 0.05], ["2026-07-26", 0.81], ["2026-07-29", 0.78],
   ] as [string, number][],
   breaks: [], // already thinned: these fixtures are what the chart draws
+  daily: [] as [string, number][],
   changes: [{ date: "2026-07-26", shift: 0.81 }],
   firstDate: "2026-07-17",
   lastDate: "2026-07-29",
@@ -53,7 +55,7 @@ async function mount(
   const { chartSvg } = await import("../src/endpoint");
   const { bindHover } = await import("../src/chart_hover");
   document.body.innerHTML = `<div class="chartwrap chart" id="mainchart"></div>
-    <div class="chart-tip" id="charttip" hidden></div>`;
+    <div class="chart-readout idle" id="charttip"><p>Hover to read.</p></div>`;
   const chart = document.getElementById("mainchart")!;
   const tip = document.getElementById("charttip")!;
   chart.innerHTML = chartSvg(lt, b3it, DESIGN_VW);
@@ -62,7 +64,8 @@ async function mount(
     ({ left: 0, top: 0, width: DESIGN_VW, height: VH, right: DESIGN_VW, bottom: VH, x: 0, y: 0 }) as DOMRect;
   chart.getBoundingClientRect = (): DOMRect =>
     ({ left: 0, top: 0, width: DESIGN_VW, height: VH, right: DESIGN_VW, bottom: VH, x: 0, y: 0 }) as DOMRect;
-  bindHover(chart, tip, lt, b3it, () => DESIGN_VW);
+  const none = (): Promise<null> => Promise.resolve(null);
+  bindHover(chart, tip, lt, b3it, () => DESIGN_VW, { lt: none, b3it: none });
   return { chart, tip, hits: [...chart.querySelectorAll(".lane-hit")] };
 }
 
@@ -125,7 +128,7 @@ describe("readout", () => {
   test("a hover names the day and that lane's value", async () => {
     const { tip, hits } = await mount(null, B3IT);
     point(hits[0], "pointermove", dayX(26), "mouse");
-    expect(tip.hidden).toBe(false);
+    expect(tip.classList.contains("idle")).toBe(false);
     expect(tip.textContent).toContain("2026-07-26");
     expect(tip.textContent).toContain("TV 0.536");
   });
@@ -138,24 +141,22 @@ describe("readout", () => {
     expect(tip.textContent).not.toContain("TV");
   });
 
-  test("leaving the lane takes the readout away", async () => {
-    const { tip, hits } = await mount(null, B3IT);
+  test("leaving the lane keeps the last readout, so a hand can move down into it", async () => {
+    const { chart, tip, hits } = await mount(null, B3IT);
     point(hits[0], "pointermove", dayX(26), "mouse");
     point(hits[0], "pointerleave", dayX(26), "mouse");
-    expect(tip.hidden).toBe(true);
+    point(chart, "pointerleave", dayX(26), "mouse");
+    expect(tip.classList.contains("idle")).toBe(false);
+    expect(tip.textContent).toContain("2026-07-26");
   });
 
-  test("a tap pins the readout, and one outside dismisses it", async () => {
+  test("a tap reads, and one off every target returns the block to idle", async () => {
     const { chart, tip, hits } = await mount(null, B3IT);
     point(hits[0], "pointerdown", dayX(26), "touch");
-    expect(tip.hidden).toBe(false);
     expect(tip.textContent).toContain("2026-07-26");
-    // a touch never fires pointerleave on its own -- the tip must survive until
-    // something else is touched
-    point(hits[0], "pointerleave", dayX(26), "touch");
-    expect(tip.hidden).toBe(false);
     point(chart, "pointerdown", 5, "touch");
-    expect(tip.hidden).toBe(true);
+    expect(tip.classList.contains("idle")).toBe(true);
+    expect(tip.textContent).toBe("Hover to read.");
   });
 
   test("marks the read sample on the curve", async () => {

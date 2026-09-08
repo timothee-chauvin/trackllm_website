@@ -195,6 +195,12 @@ class LTData:
         young to have a drift lane."""
         return [d for d, _ in self.drift] or self.dates
 
+    @property
+    def first_change(self) -> datetime | None:
+        """The instant the drift reference period was anchored on: the earliest
+        raw changepoint, as compute_endpoint_scores handed it to compute_drift_series."""
+        return self.dates[self.changes[0]["index"]] if self.changes else None
+
 
 def load_lt_data(lt_dir: Path, slug: str) -> LTData | None:
     d = load_lt_scores(lt_dir, slug)

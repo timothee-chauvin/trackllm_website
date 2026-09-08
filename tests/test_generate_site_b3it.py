@@ -5,7 +5,12 @@ import pytest
 
 from trackllm_website.bi.state import EndpointBIState, Epoch, RetiredInfo
 from trackllm_website.config import Endpoint, config
-from trackllm_website.generate_site.b3it import derive_b3it, discover_b3it_views
+from trackllm_website.generate_site.b3it import (
+    derive_b3it,
+    discover_b3it_views,
+    to_json,
+    votes_json,
+)
 
 
 def _ep():
@@ -263,7 +268,100 @@ def test_backfill_events_surface_as_scan_changes():
     )
     backfill = [{"date": "2026-01-05T00:00:00+00:00", "p_value": 0.001}]
     view = derive_b3it(state, {}, backfill)
-    assert {"date": "2026-01-05T00:00:00+00:00", "kind": "scan"} in view.changes
+    assert {
+        "date": "2026-01-05T00:00:00+00:00",
+        "kind": "scan",
+        "detector": "scan",
+    } in view.changes
+
+
+def test_raw_votes_are_exported_beside_the_series(monkeypatch):
+    """The hover readout shows the counts each TV point was computed from: one
+    batch per series point, each ranked border input's votes next to the epoch's
+    reference votes, tokens by descending count."""
+    day1, day2 = "2026-01-01T00:00:00+00:00", "2026-01-02T00:00:00+00:00"
+    ref = {
+        "signal": [("2025-12-31T00:00:00+00:00", t) for t in "AAAB"],
+        "noise": [("2025-12-31T00:00:00+00:00", "A")] * 4,
+    }
+    results = {
+        "signal": {day1: [(day1, t) for t in "AB"], day2: [(day2, t) for t in "BBA"]},
+        "noise": {day1: [(day1, "A")], day2: [(day2, "A")]},
+    }
+    state = EndpointBIState(
+        endpoint=_ep(),
+        status="monitoring",
+        retired=None,
+        epochs=[
+            Epoch(
+                start=datetime(2026, 1, 1, tzinfo=timezone.utc),
+                border_inputs=["signal", "noise"],
+                reference=ref,
+                params={"detector": "adaptive"},
+            )
+        ],
+    )
+    monkeypatch.setattr(
+        "trackllm_website.generate_site.b3it.select_top_bis",
+        lambda reference, k: ["signal"],
+    )
+    view = derive_b3it(state, results, [])
+    assert view.bis == ["signal"]
+    assert view.references == [[[0, {"A": 3, "B": 1}]]]
+    assert view.epochs[0]["n_ref"] == 1
+    assert view.epochs[0]["detector"] == "adaptive"
+    # the reference batch (day1) is not a series point; day2 is
+    assert view.tv_series["dates"] == [day2]
+    # TV of the day's votes vs the reference: |3/4 - 1/3| = |1/4 - 2/3| = 5/12
+    assert view.batches == [[[0, {"B": 2, "A": 1}, 0.417]]]
+    assert votes_json(view) == {
+        "bis": ["signal"],
+        "reference": [[[0, {"A": 3, "B": 1}]]],
+        "batches": view.batches,
+    }
+    assert "batches" not in to_json(view)
+
+
+def test_long_tokens_are_cut_for_display_but_scored_whole():
+    long_a, long_b = "x" * 60 + "a", "x" * 60 + "b"
+    ts0, ts1 = "2026-01-01T00:00:00+00:00", "2026-01-02T00:00:00+00:00"
+    ref = {"p": [(ts0, long_a)] * 2}
+    results = {"p": {ts0: [(ts0, long_a)], ts1: [(ts1, long_a), (ts1, long_b)]}}
+    state = EndpointBIState(
+        endpoint=_ep(),
+        status="monitoring",
+        retired=None,
+        epochs=[
+            Epoch(
+                start=datetime(2026, 1, 1, tzinfo=timezone.utc),
+                border_inputs=["p"],
+                reference=ref,
+            )
+        ],
+    )
+    (batch,) = derive_b3it(state, results, []).batches
+    ((_, votes, tv),) = batch
+    assert votes == {"x" * 40 + "…": 2}
+    assert tv == pytest.approx(0.5)
+
+
+def test_epoch_without_params_has_no_detector():
+    state = EndpointBIState(
+        endpoint=_ep(),
+        status="monitoring",
+        retired=None,
+        epochs=[
+            Epoch(
+                start=datetime(2026, 1, 1, tzinfo=timezone.utc),
+                border_inputs=[],
+                reference={},
+            )
+        ],
+    )
+    view = derive_b3it(state, {}, [])
+    assert view.epochs[0]["detector"] is None
+    assert view.epochs[0]["n_ref"] == 0
+    assert view.bis == [] and view.references == [[]] and view.batches == []
 
 
 def test_change_magnitude_is_the_tv_shift_on_the_full_reference_series(monkeypatch):

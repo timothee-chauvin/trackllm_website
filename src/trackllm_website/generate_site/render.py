@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 
+import orjson
 from jinja2 import Environment, FileSystemLoader
 
 from trackllm_website.bi.state import load_all_states
@@ -11,6 +12,7 @@ from trackllm_website.generate_site import b3it as b3it_mod
 from trackllm_website.generate_site import changes as changes_mod
 from trackllm_website.generate_site import changes_page as changes_page_mod
 from trackllm_website.generate_site import home as home_mod
+from trackllm_website.generate_site import lt_raw as lt_raw_mod
 from trackllm_website.generate_site import machine as machine_mod
 from trackllm_website.generate_site import manifest as manifest_mod
 from trackllm_website.generate_site import model as model_mod
@@ -140,6 +142,8 @@ def render_site(
         {e.slug: e for e in discovered}, lt_data, b3it_views
     )
     endpoints = [e for e in discovered if e.slug in lt_by_slug]
+    # The drift lane's hover readout: daily.json beside each lt_scores.json.
+    lt_raw_mod.write_lt_daily(data_dir, endpoints, lt_data)
     n_skipped = n_discovered - len(set(lt_by_slug) | set(b3it_views))
     if n_skipped:
         print(f"Skipping {n_skipped} endpoints with nothing to show (no series)")
@@ -150,9 +154,10 @@ def render_site(
     lt_stalled = lt_stalled_slugs(data_dir, status_inputs.endpoints_lt, set(lt_by_slug))
     site = resolve_site_statuses(status_inputs, lt_by_slug, lt_stalled, bi_states)
 
-    # Only the generated b3it.json is pruned (and the directory it leaves empty):
-    # state/ and phase_2/ sit under the same parent and are collected data.
-    for f in b3it_dir.glob("*/b3it.json"):
+    # Only the generated b3it.json and votes.json are pruned (and the directory
+    # they leave empty): state/ and phase_2/ sit under the same parent and are
+    # collected data.
+    for f in [*b3it_dir.glob("*/b3it.json"), *b3it_dir.glob("*/votes.json")]:
         f.unlink()
         if not any(f.parent.iterdir()):
             f.parent.rmdir()
@@ -160,6 +165,7 @@ def render_site(
         out_dir = b3it_dir / slug
         out_dir.mkdir(parents=True, exist_ok=True)
         (out_dir / "b3it.json").write_text(json.dumps(b3it_mod.to_json(view)))
+        (out_dir / "votes.json").write_bytes(orjson.dumps(b3it_mod.votes_json(view)))
 
     lt_changes_file = website_dir / "data" / "lt" / "lt_changes.json"
     lt_changes = (

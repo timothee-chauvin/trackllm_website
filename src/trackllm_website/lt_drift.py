@@ -7,7 +7,8 @@ period; rises and stays elevated after a real change.
 
 import statistics
 from collections import defaultdict
-from datetime import datetime, timezone
+from dataclasses import dataclass
+from datetime import date, datetime, timezone
 
 REFERENCE_DAYS = 14
 # Every logprob is clipped here before anything else sees it. Some providers return
@@ -53,11 +54,22 @@ def _mean_vector(
     return {t: statistics.mean([d.get(t, floor) for d in dicts]) for t in tokens}
 
 
-def compute_drift_series(
+@dataclass
+class DailyMeans:
+    """The vectors drift is measured between: the reference-period mean and one
+    mean per observed UTC day, both over the reference tokens (plus the day's own)."""
+
+    ref_mean: dict[str, float]
+    floor: float
+    days: list[tuple[date, int, dict[str, float]]]  # (day, n observations, mean)
+
+
+def daily_means(
     observations: list[tuple[datetime, dict[str, float]]],
     first_change: datetime | None,
-) -> list[tuple[datetime, float]]:
-    """Compute daily drift series from reference period baseline.
+) -> DailyMeans | None:
+    """The reference and per-day means behind compute_drift_series; None for a
+    series too short (under three observed days) to have a drift lane.
 
     The reference is the REFERENCE_DAYS before `first_change` (the endpoint's
     earliest detected changepoint), so a young endpoint's baseline is never a
@@ -74,7 +86,7 @@ def compute_drift_series(
         key=lambda x: x[0],
     )
     if len({dt.date() for dt, _ in obs}) < 3:
-        return []
+        return None
     ref_dicts = []
     if first_change is not None:
         ref_dicts = [
@@ -91,15 +103,33 @@ def compute_drift_series(
     by_day = defaultdict(list)
     for dt, d in obs:
         by_day[dt.date()].append(d)
+    return DailyMeans(
+        ref_mean=ref_mean,
+        floor=floor,
+        days=[
+            (day, len(by_day[day]), _mean_vector(by_day[day], ref_tokens, floor))
+            for day in sorted(by_day)
+        ],
+    )
+
+
+def compute_drift_series(
+    observations: list[tuple[datetime, dict[str, float]]],
+    first_change: datetime | None,
+) -> list[tuple[datetime, float]]:
+    """Daily drift series from the reference period baseline (see daily_means)."""
+    dm = daily_means(observations, first_change)
+    if dm is None:
+        return []
     # The daily mean is the only aggregation. There used to be a 5-point rolling
     # median on top of it; it erased single-day excursions -- the exact shape this
     # site exists to surface -- and collapsed distinct days into constant runs.
     series = []
-    for day in sorted(by_day):
-        day_mean = _mean_vector(by_day[day], ref_tokens, floor)
-        tokens = sorted(set(day_mean) | set(ref_mean))
+    for day, _, day_mean in dm.days:
+        tokens = sorted(set(day_mean) | set(dm.ref_mean))
         drift = statistics.mean(
-            abs(day_mean.get(t, floor) - ref_mean.get(t, floor)) for t in tokens
+            abs(day_mean.get(t, dm.floor) - dm.ref_mean.get(t, dm.floor))
+            for t in tokens
         )
         series.append(
             (

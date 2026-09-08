@@ -188,20 +188,33 @@ def detect_changes(
     ], sigmas
 
 
-def compute_endpoint_scores(endpoint_dir: Path) -> LTScores | None:
-    """Compute LT scores for an endpoint, averaged across prompts."""
+Observations = list[tuple[datetime, dict[str, float]]]
+
+
+def load_endpoint_logprobs(endpoint_dir: Path) -> list[tuple[Path, Observations]]:
+    """Every prompt of an endpoint with enough observations for one window pair,
+    in directory order. The one reader behind the scores and the site's raw
+    export (generate_site.lt_raw), so both see the same prompts."""
     prompt_dirs = sorted(
         d for d in endpoint_dir.iterdir() if d.is_dir() and (d / "info.json").exists()
     )
+    loaded = [(d, load_prompt_logprobs(d)) for d in prompt_dirs]
+    return [(d, data) for d, data in loaded if len(data) >= 2 * N_PER_TEST]
 
+
+def longest_prompt(per_prompt_data: list[Observations]) -> int:
+    """Index of the prompt whose timeline the others are interpolated onto -- and
+    the one the drift series is computed from."""
+    return max(range(len(per_prompt_data)), key=lambda i: len(per_prompt_data[i]))
+
+
+def compute_endpoint_scores(endpoint_dir: Path) -> LTScores | None:
+    """Compute LT scores for an endpoint, averaged across prompts."""
     per_prompt_stats: list[np.ndarray] = []
     per_prompt_dates: list[list[datetime]] = []
-    per_prompt_data: list[list[tuple[datetime, dict[str, float]]]] = []
+    per_prompt_data: list[Observations] = []
 
-    for prompt_dir in prompt_dirs:
-        data = load_prompt_logprobs(prompt_dir)
-        if len(data) < 2 * N_PER_TEST:
-            continue
+    for _, data in load_endpoint_logprobs(endpoint_dir):
         logprob_dicts = [d for _, d in data]
         dates = [dt for dt, _ in data]
         stats = compute_statistics(*build_tensor(logprob_dicts), N_PER_TEST)
@@ -212,7 +225,7 @@ def compute_endpoint_scores(endpoint_dir: Path) -> LTScores | None:
     if not per_prompt_stats:
         return None
 
-    longest = max(range(len(per_prompt_stats)), key=lambda i: len(per_prompt_stats[i]))
+    longest = longest_prompt(per_prompt_data)
     ref_dates = per_prompt_dates[longest]
     ref_ts = np.array([d.timestamp() for d in ref_dates])
 

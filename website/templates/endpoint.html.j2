@@ -40,12 +40,13 @@
     <div class="sec-head"><h2>Drift from baseline</h2></div>
     <p class="sec-desc">Both signals measure how far this endpoint's behavior has moved from its <b>reference period</b>. <span class="lt">LT</span> tracks the average change in the returned tokens' log-probabilities (nats); <span class="b3">B3IT</span> tracks the total-variation distance of the border-input votes (0–1). Both should ideally be as close to 0 as possible. Dashed lines mark published changes, labeled with the <b>level shift</b> across them: for LT the mean drift over the 7 days after minus the 7 days before; for B3IT the total-variation shift its detector measured.</p>
     <div class="panel">
-      {# the tip is a sibling of the chart, not a child: every redraw replaces #mainchart's contents #}
+      {# the readout is a sibling of the chart, not a child: every redraw replaces
+         #mainchart's contents. It sits right under the plot, so a hand moving down
+         from a point lands in it and a hand moving along the curve reads on. #}
       <div class="chartbox">
         <div class="chartwrap chart" id="mainchart"></div>
-        <div class="chart-tip" id="charttip" hidden></div>
+        <div class="chart-readout idle" id="charttip"><p>Hover a day on either lane, a change mark or an epoch line to read the data behind it.</p></div>
       </div>
-      <div class="footnote" id="footnote"></div>
     </div>
   </section>
 
