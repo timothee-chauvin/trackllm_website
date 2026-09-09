@@ -639,6 +639,9 @@
   "openrouter#inception/mercury-2#inception": {
     "skip": "hidden reasoning"
   },
+  "openrouter#inception/mercury-2.5#inception": {
+    "effort": "none"
+  },
   "openrouter#inception/mercury-2.5-preview#inception": {
     "effort": "none"
   },
@@ -1934,6 +1937,7 @@
   "openrouter#z-ai/glm-5.3-flash#baseten/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#cloudflare": null,
   "openrouter#z-ai/glm-5.3-flash#coreweave/fp8": null,
+  "openrouter#z-ai/glm-5.3-flash#crusoe/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#deepinfra/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#deepinfra/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#digitalocean": null,

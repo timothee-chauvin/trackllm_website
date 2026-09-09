@@ -447,6 +447,12 @@ too_expensive:
   - 15.0
 - api: openrouter
   model: moonshotai/kimi-k3
+  provider: relace/fp4
+  cost:
+  - 2.4
+  - 12.0
+- api: openrouter
+  model: moonshotai/kimi-k3
   provider: sail-research/fp4
   cost:
   - 2.6
@@ -2174,6 +2180,16 @@ unprobeable:
   reason: flaky
   detail: 'cached: hidden reasoning'
 - api: openrouter
+  model: deepseek/deepseek-chat-v3.1
+  provider: google-vertex/us-west2
+  cost:
+  - 0.6
+  - 1.7
+  reason: flaky
+  detail: '{"message":"Provider returned error","code":503,"metadata":{"raw":"[{\n  \"error\":
+    {\n    \"code\": 503,\n    \"message\": \"Model server is not available. Please
+    retry. endpoint_id: 4539483288854593...'
+- api: openrouter
   model: deepseek/deepseek-r1-0528
   provider: novita/fp8
   cost:
@@ -2194,6 +2210,14 @@ unprobeable:
     (an endpoint may have matched multiple reasons)...'
 - api: openrouter
   model: deepseek/deepseek-v4-flash-0731:batch
+  provider: fireworks
+  cost:
+  - 0.11
+  - 0.33
+  reason: batch
+  detail: null
+- api: openrouter
+  model: deepseek/deepseek-v4-flash-0731:batch
   provider: together
   cost:
   - 0.14
@@ -2210,6 +2234,14 @@ unprobeable:
   detail: 'plain: 404 {"message":"0 endpoints out of 1 requested are available matching
     your guardrail restrictions and data policy. We removed them for the following
     reasons (an endpoint may have matched multip...'
+- api: openrouter
+  model: deepseek/deepseek-v4-flash-vision-exp:batch
+  provider: fireworks
+  cost:
+  - 0.11
+  - 0.33
+  reason: batch
+  detail: null
 - api: openrouter
   model: deepseek/deepseek-v4-pro
   provider: fireworks
@@ -2228,6 +2260,14 @@ unprobeable:
   detail: '{"message":"0 endpoints out of 1 requested are available matching your
     guardrail restrictions and data policy. We removed them for the following reasons
     (an endpoint may have matched multiple reasons)...'
+- api: openrouter
+  model: deepseek/deepseek-v4-pro-0813:batch
+  provider: fireworks
+  cost:
+  - 0.66
+  - 1.98
+  reason: batch
+  detail: null
 - api: openrouter
   model: deepseek/deepseek-v4-pro-0813:batch
   provider: together
@@ -2701,6 +2741,14 @@ unprobeable:
   - 0.18
   reason: flaky
   detail: 'cached: hidden reasoning'
+- api: openrouter
+  model: meta/muse-glimmer-30b:batch
+  provider: fireworks
+  cost:
+  - 0.175
+  - 0.75
+  reason: batch
+  detail: null
 - api: openrouter
   model: meta/muse-glimmer-30b:batch
   provider: together
@@ -3392,6 +3440,22 @@ unprobeable:
   reason: flaky
   detail: Timeout after 15.0s
 - api: openrouter
+  model: z-ai/glm-5.2:batch
+  provider: fireworks
+  cost:
+  - 0.7
+  - 2.2
+  reason: batch
+  detail: null
+- api: openrouter
+  model: z-ai/glm-5.3-flash:batch
+  provider: fireworks
+  cost:
+  - 0.075
+  - 0.25
+  reason: batch
+  detail: null
+- api: openrouter
   model: z-ai/glm-5.3-flash:batch
   provider: together
   cost:
@@ -3399,9 +3463,25 @@ unprobeable:
   - 0.5
   reason: batch
   detail: null
+- api: openrouter
+  model: z-ai/glm-5.3:batch
+  provider: fireworks
+  cost:
+  - 0.7
+  - 2.2
+  reason: batch
+  detail: null
 failure_streaks:
-  openrouter#deepseek/deepseek-chat-v3.1#google-vertex/us-west2:
-    count: 2
-    last_error: '{"message":"Provider returned error","code":503,"metadata":{"raw":"[{\n  \"error\":
-      {\n    \"code\": 503,\n    \"message\": \"Model server is not available. Please
-      retry. endpoint_id: 4539483288854593...'
+  openrouter#kwaipilot/kat-coder-pro-v2#atlas-cloud/fp8:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"code\":400,\"msg\":\"bad
+      request\",\"request_id\":\"98a5a8c6-3680-43e1-bbb6-7abe0e5048dd\"}","provider_name":"AtlasCloud","is_byok...'
+  openrouter#kwaipilot/kat-coder-pro-v2.5#atlas-cloud/fp8:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"code\":400,\"msg\":\"bad
+      request\",\"request_id\":\"1697fe23-7562-4c54-b02e-a0d7c3760705\"}","provider_name":"AtlasCloud","is_byok...'
+  openrouter#z-ai/glm-5.3-flash#crusoe/fp4:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"z-ai/glm-5.3-flash
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rate limits: ht...'
