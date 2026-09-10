@@ -1595,6 +1595,9 @@
   "openrouter#qwen/qwen3.8-27b#ionstream/fp8": {
     "effort": "none"
   },
+  "openrouter#qwen/qwen3.8-27b#mancer/fp8": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.8-27b#parasail/fp8": {
     "effort": "none"
   },
@@ -1605,6 +1608,9 @@
     "effort": "none"
   },
   "openrouter#qwen/qwen3.8-flash#alibaba": {
+    "effort": "none"
+  },
+  "openrouter#qwen/qwen3.8-flash#makora/fp4": {
     "effort": "none"
   },
   "openrouter#rekaai/reka-edge#reka/bf16": null,
@@ -1827,6 +1833,9 @@
   "openrouter#z-ai/glm-5.2#alibaba/fp8": null,
   "openrouter#z-ai/glm-5.2#ambient/fp8": null,
   "openrouter#z-ai/glm-5.2#atlas-cloud/fp8": null,
+  "openrouter#z-ai/glm-5.2#baidu/fast": {
+    "effort": "none"
+  },
   "openrouter#z-ai/glm-5.2#baidu/fp4": {
     "effort": "none"
   },
@@ -1912,6 +1921,7 @@
   "openrouter#z-ai/glm-5.3#friendli": null,
   "openrouter#z-ai/glm-5.3#gmicloud/fp8": null,
   "openrouter#z-ai/glm-5.3#inceptron/fp4": null,
+  "openrouter#z-ai/glm-5.3#io-net/fp4": null,
   "openrouter#z-ai/glm-5.3#io-net/fp8": null,
   "openrouter#z-ai/glm-5.3#makora/fp4": null,
   "openrouter#z-ai/glm-5.3#modal": null,

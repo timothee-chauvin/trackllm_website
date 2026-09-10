@@ -2278,6 +2278,14 @@ unprobeable:
   detail: null
 - api: openrouter
   model: google/gemini-2.5-flash-lite:batch
+  provider: google-ai-studio
+  cost:
+  - 0.05
+  - 0.2
+  reason: batch
+  detail: null
+- api: openrouter
+  model: google/gemini-2.5-flash-lite:batch
   provider: google-vertex/eu
   cost:
   - 0.05
@@ -2820,11 +2828,43 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
+  model: mistralai/codestral-2508:batch
+  provider: mistral
+  cost:
+  - 0.15
+  - 0.45
+  reason: batch
+  detail: null
+- api: openrouter
+  model: mistralai/ministral-8b-2512:batch
+  provider: mistral
+  cost:
+  - 0.075
+  - 0.075
+  reason: batch
+  detail: null
+- api: openrouter
+  model: mistralai/mistral-large-2512:batch
+  provider: mistral
+  cost:
+  - 0.25
+  - 0.75
+  reason: batch
+  detail: null
+- api: openrouter
   model: mistralai/mistral-medium-3-5:batch
   provider: mistral
   cost:
   - 0.75
   - 3.75
+  reason: batch
+  detail: null
+- api: openrouter
+  model: mistralai/mistral-medium-3.1:batch
+  provider: mistral
+  cost:
+  - 0.2
+  - 1.0
   reason: batch
   detail: null
 - api: openrouter
@@ -2835,6 +2875,14 @@ unprobeable:
   - 0.03
   reason: flaky
   detail: 'cached: hidden reasoning'
+- api: openrouter
+  model: mistralai/mistral-small-2603:batch
+  provider: mistral
+  cost:
+  - 0.075
+  - 0.3
+  reason: batch
+  detail: null
 - api: openrouter
   model: moonshotai/kimi-k2.6
   provider: fireworks
@@ -3472,16 +3520,16 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
+  openrouter#deepseek/deepseek-v4-pro-0813#nebius/fp8:
+    count: 1
+    last_error: 'plain: 404 {"message":"No allowed providers are available for the
+      selected model. Providers serving deepseek/deepseek-v4-pro-20260813: deepseek,
+      novita, streamlake, gmicloud, ionstream, nextbit, aliba...'
   openrouter#kwaipilot/kat-coder-pro-v2#atlas-cloud/fp8:
-    count: 1
+    count: 2
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"code\":400,\"msg\":\"bad
-      request\",\"request_id\":\"98a5a8c6-3680-43e1-bbb6-7abe0e5048dd\"}","provider_name":"AtlasCloud","is_byok...'
+      request\",\"request_id\":\"aa995de9-aabb-4c23-b41e-bfacad77ad06\"}","provider_name":"AtlasCloud","is_byok...'
   openrouter#kwaipilot/kat-coder-pro-v2.5#atlas-cloud/fp8:
-    count: 1
+    count: 2
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"code\":400,\"msg\":\"bad
-      request\",\"request_id\":\"1697fe23-7562-4c54-b02e-a0d7c3760705\"}","provider_name":"AtlasCloud","is_byok...'
-  openrouter#z-ai/glm-5.3-flash#crusoe/fp4:
-    count: 1
-    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"z-ai/glm-5.3-flash
-      is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulate your rate limits: ht...'
+      request\",\"request_id\":\"65da5953-07bb-4c0f-9d2e-0bce5785b0c9\"}","provider_name":"AtlasCloud","is_byok...'
