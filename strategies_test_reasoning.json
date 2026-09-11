@@ -286,6 +286,9 @@
   "openrouter#deepseek/deepseek-v4-flash-vision-exp#fireworks": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4-flash-vision-exp#gmicloud/fp8": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-flash-vision-exp#novita": {
     "effort": "none"
   },
@@ -333,6 +336,7 @@
   "openrouter#deepseek/deepseek-v4-pro-0813#gmicloud/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4-pro-0813#ionstream": null,
   "openrouter#deepseek/deepseek-v4-pro-0813#ionstream/fp4": null,
   "openrouter#deepseek/deepseek-v4-pro-0813#parasail/fp8": {
     "effort": "none"
@@ -342,6 +346,21 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4-pro-0813#together": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash#deepinfra/fp8": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash#fireworks": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash#gmicloud/fp8": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash#morph/fp8": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash#novita/fp8": {
     "effort": "none"
   },
   "openrouter#essentialai/rnj-1-instruct#together": null,
@@ -1204,6 +1223,9 @@
   "openrouter#openai/gpt-oss-120b#deepinfra/turbo": {
     "max_tokens": 4
   },
+  "openrouter#openai/gpt-oss-120b#dekallm/bf16": {
+    "max_tokens": 4
+  },
   "openrouter#openai/gpt-oss-120b#digitalocean": null,
   "openrouter#openai/gpt-oss-120b#google-vertex/global": {
     "max_tokens": 4
@@ -1248,6 +1270,9 @@
     "max_tokens": 4
   },
   "openrouter#openai/gpt-oss-20b#deepinfra/bf16": {
+    "max_tokens": 4
+  },
+  "openrouter#openai/gpt-oss-20b#dekallm/bf16": {
     "max_tokens": 4
   },
   "openrouter#openai/gpt-oss-20b#fireworks": {
@@ -1555,6 +1580,9 @@
     "effort": "none"
   },
   "openrouter#qwen/qwen3.6-35b-a3b#deepinfra/fp8": null,
+  "openrouter#qwen/qwen3.6-35b-a3b#dekallm": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.6-35b-a3b#io-net/fp8": null,
   "openrouter#qwen/qwen3.6-35b-a3b#parasail/fp8": null,
   "openrouter#qwen/qwen3.6-35b-a3b#phala": null,
@@ -1926,6 +1954,7 @@
   "openrouter#z-ai/glm-5.3#makora/fp4": null,
   "openrouter#z-ai/glm-5.3#modal": null,
   "openrouter#z-ai/glm-5.3#morph/fp4": null,
+  "openrouter#z-ai/glm-5.3#morph/fp8": null,
   "openrouter#z-ai/glm-5.3#novita/fp8": null,
   "openrouter#z-ai/glm-5.3#parasail/fp8": {
     "max_tokens": 1
