@@ -213,6 +213,7 @@
   "openrouter#deepseek/deepseek-v4-flash#streamlake": null,
   "openrouter#deepseek/deepseek-v4-flash#streamlake/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash#venice": null,
+  "openrouter#deepseek/deepseek-v4-flash#wafer": null,
   "openrouter#deepseek/deepseek-v4-flash#wafer/fp4": null,
   "openrouter#deepseek/deepseek-v4-flash#wandb/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#akashml/fp8": null,
@@ -357,10 +358,28 @@
   "openrouter#deepseek/deepseek-v4.1-flash#gmicloud/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash#io-net/fp8": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash#modal": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash#morph/fp8": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#novita/fp8": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash#parasail/fp8": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash#siliconflow/fp8": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash#venice/fp8": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash#wafer": {
     "effort": "none"
   },
   "openrouter#essentialai/rnj-1-instruct#together": null,
@@ -617,6 +636,7 @@
   "openrouter#google/gemma-4-26b-a4b-it#dekallm/bf16": null,
   "openrouter#google/gemma-4-26b-a4b-it#google-vertex/global": null,
   "openrouter#google/gemma-4-26b-a4b-it#ionstream/bf16": null,
+  "openrouter#google/gemma-4-26b-a4b-it#makora": null,
   "openrouter#google/gemma-4-26b-a4b-it#nextbit/bf16": null,
   "openrouter#google/gemma-4-26b-a4b-it#novita/bf16": null,
   "openrouter#google/gemma-4-26b-a4b-it#parasail/bf16": null,
@@ -674,9 +694,14 @@
   "openrouter#inclusionai/ling-3.0-flash-fin#deepinfra/fp4": {
     "effort": "none"
   },
+  "openrouter#inclusionai/ling-3.0-flash-vl#deepinfra/fp16": {
+    "effort": "none"
+  },
   "openrouter#inclusionai/ring-2.6-1t#novita": {
     "max_tokens": 4
   },
+  "openrouter#inference-net/schematron-v2-small#inference-net": null,
+  "openrouter#inference-net/schematron-v2-turbo#inference-net": null,
   "openrouter#kwaipilot/kat-coder-air-v2.5#streamlake": {
     "skip": "hidden reasoning"
   },
@@ -1001,7 +1026,13 @@
   "openrouter#nvidia/nemotron-3-ultra-550b-a55b#together": null,
   "openrouter#nvidia/nemotron-3-ultra-550b-a55b#venice/fp8": null,
   "openrouter#nvidia/nemotron-3.5-lightning#coreweave/bf16": null,
+  "openrouter#nvidia/nemotron-3.5-lightning#darkbloom/int4": {
+    "effort": "none"
+  },
   "openrouter#nvidia/nemotron-3.5-lightning#deepinfra/bf16": null,
+  "openrouter#nvidia/nemotron-3.5-lightning#phala": {
+    "effort": "none"
+  },
   "openrouter#nvidia/nemotron-3.5-lightning#venice/fp4": {
     "effort": "none"
   },
@@ -1992,6 +2023,7 @@
   "openrouter#z-ai/glm-5.3-flash#parasail/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#phala/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#reka/fp8": null,
+  "openrouter#z-ai/glm-5.3-flash#relace": null,
   "openrouter#z-ai/glm-5.3-flash#relace/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#relace/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#sail-research/fp8": null,
