@@ -541,6 +541,12 @@ endpoints_lt:
   - 1.2
 - api: openrouter
   model: deepseek/deepseek-v4.1-flash
+  provider: together
+  cost:
+  - 0.3
+  - 1.2
+- api: openrouter
+  model: deepseek/deepseek-v4.1-flash
   provider: wafer
   cost:
   - 0.3
@@ -637,6 +643,12 @@ endpoints_lt:
   - 1.74
 - api: openrouter
   model: qwen/qwen3.8-27b
+  provider: dekallm
+  cost:
+  - 0.2
+  - 2.5
+- api: openrouter
+  model: qwen/qwen3.8-27b
   provider: reka/fp8
   cost:
   - 0.214
@@ -696,6 +708,12 @@ endpoints_lt:
   - 1.056
   - 3.168
 - api: openrouter
+  model: moonshotai/kimi-k2.6
+  provider: gmicloud/fp8
+  cost:
+  - 0.855
+  - 3.6
+- api: openrouter
   model: qwen/qwen3-max
   provider: alibaba
   cost:
@@ -707,12 +725,6 @@ endpoints_lt:
   cost:
   - 0.78
   - 3.9
-- api: openrouter
-  model: z-ai/glm-5.2
-  provider: reka/fp8
-  cost:
-  - 1.1
-  - 3.75
 - api: openrouter
   model: moonshotai/kimi-k2.7-code
   provider: alibaba/fp8

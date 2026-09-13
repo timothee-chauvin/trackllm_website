@@ -417,6 +417,12 @@ too_expensive:
   - 16.5
 - api: openrouter
   model: moonshotai/kimi-k3
+  provider: inference-net
+  cost:
+  - 2.1
+  - 10.95
+- api: openrouter
+  model: moonshotai/kimi-k3
   provider: makora
   cost:
   - 2.55
@@ -2325,6 +2331,16 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
+  model: deepseek/deepseek-v4.1-flash
+  provider: deepseek
+  cost:
+  - 0.15
+  - 0.6
+  reason: flaky
+  detail: 'plain: 404 {"message":"0 endpoints out of 1 requested are available matching
+    your guardrail restrictions and data policy. We removed them for the following
+    reasons (an endpoint may have matched multip...'
+- api: openrouter
   model: google/gemini-2.5-flash-lite:batch
   provider: google-ai-studio
   cost:
@@ -3482,6 +3498,16 @@ unprobeable:
   detail: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"code\":400,\"reason\":\"INVALID_REQUEST_BODY\",\"message\":\"model:
     qwen/qwen-2.5-72b-instruct does not support endpoin...'
 - api: openrouter
+  model: qwen/qwen3-30b-a3b-instruct-2507
+  provider: dekallm
+  cost:
+  - 0.09
+  - 0.3
+  reason: flaky
+  detail: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"qwen/qwen3-30b-a3b-instruct-2507
+    is temporarily rate-limited upstream. Please retry shortly, or add your own key
+    to accumu...'
+- api: openrouter
   model: qwen/qwen3-coder-30b-a3b-instruct
   provider: amazon-bedrock
   cost:
@@ -3591,21 +3617,11 @@ failure_streaks:
     last_error: 'plain: 404 {"message":"No allowed providers are available for the
       selected model. Providers serving deepseek/deepseek-v4-pro-20260813: deepseek,
       novita, streamlake, gmicloud, ionstream, nextbit, aliba...'
-  openrouter#deepseek/deepseek-v4.1-flash#deepseek:
-    count: 2
-    last_error: 'plain: 404 {"message":"0 endpoints out of 1 requested are available
-      matching your guardrail restrictions and data policy. We removed them for the
-      following reasons (an endpoint may have matched multip...'
-  openrouter#qwen/qwen3-30b-a3b-instruct-2507#dekallm:
-    count: 2
-    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"qwen/qwen3-30b-a3b-instruct-2507
-      is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumu...'
   openrouter#z-ai/glm-5.3#baseten/fp4:
-    count: 1
+    count: 2
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"max_tokens
       must be at least 2 for this deployment.\",\"type\":\"Bad Request\",\"code\":400}","provider_name":"BaseTen"...'
   openrouter#z-ai/glm-5.3#baseten/fp8:
-    count: 1
+    count: 2
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"max_tokens
       must be at least 2 for this deployment.\",\"type\":\"Bad Request\",\"code\":400}","provider_name":"BaseTen"...'

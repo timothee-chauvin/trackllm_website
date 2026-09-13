@@ -376,6 +376,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash#siliconflow/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash#together": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash#venice/fp8": {
     "effort": "none"
   },
@@ -1646,6 +1649,9 @@
   },
   "openrouter#qwen/qwen3.8-27b#coreweave/fp8": null,
   "openrouter#qwen/qwen3.8-27b#darkbloom/fp4": {
+    "effort": "none"
+  },
+  "openrouter#qwen/qwen3.8-27b#dekallm": {
     "effort": "none"
   },
   "openrouter#qwen/qwen3.8-27b#io-net/fp8": {
