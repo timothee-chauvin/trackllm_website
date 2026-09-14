@@ -349,6 +349,12 @@
   "openrouter#deepseek/deepseek-v4-pro-0813#together": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash#alibaba": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash#baseten/fp8": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash#deepinfra/fp8": {
     "effort": "none"
   },
@@ -371,6 +377,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#parasail/fp8": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash#relace/fp4": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#siliconflow/fp8": {
@@ -1641,6 +1650,9 @@
   "openrouter#qwen/qwen3.8-27b#akashml/fp8": {
     "effort": "none"
   },
+  "openrouter#qwen/qwen3.8-27b#alibaba": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.8-27b#chutes/fp8": {
     "effort": "none"
   },
@@ -1973,6 +1985,7 @@
   "openrouter#z-ai/glm-5.2#z-ai/fp8": null,
   "openrouter#z-ai/glm-5.3#akashml/fp8": null,
   "openrouter#z-ai/glm-5.3#atlas-cloud/fp8": null,
+  "openrouter#z-ai/glm-5.3#baidu/fp8": null,
   "openrouter#z-ai/glm-5.3#baseten/fp4": null,
   "openrouter#z-ai/glm-5.3#baseten/fp8": null,
   "openrouter#z-ai/glm-5.3#cloudflare": null,

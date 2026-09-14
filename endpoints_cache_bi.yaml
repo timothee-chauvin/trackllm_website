@@ -153,6 +153,12 @@ too_expensive:
   - 0.25
 - api: openrouter
   model: deepseek/deepseek-v4-pro
+  provider: cloudflare
+  cost:
+  - 1.15
+  - 2.55
+- api: openrouter
+  model: deepseek/deepseek-v4-pro
   provider: gmicloud/fp8
   cost:
   - 1.044
@@ -3588,6 +3594,24 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
+  model: z-ai/glm-5.3
+  provider: baseten/fp4
+  cost:
+  - 1.4
+  - 4.4
+  reason: flaky
+  detail: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"max_tokens
+    must be at least 2 for this deployment.\",\"type\":\"Bad Request\",\"code\":400}","provider_name":"BaseTen"...'
+- api: openrouter
+  model: z-ai/glm-5.3
+  provider: baseten/fp8
+  cost:
+  - 2.1
+  - 6.6
+  reason: flaky
+  detail: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"max_tokens
+    must be at least 2 for this deployment.\",\"type\":\"Bad Request\",\"code\":400}","provider_name":"BaseTen"...'
+- api: openrouter
   model: z-ai/glm-5.3-flash:batch
   provider: fireworks
   cost:
@@ -3617,11 +3641,3 @@ failure_streaks:
     last_error: 'plain: 404 {"message":"No allowed providers are available for the
       selected model. Providers serving deepseek/deepseek-v4-pro-20260813: deepseek,
       novita, streamlake, gmicloud, ionstream, nextbit, aliba...'
-  openrouter#z-ai/glm-5.3#baseten/fp4:
-    count: 2
-    last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"max_tokens
-      must be at least 2 for this deployment.\",\"type\":\"Bad Request\",\"code\":400}","provider_name":"BaseTen"...'
-  openrouter#z-ai/glm-5.3#baseten/fp8:
-    count: 2
-    last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"max_tokens
-      must be at least 2 for this deployment.\",\"type\":\"Bad Request\",\"code\":400}","provider_name":"BaseTen"...'

@@ -90,12 +90,6 @@ endpoints_lt:
   - 0.065
   - 0.18
 - api: openrouter
-  model: deepseek/deepseek-v4-flash-0731
-  provider: streamlake/fp8
-  cost:
-  - 0.0616
-  - 0.1848
-- api: openrouter
   model: ibm-granite/granite-4.2-8b
   provider: coreweave/bf16
   cost:
@@ -179,6 +173,12 @@ endpoints_lt:
   cost:
   - 0.1
   - 0.34
+- api: openrouter
+  model: deepseek/deepseek-v4-flash-0731
+  provider: streamlake/fp8
+  cost:
+  - 0.1188
+  - 0.3564
 - api: openrouter
   model: google/gemma-4-31b-it
   provider: venice/bf16
@@ -636,12 +636,6 @@ endpoints_lt:
   - 0.25
   - 2.2
 - api: openrouter
-  model: deepseek/deepseek-v4-pro
-  provider: digitalocean
-  cost:
-  - 0.87
-  - 1.74
-- api: openrouter
   model: qwen/qwen3.8-27b
   provider: dekallm
   cost:
@@ -654,10 +648,22 @@ endpoints_lt:
   - 0.214
   - 2.55
 - api: openrouter
+  model: morph/morph-v3-large
+  provider: morph/fp8
+  cost:
+  - 0.9
+  - 1.9
+- api: openrouter
   model: qwen/qwen3.8-27b
   provider: ionstream/fp8
   cost:
   - 0.35
+  - 2.55
+- api: openrouter
+  model: qwen/qwen3.8-27b
+  provider: alibaba
+  cost:
+  - 0.425
   - 2.55
 - api: openrouter
   model: openai/gpt-3.5-turbo-0613
@@ -678,12 +684,6 @@ endpoints_lt:
   - 0.3
   - 2.8
 - api: openrouter
-  model: deepseek/deepseek-v4-pro
-  provider: ionstream/fp4
-  cost:
-  - 1.131
-  - 2.262
-- api: openrouter
   model: qwen/qwen3.8-27b
   provider: cloudflare
   cost:
@@ -699,8 +699,8 @@ endpoints_lt:
   model: deepseek/deepseek-v4-pro-0813
   provider: streamlake
   cost:
-  - 1.05468
-  - 3.16404
+  - 0.9834
+  - 2.9502
 - api: openrouter
   model: deepseek/deepseek-v4-pro-0813
   provider: gmicloud/fp8
