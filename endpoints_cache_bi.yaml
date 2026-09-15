@@ -141,6 +141,12 @@ too_expensive:
   - 2.18
 - api: openrouter
   model: deepseek/deepseek-v4-flash
+  provider: novita/fp8
+  cost:
+  - 0.14
+  - 0.28
+- api: openrouter
+  model: deepseek/deepseek-v4-flash
   provider: phala
   cost:
   - 0.2
@@ -157,6 +163,12 @@ too_expensive:
   cost:
   - 1.15
   - 2.55
+- api: openrouter
+  model: deepseek/deepseek-v4-pro
+  provider: digitalocean
+  cost:
+  - 1.044
+  - 2.088
 - api: openrouter
   model: deepseek/deepseek-v4-pro
   provider: gmicloud/fp8
@@ -304,6 +316,12 @@ too_expensive:
 - api: openrouter
   model: minimax/minimax-m3
   provider: gmicloud/fp8
+  cost:
+  - 0.6
+  - 2.4
+- api: openrouter
+  model: minimax/minimax-m3
+  provider: mara
   cost:
   - 0.6
   - 2.4
@@ -3641,3 +3659,8 @@ failure_streaks:
     last_error: 'plain: 404 {"message":"No allowed providers are available for the
       selected model. Providers serving deepseek/deepseek-v4-pro-20260813: deepseek,
       novita, streamlake, gmicloud, ionstream, nextbit, aliba...'
+  openrouter#openai/gpt-oss-120b#crusoe/bf16:
+    count: 1
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"openai/gpt-oss-120b
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rat...'
