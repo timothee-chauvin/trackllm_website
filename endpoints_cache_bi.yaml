@@ -662,6 +662,12 @@ too_expensive:
   - 0.3
   - 2.4
 - api: openrouter
+  model: qwen/qwen3.5-27b
+  provider: siliconflow/fp8
+  cost:
+  - 0.25
+  - 2.0
+- api: openrouter
   model: qwen/qwen3.5-35b-a3b
   provider: alibaba
   cost:
@@ -3659,8 +3665,8 @@ failure_streaks:
     last_error: 'plain: 404 {"message":"No allowed providers are available for the
       selected model. Providers serving deepseek/deepseek-v4-pro-20260813: deepseek,
       novita, streamlake, gmicloud, ionstream, nextbit, aliba...'
-  openrouter#openai/gpt-oss-120b#crusoe/bf16:
+  openrouter#z-ai/glm-5.3-flash#coreweave/nvfp4:
     count: 1
-    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"openai/gpt-oss-120b
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"z-ai/glm-5.3-flash
       is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulate your rat...'
+      key to accumulate your rate...'

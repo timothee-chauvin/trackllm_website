@@ -270,6 +270,9 @@
   },
   "openrouter#deepseek/deepseek-v4-flash-0731#relace/fp4": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#sail-research/fp4": null,
+  "openrouter#deepseek/deepseek-v4-flash-0731#sail-research/us": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-flash-0731#siliconflow/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#streamlake": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#streamlake/fp8": {
@@ -343,6 +346,7 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4-pro-0813#sail-research/fp4": null,
+  "openrouter#deepseek/deepseek-v4-pro-0813#sail-research/us": null,
   "openrouter#deepseek/deepseek-v4-pro-0813#streamlake": {
     "effort": "none"
   },
@@ -365,6 +369,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#io-net/fp8": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash#krea/fp8": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#modal": {
@@ -665,6 +672,7 @@
   "openrouter#google/gemma-4-31b-it#coreweave/bf16": null,
   "openrouter#google/gemma-4-31b-it#coreweave/fp4": null,
   "openrouter#google/gemma-4-31b-it#crusoe": null,
+  "openrouter#google/gemma-4-31b-it#crusoe/bf16": null,
   "openrouter#google/gemma-4-31b-it#deepinfra/fp8": null,
   "openrouter#google/gemma-4-31b-it#deepinfra/turbo": null,
   "openrouter#google/gemma-4-31b-it#deepinfra/ultra": null,
@@ -1263,6 +1271,9 @@
     "max_tokens": 4
   },
   "openrouter#openai/gpt-oss-120b#coreweave/fp4": {
+    "max_tokens": 4
+  },
+  "openrouter#openai/gpt-oss-120b#crusoe/bf16": {
     "max_tokens": 4
   },
   "openrouter#openai/gpt-oss-120b#deepinfra/bf16": {
@@ -1996,6 +2007,7 @@
   "openrouter#z-ai/glm-5.2#venice/fp8": null,
   "openrouter#z-ai/glm-5.2#z-ai/fp8": null,
   "openrouter#z-ai/glm-5.3#akashml/fp8": null,
+  "openrouter#z-ai/glm-5.3#alibaba": null,
   "openrouter#z-ai/glm-5.3#atlas-cloud/fp8": null,
   "openrouter#z-ai/glm-5.3#baidu/fp8": null,
   "openrouter#z-ai/glm-5.3#baseten/fp4": null,
