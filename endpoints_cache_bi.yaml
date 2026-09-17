@@ -447,6 +447,12 @@ too_expensive:
   - 10.95
 - api: openrouter
   model: moonshotai/kimi-k3
+  provider: inference-net/fp4
+  cost:
+  - 2.1
+  - 10.95
+- api: openrouter
+  model: moonshotai/kimi-k3
   provider: makora
   cost:
   - 2.55
@@ -678,6 +684,12 @@ too_expensive:
   provider: atlas-cloud/fp8
   cost:
   - 0.225
+  - 1.8
+- api: openrouter
+  model: qwen/qwen3.5-35b-a3b
+  provider: siliconflow/fp8
+  cost:
+  - 0.24
   - 1.8
 - api: openrouter
   model: qwen/qwen3.5-397b-a17b
@@ -3666,7 +3678,7 @@ failure_streaks:
       selected model. Providers serving deepseek/deepseek-v4-pro-20260813: deepseek,
       novita, streamlake, gmicloud, ionstream, nextbit, aliba...'
   openrouter#z-ai/glm-5.3-flash#coreweave/nvfp4:
-    count: 1
-    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"z-ai/glm-5.3-flash
+    count: 2
+    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"z-ai/glm-5.3-flash
       is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulate your rate...'
+      key to accumulate your rate limits: ht...'
