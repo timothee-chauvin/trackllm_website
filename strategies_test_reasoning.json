@@ -356,6 +356,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash#alibaba": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash#atlas-cloud/fp8": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash#baseten/fp8": {
     "effort": "none"
   },
@@ -560,6 +563,9 @@
   },
   "openrouter#google/gemini-3.1-flash-lite-image#google-ai-studio": {
     "max_tokens": 4
+  },
+  "openrouter#google/gemini-3.1-flash-lite-image#google-vertex/global": {
+    "max_tokens": 16
   },
   "openrouter#google/gemini-3.1-flash-lite-preview#google-ai-studio": {
     "max_tokens": 4
@@ -1705,6 +1711,9 @@
   "openrouter#qwen/qwen3.8-27b#parasail/fp8": {
     "effort": "none"
   },
+  "openrouter#qwen/qwen3.8-27b#phala": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.8-27b#reka/fp8": {
     "effort": "none"
   },
@@ -2012,6 +2021,9 @@
   "openrouter#z-ai/glm-5.2#streamlake/fp8": null,
   "openrouter#z-ai/glm-5.2#together": null,
   "openrouter#z-ai/glm-5.2#venice/fp8": null,
+  "openrouter#z-ai/glm-5.2#wafer": {
+    "effort": "none"
+  },
   "openrouter#z-ai/glm-5.2#z-ai/fp8": null,
   "openrouter#z-ai/glm-5.3#akashml/fp8": null,
   "openrouter#z-ai/glm-5.3#alibaba": null,
@@ -2030,6 +2042,7 @@
   "openrouter#z-ai/glm-5.3#friendli": null,
   "openrouter#z-ai/glm-5.3#gmicloud/fp8": null,
   "openrouter#z-ai/glm-5.3#inceptron/fp4": null,
+  "openrouter#z-ai/glm-5.3#inference-net/fp4": null,
   "openrouter#z-ai/glm-5.3#io-net/fp4": null,
   "openrouter#z-ai/glm-5.3#io-net/fp8": null,
   "openrouter#z-ai/glm-5.3#makora/fp4": null,
