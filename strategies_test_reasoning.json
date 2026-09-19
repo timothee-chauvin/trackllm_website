@@ -404,7 +404,13 @@
   "openrouter#deepseek/deepseek-v4.1-flash#relace/fp4": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash#sail-research/fp4": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash#siliconflow/fp8": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash#streamlake/fp8": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#together": {
@@ -1432,6 +1438,9 @@
   },
   "openrouter#poolside/laguna-xs-2.1#poolside/fp8": null,
   "openrouter#prime-intellect/intellect-3#nebius/fp8": null,
+  "openrouter#prism-ml/ternary-bonsai-2-27b#darkbloom/int4": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen-2.5-72b-instruct#deepinfra/fp8": null,
   "openrouter#qwen/qwen-2.5-7b-instruct#phala": null,
   "openrouter#qwen/qwen-2.5-7b-instruct#together": null,
@@ -1492,6 +1501,7 @@
   "openrouter#qwen/qwen3-30b-a3b-instruct-2507#alibaba/fp8": null,
   "openrouter#qwen/qwen3-30b-a3b-instruct-2507#atlas-cloud/fp8": null,
   "openrouter#qwen/qwen3-30b-a3b-instruct-2507#coreweave/bf16": null,
+  "openrouter#qwen/qwen3-30b-a3b-instruct-2507#dekallm": null,
   "openrouter#qwen/qwen3-30b-a3b-instruct-2507#nebius/fp8": null,
   "openrouter#qwen/qwen3-30b-a3b-instruct-2507#siliconflow/fp8": null,
   "openrouter#qwen/qwen3-30b-a3b-instruct-2507#streamlake": null,
@@ -2097,6 +2107,7 @@
   "openrouter#z-ai/glm-5.3-flash#relace/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#relace/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#sail-research/fp8": null,
+  "openrouter#z-ai/glm-5.3-flash#sail-research/us": null,
   "openrouter#z-ai/glm-5.3-flash#siliconflow/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#streamlake": null,
   "openrouter#z-ai/glm-5.3-flash#streamlake/fp8": null,
@@ -2104,5 +2115,6 @@
   "openrouter#z-ai/glm-5.3-flash#venice": null,
   "openrouter#z-ai/glm-5.3-flash#wafer": null,
   "openrouter#z-ai/glm-5.3-flash#z-ai/fp8": null,
+  "openrouter#z-ai/glm-5.3-flashx#z-ai/fp8": null,
   "openrouter#z-ai/glm-5v-turbo#z-ai/fp8": null
 }
