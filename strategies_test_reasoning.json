@@ -353,6 +353,7 @@
   "openrouter#deepseek/deepseek-v4-pro-0813#together": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4-pro-0813#wafer": null,
   "openrouter#deepseek/deepseek-v4.1-flash#alibaba": {
     "effort": "none"
   },
@@ -384,6 +385,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#modal": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash#morph": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#morph/fp8": {
@@ -2058,6 +2062,7 @@
   "openrouter#z-ai/glm-5.3#makora/fp4": null,
   "openrouter#z-ai/glm-5.3#mistral/nvfp4": null,
   "openrouter#z-ai/glm-5.3#modal": null,
+  "openrouter#z-ai/glm-5.3#morph": null,
   "openrouter#z-ai/glm-5.3#morph/fp4": null,
   "openrouter#z-ai/glm-5.3#morph/fp8": null,
   "openrouter#z-ai/glm-5.3#novita/fp8": null,
@@ -2096,6 +2101,7 @@
   "openrouter#z-ai/glm-5.3-flash#io-net/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#makora": null,
   "openrouter#z-ai/glm-5.3-flash#modal/fp8": null,
+  "openrouter#z-ai/glm-5.3-flash#morph": null,
   "openrouter#z-ai/glm-5.3-flash#morph/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#near-ai/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#nextbit/fp8": null,

@@ -42,6 +42,12 @@ endpoints_lt:
   - 0.017
   - 0.112
 - api: openrouter
+  model: deepseek/deepseek-v4-flash-0731
+  provider: streamlake/fp8
+  cost:
+  - 0.044
+  - 0.132
+- api: openrouter
   model: openai/gpt-oss-20b
   provider: parasail/fp4
   cost:
@@ -53,12 +59,6 @@ endpoints_lt:
   cost:
   - 0.08
   - 0.11
-- api: openrouter
-  model: deepseek/deepseek-v4-flash-0731
-  provider: streamlake/fp8
-  cost:
-  - 0.0484
-  - 0.1452
 - api: openrouter
   model: openai/gpt-oss-120b
   provider: akashml/bf16
@@ -480,12 +480,6 @@ endpoints_lt:
   - 0.225
   - 0.9
 - api: openrouter
-  model: deepseek/deepseek-v4-flash-0731
-  provider: gmicloud/fp4
-  cost:
-  - 0.286
-  - 0.858
-- api: openrouter
   model: mancer/weaver
   provider: mancer/fp8
   cost:
@@ -684,6 +678,12 @@ endpoints_lt:
   - 0.6
   - 1.7
 - api: openrouter
+  model: deepseek/deepseek-v4-pro-0813
+  provider: streamlake
+  cost:
+  - 0.57684
+  - 1.73052
+- api: openrouter
   model: qwen/qwen3.8-27b
   provider: parasail/fp8
   cost:
@@ -711,11 +711,11 @@ endpoints_lt:
   model: qwen/qwen3.8-27b
   provider: reka/fp8
   cost:
-  - 0.214
+  - 0.2
   - 2.55
 - api: openrouter
   model: morph/morph-v3-large
-  provider: morph/fp8
+  provider: morph
   cost:
   - 0.9
   - 1.9
@@ -725,6 +725,12 @@ endpoints_lt:
   cost:
   - 0.28
   - 2.55
+- api: openrouter
+  model: qwen/qwen3.8-27b
+  provider: io-net/fp8
+  cost:
+  - 0.285
+  - 2.66
 - api: openrouter
   model: qwen/qwen3.8-27b
   provider: alibaba
@@ -737,12 +743,6 @@ endpoints_lt:
   cost:
   - 1.0
   - 2.0
-- api: openrouter
-  model: qwen/qwen3.8-27b
-  provider: io-net/fp8
-  cost:
-  - 0.3
-  - 2.8
 - api: openrouter
   model: qwen/qwen3.8-27b
   provider: cloudflare
@@ -762,6 +762,12 @@ endpoints_lt:
   - 0.7
   - 2.96
 - api: openrouter
+  model: deepseek/deepseek-v4-pro-0813
+  provider: wafer
+  cost:
+  - 0.98
+  - 2.9
+- api: openrouter
   model: qwen/qwen3-coder-plus
   provider: alibaba
   cost:
@@ -769,22 +775,10 @@ endpoints_lt:
   - 3.25
 - api: openrouter
   model: deepseek/deepseek-v4-pro-0813
-  provider: streamlake
-  cost:
-  - 0.98868
-  - 2.96604
-- api: openrouter
-  model: deepseek/deepseek-v4-pro-0813
   provider: gmicloud/fp8
   cost:
   - 1.056
   - 3.168
-- api: openrouter
-  model: moonshotai/kimi-k2.6
-  provider: gmicloud/fp8
-  cost:
-  - 0.855
-  - 3.6
 - api: openrouter
   model: qwen/qwen3-max
   provider: alibaba
