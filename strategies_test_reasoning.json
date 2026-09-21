@@ -1734,6 +1734,9 @@
   "openrouter#qwen/qwen3.8-27b#venice/fp8": {
     "effort": "none"
   },
+  "openrouter#qwen/qwen3.8-27b#wafer": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.8-flash#alibaba": {
     "effort": "none"
   },

@@ -159,6 +159,12 @@ too_expensive:
   - 2.088
 - api: openrouter
   model: deepseek/deepseek-v4-pro
+  provider: gmicloud/fp8
+  cost:
+  - 0.957
+  - 1.914
+- api: openrouter
+  model: deepseek/deepseek-v4-pro
   provider: novita/fp8
   cost:
   - 1.6
@@ -656,6 +662,12 @@ too_expensive:
   - 0.225
   - 1.8
 - api: openrouter
+  model: qwen/qwen3.5-35b-a3b
+  provider: siliconflow/fp8
+  cost:
+  - 0.24
+  - 1.8
+- api: openrouter
   model: qwen/qwen3.5-397b-a17b
   provider: alibaba
   cost:
@@ -691,6 +703,12 @@ too_expensive:
   cost:
   - 0.45
   - 2.7
+- api: openrouter
+  model: qwen/qwen3.6-27b
+  provider: siliconflow/fp8
+  cost:
+  - 0.3
+  - 3.2
 - api: openrouter
   model: qwen/qwen3.6-35b-a3b
   provider: atlas-cloud/fp8
@@ -3534,6 +3552,11 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
+  openrouter#openai/gpt-oss-20b#together:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"id\":
+      \"p28SohD-2kFHot-a3e6ba7d1d040dac\",\n  \"error\": {\n    \"message\": \"Unable
+      to access non-serverless model openai/gp...'
   openrouter#z-ai/glm-5.3#baseten/fp4:
     count: 1
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"max_tokens
