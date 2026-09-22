@@ -363,6 +363,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash#baseten/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash#coreweave/fp8": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash#deepinfra/fp8": {
     "effort": "none"
   },
@@ -1053,6 +1056,12 @@
   },
   "openrouter#nex-agi/nex-n2-pro#siliconflow": {
     "max_tokens": 1
+  },
+  "openrouter#nex-agi/nex-n2.5-mini#nex-agi/bf16": {
+    "effort": "none"
+  },
+  "openrouter#nex-agi/nex-n2.5-pro#nex-agi/fp8": {
+    "effort": "none"
   },
   "openrouter#nousresearch/hermes-3-llama-3.1-405b#deepinfra/fp8": null,
   "openrouter#nousresearch/hermes-3-llama-3.1-70b#deepinfra/fp8": {
@@ -1865,6 +1874,12 @@
   "openrouter#xiaomi/mimo-v2.5-pro#xiaomi/fp8": {
     "effort": "none"
   },
+  "openrouter#xiaomi/mimo-v2.6-flash#xiaomi/fp8": {
+    "effort": "none"
+  },
+  "openrouter#xiaomi/mimo-v2.6-pro#xiaomi/fp8": {
+    "effort": "none"
+  },
   "openrouter#z-ai/glm-4.5#novita/fp8": {
     "effort": "none"
   },
@@ -2109,6 +2124,7 @@
   "openrouter#z-ai/glm-5.3-flash#near-ai/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#nextbit/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#novita/fp8": null,
+  "openrouter#z-ai/glm-5.3-flash#open-inference/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#parasail/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#phala/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#reka/fp8": null,

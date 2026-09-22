@@ -116,6 +116,12 @@ too_expensive:
   - 0.2
   - 0.9
 - api: openrouter
+  model: deepseek/deepseek-r1
+  provider: novita/fp8
+  cost:
+  - 0.7
+  - 2.5
+- api: openrouter
   model: deepseek/deepseek-r1-0528
   provider: siliconflow/fp8
   cost:
@@ -908,6 +914,30 @@ too_expensive:
   - 4.0
   - 12.0
 - api: openrouter
+  model: x-ai/grok-4.7
+  provider: xai
+  cost:
+  - 1.6
+  - 4.8
+- api: openrouter
+  model: x-ai/grok-4.7
+  provider: xai/priority
+  cost:
+  - 3.2
+  - 9.6
+- api: openrouter
+  model: x-ai/grok-4.7
+  provider: xai/zdr
+  cost:
+  - 1.6
+  - 4.8
+- api: openrouter
+  model: x-ai/grok-4.7
+  provider: xai/zdr/priority
+  cost:
+  - 3.2
+  - 9.6
+- api: openrouter
   model: x-ai/grok-build-0.1
   provider: xai
   cost:
@@ -985,6 +1015,12 @@ too_expensive:
   cost:
   - 0.435
   - 0.87
+- api: openrouter
+  model: xiaomi/mimo-v2.6-pro-ultraspeed
+  provider: xiaomi/fp8
+  cost:
+  - 4.35
+  - 8.7
 - api: openrouter
   model: z-ai/glm-4.6
   provider: novita/bf16
@@ -1418,6 +1454,12 @@ bad_temperature:
   cost:
   - 3.0
   - 15.0
+- api: openrouter
+  model: nex-agi/nex-n2.5-pro
+  provider: nex-agi/fp8
+  cost:
+  - 0.075
+  - 0.25
 - api: openrouter
   model: openai/gpt-5
   provider: azure
@@ -3552,10 +3594,13 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
-  openrouter#openai/gpt-oss-20b#together:
+  openrouter#google/gemini-3.1-flash-lite#google-vertex/global/flex:
     count: 1
+    last_error: Timeout after 15.0s
+  openrouter#openai/gpt-oss-20b#together:
+    count: 2
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"id\":
-      \"p28SohD-2kFHot-a3e6ba7d1d040dac\",\n  \"error\": {\n    \"message\": \"Unable
+      \"p2G53oj-2kFHot-a3eef51a9d621268\",\n  \"error\": {\n    \"message\": \"Unable
       to access non-serverless model openai/gp...'
   openrouter#z-ai/glm-5.3#baseten/fp4:
     count: 1
