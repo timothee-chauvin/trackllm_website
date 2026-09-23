@@ -110,6 +110,18 @@ too_expensive:
   - 5.0
   - 25.0
 - api: openrouter
+  model: anthropic/claude-opus-5.5
+  provider: azure/global
+  cost:
+  - 4.0
+  - 20.0
+- api: openrouter
+  model: anthropic/claude-opus-5.5
+  provider: azure/us
+  cost:
+  - 4.4
+  - 22.0
+- api: openrouter
   model: cognitivecomputations/dolphin-mistral-24b-venice-edition
   provider: venice/fp16
   cost:
@@ -776,6 +788,12 @@ too_expensive:
   - 2.0
   - 6.0
 - api: openrouter
+  model: qwen/qwen3.8-omni-flash
+  provider: alibaba
+  cost:
+  - 0.15
+  - 0.47
+- api: openrouter
   model: unbiased/pareto
   provider: unbiased
   cost:
@@ -1051,6 +1069,12 @@ too_expensive:
   cost:
   - 1.19
   - 3.74
+- api: openrouter
+  model: z-ai/glm-5.3-flash
+  provider: siliconflow/fp8
+  cost:
+  - 0.15
+  - 0.5
 bad_temperature:
 - api: openrouter
   model: anthropic/claude-fable-5
@@ -1268,6 +1292,60 @@ bad_temperature:
   cost:
   - 5.5
   - 27.5
+- api: openrouter
+  model: anthropic/claude-opus-5.5
+  provider: amazon-bedrock
+  cost:
+  - 4.0
+  - 20.0
+- api: openrouter
+  model: anthropic/claude-opus-5.5
+  provider: amazon-bedrock/eu-west-1
+  cost:
+  - 4.4
+  - 22.0
+- api: openrouter
+  model: anthropic/claude-opus-5.5
+  provider: amazon-bedrock/us-east-1
+  cost:
+  - 4.4
+  - 22.0
+- api: openrouter
+  model: anthropic/claude-opus-5.5
+  provider: anthropic
+  cost:
+  - 4.0
+  - 20.0
+- api: openrouter
+  model: anthropic/claude-opus-5.5
+  provider: anthropic/fast
+  cost:
+  - 8.0
+  - 40.0
+- api: openrouter
+  model: anthropic/claude-opus-5.5
+  provider: claude-on-aws
+  cost:
+  - 4.0
+  - 20.0
+- api: openrouter
+  model: anthropic/claude-opus-5.5
+  provider: google-vertex/europe
+  cost:
+  - 4.4
+  - 22.0
+- api: openrouter
+  model: anthropic/claude-opus-5.5
+  provider: google-vertex/global
+  cost:
+  - 4.0
+  - 20.0
+- api: openrouter
+  model: anthropic/claude-opus-5.5
+  provider: google-vertex/us
+  cost:
+  - 4.4
+  - 22.0
 - api: openrouter
   model: anthropic/claude-sonnet-5
   provider: amazon-bedrock/eu-west-1
@@ -2032,6 +2110,12 @@ bad_temperature:
   - 6.0
 - api: openrouter
   model: openai/gpt-6-astra
+  provider: amazon-bedrock/us-west-2
+  cost:
+  - 11.0
+  - 55.0
+- api: openrouter
+  model: openai/gpt-6-astra
   provider: azure
   cost:
   - 10.0
@@ -2090,6 +2174,162 @@ bad_temperature:
   cost:
   - 5.0
   - 25.0
+- api: openrouter
+  model: openai/gpt-6-luna
+  provider: amazon-bedrock/us-east-1
+  cost:
+  - 0.11
+  - 0.55
+- api: openrouter
+  model: openai/gpt-6-luna
+  provider: azure
+  cost:
+  - 0.1
+  - 0.5
+- api: openrouter
+  model: openai/gpt-6-luna
+  provider: azure/eu
+  cost:
+  - 0.11
+  - 0.55
+- api: openrouter
+  model: openai/gpt-6-luna
+  provider: azure/us
+  cost:
+  - 0.11
+  - 0.55
+- api: openrouter
+  model: openai/gpt-6-luna
+  provider: openai
+  cost:
+  - 0.1
+  - 0.5
+- api: openrouter
+  model: openai/gpt-6-luna
+  provider: openai/fast
+  cost:
+  - 0.2
+  - 1.0
+- api: openrouter
+  model: openai/gpt-6-luna
+  provider: openai/flex
+  cost:
+  - 0.05
+  - 0.25
+- api: openrouter
+  model: openai/gpt-6-luna-pro
+  provider: azure
+  cost:
+  - 0.1
+  - 0.5
+- api: openrouter
+  model: openai/gpt-6-luna-pro
+  provider: azure/eu
+  cost:
+  - 0.11
+  - 0.55
+- api: openrouter
+  model: openai/gpt-6-luna-pro
+  provider: azure/us
+  cost:
+  - 0.11
+  - 0.55
+- api: openrouter
+  model: openai/gpt-6-luna-pro
+  provider: openai
+  cost:
+  - 0.1
+  - 0.5
+- api: openrouter
+  model: openai/gpt-6-luna-pro
+  provider: openai/fast
+  cost:
+  - 0.2
+  - 1.0
+- api: openrouter
+  model: openai/gpt-6-luna-pro
+  provider: openai/flex
+  cost:
+  - 0.05
+  - 0.25
+- api: openrouter
+  model: openai/gpt-6-sol
+  provider: amazon-bedrock/us-east-1
+  cost:
+  - 2.2
+  - 11.0
+- api: openrouter
+  model: openai/gpt-6-sol
+  provider: azure
+  cost:
+  - 2.0
+  - 10.0
+- api: openrouter
+  model: openai/gpt-6-sol
+  provider: azure/eu
+  cost:
+  - 2.2
+  - 11.0
+- api: openrouter
+  model: openai/gpt-6-sol
+  provider: azure/us
+  cost:
+  - 2.2
+  - 11.0
+- api: openrouter
+  model: openai/gpt-6-sol
+  provider: openai
+  cost:
+  - 2.0
+  - 10.0
+- api: openrouter
+  model: openai/gpt-6-sol
+  provider: openai/fast
+  cost:
+  - 4.0
+  - 20.0
+- api: openrouter
+  model: openai/gpt-6-sol
+  provider: openai/flex
+  cost:
+  - 1.0
+  - 5.0
+- api: openrouter
+  model: openai/gpt-6-sol-pro
+  provider: azure
+  cost:
+  - 2.0
+  - 10.0
+- api: openrouter
+  model: openai/gpt-6-sol-pro
+  provider: azure/eu
+  cost:
+  - 2.2
+  - 11.0
+- api: openrouter
+  model: openai/gpt-6-sol-pro
+  provider: azure/us
+  cost:
+  - 2.2
+  - 11.0
+- api: openrouter
+  model: openai/gpt-6-sol-pro
+  provider: openai
+  cost:
+  - 2.0
+  - 10.0
+- api: openrouter
+  model: openai/gpt-6-sol-pro
+  provider: openai/fast
+  cost:
+  - 4.0
+  - 20.0
+- api: openrouter
+  model: openai/gpt-6-sol-pro
+  provider: openai/flex
+  cost:
+  - 1.0
+  - 5.0
 - api: openrouter
   model: openai/gpt-chat-latest
   provider: openai
@@ -2174,6 +2414,12 @@ bad_temperature:
   cost:
   - 0.95
   - 4.0
+- api: openrouter
+  model: z-ai/glm-5.3
+  provider: primeintellect
+  cost:
+  - 1.4
+  - 4.4
 unprobeable:
 - api: openrouter
   model: anthropic/claude-fable-5.1:batch
@@ -2257,6 +2503,14 @@ unprobeable:
   cost:
   - 2.5
   - 12.5
+  reason: batch
+  detail: null
+- api: openrouter
+  model: anthropic/claude-opus-5.5:batch
+  provider: anthropic
+  cost:
+  - 2.0
+  - 10.0
   reason: batch
   detail: null
 - api: openrouter
@@ -2387,6 +2641,14 @@ unprobeable:
   detail: 'plain: 404 {"message":"0 endpoints out of 1 requested are available matching
     your guardrail restrictions and data policy. We removed them for the following
     reasons (an endpoint may have matched multip...'
+- api: openrouter
+  model: deepseek/deepseek-v4.1-flash:batch
+  provider: deepinfra/fp8
+  cost:
+  - 0.112
+  - 0.336
+  reason: batch
+  detail: null
 - api: openrouter
   model: google/gemini-2.5-flash-lite:batch
   provider: google-ai-studio
@@ -3040,6 +3302,14 @@ unprobeable:
     0.95}\",\"type\":\"Bad...'
 - api: openrouter
   model: moonshotai/kimi-k3:batch
+  provider: deepinfra/bf16
+  cost:
+  - 2.28
+  - 11.4
+  reason: batch
+  detail: null
+- api: openrouter
+  model: moonshotai/kimi-k3:batch
   provider: together
   cost:
   - 3.0
@@ -3363,6 +3633,38 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
+  model: openai/gpt-6-luna-pro:batch
+  provider: openai
+  cost:
+  - 0.05
+  - 0.25
+  reason: batch
+  detail: null
+- api: openrouter
+  model: openai/gpt-6-luna:batch
+  provider: openai
+  cost:
+  - 0.05
+  - 0.25
+  reason: batch
+  detail: null
+- api: openrouter
+  model: openai/gpt-6-sol-pro:batch
+  provider: openai
+  cost:
+  - 1.0
+  - 5.0
+  reason: batch
+  detail: null
+- api: openrouter
+  model: openai/gpt-6-sol:batch
+  provider: openai
+  cost:
+  - 1.0
+  - 5.0
+  reason: batch
+  detail: null
+- api: openrouter
   model: openai/gpt-audio
   provider: openai
   cost:
@@ -3422,6 +3724,14 @@ unprobeable:
   - 0.15
   reason: flaky
   detail: 'cached: hidden reasoning'
+- api: openrouter
+  model: openai/gpt-oss-20b:batch
+  provider: deepinfra/bf16
+  cost:
+  - 0.024
+  - 0.112
+  reason: batch
+  detail: null
 - api: openrouter
   model: openai/o3-mini:batch
   provider: openai
@@ -3571,6 +3881,14 @@ unprobeable:
     must be at least 2 for this deployment.\",\"type\":\"Bad Request\",\"code\":400}","provider_name":"BaseTen"...'
 - api: openrouter
   model: z-ai/glm-5.3-flash:batch
+  provider: deepinfra/fp4
+  cost:
+  - 0.06
+  - 0.2
+  reason: batch
+  detail: null
+- api: openrouter
+  model: z-ai/glm-5.3-flash:batch
   provider: fireworks
   cost:
   - 0.075
@@ -3587,6 +3905,14 @@ unprobeable:
   detail: null
 - api: openrouter
   model: z-ai/glm-5.3:batch
+  provider: deepinfra/fp4
+  cost:
+  - 0.72
+  - 2.4
+  reason: batch
+  detail: null
+- api: openrouter
+  model: z-ai/glm-5.3:batch
   provider: fireworks
   cost:
   - 0.7
@@ -3594,14 +3920,25 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
-  openrouter#google/gemini-3.1-flash-lite#google-vertex/global/flex:
+  openrouter#cohere/command-a-plus#cohere:
     count: 1
-    last_error: Timeout after 15.0s
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"cohere/command-a-plus
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your r...'
   openrouter#openai/gpt-oss-20b#together:
     count: 2
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"id\":
       \"p2G53oj-2kFHot-a3eef51a9d621268\",\n  \"error\": {\n    \"message\": \"Unable
       to access non-serverless model openai/gp...'
+  openrouter#xiaomi/mimo-v2.6-pro#deepinfra/fp8:
+    count: 1
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"xiaomi/mimo-v2.6-pro
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your ra...'
+  openrouter#z-ai/glm-5.2#baseten/fp8:
+    count: 2
+    last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"max_tokens
+      must be at least 2 for this deployment.\",\"type\":\"Bad Request\",\"code\":\"400\"}","provider_name":"Base...'
   openrouter#z-ai/glm-5.3#baseten/fp4:
     count: 1
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"max_tokens

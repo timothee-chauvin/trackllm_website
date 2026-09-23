@@ -227,6 +227,9 @@
   "openrouter#deepseek/deepseek-v4-flash-0731#baseten/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#cloudflare": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#cloudflare/fp8": null,
+  "openrouter#deepseek/deepseek-v4-flash-0731#cohere": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-flash-0731#coreweave/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#decart/fp4": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#deepinfra/fp4": null,
@@ -397,6 +400,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#novita/fp8": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash#open-inference/fp4": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#parasail/fp8": {
@@ -681,6 +687,7 @@
   "openrouter#google/gemma-3-4b-it#deepinfra/bf16": null,
   "openrouter#google/gemma-3n-e4b-it#together": null,
   "openrouter#google/gemma-4-26b-a4b-it#cloudflare": null,
+  "openrouter#google/gemma-4-26b-a4b-it#coreweave/bf16": null,
   "openrouter#google/gemma-4-26b-a4b-it#darkbloom": null,
   "openrouter#google/gemma-4-26b-a4b-it#deepinfra/fp8": null,
   "openrouter#google/gemma-4-26b-a4b-it#dekallm/bf16": null,
@@ -1731,6 +1738,9 @@
   "openrouter#qwen/qwen3.8-27b#mancer/fp8": {
     "effort": "none"
   },
+  "openrouter#qwen/qwen3.8-27b#novita": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.8-27b#parasail/fp8": {
     "effort": "none"
   },
@@ -1793,6 +1803,9 @@
   "openrouter#tencent/hy3#tencent/fp8": null,
   "openrouter#tencent/hy3-preview#gmicloud/bf16": null,
   "openrouter#tencent/hy3-preview#siliconflow": null,
+  "openrouter#tencent/hy4-preview#siliconflow/fp8": {
+    "effort": "none"
+  },
   "openrouter#tencent/hy4-preview#tencent/fp8": {
     "effort": "none"
   },
@@ -1872,6 +1885,9 @@
     "effort": "none"
   },
   "openrouter#xiaomi/mimo-v2.5-pro#xiaomi/fp8": {
+    "effort": "none"
+  },
+  "openrouter#xiaomi/mimo-v2.6-flash#deepinfra/fp8": {
     "effort": "none"
   },
   "openrouter#xiaomi/mimo-v2.6-flash#xiaomi/fp8": {
@@ -2088,6 +2104,7 @@
     "max_tokens": 1
   },
   "openrouter#z-ai/glm-5.3#phala": null,
+  "openrouter#z-ai/glm-5.3#primeintellect": null,
   "openrouter#z-ai/glm-5.3#reka/fp8": null,
   "openrouter#z-ai/glm-5.3#sail-research/fp8": null,
   "openrouter#z-ai/glm-5.3#sail-research/us": null,
