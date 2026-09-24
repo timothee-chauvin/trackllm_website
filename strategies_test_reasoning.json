@@ -5,6 +5,8 @@
   "openrouter#aion-labs/aion-2.0#aion-labs": null,
   "openrouter#aion-labs/aion-3.0#aion-labs": null,
   "openrouter#aion-labs/aion-3.0-mini#aion-labs": null,
+  "openrouter#aion-labs/aion-3.5#aion-labs": null,
+  "openrouter#aion-labs/aion-3.5-mini#aion-labs": null,
   "openrouter#aion-labs/aion-rp-llama-3.1-8b#aion-labs": null,
   "openrouter#amazon/nova-2-lite-v1#amazon-bedrock": null,
   "openrouter#amazon/nova-2-lite-v1#amazon-bedrock/eu-west-1": null,
@@ -372,6 +374,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash#deepinfra/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash#dekallm": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash#digitalocean": {
     "effort": "none"
   },
@@ -388,6 +393,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#makora": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash#makora/fp8": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#modal": {
@@ -412,6 +420,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#reka/fp4": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash#relace": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#relace/fp4": {
@@ -754,6 +765,9 @@
     "effort": "none"
   },
   "openrouter#inclusionai/ling-3.0-flash-vl#deepinfra/fp16": {
+    "effort": "none"
+  },
+  "openrouter#inclusionai/ling-3.0-flash-vl#novita/bf16": {
     "effort": "none"
   },
   "openrouter#inclusionai/ring-2.6-1t#novita": {
@@ -1762,6 +1776,9 @@
   "openrouter#qwen/qwen3.8-flash#makora/fp4": {
     "effort": "none"
   },
+  "openrouter#qwen/qwen3.8-omni-flash#alibaba": {
+    "effort": "none"
+  },
   "openrouter#rekaai/reka-edge#reka/bf16": null,
   "openrouter#rekaai/reka-flash-3#reka/fp8": {
     "max_tokens": 4
@@ -1777,6 +1794,7 @@
   "openrouter#stepfun/step-3.5-flash#deepinfra/fp8": null,
   "openrouter#stepfun/step-3.5-flash#siliconflow/fp8": null,
   "openrouter#stepfun/step-3.7-flash#deepinfra": null,
+  "openrouter#stepfun/step-3.7-flash#deepinfra/us": null,
   "openrouter#stepfun/step-3.7-flash#novita": null,
   "openrouter#stepfun/step-3.7-flash#novita/fp8": null,
   "openrouter#stepfun/step-3.7-flash#stepfun/fp8": null,
@@ -1785,6 +1803,7 @@
     "max_tokens": 1
   },
   "openrouter#tencent/hy-mt2-1.8b#tencent/fp8": null,
+  "openrouter#tencent/hy-mt2-30b-a3b#reka/bf16": null,
   "openrouter#tencent/hy-mt2-30b-a3b#tencent/fp8": {
     "skip": "hidden reasoning"
   },
@@ -1803,6 +1822,9 @@
   "openrouter#tencent/hy3#tencent/fp8": null,
   "openrouter#tencent/hy3-preview#gmicloud/bf16": null,
   "openrouter#tencent/hy3-preview#siliconflow": null,
+  "openrouter#tencent/hy4-preview#novita/fp8": {
+    "effort": "none"
+  },
   "openrouter#tencent/hy4-preview#siliconflow/fp8": {
     "effort": "none"
   },
@@ -1836,6 +1858,10 @@
   },
   "openrouter#undi95/remm-slerp-l2-13b#mancer/fp8": null,
   "openrouter#undi95/remm-slerp-l2-13b#nextbit/bf16": null,
+  "openrouter#upstage/solar-mini4#upstage": {
+    "effort": "none"
+  },
+  "openrouter#upstage/solar-mini4#upstage/zdr": null,
   "openrouter#upstage/solar-pro-3#upstage": {
     "skip": "hidden reasoning"
   },
@@ -1891,6 +1917,9 @@
     "effort": "none"
   },
   "openrouter#xiaomi/mimo-v2.6-flash#xiaomi/fp8": {
+    "effort": "none"
+  },
+  "openrouter#xiaomi/mimo-v2.6-pro#deepinfra/fp8": {
     "effort": "none"
   },
   "openrouter#xiaomi/mimo-v2.6-pro#xiaomi/fp8": {
@@ -2077,6 +2106,7 @@
   "openrouter#z-ai/glm-5.3#alibaba": null,
   "openrouter#z-ai/glm-5.3#atlas-cloud/fp8": null,
   "openrouter#z-ai/glm-5.3#baidu/fp8": null,
+  "openrouter#z-ai/glm-5.3#baseten/fast": null,
   "openrouter#z-ai/glm-5.3#baseten/fp4": null,
   "openrouter#z-ai/glm-5.3#baseten/fp8": null,
   "openrouter#z-ai/glm-5.3#cloudflare": null,
@@ -2158,5 +2188,8 @@
   "openrouter#z-ai/glm-5.3-flash#wafer": null,
   "openrouter#z-ai/glm-5.3-flash#z-ai/fp8": null,
   "openrouter#z-ai/glm-5.3-flashx#z-ai/fp8": null,
+  "openrouter#z-ai/glm-5.3-prime#alibaba": {
+    "max_tokens": 1
+  },
   "openrouter#z-ai/glm-5v-turbo#z-ai/fp8": null
 }

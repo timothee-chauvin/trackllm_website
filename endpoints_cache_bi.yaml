@@ -788,6 +788,12 @@ too_expensive:
   - 2.0
   - 6.0
 - api: openrouter
+  model: qwen/qwen3.8-max-prime
+  provider: alibaba
+  cost:
+  - 4.0
+  - 12.0
+- api: openrouter
   model: qwen/qwen3.8-omni-flash
   provider: alibaba
   cost:
@@ -1075,6 +1081,12 @@ too_expensive:
   cost:
   - 0.15
   - 0.5
+- api: openrouter
+  model: z-ai/glm-5.3-flash
+  provider: streamlake/fp8
+  cost:
+  - 0.141
+  - 0.47
 bad_temperature:
 - api: openrouter
   model: anthropic/claude-fable-5
@@ -3702,6 +3714,14 @@ unprobeable:
   detail: 'cached: hidden reasoning'
 - api: openrouter
   model: openai/gpt-oss-120b:batch
+  provider: deepinfra/bf16
+  cost:
+  - 0.0296
+  - 0.136
+  reason: batch
+  detail: null
+- api: openrouter
+  model: openai/gpt-oss-120b:batch
   provider: together
   cost:
   - 0.15
@@ -3863,6 +3883,15 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
+  model: z-ai/glm-5.2
+  provider: baseten/fp8
+  cost:
+  - 1.4
+  - 4.4
+  reason: flaky
+  detail: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"max_tokens
+    must be at least 2 for this deployment.\",\"type\":\"Bad Request\",\"code\":\"400\"}","provider_name":"Base...'
+- api: openrouter
   model: z-ai/glm-5.2:batch
   provider: fireworks
   cost:
@@ -3921,7 +3950,7 @@ unprobeable:
   detail: null
 failure_streaks:
   openrouter#cohere/command-a-plus#cohere:
-    count: 1
+    count: 2
     last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"cohere/command-a-plus
       is temporarily rate-limited upstream. Please retry shortly, or add your own
       key to accumulate your r...'
@@ -3930,13 +3959,8 @@ failure_streaks:
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"id\":
       \"p2G53oj-2kFHot-a3eef51a9d621268\",\n  \"error\": {\n    \"message\": \"Unable
       to access non-serverless model openai/gp...'
-  openrouter#xiaomi/mimo-v2.6-pro#deepinfra/fp8:
-    count: 1
-    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"xiaomi/mimo-v2.6-pro
-      is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulate your ra...'
   openrouter#z-ai/glm-5.2#baseten/fp8:
-    count: 2
+    count: 1
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"max_tokens
       must be at least 2 for this deployment.\",\"type\":\"Bad Request\",\"code\":\"400\"}","provider_name":"Base...'
   openrouter#z-ai/glm-5.3#baseten/fp4:
