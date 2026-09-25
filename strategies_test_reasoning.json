@@ -115,6 +115,7 @@
   "openrouter#cohere/command-a#cohere": {
     "skip": "hidden reasoning"
   },
+  "openrouter#cohere/command-a-plus#cohere": null,
   "openrouter#cohere/command-r-08-2024#cohere": null,
   "openrouter#cohere/command-r-plus-08-2024#cohere": null,
   "openrouter#cohere/command-r7b-12-2024#cohere": {
@@ -210,6 +211,9 @@
   "openrouter#deepseek/deepseek-v4-flash#open-inference/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash#parasail/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash#phala": null,
+  "openrouter#deepseek/deepseek-v4-flash#relace/fp4": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-flash#sail-research/fp4": null,
   "openrouter#deepseek/deepseek-v4-flash#siliconflow/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash#streamlake": null,
@@ -270,6 +274,9 @@
   "openrouter#deepseek/deepseek-v4-flash-0731#open-inference/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#parasail/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#phala": null,
+  "openrouter#deepseek/deepseek-v4-flash-0731#reka": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-flash-0731#reka/fp4": {
     "effort": "none"
   },
@@ -405,6 +412,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#morph/fp8": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash#nextbit/fp8": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#novita/fp8": {
@@ -1063,6 +1073,9 @@
   },
   "openrouter#moonshotai/kimi-k2.7-code#together": null,
   "openrouter#moonshotai/kimi-k2.7-code#venice/int4": null,
+  "openrouter#moonshotai/kimi-k3#sail-research/fp4": {
+    "effort": "none"
+  },
   "openrouter#morph/morph-v3-fast#morph": null,
   "openrouter#morph/morph-v3-large#morph": null,
   "openrouter#morph/morph-v3-large#morph/fp8": null,
@@ -1761,6 +1774,9 @@
   "openrouter#qwen/qwen3.8-27b#phala": {
     "effort": "none"
   },
+  "openrouter#qwen/qwen3.8-27b#reka": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.8-27b#reka/fp8": {
     "effort": "none"
   },
@@ -1779,7 +1795,11 @@
   "openrouter#qwen/qwen3.8-omni-flash#alibaba": {
     "effort": "none"
   },
+  "openrouter#rekaai/reka-edge#reka": null,
   "openrouter#rekaai/reka-edge#reka/bf16": null,
+  "openrouter#rekaai/reka-flash-3#reka": {
+    "max_tokens": 4
+  },
   "openrouter#rekaai/reka-flash-3#reka/fp8": {
     "max_tokens": 4
   },
@@ -2104,6 +2124,9 @@
   "openrouter#z-ai/glm-5.2#z-ai/fp8": null,
   "openrouter#z-ai/glm-5.3#akashml/fp8": null,
   "openrouter#z-ai/glm-5.3#alibaba": null,
+  "openrouter#z-ai/glm-5.3#alibaba/fast": {
+    "max_tokens": 1
+  },
   "openrouter#z-ai/glm-5.3#atlas-cloud/fp8": null,
   "openrouter#z-ai/glm-5.3#baidu/fp8": null,
   "openrouter#z-ai/glm-5.3#baseten/fast": null,
@@ -2120,6 +2143,7 @@
   "openrouter#z-ai/glm-5.3#friendli": null,
   "openrouter#z-ai/glm-5.3#gmicloud/fp8": null,
   "openrouter#z-ai/glm-5.3#inceptron/fp4": null,
+  "openrouter#z-ai/glm-5.3#inference-net": null,
   "openrouter#z-ai/glm-5.3#inference-net/fp4": null,
   "openrouter#z-ai/glm-5.3#io-net/fp4": null,
   "openrouter#z-ai/glm-5.3#io-net/fp8": null,
@@ -2135,6 +2159,7 @@
   },
   "openrouter#z-ai/glm-5.3#phala": null,
   "openrouter#z-ai/glm-5.3#primeintellect": null,
+  "openrouter#z-ai/glm-5.3#reka": null,
   "openrouter#z-ai/glm-5.3#reka/fp8": null,
   "openrouter#z-ai/glm-5.3#sail-research/fp8": null,
   "openrouter#z-ai/glm-5.3#sail-research/us": null,
@@ -2148,6 +2173,7 @@
   },
   "openrouter#z-ai/glm-5.3#venice": null,
   "openrouter#z-ai/glm-5.3#wafer": null,
+  "openrouter#z-ai/glm-5.3#wafer/us": null,
   "openrouter#z-ai/glm-5.3#z-ai/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#atlas-cloud/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#baseten/fp8": null,
@@ -2155,6 +2181,7 @@
   "openrouter#z-ai/glm-5.3-flash#coreweave/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#coreweave/nvfp4": null,
   "openrouter#z-ai/glm-5.3-flash#crusoe/fp4": null,
+  "openrouter#z-ai/glm-5.3-flash#decart/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#deepinfra/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#deepinfra/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#digitalocean": null,
@@ -2166,6 +2193,7 @@
   "openrouter#z-ai/glm-5.3-flash#io-net/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#makora": null,
   "openrouter#z-ai/glm-5.3-flash#modal/fp8": null,
+  "openrouter#z-ai/glm-5.3-flash#modal/nvfp4": null,
   "openrouter#z-ai/glm-5.3-flash#morph": null,
   "openrouter#z-ai/glm-5.3-flash#morph/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#near-ai/fp8": null,
@@ -2174,6 +2202,7 @@
   "openrouter#z-ai/glm-5.3-flash#open-inference/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#parasail/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#phala/fp8": null,
+  "openrouter#z-ai/glm-5.3-flash#reka": null,
   "openrouter#z-ai/glm-5.3-flash#reka/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#relace": null,
   "openrouter#z-ai/glm-5.3-flash#relace/fp4": null,

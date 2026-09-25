@@ -248,6 +248,12 @@ too_expensive:
   - 1.65
   - 4.95
 - api: openrouter
+  model: fireworks/ember-1
+  provider: fireworks
+  cost:
+  - 3.0
+  - 15.0
+- api: openrouter
   model: google/gemini-2.5-pro
   provider: google-ai-studio/priority
   cost:
@@ -3949,11 +3955,6 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
-  openrouter#cohere/command-a-plus#cohere:
-    count: 2
-    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"cohere/command-a-plus
-      is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulate your r...'
   openrouter#openai/gpt-oss-20b#together:
     count: 2
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"id\":
