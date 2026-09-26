@@ -393,6 +393,7 @@
   "openrouter#deepseek/deepseek-v4.1-flash#gmicloud/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash#inference-net": null,
   "openrouter#deepseek/deepseek-v4.1-flash#io-net/fp8": {
     "effort": "none"
   },
@@ -713,11 +714,13 @@
   "openrouter#google/gemma-4-26b-a4b-it#deepinfra/fp8": null,
   "openrouter#google/gemma-4-26b-a4b-it#dekallm/bf16": null,
   "openrouter#google/gemma-4-26b-a4b-it#google-vertex/global": null,
+  "openrouter#google/gemma-4-26b-a4b-it#io-net/bf16": null,
   "openrouter#google/gemma-4-26b-a4b-it#ionstream/bf16": null,
   "openrouter#google/gemma-4-26b-a4b-it#makora": null,
   "openrouter#google/gemma-4-26b-a4b-it#nextbit/bf16": null,
   "openrouter#google/gemma-4-26b-a4b-it#novita/bf16": null,
   "openrouter#google/gemma-4-26b-a4b-it#parasail/bf16": null,
+  "openrouter#google/gemma-4-26b-a4b-it#reka": null,
   "openrouter#google/gemma-4-26b-a4b-it#siliconflow/fp8": null,
   "openrouter#google/gemma-4-26b-a4b-it#venice/bf16": null,
   "openrouter#google/gemma-4-31b-it#cerebras/fp16": null,
@@ -730,12 +733,14 @@
   "openrouter#google/gemma-4-31b-it#deepinfra/turbo": null,
   "openrouter#google/gemma-4-31b-it#deepinfra/ultra": null,
   "openrouter#google/gemma-4-31b-it#friendli": null,
+  "openrouter#google/gemma-4-31b-it#io-net": null,
   "openrouter#google/gemma-4-31b-it#modelrun/fp4": null,
   "openrouter#google/gemma-4-31b-it#morph/fp4": null,
   "openrouter#google/gemma-4-31b-it#novita/bf16": null,
   "openrouter#google/gemma-4-31b-it#open-inference/bf16": null,
   "openrouter#google/gemma-4-31b-it#parasail/fp8": null,
   "openrouter#google/gemma-4-31b-it#phala": null,
+  "openrouter#google/gemma-4-31b-it#reka": null,
   "openrouter#google/gemma-4-31b-it#sambanova": null,
   "openrouter#google/gemma-4-31b-it#siliconflow/fp8": null,
   "openrouter#google/gemma-4-31b-it#together": null,
@@ -1122,6 +1127,9 @@
     "effort": "none"
   },
   "openrouter#nvidia/nemotron-3.5-lightning#deepinfra/bf16": null,
+  "openrouter#nvidia/nemotron-3.5-lightning#io-net": {
+    "effort": "none"
+  },
   "openrouter#nvidia/nemotron-3.5-lightning#phala": {
     "effort": "none"
   },
@@ -1465,6 +1473,9 @@
   "openrouter#perceptron/perceptron-mk1#perceptron": {
     "max_tokens": 4
   },
+  "openrouter#perceptron/perceptron-mk1.5#perceptron": {
+    "max_tokens": 4
+  },
   "openrouter#perplexity/sonar#perplexity": {
     "skip": "hidden reasoning"
   },
@@ -1716,6 +1727,9 @@
   "openrouter#qwen/qwen3.6-35b-a3b#io-net/fp8": null,
   "openrouter#qwen/qwen3.6-35b-a3b#parasail/fp8": null,
   "openrouter#qwen/qwen3.6-35b-a3b#phala": null,
+  "openrouter#qwen/qwen3.6-35b-a3b#reka": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.6-35b-a3b#siliconflow/fp8": null,
   "openrouter#qwen/qwen3.6-35b-a3b#venice/fp8": null,
   "openrouter#qwen/qwen3.6-35b-a3b#wandb/fp8": null,
@@ -1942,6 +1956,9 @@
   "openrouter#xiaomi/mimo-v2.6-pro#deepinfra/fp8": {
     "effort": "none"
   },
+  "openrouter#xiaomi/mimo-v2.6-pro#gmicloud/bf16": {
+    "effort": "none"
+  },
   "openrouter#xiaomi/mimo-v2.6-pro#xiaomi/fp8": {
     "effort": "none"
   },
@@ -2064,6 +2081,9 @@
     "effort": "none"
   },
   "openrouter#z-ai/glm-5.2#decart/fp4": null,
+  "openrouter#z-ai/glm-5.2#decart/mxfp4": {
+    "effort": "none"
+  },
   "openrouter#z-ai/glm-5.2#deepinfra/fp4": null,
   "openrouter#z-ai/glm-5.2#digitalocean": null,
   "openrouter#z-ai/glm-5.2#fireworks": null,
@@ -2149,6 +2169,7 @@
   "openrouter#z-ai/glm-5.3#io-net/fp8": null,
   "openrouter#z-ai/glm-5.3#makora/fp4": null,
   "openrouter#z-ai/glm-5.3#mistral/nvfp4": null,
+  "openrouter#z-ai/glm-5.3#mistral/zdr": null,
   "openrouter#z-ai/glm-5.3#modal": null,
   "openrouter#z-ai/glm-5.3#morph": null,
   "openrouter#z-ai/glm-5.3#morph/fp4": null,
@@ -2161,6 +2182,7 @@
   "openrouter#z-ai/glm-5.3#primeintellect": null,
   "openrouter#z-ai/glm-5.3#reka": null,
   "openrouter#z-ai/glm-5.3#reka/fp8": null,
+  "openrouter#z-ai/glm-5.3#relace": null,
   "openrouter#z-ai/glm-5.3#sail-research/fp8": null,
   "openrouter#z-ai/glm-5.3#sail-research/us": null,
   "openrouter#z-ai/glm-5.3#siliconflow/fp8": {
