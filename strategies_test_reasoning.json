@@ -1743,6 +1743,9 @@
   "openrouter#qwen/qwen3.7-flash#alibaba": null,
   "openrouter#qwen/qwen3.7-max#alibaba": null,
   "openrouter#qwen/qwen3.7-max#alibaba/fp8": null,
+  "openrouter#qwen/qwen3.7-max#atlas-cloud/fp8": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.7-plus#alibaba": null,
   "openrouter#qwen/qwen3.7-plus#alibaba/fp8": null,
   "openrouter#qwen/qwen3.8-27b#akashml/bf16": {
