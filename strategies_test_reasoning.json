@@ -357,6 +357,9 @@
   "openrouter#deepseek/deepseek-v4-pro-0813#parasail/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4-pro-0813#relace/fp4": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-pro-0813#sail-research/fp4": null,
   "openrouter#deepseek/deepseek-v4-pro-0813#sail-research/us": null,
   "openrouter#deepseek/deepseek-v4-pro-0813#streamlake": {

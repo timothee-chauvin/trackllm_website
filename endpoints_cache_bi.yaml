@@ -152,6 +152,12 @@ too_expensive:
   - 0.2
   - 0.4
 - api: openrouter
+  model: deepseek/deepseek-v4-flash
+  provider: siliconflow/fp8
+  cost:
+  - 0.13
+  - 0.28
+- api: openrouter
   model: deepseek/deepseek-v4-flash-0731
   provider: siliconflow/fp8
   cost:
@@ -554,6 +560,12 @@ too_expensive:
   - 10.0
   - 30.0
 - api: openrouter
+  model: openai/gpt-oss-20b
+  provider: siliconflow/fp8
+  cost:
+  - 0.04
+  - 0.18
+- api: openrouter
   model: qwen/qwen3-14b
   provider: alibaba
   cost:
@@ -739,6 +751,12 @@ too_expensive:
   cost:
   - 0.186
   - 1.11375
+- api: openrouter
+  model: qwen/qwen3.6-35b-a3b
+  provider: siliconflow/fp8
+  cost:
+  - 0.24
+  - 1.8
 - api: openrouter
   model: qwen/qwen3.8-2.4t-a95b
   provider: alibaba
