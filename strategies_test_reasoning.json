@@ -334,6 +334,9 @@
   "openrouter#deepseek/deepseek-v4-pro#nextbit/fp8": null,
   "openrouter#deepseek/deepseek-v4-pro#novita/fp8": null,
   "openrouter#deepseek/deepseek-v4-pro#parasail/fp8": null,
+  "openrouter#deepseek/deepseek-v4-pro#relace/fp4": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-pro#siliconflow/fp8": null,
   "openrouter#deepseek/deepseek-v4-pro#streamlake": null,
   "openrouter#deepseek/deepseek-v4-pro#streamlake/fp8": null,
@@ -352,6 +355,7 @@
   "openrouter#deepseek/deepseek-v4-pro-0813#gmicloud/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4-pro-0813#io-net/fp8": null,
   "openrouter#deepseek/deepseek-v4-pro-0813#ionstream": null,
   "openrouter#deepseek/deepseek-v4-pro-0813#ionstream/fp4": null,
   "openrouter#deepseek/deepseek-v4-pro-0813#parasail/fp8": {
@@ -375,6 +379,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash#atlas-cloud/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash#baidu/fp8": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash#baseten/fp8": {
     "effort": "none"
   },
@@ -393,11 +400,17 @@
   "openrouter#deepseek/deepseek-v4.1-flash#fireworks": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash#fireworks/us": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash#gmicloud/fp8": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#inference-net": null,
   "openrouter#deepseek/deepseek-v4.1-flash#io-net/fp8": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash#ionstream": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#krea/fp8": {
@@ -782,6 +795,9 @@
   "openrouter#inclusionai/ling-3.0-flash-fin#deepinfra/fp4": {
     "effort": "none"
   },
+  "openrouter#inclusionai/ling-3.0-flash-fin#novita": {
+    "effort": "none"
+  },
   "openrouter#inclusionai/ling-3.0-flash-vl#deepinfra/fp16": {
     "effort": "none"
   },
@@ -1081,6 +1097,9 @@
   },
   "openrouter#moonshotai/kimi-k2.7-code#together": null,
   "openrouter#moonshotai/kimi-k2.7-code#venice/int4": null,
+  "openrouter#moonshotai/kimi-k3#morph/fp8": {
+    "effort": "none"
+  },
   "openrouter#moonshotai/kimi-k3#sail-research/fp4": {
     "effort": "none"
   },
@@ -1862,6 +1881,9 @@
   "openrouter#tencent/hy3#tencent/fp8": null,
   "openrouter#tencent/hy3-preview#gmicloud/bf16": null,
   "openrouter#tencent/hy3-preview#siliconflow": null,
+  "openrouter#tencent/hy4-preview#deepinfra/fp8": {
+    "effort": "none"
+  },
   "openrouter#tencent/hy4-preview#novita/fp8": {
     "effort": "none"
   },
@@ -1954,6 +1976,12 @@
     "effort": "none"
   },
   "openrouter#xiaomi/mimo-v2.6-flash#deepinfra/fp8": {
+    "effort": "none"
+  },
+  "openrouter#xiaomi/mimo-v2.6-flash#novita/fp8": {
+    "effort": "none"
+  },
+  "openrouter#xiaomi/mimo-v2.6-flash#relace/mxfp4": {
     "effort": "none"
   },
   "openrouter#xiaomi/mimo-v2.6-flash#xiaomi/fp8": {
@@ -2136,6 +2164,9 @@
   "openrouter#z-ai/glm-5.2#reka/fp8": {
     "effort": "none"
   },
+  "openrouter#z-ai/glm-5.2#relace": {
+    "effort": "none"
+  },
   "openrouter#z-ai/glm-5.2#relace/fp8": {
     "effort": "none"
   },
@@ -2214,6 +2245,7 @@
   "openrouter#z-ai/glm-5.3-flash#deepinfra/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#digitalocean": null,
   "openrouter#z-ai/glm-5.3-flash#fireworks": null,
+  "openrouter#z-ai/glm-5.3-flash#fireworks/us": null,
   "openrouter#z-ai/glm-5.3-flash#friendli": null,
   "openrouter#z-ai/glm-5.3-flash#gmicloud/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#inceptron/fp8": null,
