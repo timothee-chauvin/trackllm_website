@@ -321,6 +321,7 @@ def test_render_emits_about_page_and_front_page_logos(tmp_path):
     page = (tmp_path / "about.html").read_text()
     assert 'href="https://tchauvin.com"' in page
     assert "INESIA" in page
+    assert 'href="https://cluster-sequoia.univ-rennes.fr/' in page
     assert 'id="github"' in page
     github = (tmp_path / "github.html").read_text()
     for url in (CODE_REPO_URL, DATA_REPO_URL):
