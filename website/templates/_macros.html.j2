@@ -96,7 +96,7 @@
 {# Logos of the institutions behind the project; shared by the front page and About. #}
 {% macro affiliations() %}
 <div class="affil" aria-label="Affiliations">
-  {% for slug, name, ext, url in [('inria', 'Inria', 'svg', 'https://www.inria.fr/'), ('irisa', 'IRISA', 'png', 'https://www.irisa.fr/'), ('cnrs', 'CNRS', 'svg', 'https://www.cnrs.fr/')] %}
+  {% for slug, name, ext, url in [('inria', 'Inria', 'svg', 'https://www.inria.fr/'), ('irisa', 'IRISA', 'png', 'https://www.irisa.fr/'), ('cnrs', 'CNRS', 'svg', 'https://www.cnrs.fr/'), ('SequoIAQ - Modifié_0', 'SequoIAQ', 'png', 'https://github.com/timothee-chauvin/trackllm_website/blob/main/website/logos/SequoIAQ%20-%20Modifi%C3%A9_0.png')] %}
   <a href="{{ url }}" target="_blank" rel="noopener"><img src="logos/{{ slug }}.{{ ext }}" alt="{{ name }}"></a>
   {% endfor %}
 </div>

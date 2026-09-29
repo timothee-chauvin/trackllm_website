@@ -330,7 +330,7 @@ def test_render_emits_about_page_and_front_page_logos(tmp_path):
     assert 'href="about.html"' in index
     # nav and footer both point at the GitHub page
     assert index.count('href="github.html">GitHub</a>') == 2
-    for logo in ("inria", "irisa", "cnrs"):
+    for logo in ("inria", "irisa", "cnrs", "SequoIAQ - Modifié_0"):
         assert f'src="logos/{logo}.' in index
         assert f'src="logos/{logo}.' in page
 
