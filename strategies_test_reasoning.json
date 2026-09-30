@@ -382,6 +382,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash#baidu/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash#baseten/fast": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash#baseten/fp8": {
     "effort": "none"
   },
@@ -957,6 +960,9 @@
     "max_tokens": 1
   },
   "openrouter#minimax/minimax-m3#parasail/fp8": {
+    "effort": "none"
+  },
+  "openrouter#minimax/minimax-m3#sambanova": {
     "effort": "none"
   },
   "openrouter#minimax/minimax-m3#together": {
@@ -1984,6 +1990,9 @@
   "openrouter#xiaomi/mimo-v2.6-flash#relace/mxfp4": {
     "effort": "none"
   },
+  "openrouter#xiaomi/mimo-v2.6-flash#venice/fp8": {
+    "effort": "none"
+  },
   "openrouter#xiaomi/mimo-v2.6-flash#xiaomi/fp8": {
     "effort": "none"
   },
@@ -2159,6 +2168,9 @@
   "openrouter#z-ai/glm-5.2#parasail/fp4": null,
   "openrouter#z-ai/glm-5.2#phala": null,
   "openrouter#z-ai/glm-5.2#phala/fp8": {
+    "effort": "none"
+  },
+  "openrouter#z-ai/glm-5.2#reka": {
     "effort": "none"
   },
   "openrouter#z-ai/glm-5.2#reka/fp8": {

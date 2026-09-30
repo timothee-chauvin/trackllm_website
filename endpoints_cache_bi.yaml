@@ -429,6 +429,12 @@ too_expensive:
   - 2.52
 - api: openrouter
   model: moonshotai/kimi-k3
+  provider: akashml/fp4
+  cost:
+  - 3.0
+  - 15.0
+- api: openrouter
+  model: moonshotai/kimi-k3
   provider: chutes/mxfp4
   cost:
   - 3.0
@@ -541,6 +547,12 @@ too_expensive:
   cost:
   - 2.5
   - 10.95
+- api: openrouter
+  model: moonshotai/kimi-k3
+  provider: wafer/us
+  cost:
+  - 2.8
+  - 14.0
 - api: openrouter
   model: morph/morph-v3-fast
   provider: morph
@@ -2265,6 +2277,12 @@ bad_temperature:
   - 5.0
   - 25.0
 - api: openrouter
+  model: openai/gpt-6-astra
+  provider: openai/ultrafast
+  cost:
+  - 60.0
+  - 300.0
+- api: openrouter
   model: openai/gpt-6-astra-pro
   provider: azure
   cost:
@@ -2295,6 +2313,12 @@ bad_temperature:
   - 5.0
   - 25.0
 - api: openrouter
+  model: openai/gpt-6-astra-pro
+  provider: openai/ultrafast
+  cost:
+  - 60.0
+  - 300.0
+- api: openrouter
   model: openai/gpt-6-luna
   provider: amazon-bedrock/us-east-1
   cost:
@@ -2446,6 +2470,78 @@ bad_temperature:
   - 20.0
 - api: openrouter
   model: openai/gpt-6-sol-pro
+  provider: openai/flex
+  cost:
+  - 1.0
+  - 5.0
+- api: openrouter
+  model: openai/gpt-6.1-sol
+  provider: azure
+  cost:
+  - 2.0
+  - 10.0
+- api: openrouter
+  model: openai/gpt-6.1-sol
+  provider: azure/eu
+  cost:
+  - 2.2
+  - 11.0
+- api: openrouter
+  model: openai/gpt-6.1-sol
+  provider: azure/us
+  cost:
+  - 2.2
+  - 11.0
+- api: openrouter
+  model: openai/gpt-6.1-sol
+  provider: openai
+  cost:
+  - 2.0
+  - 10.0
+- api: openrouter
+  model: openai/gpt-6.1-sol
+  provider: openai/fast
+  cost:
+  - 4.0
+  - 20.0
+- api: openrouter
+  model: openai/gpt-6.1-sol
+  provider: openai/flex
+  cost:
+  - 1.0
+  - 5.0
+- api: openrouter
+  model: openai/gpt-6.1-sol-pro
+  provider: azure
+  cost:
+  - 2.0
+  - 10.0
+- api: openrouter
+  model: openai/gpt-6.1-sol-pro
+  provider: azure/eu
+  cost:
+  - 2.2
+  - 11.0
+- api: openrouter
+  model: openai/gpt-6.1-sol-pro
+  provider: azure/us
+  cost:
+  - 2.2
+  - 11.0
+- api: openrouter
+  model: openai/gpt-6.1-sol-pro
+  provider: openai
+  cost:
+  - 2.0
+  - 10.0
+- api: openrouter
+  model: openai/gpt-6.1-sol-pro
+  provider: openai/fast
+  cost:
+  - 4.0
+  - 20.0
+- api: openrouter
+  model: openai/gpt-6.1-sol-pro
   provider: openai/flex
   cost:
   - 1.0
@@ -3793,6 +3889,22 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
+  model: openai/gpt-6.1-sol-pro:batch
+  provider: openai
+  cost:
+  - 1.0
+  - 5.0
+  reason: batch
+  detail: null
+- api: openrouter
+  model: openai/gpt-6.1-sol:batch
+  provider: openai
+  cost:
+  - 1.0
+  - 5.0
+  reason: batch
+  detail: null
+- api: openrouter
   model: openai/gpt-audio
   provider: openai
   cost:
@@ -4070,9 +4182,6 @@ failure_streaks:
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"id\":
       \"p2G53oj-2kFHot-a3eef51a9d621268\",\n  \"error\": {\n    \"message\": \"Unable
       to access non-serverless model openai/gp...'
-  openrouter#xiaomi/mimo-v2.6-flash#venice/fp8:
-    count: 1
-    last_error: 'plain: 0 Timeout after 15.0s'
   openrouter#z-ai/glm-5.2#baseten/fp8:
     count: 1
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"max_tokens
