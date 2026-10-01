@@ -84,12 +84,6 @@ endpoints_lt:
   - 0.1
   - 0.1
 - api: openrouter
-  model: rekaai/reka-edge
-  provider: reka/bf16
-  cost:
-  - 0.1
-  - 0.1
-- api: openrouter
   model: mistralai/mistral-nemo
   provider: novita/fp8
   cost:
@@ -162,12 +156,6 @@ endpoints_lt:
   - 0.1
   - 0.2
 - api: openrouter
-  model: rekaai/reka-flash-3
-  provider: reka/fp8
-  cost:
-  - 0.1
-  - 0.2
-- api: openrouter
   model: nex-agi/nex-n2.5-pro
   provider: nex-agi/fp8
   cost:
@@ -235,16 +223,16 @@ endpoints_lt:
   - 0.32
 - api: openrouter
   model: deepseek/deepseek-v4-flash-0731
-  provider: wafer/fast
-  cost:
-  - 0.07
-  - 0.35
-- api: openrouter
-  model: deepseek/deepseek-v4-flash-0731
   provider: cohere
   cost:
   - 0.14
   - 0.28
+- api: openrouter
+  model: google/gemma-4-31b-it
+  provider: dekallm
+  cost:
+  - 0.1
+  - 0.33
 - api: openrouter
   model: qwen/qwen3-235b-a22b-2507
   provider: gmicloud/fp8
@@ -275,12 +263,6 @@ endpoints_lt:
   cost:
   - 0.08
   - 0.4
-- api: openrouter
-  model: deepseek/deepseek-v4.1-flash
-  provider: wafer
-  cost:
-  - 0.0449
-  - 0.44
 - api: openrouter
   model: deepseek/deepseek-v4.1-flash
   provider: dekallm
@@ -318,12 +300,6 @@ endpoints_lt:
   - 0.135
   - 0.4
 - api: openrouter
-  model: deepseek/deepseek-v4.1-flash
-  provider: io-net/fp8
-  cost:
-  - 0.13
-  - 0.41
-- api: openrouter
   model: google/gemma-4-31b-it
   provider: novita/bf16
   cost:
@@ -349,10 +325,10 @@ endpoints_lt:
   - 0.5
 - api: openrouter
   model: deepseek/deepseek-v4-flash-0731
-  provider: reka/fp4
+  provider: wafer/fast
   cost:
-  - 0.088
-  - 0.528
+  - 0.12
+  - 0.5
 - api: openrouter
   model: qwen/qwen3.8-flash
   provider: alibaba
@@ -366,6 +342,12 @@ endpoints_lt:
   - 0.15
   - 0.47
 - api: openrouter
+  model: deepseek/deepseek-v4.1-flash
+  provider: wafer
+  cost:
+  - 0.05
+  - 0.6
+- api: openrouter
   model: google/gemma-4-26b-a4b-it
   provider: io-net/bf16
   cost:
@@ -378,11 +360,23 @@ endpoints_lt:
   - 0.13
   - 0.52
 - api: openrouter
+  model: deepseek/deepseek-v4.1-flash
+  provider: io-net/fp8
+  cost:
+  - 0.16
+  - 0.51
+- api: openrouter
   model: deepseek/deepseek-v4-flash
   provider: mancer/fp8
   cost:
   - 0.19
   - 0.5
+- api: openrouter
+  model: deepseek/deepseek-v4.1-flash
+  provider: streamlake/fp8
+  cost:
+  - 0.141
+  - 0.564
 - api: openrouter
   model: meta-llama/llama-3.3-70b-instruct
   provider: akashml/fp8
@@ -395,12 +389,6 @@ endpoints_lt:
   cost:
   - 0.22
   - 0.5
-- api: openrouter
-  model: deepseek/deepseek-v4.1-flash
-  provider: streamlake/fp8
-  cost:
-  - 0.147
-  - 0.588
 - api: openrouter
   model: qwen/qwen3-235b-a22b-2507
   provider: alibaba
@@ -456,6 +444,12 @@ endpoints_lt:
   - 0.165
   - 0.66
 - api: openrouter
+  model: deepseek/deepseek-v4.1-flash
+  provider: ionstream
+  cost:
+  - 0.079
+  - 0.75
+- api: openrouter
   model: qwen/qwen3.5-35b-a3b
   provider: darkbloom/fp4
   cost:
@@ -497,6 +491,12 @@ endpoints_lt:
   cost:
   - 0.22
   - 0.66
+- api: openrouter
+  model: deepseek/deepseek-v4.1-flash
+  provider: digitalocean
+  cost:
+  - 0.18
+  - 0.72
 - api: openrouter
   model: deepseek/deepseek-v4.1-flash
   provider: gmicloud/fp8
@@ -630,12 +630,6 @@ endpoints_lt:
   - 0.3
   - 0.96
 - api: openrouter
-  model: deepseek/deepseek-v4.1-flash
-  provider: ionstream
-  cost:
-  - 0.14
-  - 1.15
-- api: openrouter
   model: qwen/qwen3-next-80b-a3b-instruct
   provider: google-vertex/global
   cost:
@@ -677,12 +671,6 @@ endpoints_lt:
   cost:
   - 0.29
   - 1.14
-- api: openrouter
-  model: deepseek/deepseek-v4.1-flash
-  provider: digitalocean
-  cost:
-  - 0.3
-  - 1.2
 - api: openrouter
   model: deepseek/deepseek-v4.1-flash
   provider: makora
@@ -762,11 +750,23 @@ endpoints_lt:
   - 0.22
   - 1.8
 - api: openrouter
+  model: z-ai/glm-5.2
+  provider: reka
+  cost:
+  - 0.7
+  - 1.4
+- api: openrouter
   model: qwen/qwen3-vl-235b-a22b-instruct
   provider: parasail/fp8
   cost:
   - 0.21
   - 1.9
+- api: openrouter
+  model: deepseek/deepseek-v4-pro-0813
+  provider: ionstream
+  cost:
+  - 0.36224
+  - 1.79648
 - api: openrouter
   model: deepseek/deepseek-chat-v3.1
   provider: coreweave/fp8
@@ -804,29 +804,17 @@ endpoints_lt:
   - 0.24
   - 2.2
 - api: openrouter
-  model: deepseek/deepseek-v4-pro-0813
-  provider: ionstream
+  model: qwen/qwen3.8-27b
+  provider: ionstream/fp8
   cost:
-  - 0.63616
-  - 1.85024
-- api: openrouter
-  model: z-ai/glm-5.2
-  provider: reka
-  cost:
-  - 0.6
-  - 2.0
+  - 0.089
+  - 2.55
 - api: openrouter
   model: deepseek/deepseek-v4-pro-0813
   provider: streamlake
   cost:
   - 0.66
   - 1.98
-- api: openrouter
-  model: qwen/qwen3.8-27b
-  provider: ionstream/fp8
-  cost:
-  - 0.145
-  - 2.55
 - api: openrouter
   model: qwen/qwen3.8-27b
   provider: mancer/fp8
@@ -871,12 +859,6 @@ endpoints_lt:
   - 3.2
 - api: openrouter
   model: deepseek/deepseek-v4-pro-0813
-  provider: wafer
-  cost:
-  - 0.2449
-  - 3.49
-- api: openrouter
-  model: deepseek/deepseek-v4-pro-0813
   provider: io-net/fp8
   cost:
   - 0.63
@@ -888,28 +870,28 @@ endpoints_lt:
   - 0.65
   - 3.25
 - api: openrouter
+  model: deepseek/deepseek-v4-pro
+  provider: reka
+  cost:
+  - 1.3
+  - 2.6
+- api: openrouter
   model: deepseek/deepseek-v4-pro-0813
   provider: gmicloud/fp8
   cost:
   - 1.056
   - 3.168
 - api: openrouter
-  model: z-ai/glm-5.2
-  provider: wafer
-  cost:
-  - 0.3
-  - 3.99
-- api: openrouter
   model: qwen/qwen3.8-27b
   provider: reka
   cost:
-  - 0.0249
+  - 0.0248
   - 4.35
 - api: openrouter
   model: qwen/qwen3.8-27b
   provider: wafer
   cost:
-  - 0.0249
+  - 0.0248
   - 4.35
 - api: openrouter
   model: moonshotai/kimi-k2.6
@@ -918,11 +900,17 @@ endpoints_lt:
   - 0.855
   - 3.6
 - api: openrouter
-  model: qwen/qwen3.8-27b
-  provider: reka/fp8
+  model: deepseek/deepseek-v4-pro-0813
+  provider: reka
   cost:
-  - 0.098
-  - 4.4
+  - 1.122
+  - 3.366
+- api: openrouter
+  model: deepseek/deepseek-v4-pro-0813
+  provider: wafer
+  cost:
+  - 0.48
+  - 4.2
 - api: openrouter
   model: qwen/qwen3-max
   provider: alibaba
@@ -954,6 +942,12 @@ endpoints_lt:
   - 0.95
   - 4.0
 - api: openrouter
+  model: z-ai/glm-5.2
+  provider: morph/fp8
+  cost:
+  - 1.392
+  - 3.74
+- api: openrouter
   model: deepseek/deepseek-v4-pro-0813
   provider: digitalocean
   cost:
@@ -980,6 +974,12 @@ endpoints_lt:
 - api: openrouter
   model: z-ai/glm-5.2
   provider: mistral/zdr
+  cost:
+  - 1.4
+  - 4.4
+- api: openrouter
+  model: z-ai/glm-5.2
+  provider: wafer
   cost:
   - 1.4
   - 4.4
@@ -1038,6 +1038,12 @@ endpoints_lt:
   - 2.1
   - 6.6
 - api: openrouter
+  model: moonshotai/kimi-k3
+  provider: morph/fp8
+  cost:
+  - 2.35
+  - 6.951
+- api: openrouter
   model: z-ai/glm-5.2
   provider: alibaba/fast
   cost:
@@ -1049,12 +1055,6 @@ endpoints_lt:
   cost:
   - 2.25
   - 8.0
-- api: openrouter
-  model: moonshotai/kimi-k3
-  provider: sail-research/fp4
-  cost:
-  - 0.4202
-  - 10.504
 - api: openrouter
   model: openai/gpt-4o
   provider: azure
@@ -1087,10 +1087,10 @@ endpoints_lt:
   - 10.0
 - api: openrouter
   model: moonshotai/kimi-k3
-  provider: morph/fp8
+  provider: sail-research/fp4
   cost:
-  - 2.42625
-  - 10.878
+  - 2.8
+  - 14.0
 - api: openrouter
   model: openai/gpt-4o-2024-05-13
   provider: azure

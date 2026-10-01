@@ -334,6 +334,7 @@
   "openrouter#deepseek/deepseek-v4-pro#nextbit/fp8": null,
   "openrouter#deepseek/deepseek-v4-pro#novita/fp8": null,
   "openrouter#deepseek/deepseek-v4-pro#parasail/fp8": null,
+  "openrouter#deepseek/deepseek-v4-pro#reka": null,
   "openrouter#deepseek/deepseek-v4-pro#relace/fp4": {
     "effort": "none"
   },
@@ -361,6 +362,7 @@
   "openrouter#deepseek/deepseek-v4-pro-0813#parasail/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4-pro-0813#reka": null,
   "openrouter#deepseek/deepseek-v4-pro-0813#relace/fp4": {
     "effort": "none"
   },
@@ -751,6 +753,7 @@
   "openrouter#google/gemma-4-31b-it#deepinfra/fp8": null,
   "openrouter#google/gemma-4-31b-it#deepinfra/turbo": null,
   "openrouter#google/gemma-4-31b-it#deepinfra/ultra": null,
+  "openrouter#google/gemma-4-31b-it#dekallm": null,
   "openrouter#google/gemma-4-31b-it#friendli": null,
   "openrouter#google/gemma-4-31b-it#io-net": null,
   "openrouter#google/gemma-4-31b-it#modelrun/fp4": null,
@@ -1981,7 +1984,13 @@
   "openrouter#xiaomi/mimo-v2.5-pro#xiaomi/fp8": {
     "effort": "none"
   },
+  "openrouter#xiaomi/mimo-v2.6-flash#darkbloom/fp4": {
+    "effort": "none"
+  },
   "openrouter#xiaomi/mimo-v2.6-flash#deepinfra/fp8": {
+    "effort": "none"
+  },
+  "openrouter#xiaomi/mimo-v2.6-flash#gmicloud/bf16": {
     "effort": "none"
   },
   "openrouter#xiaomi/mimo-v2.6-flash#novita/fp8": {
@@ -2162,6 +2171,9 @@
   },
   "openrouter#z-ai/glm-5.2#morph": null,
   "openrouter#z-ai/glm-5.2#morph/fp4": {
+    "effort": "none"
+  },
+  "openrouter#z-ai/glm-5.2#morph/fp8": {
     "effort": "none"
   },
   "openrouter#z-ai/glm-5.2#novita/fp8": null,
