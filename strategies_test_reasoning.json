@@ -344,6 +344,9 @@
   "openrouter#deepseek/deepseek-v4-pro#together": null,
   "openrouter#deepseek/deepseek-v4-pro#venice": null,
   "openrouter#deepseek/deepseek-v4-pro#wandb/fp8": null,
+  "openrouter#deepseek/deepseek-v4-pro-0813#baidu/fp8": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-pro-0813#baseten/fp4": {
     "effort": "none"
   },
@@ -449,6 +452,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#phala": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash#reka": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#reka/fp4": {
@@ -1531,6 +1537,7 @@
     "effort": "none"
   },
   "openrouter#qwen/qwen-2.5-72b-instruct#deepinfra/fp8": null,
+  "openrouter#qwen/qwen-2.5-72b-instruct#novita/bf16": null,
   "openrouter#qwen/qwen-2.5-7b-instruct#phala": null,
   "openrouter#qwen/qwen-2.5-7b-instruct#together": null,
   "openrouter#qwen/qwen-2.5-7b-instruct#together/fp8": null,
@@ -1788,6 +1795,9 @@
   "openrouter#qwen/qwen3.8-27b#alibaba": {
     "effort": "none"
   },
+  "openrouter#qwen/qwen3.8-27b#cerebras/fp16": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.8-27b#chutes/fp8": {
     "effort": "none"
   },
@@ -1893,6 +1903,9 @@
   "openrouter#tencent/hy4-preview#deepinfra/fp8": {
     "effort": "none"
   },
+  "openrouter#tencent/hy4-preview#inference-net/fp8": {
+    "effort": "none"
+  },
   "openrouter#tencent/hy4-preview#novita/fp8": {
     "effort": "none"
   },
@@ -1963,7 +1976,13 @@
   "openrouter#xiaomi/mimo-v2.5#io-net/fp8": {
     "effort": "none"
   },
+  "openrouter#xiaomi/mimo-v2.5#novita/fp8": {
+    "max_tokens": 1
+  },
   "openrouter#xiaomi/mimo-v2.5#parasail/fp8": {
+    "effort": "none"
+  },
+  "openrouter#xiaomi/mimo-v2.5#streamlake": {
     "effort": "none"
   },
   "openrouter#xiaomi/mimo-v2.5#venice/fp8": {
@@ -2267,6 +2286,7 @@
   "openrouter#z-ai/glm-5.3-flash#decart/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#deepinfra/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#deepinfra/fp8": null,
+  "openrouter#z-ai/glm-5.3-flash#dekallm": null,
   "openrouter#z-ai/glm-5.3-flash#digitalocean": null,
   "openrouter#z-ai/glm-5.3-flash#fireworks": null,
   "openrouter#z-ai/glm-5.3-flash#fireworks/us": null,
@@ -2284,6 +2304,7 @@
   "openrouter#z-ai/glm-5.3-flash#nextbit/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#novita/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#open-inference/fp4": null,
+  "openrouter#z-ai/glm-5.3-flash#parasail/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#parasail/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#phala/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#reka": null,
