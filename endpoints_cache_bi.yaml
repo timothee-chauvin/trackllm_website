@@ -7,6 +7,12 @@ liars:
   - 0.2002
   - 0.8001
 - api: openrouter
+  model: deepseek/deepseek-v4-flash-0731
+  provider: relace/fp4
+  cost:
+  - 0.0125
+  - 1.28
+- api: openrouter
   model: deepseek/deepseek-v4-pro
   provider: baidu/fp8
   cost:
@@ -332,6 +338,12 @@ too_expensive:
   - 2.2
   - 6.6
 - api: openrouter
+  model: moonshotai/kimi-k2-thinking
+  provider: novita/bf16
+  cost:
+  - 0.6
+  - 2.5
+- api: openrouter
   model: moonshotai/kimi-k2.5
   provider: novita
   cost:
@@ -415,6 +427,12 @@ too_expensive:
   cost:
   - 4.5
   - 22.5
+- api: openrouter
+  model: moonshotai/kimi-k3
+  provider: inference-net/fast
+  cost:
+  - 3.5
+  - 17.5
 - api: openrouter
   model: moonshotai/kimi-k3
   provider: inference-net/fp4
@@ -505,6 +523,18 @@ too_expensive:
   cost:
   - 10.0
   - 30.0
+- api: openrouter
+  model: openai/gpt-oss-20b
+  provider: siliconflow/fp8
+  cost:
+  - 0.04
+  - 0.18
+- api: openrouter
+  model: qwen/qwen3-14b
+  provider: alibaba
+  cost:
+  - 0.2275
+  - 0.91
 - api: openrouter
   model: qwen/qwen3-235b-a22b
   provider: alibaba
@@ -685,6 +715,12 @@ too_expensive:
   cost:
   - 0.186
   - 1.11375
+- api: openrouter
+  model: qwen/qwen3.6-35b-a3b
+  provider: siliconflow/fp8
+  cost:
+  - 0.24
+  - 1.8
 - api: openrouter
   model: qwen/qwen3.8-2.4t-a95b
   provider: alibaba
@@ -2290,6 +2326,12 @@ bad_temperature:
   - 5.0
 - api: openrouter
   model: openai/gpt-6.1-sol
+  provider: amazon-bedrock/us-east-1
+  cost:
+  - 2.2
+  - 11.0
+- api: openrouter
+  model: openai/gpt-6.1-sol
   provider: azure
   cost:
   - 2.0
@@ -3022,6 +3064,25 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
+  model: z-ai/glm-5.2
+  provider: baseten/fp8
+  cost:
+  - 1.4
+  - 4.4
+  reason: flaky
+  detail: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"max_tokens
+    must be at least 2 for this deployment.\",\"type\":\"Bad Request\",\"code\":\"400\"}","provider_name":"Base...'
+- api: openrouter
+  model: z-ai/glm-5.3
+  provider: baseten/fp4
+  cost:
+  - 1.4
+  - 4.4
+  reason: flaky
+  detail: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n\t\"error\":
+    {\n\t\t\"code\": \"400\",\n\t\t\"message\": \"max_tokens must be at least 2 for
+    this deployment.\",\n\t\t\"type\": \"...'
+- api: openrouter
   model: z-ai/glm-5.3-flash:batch
   provider: deepinfra/fp4
   cost:
@@ -3039,324 +3100,314 @@ unprobeable:
   detail: null
 failure_streaks:
   openrouter#amazon/nova-premier-v1#amazon-bedrock:
-    count: 1
+    count: 2
     last_error: '{"message":"Provider returned error","code":404,"metadata":{"raw":"{\"message\":\"This
       model version has reached the end of its life. Please refer to the AWS documentation
       for more details.\"}","provi...'
   openrouter#cohere/command-a#cohere:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#cohere/command-r7b-12-2024#cohere:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#deepseek/deepseek-chat-v3.1#google-vertex/us-west2:
-    count: 1
+    count: 2
     last_error: '{"message":"Provider returned error","code":502,"metadata":{"raw":"[{\n  \"error\":
       {\n    \"code\": 500,\n    \"message\": \"Internal error encountered.\",\n    \"status\":
       \"INTERNAL\"\n  }\n}\n]","...'
   openrouter#deepseek/deepseek-v4-pro-0813#deepseek:
-    count: 1
+    count: 2
     last_error: '{"message":"0 endpoints out of 1 requested are available matching
       your guardrail restrictions and data policy. We removed them for the following
       reasons (an endpoint may have matched multiple reasons)...'
   openrouter#deepseek/deepseek-v4.1-flash#deepseek:
-    count: 1
+    count: 2
     last_error: 'plain: 404 {"message":"0 endpoints out of 1 requested are available
       matching your guardrail restrictions and data policy. We removed them for the
       following reasons (an endpoint may have matched multip...'
   openrouter#google/gemini-2.5-pro#google-vertex/eu:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-2.5-pro#google-vertex/global:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-2.5-pro#google-vertex/us:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-2.5-pro-preview#google-vertex/eu:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-2.5-pro-preview#google-vertex/global:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-2.5-pro-preview#google-vertex/global/priority:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-2.5-pro-preview#google-vertex/us:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3-flash-preview#google-ai-studio:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3-flash-preview#google-ai-studio/flex:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3-flash-preview#google-ai-studio/priority:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3-flash-preview#google-vertex/global:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3-flash-preview#google-vertex/global/flex:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3-flash-preview#google-vertex/global/priority:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3.1-flash-image#google-ai-studio:
-    count: 1
-    last_error: 'No usage in response; body: {"id":"gen-1790922602-xFtodLzKR3R9WO4qEaio","object":"chat.completion","created":1790922602,"model":"google/gemini-3.1-flash-image","provider":"Google
+    count: 2
+    last_error: 'No usage in response; body: {"id":"gen-1791007243-gYaPGeC0KOFOdGm5hnqF","object":"chat.completion","created":1791007243,"model":"google/gemini-3.1-flash-image","provider":"Google
       AI Studio","system_fi...'
   openrouter#google/gemini-3.1-flash-image-preview#google-ai-studio:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3.1-flash-lite-image#google-vertex/global:
-    count: 1
+    count: 2
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
       {\n    \"code\": 400,\n    \"message\": \"Thinking level LOW is not supported
       for this model. Please retry with other...'
   openrouter#google/gemini-3.1-flash-lite-preview#google-ai-studio/flex:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3.1-pro-preview#google-vertex/global/flex:
-    count: 1
+    count: 2
     last_error: 'plain: 0 Timeout after 15.0s'
   openrouter#google/gemini-3.5-flash#google-ai-studio:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3.5-flash#google-ai-studio/flex:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3.5-flash#google-ai-studio/priority:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3.5-flash#google-vertex/global:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3.5-flash#google-vertex/global/flex:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3.5-flash#google-vertex/global/priority:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3.5-flash#google-vertex/us:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3.5-flash-lite#google-ai-studio:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3.5-flash-lite#google-ai-studio/flex:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3.5-flash-lite#google-ai-studio/priority:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3.6-flash#google-ai-studio:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3.6-flash#google-ai-studio/flex:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3.6-flash#google-ai-studio/priority:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3.7-flash#google-ai-studio:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3.7-flash#google-ai-studio/flex:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3.7-flash#google-ai-studio/priority:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3.8-flash#google-ai-studio:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3.8-flash#google-ai-studio/flex:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemini-3.8-flash#google-ai-studio/priority:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#google/gemma-2-27b-it#nextbit/int4:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#inception/mercury-2#inception:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#kwaipilot/kat-coder-pro-v2.5#atlas-cloud/fp8:
-    count: 1
+    count: 2
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"code\":400,\"msg\":\"bad
-      request\",\"request_id\":\"b1394211-f03d-48ed-b9d1-cd8fbd063e4b\"}","provider_name":"AtlasCloud","is_byok...'
+      request\",\"request_id\":\"56b534a6-0e6a-4f8f-b9d1-dda70b0586f5\"}","provider_name":"AtlasCloud","is_byok...'
   openrouter#mancer/weaver#mancer/fp8:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#meta-llama/llama-3.1-70b-instruct#amazon-bedrock:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#meta-llama/llama-3.3-70b-instruct#google-vertex:
-    count: 1
+    count: 2
     last_error: '{"message":"No endpoints found for meta-llama/llama-3.3-70b-instruct.
       Every candidate endpoint was removed during routing: Filter by Allowed Providers
       removed deepinfra/turbo, novita/bf16, akashml/fp8...'
   openrouter#meta-llama/llama-3.3-70b-instruct#google-vertex/us-central1:
-    count: 1
+    count: 2
     last_error: '{"message":"No endpoints found for meta-llama/llama-3.3-70b-instruct.
       Every candidate endpoint was removed during routing: Filter by Allowed Providers
       removed deepinfra/turbo, novita/bf16, akashml/fp8...'
   openrouter#meta-llama/llama-4-maverick#google-vertex/us-east5:
-    count: 1
+    count: 2
     last_error: '{"message":"No endpoints found for meta-llama/llama-4-maverick. Every
       candidate endpoint was removed during routing: Filter by Allowed Providers removed
       digitalocean, novita/fp8, parasail/fp8 (not in ...'
   openrouter#meta-llama/llama-4-scout#google-vertex/us-east5:
-    count: 1
+    count: 2
     last_error: '{"message":"No endpoints found for meta-llama/llama-4-scout. Every
       candidate endpoint was removed during routing: Filter by Allowed Providers removed
       deepinfra/fp8, novita/bf16 (not in your request''s ...'
   openrouter#meta-llama/llama-guard-4-12b#deepinfra/bf16:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#meta/muse-spark-1.1#meta:
-    count: 1
+    count: 2
     last_error: 'plain: 403 {"message":"This model requires you to complete the following
       before use: 18+ age confirmation. Confirm at https://openrouter.ai/settings/preferences.","code":403,"metadata":{"missing_attes...'
   openrouter#meta/muse-spark-1.2#meta:
-    count: 1
+    count: 2
     last_error: 'plain: 403 {"message":"This model requires you to complete the following
       before use: 18+ age confirmation. Confirm at https://openrouter.ai/settings/preferences.","code":403,"metadata":{"missing_attes...'
   openrouter#meta/muse-spark-1.2-contributor#meta:
-    count: 1
+    count: 2
     last_error: 'plain: 403 {"message":"This model requires you to complete the following
       before use: 18+ age confirmation. Confirm at https://openrouter.ai/settings/preferences.","code":403,"metadata":{"missing_attes...'
   openrouter#meta/muse-spark-1.3#meta:
-    count: 1
+    count: 2
     last_error: 'plain: 403 {"message":"This model requires you to complete the following
       before use: 18+ age confirmation. Confirm at https://openrouter.ai/settings/preferences.","code":403,"metadata":{"missing_attes...'
   openrouter#meta/muse-spark-1.3-contributor#meta:
-    count: 1
+    count: 2
     last_error: 'plain: 403 {"message":"This model requires you to complete the following
       before use: 18+ age confirmation. Confirm at https://openrouter.ai/settings/preferences.","code":403,"metadata":{"missing_attes...'
   openrouter#minimax/minimax-m3#atlas-cloud/fp8:
-    count: 1
+    count: 2
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"code\":400,\"msg\":\"invalid
       request params\"}","provider_name":"AtlasCloud","is_byok":false}}'
   openrouter#mistralai/mistral-nemo#parasail/fp8:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#moonshotai/kimi-k2.7-code#siliconflow/fp8:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#moonshotai/kimi-k3#baseten/fp8:
-    count: 1
-    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"Cannot
-      override enforced sampling params: {''top_p'': 1.0}. Required values: {''top_p'':
-      0.95}\",\"type\":\"Bad...'
-  openrouter#moonshotai/kimi-k3#morph/fp8:
-    count: 1
-    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"moonshotai/kimi-k3
-      is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulate your rate limits: ht...'
+    count: 2
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n\t\"error\":
+      {\n\t\t\"code\": \"400\",\n\t\t\"message\": \"Cannot override enforced sampling
+      params: {''top_p'': 1.0}. Re...'
   openrouter#moonshotai/kimi-k3#sail-research/fp4:
-    count: 1
+    count: 2
     last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"moonshotai/kimi-k3
       is temporarily rate-limited upstream. Please retry shortly, or add your own
       key to accumulate your rate limits: ht...'
   openrouter#openai/gpt-4.1#azure:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#openai/gpt-4.1#azure/swedencentral:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#openai/gpt-4.1#openai:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#openai/gpt-4.1-mini#azure:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#openai/gpt-4.1-mini#azure/swedencentral:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#openai/gpt-4.1-mini#openai:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#openai/gpt-4.1-nano#azure:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#openai/gpt-4.1-nano#azure/swedencentral:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#openai/gpt-4.1-nano#openai:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#openai/gpt-5-image#openai:
-    count: 1
+    count: 2
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
       {\n    \"message\": \"Unsupported parameter: ''temperature'' is not supported
       with this model.\",\n    \"type\": \"inva...'
   openrouter#openai/gpt-5-image-mini#openai:
-    count: 1
+    count: 2
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
       {\n    \"message\": \"Unsupported parameter: ''temperature'' is not supported
       with this model.\",\n    \"type\": \"inva...'
   openrouter#openai/gpt-audio#openai:
-    count: 1
+    count: 2
     last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
       {\n    \"message\": \"This model requires that either input content or output
       modality contain audio.\",\n...'
   openrouter#openai/gpt-audio-mini#openai:
-    count: 1
+    count: 2
     last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
       {\n    \"message\": \"This model requires that either input content or output
       modality contain audio.\",\n...'
   openrouter#openai/gpt-oss-120b#amazon-bedrock:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#openai/gpt-oss-120b#amazon-bedrock/eu-west-1:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#openai/gpt-oss-20b#amazon-bedrock:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#openai/gpt-oss-20b#amazon-bedrock/eu-west-1:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#perplexity/sonar#perplexity:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#perplexity/sonar-deep-research#perplexity:
-    count: 1
-    last_error: 'No usage in response; body: {"id":"gen-1790922748-KVqZAKUf2UKwA3xQ9drm","error":{"message":"Upstream
+    count: 2
+    last_error: 'No usage in response; body: {"id":"gen-1791007569-as1IB6OTFW0Zi4XrMBrV","error":{"message":"Upstream
       error from Perplexity: The inference server returned an error or timed out.","code":502,"metadata":...'
   openrouter#perplexity/sonar-pro#perplexity:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#perplexity/sonar-pro-search#perplexity:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#perplexity/sonar-reasoning-pro#perplexity:
-    count: 1
-    last_error: 'No usage in response; body: {"id":"gen-1790922714-CnQ3jhVlWyXt2H6eifla","object":"chat.completion","created":1790922714,"model":"perplexity/sonar-reasoning-pro","provider":"Perplexity","system_fingerp...'
+    count: 2
+    last_error: 'No usage in response; body: {"id":"gen-1791007342-beQSLRx4uEpQq5ZAQWFc","object":"chat.completion","created":1791007342,"model":"perplexity/sonar-reasoning-pro","provider":"Perplexity","system_fingerp...'
   openrouter#qwen/qwen3-coder-30b-a3b-instruct#amazon-bedrock:
-    count: 1
+    count: 2
     last_error: 'plain: 500 {"message":"Internal Server Error","code":500}'
   openrouter#tencent/hy-mt2-30b-a3b#tencent/fp8:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#upstage/solar-pro-3#upstage:
-    count: 1
+    count: 2
     last_error: 'cached: hidden reasoning'
   openrouter#z-ai/glm-5.2#baseten/fp8:
-    count: 2
+    count: 1
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"max_tokens
       must be at least 2 for this deployment.\",\"type\":\"Bad Request\",\"code\":\"400\"}","provider_name":"Base...'
   openrouter#z-ai/glm-5.3#baseten/fp4:
-    count: 2
+    count: 1
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n\t\"error\":
       {\n\t\t\"code\": \"400\",\n\t\t\"message\": \"max_tokens must be at least 2
       for this deployment.\",\n\t\t\"type\": \"...'
-  openrouter#z-ai/glm-5.3-flash#dekallm:
-    count: 1
-    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"z-ai/glm-5.3-flash
-      is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulate your rate limits: ht...'

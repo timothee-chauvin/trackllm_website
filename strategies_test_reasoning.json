@@ -208,6 +208,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4-flash#novita/fp8": null,
+  "openrouter#deepseek/deepseek-v4-flash#open-inference/fp4": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-flash#open-inference/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash#parasail/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash#phala": null,
@@ -394,6 +397,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#coreweave/fp8": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash#decart/fp4": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#deepinfra/fp8": {
@@ -1616,6 +1622,9 @@
     "max_tokens": 1
   },
   "openrouter#qwen/qwen3-32b#siliconflow/fp8": null,
+  "openrouter#qwen/qwen3-32b#tenstorrent/fp8": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3-8b#alibaba": null,
   "openrouter#qwen/qwen3-8b#atlas-cloud/fp8": null,
   "openrouter#qwen/qwen3-coder#alibaba/opensource": null,
@@ -2012,6 +2021,12 @@
   "openrouter#xiaomi/mimo-v2.6-flash#gmicloud/bf16": {
     "effort": "none"
   },
+  "openrouter#xiaomi/mimo-v2.6-flash#inference-net/fp8": {
+    "effort": "none"
+  },
+  "openrouter#xiaomi/mimo-v2.6-flash#io-net/fp8": {
+    "effort": "none"
+  },
   "openrouter#xiaomi/mimo-v2.6-flash#novita/fp8": {
     "effort": "none"
   },
@@ -2028,6 +2043,9 @@
     "effort": "none"
   },
   "openrouter#xiaomi/mimo-v2.6-pro#gmicloud/bf16": {
+    "effort": "none"
+  },
+  "openrouter#xiaomi/mimo-v2.6-pro#novita/fp8": {
     "effort": "none"
   },
   "openrouter#xiaomi/mimo-v2.6-pro#xiaomi/fp8": {
@@ -2165,6 +2183,9 @@
   "openrouter#z-ai/glm-5.2#friendli": null,
   "openrouter#z-ai/glm-5.2#gmicloud/fp8": null,
   "openrouter#z-ai/glm-5.2#inceptron/fp4": null,
+  "openrouter#z-ai/glm-5.2#inference-net": {
+    "effort": "none"
+  },
   "openrouter#z-ai/glm-5.2#io-net/fp4": {
     "effort": "none"
   },
@@ -2254,6 +2275,7 @@
   "openrouter#z-ai/glm-5.3#morph": null,
   "openrouter#z-ai/glm-5.3#morph/fp4": null,
   "openrouter#z-ai/glm-5.3#morph/fp8": null,
+  "openrouter#z-ai/glm-5.3#nebius/fp4": null,
   "openrouter#z-ai/glm-5.3#novita/fp8": null,
   "openrouter#z-ai/glm-5.3#parasail/fp8": {
     "max_tokens": 1
