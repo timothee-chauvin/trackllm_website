@@ -1728,6 +1728,15 @@ endpoints_catalog:
   supports_logprobs: false
   free: false
 - model: deepseek/deepseek-v4-flash
+  provider: cloudflare
+  cost:
+  - 0.44
+  - 1.32
+  created: '2026-04-24T03:17:46+00:00'
+  supports_temperature: true
+  supports_logprobs: true
+  free: false
+- model: deepseek/deepseek-v4-flash
   provider: deepinfra/fp8
   cost:
   - 0.09
@@ -1775,7 +1784,7 @@ endpoints_catalog:
 - model: deepseek/deepseek-v4-flash
   provider: open-inference/fp4
   cost:
-  - 0.00949
+  - 0.02912
   - 1.664
   created: '2026-04-24T03:17:46+00:00'
   supports_temperature: true
@@ -1793,7 +1802,7 @@ endpoints_catalog:
 - model: deepseek/deepseek-v4-flash
   provider: relace/fp4
   cost:
-  - 0.0066
+  - 0.0224
   - 1.28
   created: '2026-04-24T03:17:46+00:00'
   supports_temperature: true
@@ -1973,7 +1982,7 @@ endpoints_catalog:
 - model: deepseek/deepseek-v4-flash-0731
   provider: open-inference/fp4
   cost:
-  - 0.01625
+  - 0.01976
   - 1.664
   created: '2026-07-31T06:21:48+00:00'
   supports_temperature: true
@@ -2009,7 +2018,7 @@ endpoints_catalog:
 - model: deepseek/deepseek-v4-flash-0731
   provider: relace/fp4
   cost:
-  - 0.0125
+  - 0.0152
   - 1.28
   created: '2026-07-31T06:21:48+00:00'
   supports_temperature: true
@@ -2073,7 +2082,7 @@ endpoints_catalog:
   provider: wafer/fast
   cost:
   - 0.12
-  - 1.0
+  - 0.84
   created: '2026-07-31T06:21:48+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -2207,8 +2216,17 @@ endpoints_catalog:
 - model: deepseek/deepseek-v4-pro
   provider: parasail/fp8
   cost:
-  - 1.74
+  - 0.45
   - 3.48
+  created: '2026-04-24T03:17:59+00:00'
+  supports_temperature: true
+  supports_logprobs: true
+  free: false
+- model: deepseek/deepseek-v4-pro
+  provider: reka
+  cost:
+  - 1.25
+  - 2.5
   created: '2026-04-24T03:17:59+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -2216,8 +2234,8 @@ endpoints_catalog:
 - model: deepseek/deepseek-v4-pro
   provider: relace/fp4
   cost:
-  - 0.1988
-  - 2.7
+  - 0.2067
+  - 4.2
   created: '2026-04-24T03:17:59+00:00'
   supports_temperature: true
   supports_logprobs: false
@@ -2333,8 +2351,8 @@ endpoints_catalog:
 - model: deepseek/deepseek-v4-pro-0813
   provider: ionstream
   cost:
-  - 0.148544
-  - 1.481024
+  - 0.237696
+  - 1.958656
   created: '2026-08-12T15:42:44+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -2378,8 +2396,8 @@ endpoints_catalog:
 - model: deepseek/deepseek-v4-pro-0813
   provider: relace/fp4
   cost:
-  - 0.11
-  - 2.7
+  - 0.1901
+  - 4.2
   created: '2026-08-12T15:42:44+00:00'
   supports_temperature: true
   supports_logprobs: false
@@ -2423,7 +2441,7 @@ endpoints_catalog:
 - model: deepseek/deepseek-v4-pro-0813
   provider: wafer
   cost:
-  - 0.12
+  - 0.33
   - 4.2
   created: '2026-08-12T15:42:44+00:00'
   supports_temperature: true
@@ -2558,8 +2576,8 @@ endpoints_catalog:
 - model: deepseek/deepseek-v4.1-flash
   provider: inference-net
   cost:
-  - 0.04
-  - 0.6
+  - 0.02
+  - 0.45
   created: '2026-09-10T06:21:25+00:00'
   supports_temperature: true
   supports_logprobs: false
@@ -2594,8 +2612,8 @@ endpoints_catalog:
 - model: deepseek/deepseek-v4.1-flash
   provider: morph/fp8
   cost:
-  - 0.021
-  - 0.383
+  - 0.026
+  - 0.377
   created: '2026-09-10T06:21:25+00:00'
   supports_temperature: true
   supports_logprobs: false
@@ -2619,15 +2637,6 @@ endpoints_catalog:
   supports_logprobs: true
   free: false
 - model: deepseek/deepseek-v4.1-flash
-  provider: open-inference/fp4
-  cost:
-  - 0.026
-  - 0.78
-  created: '2026-09-10T06:21:25+00:00'
-  supports_temperature: true
-  supports_logprobs: false
-  free: false
-- model: deepseek/deepseek-v4.1-flash
   provider: parasail/fp8
   cost:
   - 0.3
@@ -2648,8 +2657,8 @@ endpoints_catalog:
 - model: deepseek/deepseek-v4.1-flash
   provider: relace
   cost:
-  - 0.02
-  - 0.6
+  - 0.003
+  - 2.4
   created: '2026-09-10T06:21:25+00:00'
   supports_temperature: true
   supports_logprobs: false
@@ -4392,6 +4401,15 @@ endpoints_catalog:
   supports_logprobs: true
   free: false
 - model: meta-llama/llama-3.3-70b-instruct
+  provider: primeintellect
+  cost:
+  - 1.04
+  - 2.253
+  created: '2024-12-06T17:28:57+00:00'
+  supports_temperature: true
+  supports_logprobs: false
+  free: false
+- model: meta-llama/llama-3.3-70b-instruct
   provider: sambanova-turbo
   cost:
   - 0.45
@@ -4716,6 +4734,15 @@ endpoints_catalog:
   supports_logprobs: false
   free: false
 - model: minimax/minimax-m2.5
+  provider: primeintellect
+  cost:
+  - 0.6
+  - 2.4
+  created: '2026-02-12T15:01:42+00:00'
+  supports_temperature: true
+  supports_logprobs: false
+  free: false
+- model: minimax/minimax-m2.5
   provider: streamlake
   cost:
   - 0.27
@@ -4783,6 +4810,15 @@ endpoints_catalog:
   cost:
   - 0.27
   - 1.08
+  created: '2026-03-18T12:24:57+00:00'
+  supports_temperature: true
+  supports_logprobs: false
+  free: false
+- model: minimax/minimax-m2.7
+  provider: primeintellect
+  cost:
+  - 0.6
+  - 2.4
   created: '2026-03-18T12:24:57+00:00'
   supports_temperature: true
   supports_logprobs: false
@@ -5102,6 +5138,15 @@ endpoints_catalog:
   supports_temperature: true
   supports_logprobs: false
   free: false
+- model: mistralai/mistral-large-2512
+  provider: primeintellect
+  cost:
+  - 0.5
+  - 1.5
+  created: '2025-12-01T21:27:52+00:00'
+  supports_temperature: true
+  supports_logprobs: false
+  free: false
 - model: mistralai/mistral-large-2512:batch
   provider: mistral
   cost:
@@ -5231,8 +5276,8 @@ endpoints_catalog:
 - model: mistralai/mistral-nemo
   provider: io-net/fp16
   cost:
-  - 0.03564
-  - 0.1296
+  - 0.03212
+  - 0.1168
   created: '2024-07-19T00:00:00+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -5787,6 +5832,15 @@ endpoints_catalog:
   supports_logprobs: true
   free: false
 - model: moonshotai/kimi-k2.7-code
+  provider: tenstorrent/fp8
+  cost:
+  - 0.85
+  - 3.0
+  created: '2026-06-12T12:12:41+00:00'
+  supports_temperature: true
+  supports_logprobs: false
+  free: false
+- model: moonshotai/kimi-k2.7-code
   provider: venice/int4
   cost:
   - 0.75
@@ -5812,6 +5866,15 @@ endpoints_catalog:
   created: '2026-07-16T15:30:58+00:00'
   supports_temperature: false
   supports_logprobs: true
+  free: false
+- model: moonshotai/kimi-k3
+  provider: amazon-bedrock/us-east-2
+  cost:
+  - 3.0
+  - 15.0
+  created: '2026-07-16T15:30:58+00:00'
+  supports_temperature: false
+  supports_logprobs: false
   free: false
 - model: moonshotai/kimi-k3
   provider: baseten/fp8
@@ -5888,8 +5951,8 @@ endpoints_catalog:
 - model: moonshotai/kimi-k3
   provider: inference-net/fast
   cost:
-  - 3.5
-  - 17.5
+  - 2.99
+  - 15.0
   created: '2026-07-16T15:30:58+00:00'
   supports_temperature: true
   supports_logprobs: false
@@ -5897,7 +5960,7 @@ endpoints_catalog:
 - model: moonshotai/kimi-k3
   provider: inference-net/fp4
   cost:
-  - 0.99
+  - 0.72
   - 13.0
   created: '2026-07-16T15:30:58+00:00'
   supports_temperature: true
@@ -5933,8 +5996,8 @@ endpoints_catalog:
 - model: moonshotai/kimi-k3
   provider: morph/fp8
   cost:
-  - 1.5
-  - 11.357
+  - 2.5
+  - 14.0
   created: '2026-07-16T15:30:58+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -5960,7 +6023,7 @@ endpoints_catalog:
 - model: moonshotai/kimi-k3
   provider: relace/fp4
   cost:
-  - 0.69
+  - 0.576
   - 13.0
   created: '2026-07-16T15:30:58+00:00'
   supports_temperature: true
@@ -5987,8 +6050,8 @@ endpoints_catalog:
 - model: moonshotai/kimi-k3
   provider: wafer
   cost:
-  - 0.7
-  - 19.0
+  - 0.73
+  - 13.0
   created: '2026-07-16T15:30:58+00:00'
   supports_temperature: true
   supports_logprobs: false
@@ -8487,6 +8550,15 @@ endpoints_catalog:
   supports_logprobs: true
   free: false
 - model: openai/gpt-oss-20b
+  provider: primeintellect
+  cost:
+  - 0.07
+  - 0.3
+  created: '2025-08-05T17:17:09+00:00'
+  supports_temperature: true
+  supports_logprobs: false
+  free: false
+- model: openai/gpt-oss-20b
   provider: siliconflow/fp8
   cost:
   - 0.04
@@ -8892,6 +8964,15 @@ endpoints_catalog:
   supports_logprobs: true
   free: false
 - model: qwen/qwen3-235b-a22b-2507
+  provider: primeintellect
+  cost:
+  - 0.25
+  - 1.0
+  created: '2025-07-21T17:39:15+00:00'
+  supports_temperature: true
+  supports_logprobs: false
+  free: false
+- model: qwen/qwen3-235b-a22b-2507
   provider: streamlake
   cost:
   - 0.21
@@ -8982,6 +9063,15 @@ endpoints_catalog:
   supports_logprobs: false
   free: false
 - model: qwen/qwen3-30b-a3b-instruct-2507
+  provider: primeintellect
+  cost:
+  - 0.13
+  - 0.52
+  created: '2025-07-29T16:36:05+00:00'
+  supports_temperature: true
+  supports_logprobs: false
+  free: false
+- model: qwen/qwen3-30b-a3b-instruct-2507
   provider: siliconflow/fp8
   cost:
   - 0.09
@@ -9029,8 +9119,8 @@ endpoints_catalog:
 - model: qwen/qwen3-32b
   provider: tenstorrent/fp8
   cost:
-  - 0.07
-  - 0.2
+  - 0.14
+  - 0.4
   created: '2025-04-28T21:32:25+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -9160,6 +9250,15 @@ endpoints_catalog:
   created: '2026-02-04T00:15:01+00:00'
   supports_temperature: true
   supports_logprobs: true
+  free: false
+- model: qwen/qwen3-coder-next
+  provider: primeintellect
+  cost:
+  - 0.3
+  - 1.5
+  created: '2026-02-04T00:15:01+00:00'
+  supports_temperature: true
+  supports_logprobs: false
   free: false
 - model: qwen/qwen3-coder-next
   provider: streamlake
@@ -9297,6 +9396,15 @@ endpoints_catalog:
   supports_logprobs: true
   free: false
 - model: qwen/qwen3-vl-235b-a22b-instruct
+  provider: primeintellect
+  cost:
+  - 0.3
+  - 1.5
+  created: '2025-09-23T23:04:47+00:00'
+  supports_temperature: true
+  supports_logprobs: true
+  free: false
+- model: qwen/qwen3-vl-235b-a22b-instruct
   provider: venice/fp8
   cost:
   - 0.21
@@ -9343,6 +9451,15 @@ endpoints_catalog:
   free: false
 - model: qwen/qwen3-vl-30b-a3b-instruct
   provider: novita/bf16
+  cost:
+  - 0.2
+  - 0.7
+  created: '2025-10-06T23:47:56+00:00'
+  supports_temperature: true
+  supports_logprobs: true
+  free: false
+- model: qwen/qwen3-vl-30b-a3b-instruct
+  provider: primeintellect
   cost:
   - 0.2
   - 0.7
@@ -9400,6 +9517,15 @@ endpoints_catalog:
   cost:
   - 0.25
   - 0.75
+  created: '2025-10-14T17:35:08+00:00'
+  supports_temperature: true
+  supports_logprobs: true
+  free: false
+- model: qwen/qwen3-vl-8b-instruct
+  provider: primeintellect
+  cost:
+  - 0.117
+  - 0.455
   created: '2025-10-14T17:35:08+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -10074,7 +10200,7 @@ endpoints_catalog:
   provider: ionstream/fp8
   cost:
   - 0.0893
-  - 2.5
+  - 2.35
   created: '2026-08-14T15:55:10+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -10119,7 +10245,7 @@ endpoints_catalog:
   provider: reka
   cost:
   - 0.0248
-  - 4.4
+  - 4.35
   created: '2026-08-14T15:55:10+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -10136,8 +10262,8 @@ endpoints_catalog:
 - model: qwen/qwen3.8-27b
   provider: wafer
   cost:
-  - 0.0248
-  - 7.4
+  - 0.024
+  - 4.35
   created: '2026-08-14T15:55:10+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -11054,8 +11180,8 @@ endpoints_catalog:
 - model: xiaomi/mimo-v2.6-flash
   provider: gmicloud/bf16
   cost:
-  - 0.133
-  - 0.266
+  - 0.14
+  - 0.28
   created: '2026-09-21T20:07:44+00:00'
   supports_temperature: true
   supports_logprobs: false
@@ -11072,8 +11198,8 @@ endpoints_catalog:
 - model: xiaomi/mimo-v2.6-flash
   provider: io-net/fp8
   cost:
-  - 0.1358
-  - 0.2716
+  - 0.118
+  - 0.252
   created: '2026-09-21T20:07:44+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -11117,8 +11243,8 @@ endpoints_catalog:
 - model: xiaomi/mimo-v2.6-pro
   provider: gmicloud/bf16
   cost:
-  - 0.41325
-  - 0.8265
+  - 0.435
+  - 0.87
   created: '2026-09-21T20:07:39+00:00'
   supports_temperature: true
   supports_logprobs: false
@@ -11747,8 +11873,8 @@ endpoints_catalog:
 - model: z-ai/glm-5.2
   provider: morph/fp8
   cost:
-  - 0.232
-  - 3.067
+  - 1.547
+  - 3.74
   created: '2026-06-16T17:45:30+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -11781,9 +11907,18 @@ endpoints_catalog:
   supports_logprobs: false
   free: false
 - model: z-ai/glm-5.2
+  provider: reka
+  cost:
+  - 0.8
+  - 4.0
+  created: '2026-06-16T17:45:30+00:00'
+  supports_temperature: true
+  supports_logprobs: true
+  free: false
+- model: z-ai/glm-5.2
   provider: relace
   cost:
-  - 0.0765
+  - 0.064
   - 8.0
   created: '2026-06-16T17:45:30+00:00'
   supports_temperature: true
@@ -11828,8 +11963,8 @@ endpoints_catalog:
 - model: z-ai/glm-5.2
   provider: wafer
   cost:
-  - 0.41
-  - 3.99
+  - 0.38
+  - 3.49
   created: '2026-06-16T17:45:30+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -12008,8 +12143,8 @@ endpoints_catalog:
 - model: z-ai/glm-5.3
   provider: inference-net
   cost:
-  - 0.12
-  - 4.0
+  - 0.05
+  - 4.4
   created: '2026-08-18T20:57:35+00:00'
   supports_temperature: true
   supports_logprobs: false
@@ -12062,8 +12197,8 @@ endpoints_catalog:
 - model: z-ai/glm-5.3
   provider: morph/fp8
   cost:
-  - 0.179
-  - 3.067
+  - 1.19
+  - 3.74
   created: '2026-08-18T20:57:35+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -12125,8 +12260,8 @@ endpoints_catalog:
 - model: z-ai/glm-5.3
   provider: relace
   cost:
-  - 0.12
-  - 4.0
+  - 0.136
+  - 4.4
   created: '2026-08-18T20:57:35+00:00'
   supports_temperature: true
   supports_logprobs: false
@@ -12341,7 +12476,7 @@ endpoints_catalog:
 - model: z-ai/glm-5.3-flash
   provider: inference-net/fp4
   cost:
-  - 0.046
+  - 0.044
   - 0.6
   created: '2026-08-26T13:59:01+00:00'
   supports_temperature: true
@@ -12350,8 +12485,8 @@ endpoints_catalog:
 - model: z-ai/glm-5.3-flash
   provider: io-net/fp8
   cost:
-  - 0.135
-  - 0.45
+  - 0.1125
+  - 0.375
   created: '2026-08-26T13:59:01+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -12368,8 +12503,8 @@ endpoints_catalog:
 - model: z-ai/glm-5.3-flash
   provider: morph/fp8
   cost:
-  - 0.17
-  - 0.48
+  - 0.16
+  - 0.444
   created: '2026-08-26T13:59:01+00:00'
   supports_temperature: true
   supports_logprobs: true
@@ -12404,7 +12539,7 @@ endpoints_catalog:
 - model: z-ai/glm-5.3-flash
   provider: open-inference/fp4
   cost:
-  - 0.0455
+  - 0.04576
   - 0.65
   created: '2026-08-26T13:59:01+00:00'
   supports_temperature: true
@@ -12429,6 +12564,15 @@ endpoints_catalog:
   supports_logprobs: false
   free: false
 - model: z-ai/glm-5.3-flash
+  provider: primeintellect
+  cost:
+  - 0.15
+  - 0.5
+  created: '2026-08-26T13:59:01+00:00'
+  supports_temperature: true
+  supports_logprobs: false
+  free: false
+- model: z-ai/glm-5.3-flash
   provider: reka
   cost:
   - 0.15
@@ -12440,7 +12584,7 @@ endpoints_catalog:
 - model: z-ai/glm-5.3-flash
   provider: relace
   cost:
-  - 0.035
+  - 0.0352
   - 0.5
   created: '2026-08-26T13:59:01+00:00'
   supports_temperature: true
@@ -12495,7 +12639,7 @@ endpoints_catalog:
   provider: wafer
   cost:
   - 0.1
-  - 1.05
+  - 0.5
   created: '2026-08-26T13:59:01+00:00'
   supports_temperature: true
   supports_logprobs: true

@@ -872,6 +872,7 @@
   "openrouter#meta-llama/llama-3.3-70b-instruct#nebius/fp8": null,
   "openrouter#meta-llama/llama-3.3-70b-instruct#novita/bf16": null,
   "openrouter#meta-llama/llama-3.3-70b-instruct#parasail/fp8": null,
+  "openrouter#meta-llama/llama-3.3-70b-instruct#primeintellect": null,
   "openrouter#meta-llama/llama-3.3-70b-instruct#sambanova-turbo": null,
   "openrouter#meta-llama/llama-3.3-70b-instruct#sambanova/bf16": null,
   "openrouter#meta-llama/llama-3.3-70b-instruct#together": null,
@@ -940,6 +941,7 @@
   "openrouter#minimax/minimax-m2.5#novita/fp8": null,
   "openrouter#minimax/minimax-m2.5#parasail/fp8": null,
   "openrouter#minimax/minimax-m2.5#phala": null,
+  "openrouter#minimax/minimax-m2.5#primeintellect": null,
   "openrouter#minimax/minimax-m2.5#siliconflow/fp8": null,
   "openrouter#minimax/minimax-m2.5#streamlake": null,
   "openrouter#minimax/minimax-m2.5#venice": null,
@@ -955,6 +957,7 @@
   "openrouter#minimax/minimax-m2.7#minimax/highspeed": null,
   "openrouter#minimax/minimax-m2.7#morph": null,
   "openrouter#minimax/minimax-m2.7#novita/fp8": null,
+  "openrouter#minimax/minimax-m2.7#primeintellect": null,
   "openrouter#minimax/minimax-m2.7#sambanova": null,
   "openrouter#minimax/minimax-m2.7#sambanova/minimax-m2.7-dedicated": null,
   "openrouter#minimax/minimax-m2.7#together/fp4": {
@@ -1010,6 +1013,7 @@
   "openrouter#mistralai/mistral-large-2512#mistral": null,
   "openrouter#mistralai/mistral-large-2512#mistral/eu": null,
   "openrouter#mistralai/mistral-large-2512#mistral/zdr": null,
+  "openrouter#mistralai/mistral-large-2512#primeintellect": null,
   "openrouter#mistralai/mistral-medium-3#mistral": null,
   "openrouter#mistralai/mistral-medium-3#mistral/eu": null,
   "openrouter#mistralai/mistral-medium-3#mistral/zdr": null,
@@ -1116,6 +1120,7 @@
   "openrouter#moonshotai/kimi-k2.7-code#siliconflow/fp8": {
     "skip": "hidden reasoning"
   },
+  "openrouter#moonshotai/kimi-k2.7-code#tenstorrent/fp8": null,
   "openrouter#moonshotai/kimi-k2.7-code#together": null,
   "openrouter#moonshotai/kimi-k2.7-code#venice/int4": null,
   "openrouter#moonshotai/kimi-k3#morph/fp8": {
@@ -1473,6 +1478,9 @@
   "openrouter#openai/gpt-oss-20b#phala": {
     "max_tokens": 4
   },
+  "openrouter#openai/gpt-oss-20b#primeintellect": {
+    "max_tokens": 4
+  },
   "openrouter#openai/gpt-oss-20b#siliconflow/fp8": null,
   "openrouter#openai/gpt-oss-20b#together": {
     "max_tokens": 4
@@ -1574,6 +1582,7 @@
   "openrouter#qwen/qwen3-235b-a22b-2507#nebius/fp8": null,
   "openrouter#qwen/qwen3-235b-a22b-2507#novita/fp8": null,
   "openrouter#qwen/qwen3-235b-a22b-2507#parasail/fp8": null,
+  "openrouter#qwen/qwen3-235b-a22b-2507#primeintellect": null,
   "openrouter#qwen/qwen3-235b-a22b-2507#streamlake": null,
   "openrouter#qwen/qwen3-235b-a22b-2507#together": null,
   "openrouter#qwen/qwen3-235b-a22b-2507#venice/fp8": null,
@@ -1605,6 +1614,7 @@
   "openrouter#qwen/qwen3-30b-a3b-instruct-2507#coreweave/bf16": null,
   "openrouter#qwen/qwen3-30b-a3b-instruct-2507#dekallm": null,
   "openrouter#qwen/qwen3-30b-a3b-instruct-2507#nebius/fp8": null,
+  "openrouter#qwen/qwen3-30b-a3b-instruct-2507#primeintellect": null,
   "openrouter#qwen/qwen3-30b-a3b-instruct-2507#siliconflow/fp8": null,
   "openrouter#qwen/qwen3-30b-a3b-instruct-2507#streamlake": null,
   "openrouter#qwen/qwen3-30b-a3b-instruct-2507#wandb/bf16": null,
@@ -1647,6 +1657,7 @@
   "openrouter#qwen/qwen3-coder-next#ionstream/fp8": null,
   "openrouter#qwen/qwen3-coder-next#novita/fp8": null,
   "openrouter#qwen/qwen3-coder-next#parasail/bf16": null,
+  "openrouter#qwen/qwen3-coder-next#primeintellect": null,
   "openrouter#qwen/qwen3-coder-next#streamlake": null,
   "openrouter#qwen/qwen3-coder-plus#alibaba": null,
   "openrouter#qwen/qwen3-coder-plus#alibaba/fp8": null,
@@ -1672,6 +1683,7 @@
   "openrouter#qwen/qwen3-vl-235b-a22b-instruct#deepinfra/fp8": null,
   "openrouter#qwen/qwen3-vl-235b-a22b-instruct#novita/bf16": null,
   "openrouter#qwen/qwen3-vl-235b-a22b-instruct#parasail/fp8": null,
+  "openrouter#qwen/qwen3-vl-235b-a22b-instruct#primeintellect": null,
   "openrouter#qwen/qwen3-vl-235b-a22b-instruct#venice/fp8": null,
   "openrouter#qwen/qwen3-vl-235b-a22b-thinking#alibaba": null,
   "openrouter#qwen/qwen3-vl-235b-a22b-thinking#novita/bf16": null,
@@ -1681,6 +1693,7 @@
   "openrouter#qwen/qwen3-vl-30b-a3b-instruct#darkbloom/fp4": null,
   "openrouter#qwen/qwen3-vl-30b-a3b-instruct#deepinfra/fp8": null,
   "openrouter#qwen/qwen3-vl-30b-a3b-instruct#novita/bf16": null,
+  "openrouter#qwen/qwen3-vl-30b-a3b-instruct#primeintellect": null,
   "openrouter#qwen/qwen3-vl-30b-a3b-instruct#siliconflow/fp8": null,
   "openrouter#qwen/qwen3-vl-30b-a3b-thinking#alibaba": null,
   "openrouter#qwen/qwen3-vl-30b-a3b-thinking#novita/fp16": null,
@@ -1691,6 +1704,7 @@
   "openrouter#qwen/qwen3-vl-8b-instruct#alibaba/fp8": null,
   "openrouter#qwen/qwen3-vl-8b-instruct#novita/fp8": null,
   "openrouter#qwen/qwen3-vl-8b-instruct#parasail/bf16": null,
+  "openrouter#qwen/qwen3-vl-8b-instruct#primeintellect": null,
   "openrouter#qwen/qwen3-vl-8b-thinking#alibaba": null,
   "openrouter#qwen/qwen3.5-122b-a10b#alibaba": null,
   "openrouter#qwen/qwen3.5-122b-a10b#alibaba/fp8": null,
@@ -2329,6 +2343,7 @@
   "openrouter#z-ai/glm-5.3-flash#parasail/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#parasail/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#phala/fp8": null,
+  "openrouter#z-ai/glm-5.3-flash#primeintellect": null,
   "openrouter#z-ai/glm-5.3-flash#reka": null,
   "openrouter#z-ai/glm-5.3-flash#reka/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#relace": null,
