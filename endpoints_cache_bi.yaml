@@ -19,6 +19,12 @@ liars:
   - 0.6929
   - 1.3858
 - api: openrouter
+  model: deepseek/deepseek-v4.1-flash
+  provider: fireworks
+  cost:
+  - 0.3
+  - 1.2
+- api: openrouter
   model: google/gemini-2.5-flash-image
   provider: google-vertex/global
   cost:
@@ -48,6 +54,12 @@ liars:
   cost:
   - 0.3248
   - 1.0208
+- api: openrouter
+  model: z-ai/glm-5.3
+  provider: reka
+  cost:
+  - 0.17
+  - 3.0
 too_expensive:
 - api: openrouter
   model: anthropic/claude-opus-4.1
@@ -406,6 +418,12 @@ too_expensive:
 - api: openrouter
   model: moonshotai/kimi-k3
   provider: deepinfra/bf16
+  cost:
+  - 2.85
+  - 14.25
+- api: openrouter
+  model: moonshotai/kimi-k3
+  provider: deepinfra/mxfp4
   cost:
   - 2.85
   - 14.25
