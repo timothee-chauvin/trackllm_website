@@ -200,6 +200,12 @@ too_expensive:
   - 1.6
   - 3.2
 - api: openrouter
+  model: deepseek/deepseek-v4-pro
+  provider: siliconflow/fp8
+  cost:
+  - 1.50162
+  - 3.135
+- api: openrouter
   model: deepseek/deepseek-v4-pro-0813
   provider: alibaba
   cost:
@@ -1045,6 +1051,12 @@ too_expensive:
   cost:
   - 4.35
   - 8.7
+- api: openrouter
+  model: z-ai/glm-5.2
+  provider: gmicloud/fp8
+  cost:
+  - 1.4
+  - 4.4
 - api: openrouter
   model: z-ai/glm-5.3
   provider: siliconflow/fp8
@@ -3871,6 +3883,16 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
+  openrouter#moonshotai/kimi-k2.6#gmicloud/fp8:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"moonshotai/kimi-k2.6
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rate limits: ...'
+  openrouter#openai/gpt-3.5-turbo-instruct#openai:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":404,"metadata":{"raw":"{\n    \"error\":
+      {\n        \"message\": \"The model `gpt-3.5-turbo-instruct` has been deprecated,
+      learn more here: https://platform...'
   openrouter#z-ai/glm-5.2#baseten/fp8:
     count: 1
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"max_tokens

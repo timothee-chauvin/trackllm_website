@@ -365,6 +365,9 @@
   "openrouter#deepseek/deepseek-v4-pro-0813#io-net/fp8": null,
   "openrouter#deepseek/deepseek-v4-pro-0813#ionstream": null,
   "openrouter#deepseek/deepseek-v4-pro-0813#ionstream/fp4": null,
+  "openrouter#deepseek/deepseek-v4-pro-0813#nebius/fp8": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-pro-0813#parasail/fp8": {
     "effort": "none"
   },
@@ -1847,6 +1850,9 @@
   "openrouter#qwen/qwen3.8-27b#mancer/fp8": {
     "effort": "none"
   },
+  "openrouter#qwen/qwen3.8-27b#modelrun/fp4": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.8-27b#novita": {
     "effort": "none"
   },
@@ -2231,6 +2237,9 @@
   "openrouter#z-ai/glm-5.2#morph/fp8": {
     "effort": "none"
   },
+  "openrouter#z-ai/glm-5.2#nebius/fp4": {
+    "effort": "none"
+  },
   "openrouter#z-ai/glm-5.2#novita/fp8": null,
   "openrouter#z-ai/glm-5.2#parasail/fp4": null,
   "openrouter#z-ai/glm-5.2#phala": null,
@@ -2352,6 +2361,7 @@
   "openrouter#z-ai/glm-5.3-flash#relace": null,
   "openrouter#z-ai/glm-5.3-flash#relace/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#relace/fp8": null,
+  "openrouter#z-ai/glm-5.3-flash#sail-research/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#sail-research/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#sail-research/us": null,
   "openrouter#z-ai/glm-5.3-flash#siliconflow/fp8": null,
