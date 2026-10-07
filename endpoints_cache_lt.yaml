@@ -2,188 +2,188 @@ failures:
 - model: deepseek/deepseek-r1-0528
   provider: streamlake
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: deepseek/deepseek-v3.2
   provider: atlas-cloud/fp8
   reason: 'error: {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"code\":400,\"msg\":\"invalid
     request params\"}","provider_name":"AtlasCloud","is_byok":false}}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: deepseek/deepseek-v3.2
   provider: friendli
   reason: 'error: {"message":"Provider returned error","code":422,"metadata":{"raw":"{\"message\":\"top_logprobs
     is not supported with reasoning content parsing.\"}","provider_name":"Friendli","is_byok":false}}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: deepseek/deepseek-v4-flash
   provider: cloudflare
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: deepseek/deepseek-v4-flash
   provider: parasail/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: deepseek/deepseek-v4-flash-0731
   provider: cloudflare
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: deepseek/deepseek-v4-flash-0731
   provider: coreweave/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: deepseek/deepseek-v4-flash-0731
   provider: digitalocean
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: deepseek/deepseek-v4-flash-0731
   provider: gmicloud/fp8
   reason: 'error: {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"type\":\"invalid_request_error\",\"message\":\"parameter
     check failed, top_logprobs range is [0, 5]\",\"backend_status\":400,\"details\":\"invalid_argument:
     invalid_request_error: parameter check failed, top_logprobs range is [0, 5]\"}}","provider_name":"GMICloud","is_byok":false}}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: deepseek/deepseek-v4-flash-0731
   provider: inceptron/fp4
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: deepseek/deepseek-v4-flash-0731
   provider: mancer/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
-- model: deepseek/deepseek-v4-flash-0731
-  provider: nebius/fp8
-  reason: 'error: Timeout after 15.0s'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: deepseek/deepseek-v4-flash-0731
   provider: novita/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: deepseek/deepseek-v4-flash-0731
   provider: parasail/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: deepseek/deepseek-v4-flash-0731
   provider: sail-research/fp4
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: deepseek/deepseek-v4-pro
   provider: cloudflare
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: deepseek/deepseek-v4-pro
   provider: novita/fp8
   reason: 'error: openrouter#deepseek/deepseek-v4-pro#novita/fp8: $0.000138/query
     > $0.0001/query guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: deepseek/deepseek-v4-pro
   provider: parasail/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: deepseek/deepseek-v4-pro
   provider: streamlake/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: deepseek/deepseek-v4-pro-0813
   provider: cloudflare
   reason: 'error: openrouter#deepseek/deepseek-v4-pro-0813#cloudflare: $0.000115/query
     > $0.0001/query guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: deepseek/deepseek-v4-pro-0813
   provider: coreweave/fp8
   reason: 'error: openrouter#deepseek/deepseek-v4-pro-0813#coreweave/fp8: $0.000114/query
     > $0.0001/query guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: deepseek/deepseek-v4-pro-0813
   provider: deepseek
   reason: 'error: {"message":"0 endpoints out of 1 requested are available matching
     your guardrail restrictions and data policy. We removed them for the following
     reasons (an endpoint may have matched multiple reasons):\nPaid model training
     violation (account settings): 1 endpoint excluded; configurable at https://openrouter.ai/settings/privacy","code":404,"metadata":{"input_endpoint_count":1,"ineligibility_reasons":[{"reason":"paid-model-training-violation-by-account","endpoint_count":1,"configure_url":"https://openrouter.ai/settings/privacy"}],"routing_funnel":[{"step":"Initial
-    Endpoints","endpoint_count":23},{"step":"Filter by Allowed Providers","endpoint_count":1,"reason":"not
+    Endpoints","endpoint_count":22},{"step":"Filter by Allowed Providers","endpoint_count":1,"reason":"not
     in your request''s provider.only preference"}],"failed_routing_step":"Filter by
     Guardrails"}}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: deepseek/deepseek-v4.1-flash
   provider: deepseek
   reason: 'error: {"message":"0 endpoints out of 1 requested are available matching
     your guardrail restrictions and data policy. We removed them for the following
     reasons (an endpoint may have matched multiple reasons):\nPaid model training
     violation (account settings): 1 endpoint excluded; configurable at https://openrouter.ai/settings/privacy","code":404,"metadata":{"input_endpoint_count":1,"ineligibility_reasons":[{"reason":"paid-model-training-violation-by-account","endpoint_count":1,"configure_url":"https://openrouter.ai/settings/privacy"}],"routing_funnel":[{"step":"Initial
-    Endpoints","endpoint_count":31},{"step":"Filter by Allowed Providers","endpoint_count":1,"reason":"not
+    Endpoints","endpoint_count":29},{"step":"Filter by Allowed Providers","endpoint_count":1,"reason":"not
     in your request''s provider.only preference"}],"failed_routing_step":"Filter by
     Guardrails"}}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: fireworks/ember-1
   provider: fireworks
   reason: 'error: openrouter#fireworks/ember-1#fireworks: $0.000282/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: google/gemma-4-31b-it
   provider: venice/fp4
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: inclusionai/ling-3.0-flash
   provider: novita
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: meta-llama/llama-3.2-3b-instruct
   provider: cloudflare
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: meta-llama/llama-3.3-70b-instruct
   provider: cloudflare/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: minimax/minimax-m2
   provider: google-vertex
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: minimax/minimax-m2.5
   provider: atlas-cloud/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: minimax/minimax-m2.5
   provider: digitalocean
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: minimax/minimax-m2.5
   provider: streamlake
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: minimax/minimax-m3
   provider: mara
   reason: 'error: openrouter#minimax/minimax-m3#mara: $0.000109/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: minimax/minimax-m3
   provider: parasail/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
+- model: minimax/minimax-m3
+  provider: sambanova
+  reason: 'error: No logprobs returned'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: mistralai/mistral-small-3.1-24b-instruct
   provider: cloudflare
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: moonshotai/kimi-k2-thinking
   provider: google-vertex
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: moonshotai/kimi-k2.5
   provider: novita
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: moonshotai/kimi-k2.5
   provider: venice
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: moonshotai/kimi-k2.6
   provider: cloudflare
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: moonshotai/kimi-k2.6
   provider: coreweave/fp4
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: moonshotai/kimi-k2.6
   provider: digitalocean
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: moonshotai/kimi-k2.6
   provider: gmicloud/fp8
   reason: 'error: {"message":"Provider returned error","code":429,"metadata":{"raw":"moonshotai/kimi-k2.6
@@ -191,724 +191,725 @@ failures:
     to accumulate your rate limits: https://openrouter.ai/settings/integrations","provider_name":"GMICloud","is_byok":false,"provider_error_code":"rate_limit_exceeded","limit_source":"upstream_provider_shared_pool","remedy_hint":"Retry
     shortly, add your own provider key (https://openrouter.ai/settings/integrations),
     or route to another provider with provider routing: https://openrouter.ai/docs/features/provider-routing","retry_after_seconds":60,"retry_after_seconds_raw":60,"headers":{"Retry-After":"60"}}}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: moonshotai/kimi-k2.6
   provider: inceptron/int4
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: moonshotai/kimi-k2.6
   provider: parasail/int4
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: moonshotai/kimi-k2.6
   provider: streamlake/fp8
-  reason: 'error: openrouter#moonshotai/kimi-k2.6#streamlake/fp8: $0.000668/query
+  reason: 'error: openrouter#moonshotai/kimi-k2.6#streamlake/fp8: $0.001136/query
     > $0.0001/query guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: moonshotai/kimi-k2.7-code
   provider: cloudflare
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: moonshotai/kimi-k2.7-code
   provider: coreweave/int4
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: moonshotai/kimi-k2.7-code
   provider: gmicloud/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: moonshotai/kimi-k2.7-code
   provider: inceptron/int4
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: moonshotai/kimi-k2.7-code
   provider: nebius/fp4
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: moonshotai/kimi-k2.7-code
   provider: novita/int4
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: moonshotai/kimi-k2.7-code
   provider: streamlake
   reason: 'error: {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"invalid
-    top_p: only 0.95 is allowed for this model\",\"type\":\"BadRequest\"},\"request_id\":\"req-7ts40i-1791269752977629916\"}","provider_name":"StreamLake","is_byok":false}}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+    top_p: only 0.95 is allowed for this model\",\"type\":\"BadRequest\"},\"request_id\":\"req-igdi2c-1791355069704744731\"}","provider_name":"StreamLake","is_byok":false}}'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: moonshotai/kimi-k3
   provider: akashml/fp4
-  reason: 'error: openrouter#moonshotai/kimi-k3#akashml/fp4: $0.000126/query > $0.0001/query
+  reason: 'error: openrouter#moonshotai/kimi-k3#akashml/fp4: $0.000117/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: moonshotai/kimi-k3
   provider: alibaba
   reason: 'error: openrouter#moonshotai/kimi-k3#alibaba: $0.000366/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: moonshotai/kimi-k3
   provider: digitalocean
   reason: 'error: openrouter#moonshotai/kimi-k3#digitalocean: $0.000240/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: moonshotai/kimi-k3
   provider: fireworks
   reason: 'error: openrouter#moonshotai/kimi-k3#fireworks: $0.000282/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: moonshotai/kimi-k3
   provider: fireworks/fast
   reason: 'error: openrouter#moonshotai/kimi-k3#fireworks/fast: $0.000423/query >
     $0.0001/query guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: moonshotai/kimi-k3
   provider: fireworks/us
   reason: 'error: openrouter#moonshotai/kimi-k3#fireworks/us: $0.000423/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: moonshotai/kimi-k3
   provider: makora
   reason: 'error: openrouter#moonshotai/kimi-k3#makora: $0.000144/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: moonshotai/kimi-k3
   provider: parasail/fp4
-  reason: 'error: openrouter#moonshotai/kimi-k3#parasail/fp4: $0.000282/query > $0.0001/query
+  reason: 'error: openrouter#moonshotai/kimi-k3#parasail/fp4: $0.000244/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: moonshotai/kimi-k3
   provider: phala
   reason: 'error: {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"The
     request was rejected as invalid\",\"type\":\"invalid_request_error\",\"code\":null,\"param\":null}}","provider_name":"Phala","is_byok":false}}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
+- model: morph/morph-v3-large
+  provider: morph/fp8
+  reason: 'too_expensive: $0.000122/query'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: nvidia/nemotron-3-nano-30b-a3b
   provider: novita/fp4
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: nvidia/nemotron-3-super-120b-a12b
   provider: dekallm/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: nvidia/nemotron-3.5-lightning
   provider: coreweave/bf16
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: openai/gpt-3.5-turbo-instruct
   provider: openai
   reason: 'error: {"message":"Provider returned error","code":404,"metadata":{"raw":"{\n    \"error\":
     {\n        \"message\": \"The model `gpt-3.5-turbo-instruct` has been deprecated,
     learn more here: https://platform.openai.com/docs/deprecations\",\n        \"type\":
     \"invalid_request_error\",\n        \"param\": null,\n        \"code\": \"model_not_found\"\n    }\n}\n","provider_name":"OpenAI","is_byok":false,"provider_error_code":"model_not_found"}}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: openai/gpt-3.5-turbo:batch
   provider: openai
   reason: 'error: {"message":"openai/gpt-3.5-turbo:batch cannot be used with the chat/completions
     endpoint (adapter OpenAIBatchAdapter).","code":404}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: openai/gpt-4-turbo:batch
   provider: openai
   reason: 'error: {"message":"openai/gpt-4-turbo:batch cannot be used with the chat/completions
     endpoint (adapter OpenAIBatchAdapter).","code":404}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: openai/gpt-4o-mini:batch
   provider: openai
   reason: 'error: {"message":"openai/gpt-4o-mini:batch cannot be used with the chat/completions
     endpoint (adapter OpenAIBatchAdapter).","code":404}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: openai/gpt-4o:batch
   provider: openai
   reason: 'error: {"message":"openai/gpt-4o:batch cannot be used with the chat/completions
     endpoint (adapter OpenAIBatchAdapter).","code":404}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: openai/gpt-5-image
   provider: openai
   reason: 'error: {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
     {\n    \"message\": \"logprobs are not supported with reasoning models.\",\n    \"type\":
     \"invalid_request_error\",\n    \"param\": \"include\",\n    \"code\": \"unsupported_parameter\"\n  }\n}","provider_name":"OpenAI","is_byok":false,"provider_error_code":"unsupported_parameter"}}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: openai/gpt-5-image-mini
   provider: openai
   reason: 'error: {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
     {\n    \"message\": \"logprobs are not supported with reasoning models.\",\n    \"type\":
     \"invalid_request_error\",\n    \"param\": \"include\",\n    \"code\": \"unsupported_parameter\"\n  }\n}","provider_name":"OpenAI","is_byok":false,"provider_error_code":"unsupported_parameter"}}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: openai/gpt-5.4-image-2
   provider: openai
   reason: 'error: openrouter#openai/gpt-5.4-image-2#openai: $0.002957/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: openai/gpt-audio
   provider: openai
   reason: 'error: {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
     {\n    \"message\": \"This model requires that either input content or output
     modality contain audio.\",\n    \"type\": \"invalid_request_error\",\n    \"param\":
     \"model\",\n    \"code\": \"invalid_value\"\n  }\n}","provider_name":"OpenAI","is_byok":false,"provider_error_code":"invalid_value"}}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: openai/gpt-audio-mini
   provider: openai
   reason: 'error: {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n  \"error\":
     {\n    \"message\": \"This model requires that either input content or output
     modality contain audio.\",\n    \"type\": \"invalid_request_error\",\n    \"param\":
     \"model\",\n    \"code\": \"invalid_value\"\n  }\n}","provider_name":"OpenAI","is_byok":false,"provider_error_code":"invalid_value"}}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: openai/gpt-oss-120b
   provider: cerebras/fp16
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: openai/gpt-oss-120b
   provider: coreweave/fp4
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: openai/gpt-oss-120b
   provider: dekallm/bf16
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: openai/gpt-oss-120b
   provider: digitalocean
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: openai/gpt-oss-120b
   provider: novita/fp4
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: openai/gpt-oss-120b
   provider: phala
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: openai/gpt-oss-20b
   provider: coreweave/fp4
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: openai/gpt-oss-20b
   provider: darkbloom/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: openai/gpt-oss-20b
   provider: dekallm/bf16
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: openai/gpt-oss-20b
   provider: novita/fp4
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3-14b
   provider: nextbit/int4
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3-235b-a22b-thinking-2507
   provider: novita/fp8
-  reason: 'error: {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"code\":\"invalid_parameter_error\",\"message\":\"\\u003c400\\u003e
-    InternalError.Algo.InvalidParameter: Range of top_logprobs should be [0, 5] trace_id:
-    560dad6f60621dc1f0f945642ff0b188\",\"type\":\"invalid_request_error\"}\n","provider_name":"Novita","is_byok":false}}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  reason: 'error: No logprobs returned'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3-next-80b-a3b-thinking
   provider: google-vertex/global
-  reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  reason: 'error: {"message":"Provider returned error","code":429,"metadata":{"raw":"qwen/qwen3-next-80b-a3b-thinking
+    is temporarily rate-limited upstream. Please retry shortly, or add your own key
+    to accumulate your rate limits: https://openrouter.ai/settings/integrations","provider_name":"Google","is_byok":false,"limit_source":"upstream_provider_shared_pool","remedy_hint":"Retry
+    shortly, add your own provider key (https://openrouter.ai/settings/integrations),
+    or route to another provider with provider routing: https://openrouter.ai/docs/features/provider-routing"}}'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3-vl-235b-a22b-instruct
   provider: alibaba
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3-vl-235b-a22b-instruct
   provider: novita/bf16
   reason: 'error: {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"code\":\"invalid_parameter_error\",\"message\":\"\\u003c400\\u003e
     InternalError.Algo.InvalidParameter: Range of top_logprobs should be [0, 5] trace_id:
-    f4d627e406b679c805a7070e35ac6396\",\"type\":\"invalid_request_error\"}\n","provider_name":"Novita","is_byok":false}}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+    4161111498b65593f9f90251e3ac6b13\",\"type\":\"invalid_request_error\"}\n","provider_name":"Novita","is_byok":false}}'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3-vl-235b-a22b-thinking
   provider: alibaba
-  reason: 'error: openrouter#qwen/qwen3-vl-235b-a22b-thinking#alibaba: $0.000712/query
+  reason: 'error: openrouter#qwen/qwen3-vl-235b-a22b-thinking#alibaba: $0.000692/query
     > $0.0001/query guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3-vl-235b-a22b-thinking
   provider: novita/bf16
   reason: 'error: {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"code\":\"invalid_parameter_error\",\"message\":\"\\u003c400\\u003e
     InternalError.Algo.InvalidParameter: Range of top_logprobs should be [0, 5] trace_id:
-    dfdb4f8bb4a95d75b382da6b83ee769d\",\"type\":\"invalid_request_error\"}\n","provider_name":"Novita","is_byok":false}}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+    f588c1410955a773b83aea9ac0c1dcb8\",\"type\":\"invalid_request_error\"}\n","provider_name":"Novita","is_byok":false}}'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3-vl-30b-a3b-instruct
   provider: alibaba
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3-vl-30b-a3b-thinking
   provider: alibaba
-  reason: 'error: openrouter#qwen/qwen3-vl-30b-a3b-thinking#alibaba: $0.000612/query
+  reason: 'error: openrouter#qwen/qwen3-vl-30b-a3b-thinking#alibaba: $0.000506/query
     > $0.0001/query guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3-vl-32b-instruct
   provider: alibaba
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3-vl-8b-instruct
   provider: alibaba
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3-vl-8b-thinking
   provider: alibaba
-  reason: 'error: openrouter#qwen/qwen3-vl-8b-thinking#alibaba: $0.000932/query >
+  reason: 'error: openrouter#qwen/qwen3-vl-8b-thinking#alibaba: $0.000479/query >
     $0.0001/query guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.5-122b-a10b
   provider: alibaba
-  reason: 'error: openrouter#qwen/qwen3.5-122b-a10b#alibaba: $0.000221/query > $0.0001/query
+  reason: 'error: openrouter#qwen/qwen3.5-122b-a10b#alibaba: $0.000483/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.5-122b-a10b
   provider: novita/bf16
   reason: 'error: {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"invalid
-    request error trace_id: adfc191a9490b4ebbf64896bcefe7e58\",\"type\":\"invalid_request_error\"}\n","provider_name":"Novita","is_byok":false}}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+    request error trace_id: b6f8139ec3a5722e4f154a8c78c43ba8\",\"type\":\"invalid_request_error\"}\n","provider_name":"Novita","is_byok":false}}'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.5-27b
   provider: alibaba
   reason: 'error: openrouter#qwen/qwen3.5-27b#alibaba: $0.000391/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.5-27b
   provider: novita/bf16
   reason: 'error: {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"invalid
-    request error trace_id: 3b0502d29be9017a33caf0c82e2bf651\",\"type\":\"invalid_request_error\"}\n","provider_name":"Novita","is_byok":false}}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+    request error trace_id: c94d8509af9775c78cdce7219f360bfa\",\"type\":\"invalid_request_error\"}\n","provider_name":"Novita","is_byok":false}}'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.5-27b
   provider: phala
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.5-35b-a3b
   provider: alibaba
-  reason: 'error: openrouter#qwen/qwen3.5-35b-a3b#alibaba: $0.000266/query > $0.0001/query
+  reason: 'error: openrouter#qwen/qwen3.5-35b-a3b#alibaba: $0.000311/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.5-35b-a3b
   provider: parasail/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.5-35b-a3b
   provider: venice
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.5-397b-a17b
   provider: alibaba
-  reason: 'error: openrouter#qwen/qwen3.5-397b-a17b#alibaba: $0.000964/query > $0.0001/query
+  reason: 'error: openrouter#qwen/qwen3.5-397b-a17b#alibaba: $0.000746/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.5-397b-a17b
   provider: digitalocean
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.5-397b-a17b
   provider: gmicloud/fp8
-  reason: 'error: No usage in response; body: {"id":"gen-1791269753-XChsVGVjuC2HAVqjgql8","error":{"message":"Provider
+  reason: 'error: No usage in response; body: {"id":"gen-1791355068-uko4pruHIOgkoDpBX6Td","error":{"message":"Provider
     returned an empty response","code":502,"metadata":{"error_type":"provider_unavailable"}}}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.5-397b-a17b
   provider: parasail/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.5-397b-a17b
   provider: streamlake
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.5-397b-a17b
   provider: venice
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.5-9b
   provider: parasail/bf16
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.5-9b
   provider: venice/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.5-plus-02-15
   provider: alibaba
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.5-plus-20260420
   provider: alibaba
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.6-27b
   provider: alibaba
-  reason: 'error: openrouter#qwen/qwen3.6-27b#alibaba: $0.000850/query > $0.0001/query
+  reason: 'error: openrouter#qwen/qwen3.6-27b#alibaba: $0.000880/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.6-35b-a3b
   provider: akashml/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.6-35b-a3b
   provider: coreweave/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.6-35b-a3b
   provider: parasail/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.6-35b-a3b
   provider: phala
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.6-flash
   provider: alibaba
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.6-plus
   provider: alibaba
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.7-flash
   provider: alibaba
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.7-max
   provider: alibaba
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.7-plus
   provider: alibaba
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.8-2.4t-a95b
   provider: alibaba
-  reason: 'error: openrouter#qwen/qwen3.8-2.4t-a95b#alibaba: $0.000568/query > $0.0001/query
+  reason: 'error: openrouter#qwen/qwen3.8-2.4t-a95b#alibaba: $0.000334/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.8-2.4t-a95b
   provider: modal
-  reason: 'error: openrouter#qwen/qwen3.8-2.4t-a95b#modal: $0.000112/query > $0.0001/query
-    guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  reason: 'error: {"message":"Provider returned error","code":429,"metadata":{"raw":"qwen/qwen3.8-2.4t-a95b
+    is temporarily rate-limited upstream. Please retry shortly, or add your own key
+    to accumulate your rate limits: https://openrouter.ai/settings/integrations","provider_name":"Modal","is_byok":false,"limit_source":"upstream_provider_shared_pool","remedy_hint":"Retry
+    shortly, add your own provider key (https://openrouter.ai/settings/integrations),
+    or route to another provider with provider routing: https://openrouter.ai/docs/features/provider-routing"}}'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.8-2.4t-a95b
   provider: novita
   reason: 'error: {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"invalid
-    request error trace_id: 0cb7b4c126956a87e407a299862cdde9\",\"type\":\"invalid_request_error\"}\n","provider_name":"Novita","is_byok":false}}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+    request error trace_id: 6780046d5cb0b9c7c586652e709b0543\",\"type\":\"invalid_request_error\"}\n","provider_name":"Novita","is_byok":false}}'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.8-2.4t-a95b
   provider: together
   reason: 'error: openrouter#qwen/qwen3.8-2.4t-a95b#together: $0.000112/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.8-27b
   provider: coreweave/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.8-27b
   provider: novita
   reason: 'error: {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"invalid
-    request error trace_id: 6ba5ece465f81c3402caeda0a1896886\",\"type\":\"invalid_request_error\"}\n","provider_name":"Novita","is_byok":false}}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+    request error trace_id: ba9b964e4a1e6f46e40961911bed92ef\",\"type\":\"invalid_request_error\"}\n","provider_name":"Novita","is_byok":false}}'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.8-max-0902
   provider: alibaba
   reason: 'error: openrouter#qwen/qwen3.8-max-0902#alibaba: $0.000130/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: qwen/qwen3.8-max-prime
   provider: alibaba
   reason: 'error: openrouter#qwen/qwen3.8-max-prime#alibaba: $0.000260/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: stepfun/step-3.7-flash
   provider: novita/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: stepfun/step-3.7-flash
   provider: stepfun/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: x-ai/grok-4.20
   provider: xai
   reason: 'error: openrouter#x-ai/grok-4.20#xai: $0.000234/query > $0.0001/query guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: x-ai/grok-4.20
   provider: xai/zdr
   reason: 'error: openrouter#x-ai/grok-4.20#xai/zdr: $0.000234/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: x-ai/grok-4.20-multi-agent
   provider: xai
-  reason: 'error: openrouter#x-ai/grok-4.20-multi-agent#xai: $0.015234/query > $0.0001/query
+  reason: 'error: openrouter#x-ai/grok-4.20-multi-agent#xai: $0.016328/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: x-ai/grok-4.20-multi-agent
   provider: xai/zdr
-  reason: 'error: openrouter#x-ai/grok-4.20-multi-agent#xai/zdr: $0.015988/query >
+  reason: 'error: openrouter#x-ai/grok-4.20-multi-agent#xai/zdr: $0.020516/query >
     $0.0001/query guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: x-ai/grok-4.3
   provider: xai
-  reason: 'error: openrouter#x-ai/grok-4.3#xai: $0.000964/query > $0.0001/query guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  reason: 'error: openrouter#x-ai/grok-4.3#xai: $0.001019/query > $0.0001/query guard'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: x-ai/grok-4.3
   provider: xai/zdr
-  reason: 'error: openrouter#x-ai/grok-4.3#xai/zdr: $0.000754/query > $0.0001/query
+  reason: 'error: openrouter#x-ai/grok-4.3#xai/zdr: $0.000839/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: x-ai/grok-4.3:batch
   provider: xai
   reason: 'error: {"message":"x-ai/grok-4.3:batch cannot be used with the chat/completions
     endpoint (adapter XAIBatchAdapter).","code":404}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: x-ai/grok-4.5
   provider: xai
-  reason: 'error: openrouter#x-ai/grok-4.5#xai: $0.000630/query > $0.0001/query guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  reason: 'error: openrouter#x-ai/grok-4.5#xai: $0.000618/query > $0.0001/query guard'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: x-ai/grok-4.5
   provider: xai/zdr
-  reason: 'error: openrouter#x-ai/grok-4.5#xai/zdr: $0.000666/query > $0.0001/query
+  reason: 'error: openrouter#x-ai/grok-4.5#xai/zdr: $0.000654/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: x-ai/grok-4.6
   provider: xai
-  reason: 'error: openrouter#x-ai/grok-4.6#xai: $0.001482/query > $0.0001/query guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  reason: 'error: openrouter#x-ai/grok-4.6#xai: $0.002658/query > $0.0001/query guard'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: x-ai/grok-4.6
   provider: xai/zdr
-  reason: 'error: openrouter#x-ai/grok-4.6#xai/zdr: $0.001434/query > $0.0001/query
+  reason: 'error: openrouter#x-ai/grok-4.6#xai/zdr: $0.000966/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: x-ai/grok-4.6
   provider: xai/zdr/us
-  reason: 'error: openrouter#x-ai/grok-4.6#xai/zdr/us: $0.004114/query > $0.0001/query
+  reason: 'error: openrouter#x-ai/grok-4.6#xai/zdr/us: $0.005104/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: x-ai/grok-4.7
   provider: xai
-  reason: 'error: openrouter#x-ai/grok-4.7#xai: $0.002978/query > $0.0001/query guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  reason: 'error: openrouter#x-ai/grok-4.7#xai: $0.002822/query > $0.0001/query guard'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: x-ai/grok-4.7
   provider: xai/zdr
-  reason: 'error: openrouter#x-ai/grok-4.7#xai/zdr: $0.002882/query > $0.0001/query
+  reason: 'error: openrouter#x-ai/grok-4.7#xai/zdr: $0.002852/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: x-ai/grok-4.7
   provider: xai/zdr/us
-  reason: 'error: openrouter#x-ai/grok-4.7#xai/zdr/us: $0.003124/query > $0.0001/query
+  reason: 'error: openrouter#x-ai/grok-4.7#xai/zdr/us: $0.003131/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: x-ai/grok-build-0.1
   provider: xai
-  reason: 'error: openrouter#x-ai/grok-build-0.1#xai: $0.001043/query > $0.0001/query
+  reason: 'error: openrouter#x-ai/grok-build-0.1#xai: $0.001189/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: x-ai/grok-build-0.1
   provider: xai/zdr
-  reason: 'error: openrouter#x-ai/grok-build-0.1#xai/zdr: $0.000981/query > $0.0001/query
+  reason: 'error: openrouter#x-ai/grok-build-0.1#xai/zdr: $0.001187/query > $0.0001/query
     guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: xiaomi/mimo-v2.5-pro
   provider: digitalocean
   reason: 'error: openrouter#xiaomi/mimo-v2.5-pro#digitalocean: $0.000123/query >
     $0.0001/query guard'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-4.7-flash
   provider: cloudflare
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5
   provider: streamlake/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.1
   provider: gmicloud/fp8
   reason: 'error: {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"type\":\"invalid_request_error\",\"message\":\"parameter
     check failed, top_logprobs range is [0, 5]\",\"backend_status\":400,\"details\":\"invalid_argument:
     invalid_request_error: parameter check failed, top_logprobs range is [0, 5]\"}}","provider_name":"GMICloud","is_byok":false}}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.1
   provider: phala
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.1
   provider: streamlake/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.2
   provider: alibaba/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.2
   provider: cloudflare
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.2
   provider: coreweave/fp4
-  reason: 'error: {"message":"Provider returned error","code":429,"metadata":{"raw":"z-ai/glm-5.2
-    is temporarily rate-limited upstream. Please retry shortly, or add your own key
-    to accumulate your rate limits: https://openrouter.ai/settings/integrations","provider_name":"CoreWeave","is_byok":false,"provider_error_code":"rate_limit_exceeded","limit_source":"upstream_provider_shared_pool","remedy_hint":"Retry
-    shortly, add your own provider key (https://openrouter.ai/settings/integrations),
-    or route to another provider with provider routing: https://openrouter.ai/docs/features/provider-routing"}}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  reason: 'error: No logprobs returned'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.2
   provider: digitalocean
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.2
   provider: inceptron/fp4
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.2
   provider: parasail/fp4
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.2
   provider: streamlake/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3
   provider: akashml/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3
   provider: alibaba
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3
   provider: alibaba/fast
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3
   provider: cloudflare
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3
   provider: digitalocean
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3
   provider: fireworks
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3
   provider: fireworks/fast
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3
   provider: inceptron/fp4
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3
   provider: makora/fp4
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3
   provider: mistral/nvfp4
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3
   provider: mistral/zdr
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3
   provider: modal
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3
   provider: morph/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3
   provider: nebius/fp4
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3
   provider: parasail/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3
   provider: primeintellect
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3
   provider: reka
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3
   provider: sail-research/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3
   provider: sail-research/us
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3
   provider: together
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3
   provider: wafer
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3
   provider: wafer/us
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3-flash
   provider: cloudflare
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3-flash
   provider: coreweave/nvfp4
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3-flash
   provider: dekallm
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3-flash
   provider: digitalocean
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3-flash
   provider: fireworks
-  reason: 'error: {"message":"Provider returned error","code":429,"metadata":{"raw":"z-ai/glm-5.3-flash
-    is temporarily rate-limited upstream. Please retry shortly, or add your own key
-    to accumulate your rate limits: https://openrouter.ai/settings/integrations","provider_name":"Fireworks","is_byok":false,"provider_error_code":"429","limit_source":"upstream_provider_shared_pool","remedy_hint":"Retry
-    shortly, add your own provider key (https://openrouter.ai/settings/integrations),
-    or route to another provider with provider routing: https://openrouter.ai/docs/features/provider-routing","retry_after_seconds":5,"retry_after_seconds_raw":5,"headers":{"Retry-After":"5"}}}'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  reason: 'error: No logprobs returned'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3-flash
   provider: fireworks/us
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3-flash
   provider: inceptron/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3-flash
   provider: modal/nvfp4
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3-flash
   provider: morph/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3-flash
   provider: near-ai/fp8
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3-flash
   provider: parasail/fp4
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3-flash
   provider: reka
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3-flash
   provider: sail-research/fp4
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3-flash
   provider: sail-research/us
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3-flash
   provider: together
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3-flash
   provider: wafer
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'
 - model: z-ai/glm-5.3-prime
   provider: alibaba
   reason: 'error: No logprobs returned'
-  last_seen: '2026-10-06T07:01:09+00:00'
+  last_seen: '2026-10-07T06:40:55+00:00'

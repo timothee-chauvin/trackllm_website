@@ -424,6 +424,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#inference-net": null,
+  "openrouter#deepseek/deepseek-v4.1-flash#inference-net/fp8": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash#io-net/fp8": {
     "effort": "none"
   },
@@ -829,7 +832,9 @@
     "max_tokens": 4
   },
   "openrouter#inference-net/schematron-v2-small#inference-net": null,
+  "openrouter#inference-net/schematron-v2-small#inference-net/bf16": null,
   "openrouter#inference-net/schematron-v2-turbo#inference-net": null,
+  "openrouter#inference-net/schematron-v2-turbo#inference-net/bf16": null,
   "openrouter#kwaipilot/kat-coder-air-v2.5#streamlake": {
     "skip": "hidden reasoning"
   },
@@ -1018,6 +1023,9 @@
   "openrouter#mistralai/mistral-large-2512#mistral/eu": null,
   "openrouter#mistralai/mistral-large-2512#mistral/zdr": null,
   "openrouter#mistralai/mistral-large-2512#primeintellect": null,
+  "openrouter#mistralai/mistral-large-4-0#mistral": {
+    "effort": "none"
+  },
   "openrouter#mistralai/mistral-medium-3#mistral": null,
   "openrouter#mistralai/mistral-medium-3#mistral/eu": null,
   "openrouter#mistralai/mistral-medium-3#mistral/zdr": null,
@@ -2207,6 +2215,9 @@
   "openrouter#z-ai/glm-5.2#inference-net": {
     "effort": "none"
   },
+  "openrouter#z-ai/glm-5.2#inference-net/fp4": {
+    "effort": "none"
+  },
   "openrouter#z-ai/glm-5.2#io-net/fp4": {
     "effort": "none"
   },
@@ -2355,6 +2366,7 @@
   "openrouter#z-ai/glm-5.3-flash#parasail/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#parasail/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#phala/fp8": null,
+  "openrouter#z-ai/glm-5.3-flash#phala/nvfp4": null,
   "openrouter#z-ai/glm-5.3-flash#primeintellect": null,
   "openrouter#z-ai/glm-5.3-flash#reka": null,
   "openrouter#z-ai/glm-5.3-flash#reka/fp8": null,

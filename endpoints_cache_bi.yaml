@@ -296,6 +296,12 @@ too_expensive:
   - 3.6
   - 21.6
 - api: openrouter
+  model: google/gemini-nano-banana-2.1
+  provider: google-ai-studio
+  cost:
+  - 1.5
+  - 7.5
+- api: openrouter
   model: minimax/minimax-01
   provider: minimax
   cost:
@@ -3884,12 +3890,12 @@ unprobeable:
   detail: null
 failure_streaks:
   openrouter#moonshotai/kimi-k2.6#gmicloud/fp8:
-    count: 1
+    count: 2
     last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"moonshotai/kimi-k2.6
       is temporarily rate-limited upstream. Please retry shortly, or add your own
       key to accumulate your rate limits: ...'
   openrouter#openai/gpt-3.5-turbo-instruct#openai:
-    count: 1
+    count: 2
     last_error: '{"message":"Provider returned error","code":404,"metadata":{"raw":"{\n    \"error\":
       {\n        \"message\": \"The model `gpt-3.5-turbo-instruct` has been deprecated,
       learn more here: https://platform...'
