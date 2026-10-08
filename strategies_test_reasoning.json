@@ -738,6 +738,7 @@
     "skip": "hidden reasoning"
   },
   "openrouter#google/gemma-3-12b-it#deepinfra/bf16": null,
+  "openrouter#google/gemma-3-12b-it#nextbit/int4": null,
   "openrouter#google/gemma-3-27b-it#deepinfra/fp8": null,
   "openrouter#google/gemma-3-27b-it#nebius/fp8": null,
   "openrouter#google/gemma-3-27b-it#novita/bf16": null,
@@ -1136,6 +1137,9 @@
   "openrouter#moonshotai/kimi-k2.7-code#together": null,
   "openrouter#moonshotai/kimi-k2.7-code#venice/int4": null,
   "openrouter#moonshotai/kimi-k3#morph/fp8": {
+    "effort": "none"
+  },
+  "openrouter#moonshotai/kimi-k3#phala": {
     "effort": "none"
   },
   "openrouter#moonshotai/kimi-k3#sail-research/fp4": {
@@ -2056,6 +2060,7 @@
   "openrouter#xiaomi/mimo-v2.6-flash#io-net/fp8": {
     "effort": "none"
   },
+  "openrouter#xiaomi/mimo-v2.6-flash#makora/fp8": null,
   "openrouter#xiaomi/mimo-v2.6-flash#novita/fp8": {
     "effort": "none"
   },
@@ -2363,6 +2368,7 @@
   "openrouter#z-ai/glm-5.3-flash#nextbit/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#novita/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#open-inference/fp4": null,
+  "openrouter#z-ai/glm-5.3-flash#parasail/fast": null,
   "openrouter#z-ai/glm-5.3-flash#parasail/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#parasail/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#phala/fp8": null,

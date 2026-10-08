@@ -1064,11 +1064,23 @@ too_expensive:
   - 1.4
   - 4.4
 - api: openrouter
+  model: z-ai/glm-5.2
+  provider: novita/fp8
+  cost:
+  - 0.6496
+  - 2.0416
+- api: openrouter
   model: z-ai/glm-5.3
   provider: siliconflow/fp8
   cost:
   - 0.7
   - 2.2
+- api: openrouter
+  model: z-ai/glm-5.3-flash
+  provider: siliconflow/fp8
+  cost:
+  - 0.15
+  - 0.5
 bad_temperature:
 - api: openrouter
   model: anthropic/claude-fable-5
@@ -1130,6 +1142,66 @@ bad_temperature:
   cost:
   - 10.0
   - 50.0
+- api: openrouter
+  model: anthropic/claude-haiku-5.5
+  provider: amazon-bedrock
+  cost:
+  - 0.1
+  - 0.5
+- api: openrouter
+  model: anthropic/claude-haiku-5.5
+  provider: amazon-bedrock/eu-west-1
+  cost:
+  - 0.11
+  - 0.55
+- api: openrouter
+  model: anthropic/claude-haiku-5.5
+  provider: amazon-bedrock/us-east-1
+  cost:
+  - 0.11
+  - 0.55
+- api: openrouter
+  model: anthropic/claude-haiku-5.5
+  provider: anthropic
+  cost:
+  - 0.1
+  - 0.5
+- api: openrouter
+  model: anthropic/claude-haiku-5.5
+  provider: azure/global
+  cost:
+  - 0.1
+  - 0.5
+- api: openrouter
+  model: anthropic/claude-haiku-5.5
+  provider: azure/us
+  cost:
+  - 0.11
+  - 0.55
+- api: openrouter
+  model: anthropic/claude-haiku-5.5
+  provider: claude-on-aws
+  cost:
+  - 0.1
+  - 0.5
+- api: openrouter
+  model: anthropic/claude-haiku-5.5
+  provider: google-vertex/europe
+  cost:
+  - 0.11
+  - 0.55
+- api: openrouter
+  model: anthropic/claude-haiku-5.5
+  provider: google-vertex/global
+  cost:
+  - 0.1
+  - 0.5
+- api: openrouter
+  model: anthropic/claude-haiku-5.5
+  provider: google-vertex/us
+  cost:
+  - 0.11
+  - 0.55
 - api: openrouter
   model: anthropic/claude-opus-4.7
   provider: amazon-bedrock/eu-west-1
@@ -2534,6 +2606,12 @@ bad_temperature:
   cost:
   - 0.95
   - 4.0
+- api: openrouter
+  model: z-ai/glm-5.2
+  provider: wafer/us
+  cost:
+  - 0.084
+  - 4.3
 unprobeable:
 - api: openrouter
   model: amazon/nova-premier-v1
@@ -2567,6 +2645,14 @@ unprobeable:
   cost:
   - 0.5
   - 2.5
+  reason: batch
+  detail: null
+- api: openrouter
+  model: anthropic/claude-haiku-5.5:batch
+  provider: anthropic
+  cost:
+  - 0.05
+  - 0.25
   reason: batch
   detail: null
 - api: openrouter
@@ -3306,6 +3392,16 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
+  model: moonshotai/kimi-k2.6
+  provider: gmicloud/fp8
+  cost:
+  - 0.855
+  - 3.6
+  reason: flaky
+  detail: '{"message":"Provider returned error","code":429,"metadata":{"raw":"moonshotai/kimi-k2.6
+    is temporarily rate-limited upstream. Please retry shortly, or add your own key
+    to accumulate your rate limits: ...'
+- api: openrouter
   model: moonshotai/kimi-k2.7-code
   provider: siliconflow/fp8
   cost:
@@ -3341,6 +3437,16 @@ unprobeable:
   - 11.4
   reason: batch
   detail: null
+- api: openrouter
+  model: openai/gpt-3.5-turbo-instruct
+  provider: openai
+  cost:
+  - 1.5
+  - 2.0
+  reason: flaky
+  detail: '{"message":"Provider returned error","code":404,"metadata":{"raw":"{\n    \"error\":
+    {\n        \"message\": \"The model `gpt-3.5-turbo-instruct` has been deprecated,
+    learn more here: https://platform...'
 - api: openrouter
   model: openai/gpt-3.5-turbo:batch
   provider: openai
@@ -3889,16 +3995,6 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
-  openrouter#moonshotai/kimi-k2.6#gmicloud/fp8:
-    count: 2
-    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"moonshotai/kimi-k2.6
-      is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulate your rate limits: ...'
-  openrouter#openai/gpt-3.5-turbo-instruct#openai:
-    count: 2
-    last_error: '{"message":"Provider returned error","code":404,"metadata":{"raw":"{\n    \"error\":
-      {\n        \"message\": \"The model `gpt-3.5-turbo-instruct` has been deprecated,
-      learn more here: https://platform...'
   openrouter#z-ai/glm-5.2#baseten/fp8:
     count: 1
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"max_tokens
