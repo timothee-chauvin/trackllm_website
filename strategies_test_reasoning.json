@@ -402,6 +402,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash#coreweave/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash#crusoe/fp8": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash#decart/fp4": {
     "effort": "none"
   },
@@ -741,6 +744,7 @@
   "openrouter#google/gemma-3-12b-it#nextbit/int4": null,
   "openrouter#google/gemma-3-27b-it#deepinfra/fp8": null,
   "openrouter#google/gemma-3-27b-it#nebius/fp8": null,
+  "openrouter#google/gemma-3-27b-it#nextbit/fp8": null,
   "openrouter#google/gemma-3-27b-it#novita/bf16": null,
   "openrouter#google/gemma-3-27b-it#parasail/fp8": null,
   "openrouter#google/gemma-3-27b-it#phala": {
@@ -821,6 +825,9 @@
     "effort": "none"
   },
   "openrouter#inclusionai/ling-3.0-flash-fin#novita": {
+    "effort": "none"
+  },
+  "openrouter#inclusionai/ling-3.0-flash-sante#novita": {
     "effort": "none"
   },
   "openrouter#inclusionai/ling-3.0-flash-vl#deepinfra/fp16": {
@@ -1025,6 +1032,12 @@
   "openrouter#mistralai/mistral-large-2512#mistral/zdr": null,
   "openrouter#mistralai/mistral-large-2512#primeintellect": null,
   "openrouter#mistralai/mistral-large-4-0#mistral": {
+    "effort": "none"
+  },
+  "openrouter#mistralai/mistral-large-4-0#mistral/eu": {
+    "effort": "none"
+  },
+  "openrouter#mistralai/mistral-large-4-0#mistral/zdr": {
     "effort": "none"
   },
   "openrouter#mistralai/mistral-medium-3#mistral": null,
@@ -1787,6 +1800,9 @@
     "effort": "none"
   },
   "openrouter#qwen/qwen3.6-27b#phala": null,
+  "openrouter#qwen/qwen3.6-27b#reka": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.6-27b#siliconflow/fp8": null,
   "openrouter#qwen/qwen3.6-27b#venice/fp8": null,
   "openrouter#qwen/qwen3.6-27b#wandb/fp8": null,
@@ -1918,6 +1934,7 @@
   "openrouter#stepfun/step-3.7-flash#novita": null,
   "openrouter#stepfun/step-3.7-flash#novita/fp8": null,
   "openrouter#stepfun/step-3.7-flash#stepfun/fp8": null,
+  "openrouter#stepfun/step-5-preview#stepfun/fp8": null,
   "openrouter#switchpoint/router#switchpoint": null,
   "openrouter#tencent/hunyuan-a13b-instruct#siliconflow/fp8": {
     "max_tokens": 1

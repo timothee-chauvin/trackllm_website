@@ -195,6 +195,12 @@ too_expensive:
   - 2.088
 - api: openrouter
   model: deepseek/deepseek-v4-pro
+  provider: gmicloud/fp8
+  cost:
+  - 0.957
+  - 1.914
+- api: openrouter
+  model: deepseek/deepseek-v4-pro
   provider: novita/fp8
   cost:
   - 1.6
@@ -483,7 +489,19 @@ too_expensive:
   - 12.75
 - api: openrouter
   model: moonshotai/kimi-k3
+  provider: makora/fp4
+  cost:
+  - 1.53
+  - 12.75
+- api: openrouter
+  model: moonshotai/kimi-k3
   provider: modal/mxfp4
+  cost:
+  - 3.0
+  - 15.0
+- api: openrouter
+  model: moonshotai/kimi-k3
+  provider: parasail/fast
   cost:
   - 3.0
   - 15.0
@@ -542,6 +560,12 @@ too_expensive:
   - 0.2
   - 0.2
 - api: openrouter
+  model: nvidia/nemotron-3.5-lightning
+  provider: wafer
+  cost:
+  - 0.035
+  - 0.13
+- api: openrouter
   model: openai/gpt-4
   provider: azure
   cost:
@@ -583,6 +607,12 @@ too_expensive:
   cost:
   - 0.23
   - 2.3
+- api: openrouter
+  model: qwen/qwen3-30b-a3b
+  provider: alibaba
+  cost:
+  - 0.13
+  - 0.52
 - api: openrouter
   model: qwen/qwen3-30b-a3b-thinking-2507
   provider: alibaba
@@ -2487,6 +2517,12 @@ bad_temperature:
   - 1.0
   - 5.0
 - api: openrouter
+  model: openai/gpt-6.1-sol
+  provider: openai/ultrafast
+  cost:
+  - 12.0
+  - 60.0
+- api: openrouter
   model: openai/gpt-6.1-sol-pro
   provider: azure
   cost:
@@ -2522,6 +2558,12 @@ bad_temperature:
   cost:
   - 1.0
   - 5.0
+- api: openrouter
+  model: openai/gpt-6.1-sol-pro
+  provider: openai/ultrafast
+  cost:
+  - 12.0
+  - 60.0
 - api: openrouter
   model: openai/gpt-chat-latest
   provider: openai
@@ -3789,6 +3831,22 @@ unprobeable:
   detail: null
 - api: openrouter
   model: openai/gpt-6-sol:batch
+  provider: openai
+  cost:
+  - 1.0
+  - 5.0
+  reason: batch
+  detail: null
+- api: openrouter
+  model: openai/gpt-6.1-sol-pro:batch
+  provider: openai
+  cost:
+  - 1.0
+  - 5.0
+  reason: batch
+  detail: null
+- api: openrouter
+  model: openai/gpt-6.1-sol:batch
   provider: openai
   cost:
   - 1.0
