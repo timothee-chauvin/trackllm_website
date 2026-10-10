@@ -219,6 +219,12 @@ too_expensive:
   - 3.366
 - api: openrouter
   model: deepseek/deepseek-v4-pro-0813
+  provider: alibaba/us-east-1
+  cost:
+  - 1.32
+  - 3.96
+- api: openrouter
+  model: deepseek/deepseek-v4-pro-0813
   provider: atlas-cloud/fp8
   cost:
   - 1.32
@@ -832,6 +838,12 @@ too_expensive:
 - api: openrouter
   model: qwen/qwen3.8-max-0902
   provider: alibaba
+  cost:
+  - 2.0
+  - 6.0
+- api: openrouter
+  model: qwen/qwen3.8-max-0902
+  provider: alibaba/us-east-1
   cost:
   - 2.0
   - 6.0
@@ -4053,6 +4065,11 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
+  openrouter#qwen/qwen3.8-flash#alibaba/us-east-1:
+    count: 1
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"qwen/qwen3.8-flash
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rate...'
   openrouter#z-ai/glm-5.2#baseten/fp8:
     count: 1
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"max_tokens

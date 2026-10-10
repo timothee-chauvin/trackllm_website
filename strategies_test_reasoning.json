@@ -229,6 +229,9 @@
   "openrouter#deepseek/deepseek-v4-flash-0731#alibaba": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4-flash-0731#alibaba/us-east-1": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-flash-0731#ambient/fp4": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#atlas-cloud/fp4": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#atlas-cloud/fp8": null,
@@ -1463,6 +1466,7 @@
   "openrouter#openai/gpt-oss-120b#together": {
     "max_tokens": 4
   },
+  "openrouter#openai/gpt-oss-120b#venice/int4": null,
   "openrouter#openai/gpt-oss-120b#wandb/fp4": {
     "max_tokens": 4
   },
@@ -1834,13 +1838,22 @@
   "openrouter#qwen/qwen3.6-plus#alibaba": null,
   "openrouter#qwen/qwen3.6-plus#alibaba/fp8": null,
   "openrouter#qwen/qwen3.7-flash#alibaba": null,
+  "openrouter#qwen/qwen3.7-flash#alibaba/us-east-1": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.7-max#alibaba": null,
   "openrouter#qwen/qwen3.7-max#alibaba/fp8": null,
+  "openrouter#qwen/qwen3.7-max#alibaba/us-east-1": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.7-max#atlas-cloud/fp8": {
     "effort": "none"
   },
   "openrouter#qwen/qwen3.7-plus#alibaba": null,
   "openrouter#qwen/qwen3.7-plus#alibaba/fp8": null,
+  "openrouter#qwen/qwen3.7-plus#alibaba/us-east-1": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.8-27b#akashml/bf16": {
     "effort": "none"
   },
@@ -1879,6 +1892,9 @@
     "effort": "none"
   },
   "openrouter#qwen/qwen3.8-27b#modelrun/fp4": {
+    "effort": "none"
+  },
+  "openrouter#qwen/qwen3.8-27b#near-ai/fp8": {
     "effort": "none"
   },
   "openrouter#qwen/qwen3.8-27b#novita": {
