@@ -1921,6 +1921,9 @@
   "openrouter#qwen/qwen3.8-flash#alibaba": {
     "effort": "none"
   },
+  "openrouter#qwen/qwen3.8-flash#alibaba/us-east-1": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.8-flash#makora/fp4": {
     "effort": "none"
   },

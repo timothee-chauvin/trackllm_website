@@ -8,10 +8,22 @@ liars:
   - 0.8001
 - api: openrouter
   model: deepseek/deepseek-v4-flash-0731
+  provider: inceptron/fp4
+  cost:
+  - 0.1722
+  - 0.6
+- api: openrouter
+  model: deepseek/deepseek-v4-flash-0731
   provider: relace/fp4
   cost:
   - 0.0125
   - 1.28
+- api: openrouter
+  model: deepseek/deepseek-v4-pro
+  provider: alibaba/fp8
+  cost:
+  - 1.416
+  - 2.832
 - api: openrouter
   model: deepseek/deepseek-v4-pro
   provider: baidu/fp8
@@ -48,6 +60,12 @@ liars:
   cost:
   - 0.6
   - 2.4
+- api: openrouter
+  model: z-ai/glm-5.2
+  provider: alibaba/fp8
+  cost:
+  - 0.966
+  - 3.036
 - api: openrouter
   model: z-ai/glm-5.2
   provider: streamlake/fp8
@@ -4065,11 +4083,6 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
-  openrouter#qwen/qwen3.8-flash#alibaba/us-east-1:
-    count: 1
-    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"qwen/qwen3.8-flash
-      is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulate your rate...'
   openrouter#z-ai/glm-5.2#baseten/fp8:
     count: 1
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"max_tokens
