@@ -2370,6 +2370,7 @@
   },
   "openrouter#z-ai/glm-5.3#streamlake": null,
   "openrouter#z-ai/glm-5.3#streamlake/fp8": null,
+  "openrouter#z-ai/glm-5.3#tenstorrent/fp8": null,
   "openrouter#z-ai/glm-5.3#together": {
     "max_tokens": 1
   },
