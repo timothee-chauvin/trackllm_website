@@ -3,8 +3,8 @@ endpoints_lt:
   model: mistralai/mistral-nemo
   provider: io-net/fp16
   cost:
-  - 0.0184
-  - 0.024
+  - 0.01656
+  - 0.0216
 - api: openrouter
   model: mistralai/mistral-nemo
   provider: dekallm/fp8
@@ -61,6 +61,12 @@ endpoints_lt:
   - 0.12
 - api: openrouter
   model: inclusionai/ling-3.0-flash-fin
+  provider: novita
+  cost:
+  - 0.042
+  - 0.1232
+- api: openrouter
+  model: inclusionai/ling-3.0-flash-sante
   provider: novita
   cost:
   - 0.042
@@ -127,12 +133,6 @@ endpoints_lt:
   - 0.15
 - api: openrouter
   model: google/gemma-4-26b-a4b-it
-  provider: io-net/bf16
-  cost:
-  - 0.0483
-  - 0.21
-- api: openrouter
-  model: google/gemma-4-26b-a4b-it
   provider: darkbloom
   cost:
   - 0.042
@@ -180,11 +180,23 @@ endpoints_lt:
   - 0.08
   - 0.3
 - api: openrouter
+  model: google/gemma-4-26b-a4b-it
+  provider: makora
+  cost:
+  - 0.1
+  - 0.28
+- api: openrouter
   model: meta-llama/llama-3.2-3b-instruct
   provider: parasail/bf16
   cost:
   - 0.05
   - 0.33
+- api: openrouter
+  model: deepseek/deepseek-v4.1-flash
+  provider: sail-research/fp4
+  cost:
+  - 0.09
+  - 0.3
 - api: openrouter
   model: google/gemma-4-26b-a4b-it
   provider: dekallm/bf16
@@ -222,12 +234,6 @@ endpoints_lt:
   - 0.1
   - 0.3
 - api: openrouter
-  model: google/gemma-4-26b-a4b-it
-  provider: makora
-  cost:
-  - 0.08
-  - 0.32
-- api: openrouter
   model: xiaomi/mimo-v2.6-flash
   provider: makora/fp8
   cost:
@@ -264,17 +270,23 @@ endpoints_lt:
   - 0.1
   - 0.34
 - api: openrouter
+  model: google/gemma-4-26b-a4b-it
+  provider: io-net/bf16
+  cost:
+  - 0.123
+  - 0.35
+- api: openrouter
   model: xiaomi/mimo-v2.6-flash
   provider: io-net/fp8
   cost:
   - 0.19
   - 0.29
 - api: openrouter
-  model: deepseek/deepseek-v4.1-flash
-  provider: sail-research/fp4
+  model: qwen/qwen3.8-27b
+  provider: tenstorrent/fp4
   cost:
-  - 0.08
-  - 0.4
+  - 0.02
+  - 0.5
 - api: openrouter
   model: deepseek/deepseek-v4-flash-0731
   provider: streamlake/fp8
@@ -567,7 +579,7 @@ endpoints_lt:
   model: deepseek/deepseek-v4.1-flash
   provider: wafer
   cost:
-  - 0.07
+  - 0.1
   - 0.99
 - api: openrouter
   model: qwen/qwen3-235b-a22b-2507
@@ -685,6 +697,12 @@ endpoints_lt:
   - 1.0925
 - api: openrouter
   model: deepseek/deepseek-v4.1-flash
+  provider: cloudflare
+  cost:
+  - 0.3
+  - 1.2
+- api: openrouter
+  model: deepseek/deepseek-v4.1-flash
   provider: fireworks
   cost:
   - 0.3
@@ -780,6 +798,12 @@ endpoints_lt:
   - 0.56
   - 1.68
 - api: openrouter
+  model: qwen/qwen3.8-27b
+  provider: reka/fp8
+  cost:
+  - 0.04
+  - 2.2
+- api: openrouter
   model: deepseek/deepseek-v4.1-flash
   provider: fireworks/us
   cost:
@@ -815,6 +839,18 @@ endpoints_lt:
   cost:
   - 0.24
   - 2.2
+- api: openrouter
+  model: deepseek/deepseek-v4-pro-0813
+  provider: sail-research/fp4
+  cost:
+  - 0.48
+  - 1.98
+- api: openrouter
+  model: deepseek/deepseek-v4-pro-0813
+  provider: sail-research/us
+  cost:
+  - 0.48
+  - 1.98
 - api: openrouter
   model: qwen/qwen3.8-27b
   provider: cerebras/fp16
@@ -882,12 +918,6 @@ endpoints_lt:
   - 0.748
   - 2.299
 - api: openrouter
-  model: qwen/qwen3.8-27b
-  provider: reka/fp8
-  cost:
-  - 0.05
-  - 3.0
-- api: openrouter
   model: deepseek/deepseek-v4-pro
   provider: digitalocean
   cost:
@@ -900,17 +930,11 @@ endpoints_lt:
   - 0.37
   - 2.93
 - api: openrouter
-  model: deepseek/deepseek-v4-pro-0813
-  provider: sail-research/fp4
+  model: tencent/hy4-preview
+  provider: makora/fp8
   cost:
-  - 0.4
-  - 3.0
-- api: openrouter
-  model: deepseek/deepseek-v4-pro-0813
-  provider: sail-research/us
-  cost:
-  - 0.4
-  - 3.0
+  - 0.83
+  - 2.501
 - api: openrouter
   model: qwen/qwen3.8-27b
   provider: cloudflare
@@ -929,6 +953,12 @@ endpoints_lt:
   cost:
   - 1.056
   - 3.168
+- api: openrouter
+  model: deepseek/deepseek-v4-pro-0813
+  provider: reka
+  cost:
+  - 1.2
+  - 3.2
 - api: openrouter
   model: qwen/qwen3-max
   provider: alibaba
@@ -1125,7 +1155,7 @@ endpoints_lt:
   model: moonshotai/kimi-k3
   provider: morph/fp8
   cost:
-  - 1.0
+  - 0.75
   - 14.9
 - api: openrouter
   model: openai/gpt-4o-2024-05-13

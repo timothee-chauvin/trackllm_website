@@ -1118,6 +1118,12 @@ too_expensive:
   - 4.35
   - 8.7
 - api: openrouter
+  model: z-ai/glm-5.1
+  provider: novita/fp8
+  cost:
+  - 1.38
+  - 4.4
+- api: openrouter
   model: z-ai/glm-5.2
   provider: gmicloud/fp8
   cost:
@@ -4083,6 +4089,10 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
+  openrouter#meta/muse-wonder#meta:
+    count: 1
+    last_error: 'plain: 403 {"message":"This model requires you to complete the following
+      before use: 18+ age confirmation. Confirm at https://openrouter.ai/settings/preferences.","code":403,"metadata":{"missing_attes...'
   openrouter#z-ai/glm-5.2#baseten/fp8:
     count: 1
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"max_tokens

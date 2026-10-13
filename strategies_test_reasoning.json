@@ -402,6 +402,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash#baseten/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash#cloudflare": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash#coreweave/fp8": {
     "effort": "none"
   },
@@ -1912,6 +1915,9 @@
   "openrouter#qwen/qwen3.8-27b#reka/fp8": {
     "effort": "none"
   },
+  "openrouter#qwen/qwen3.8-27b#tenstorrent/fp4": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.8-27b#venice/fp8": {
     "effort": "none"
   },
@@ -1982,6 +1988,9 @@
     "effort": "none"
   },
   "openrouter#tencent/hy4-preview#inference-net/fp8": {
+    "effort": "none"
+  },
+  "openrouter#tencent/hy4-preview#makora/fp8": {
     "effort": "none"
   },
   "openrouter#tencent/hy4-preview#novita/fp8": {
@@ -2349,6 +2358,7 @@
   "openrouter#z-ai/glm-5.3#mistral/nvfp4": null,
   "openrouter#z-ai/glm-5.3#mistral/zdr": null,
   "openrouter#z-ai/glm-5.3#modal": null,
+  "openrouter#z-ai/glm-5.3#modelrun/fp4": null,
   "openrouter#z-ai/glm-5.3#morph": null,
   "openrouter#z-ai/glm-5.3#morph/fp4": null,
   "openrouter#z-ai/glm-5.3#morph/fp8": null,
