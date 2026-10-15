@@ -362,6 +362,12 @@ too_expensive:
   - 3.6
   - 18.0
 - api: openrouter
+  model: google/gemini-4-argon
+  provider: google-vertex/us
+  cost:
+  - 2.2
+  - 11.0
+- api: openrouter
   model: google/gemini-nano-banana-2.1
   provider: google-ai-studio
   cost:
@@ -4181,10 +4187,28 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
-  openrouter#moonshotai/kimi-k2.7-code#phala:
+  openrouter#deepseek/deepseek-v4-flash-0731#baseten/fp8/us:
     count: 1
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4-flash-0731
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumul...'
+  openrouter#deepseek/deepseek-v4.1-flash#baseten/fp32:
+    count: 1
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4.1-flash
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate...'
+  openrouter#google/gemma-3-4b-it#parasail/fp8:
+    count: 1
+    last_error: 'cached: hidden reasoning'
+  openrouter#moonshotai/kimi-k2.7-code#phala:
+    count: 2
     last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"The
       request was rejected as invalid\",\"type\":\"invalid_request_error\",\"code\":null,\"param\"...'
+  openrouter#stepfun/step-5-preview#deepinfra/fp8:
+    count: 1
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"stepfun/step-5-preview
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your ...'
   openrouter#z-ai/glm-5.2#baseten/fp8:
     count: 1
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"max_tokens
@@ -4194,3 +4218,13 @@ failure_streaks:
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n\t\"error\":
       {\n\t\t\"code\": \"400\",\n\t\t\"message\": \"max_tokens must be at least 2
       for this deployment.\",\n\t\t\"type\": \"...'
+  openrouter#z-ai/glm-5.3#baseten/us/fast:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"z-ai/glm-5.3
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rate limits: https://...'
+  openrouter#z-ai/glm-5.3-flash#baseten/fp8/us:
+    count: 1
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"z-ai/glm-5.3-flash
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rate...'
