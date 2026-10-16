@@ -374,6 +374,42 @@ too_expensive:
   - 1.5
   - 7.5
 - api: openrouter
+  model: meta-llama/llama-guard-4-12b
+  provider: deepinfra/bf16/priority
+  cost:
+  - 0.27
+  - 0.27
+- api: openrouter
+  model: meta/muse-spark-open
+  provider: baseten/fp4
+  cost:
+  - 1.25
+  - 4.25
+- api: openrouter
+  model: meta/muse-spark-open
+  provider: fireworks
+  cost:
+  - 1.25
+  - 4.25
+- api: openrouter
+  model: meta/muse-spark-open
+  provider: modal
+  cost:
+  - 1.25
+  - 4.25
+- api: openrouter
+  model: meta/muse-spark-open
+  provider: nebius/fp4
+  cost:
+  - 1.25
+  - 4.25
+- api: openrouter
+  model: meta/muse-spark-open
+  provider: together
+  cost:
+  - 1.25
+  - 4.25
+- api: openrouter
   model: meta/muse-wonder
   provider: meta
   cost:
@@ -1725,6 +1761,12 @@ bad_temperature:
   - 1.35
   - 6.75
 - api: openrouter
+  model: google/gemini-3.7-flash
+  provider: google-vertex/us
+  cost:
+  - 0.825
+  - 4.125
+- api: openrouter
   model: google/gemini-3.8-flash
   provider: google-vertex/global
   cost:
@@ -1742,6 +1784,12 @@ bad_temperature:
   cost:
   - 1.35
   - 6.75
+- api: openrouter
+  model: google/gemini-3.8-flash
+  provider: google-vertex/us
+  cost:
+  - 0.825
+  - 4.125
 - api: openrouter
   model: moonshotai/kimi-k2.6
   provider: moonshotai/int4
@@ -3579,6 +3627,15 @@ unprobeable:
     to accumulate your rate limits: ...'
 - api: openrouter
   model: moonshotai/kimi-k2.7-code
+  provider: phala
+  cost:
+  - 0.95
+  - 4.0
+  reason: flaky
+  detail: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"The
+    request was rejected as invalid\",\"type\":\"invalid_request_error\",\"code\":null,\"param\"...'
+- api: openrouter
+  model: moonshotai/kimi-k2.7-code
   provider: siliconflow/fp8
   cost:
   - 0.85916
@@ -4179,6 +4236,14 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
+  model: z-ai/glm-5.3-flash:batch
+  provider: sail-research/fp4
+  cost:
+  - 0.05
+  - 0.18
+  reason: batch
+  detail: null
+- api: openrouter
   model: z-ai/glm-5.3:batch
   provider: deepinfra/fp4
   cost:
@@ -4187,44 +4252,163 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
+  openrouter#deepseek/deepseek-chat#deepinfra/fp4/flex:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#deepseek/deepseek-v4-flash#wafer/mxfp4:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#deepseek/deepseek-v4-flash-0731#baseten/fp32:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":520,"metadata":{"raw":"error
+      code: 520\n","provider_name":"BaseTen","is_byok":false}}'
   openrouter#deepseek/deepseek-v4-flash-0731#baseten/fp8/us:
     count: 1
     last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4-flash-0731
       is temporarily rate-limited upstream. Please retry shortly, or add your own
       key to accumul...'
+  openrouter#deepseek/deepseek-v4-pro-0813#wafer/mxfp4:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#deepseek/deepseek-v4.1-flash#baseten:
+    count: 1
+    last_error: could not fetch generation cost
   openrouter#deepseek/deepseek-v4.1-flash#baseten/fp32:
     count: 1
     last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4.1-flash
       is temporarily rate-limited upstream. Please retry shortly, or add your own
       key to accumulate...'
+  openrouter#deepseek/deepseek-v4.1-flash#baseten/us:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4.1-flash
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rate ...'
+  openrouter#deepseek/deepseek-v4.1-flash#deepinfra/fp8/flex:
+    count: 1
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4.1-flash
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate...'
+  openrouter#deepseek/deepseek-v4.1-flash#deepinfra/fp8/priority:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#deepseek/deepseek-v4.1-flash#wafer/mxfp4:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#google/gemini-3.1-flash-image#google-vertex/us:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":502,"metadata":{"raw":"{\n  \"error\":
+      {\n    \"code\": 500,\n    \"message\": \"Internal error encountered.\",\n    \"status\":
+      \"INTERNAL\"\n  }\n}\n","pr...'
+  openrouter#google/gemma-3-12b-it#deepinfra/bf16/flex:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#google/gemma-3-12b-it#deepinfra/bf16/priority:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#google/gemma-3-4b-it#parasail/bf16:
+    count: 1
+    last_error: 'cached: hidden reasoning'
   openrouter#google/gemma-3-4b-it#parasail/fp8:
     count: 1
     last_error: 'cached: hidden reasoning'
-  openrouter#moonshotai/kimi-k2.7-code#phala:
-    count: 2
-    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"The
-      request was rejected as invalid\",\"type\":\"invalid_request_error\",\"code\":null,\"param\"...'
-  openrouter#stepfun/step-5-preview#deepinfra/fp8:
+  openrouter#google/gemma-4-31b-it#deepinfra/fp8/flex:
     count: 1
-    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"stepfun/step-5-preview
-      is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulate your ...'
+    last_error: could not fetch generation cost
+  openrouter#google/gemma-4-31b-it#deepinfra/fp8/priority:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#meta-llama/llama-4-scout#deepinfra/fp8/flex:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#meta-llama/llama-4-scout#deepinfra/fp8/priority:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#meta-llama/llama-guard-4-12b#deepinfra/bf16/flex:
+    count: 1
+    last_error: 'plain: empty response'
+  openrouter#microsoft/phi-4#deepinfra/bf16/flex:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#minimax/minimax-m3#deepinfra/fp8/flex:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#moondream/moondream3-preview#primeintellect/fp8:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#moondream/moondream3.1-9b-a2b#primeintellect/fp8:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#nvidia/nemotron-3-super-120b-a12b#crusoe/fp8:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#nvidia/nemotron-3-ultra-550b-a55b#deepinfra/fp4/flex:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#nvidia/nemotron-3.5-super-vl#coreweave/nvfp4:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#nvidia/nemotron-3.5-super-vl#crusoe/bf16:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#nvidia/nemotron-3.5-super-vl#deepinfra/fp4:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#nvidia/nemotron-3.5-super-vl#together:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#nvidia/nemotron-3.5-super-vl#venice/fp4:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#openai/gpt-oss-120b#near-ai/fp4:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#qwen/qwen3-next-80b-a3b-instruct#deepinfra/fp8/flex:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#qwen/qwen3-next-80b-a3b-instruct#deepinfra/fp8/priority:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#qwen/qwen3.8-27b#wafer/fp8:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#stepfun/step-5-preview#deepinfra/fp8:
+    count: 2
+    last_error: could not fetch generation cost
+  openrouter#stepfun/step-5-preview#featherless/fp4:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#z-ai/glm-4.6#deepinfra/fp4/flex:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#z-ai/glm-4.7#deepinfra/fp4/flex:
+    count: 1
+    last_error: could not fetch generation cost
   openrouter#z-ai/glm-5.2#baseten/fp8:
     count: 1
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"message\":\"max_tokens
       must be at least 2 for this deployment.\",\"type\":\"Bad Request\",\"code\":\"400\"}","provider_name":"Base...'
+  openrouter#z-ai/glm-5.2#deepinfra/fp4/flex:
+    count: 1
+    last_error: could not fetch generation cost
   openrouter#z-ai/glm-5.3#baseten/fp4:
     count: 1
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n\t\"error\":
       {\n\t\t\"code\": \"400\",\n\t\t\"message\": \"max_tokens must be at least 2
       for this deployment.\",\n\t\t\"type\": \"...'
   openrouter#z-ai/glm-5.3#baseten/us/fast:
+    count: 2
+    last_error: could not fetch generation cost
+  openrouter#z-ai/glm-5.3#wafer/fp4:
     count: 1
-    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"z-ai/glm-5.3
-      is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulate your rate limits: https://...'
+    last_error: could not fetch generation cost
   openrouter#z-ai/glm-5.3-flash#baseten/fp8/us:
-    count: 1
-    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"z-ai/glm-5.3-flash
+    count: 2
+    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"z-ai/glm-5.3-flash
       is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulate your rate...'
+      key to accumulate your rate limits: ht...'
+  openrouter#z-ai/glm-5.3-flash#nextbit/fp4:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#z-ai/glm-5.3-flash#wafer/nvfp4:
+    count: 1
+    last_error: could not fetch generation cost
