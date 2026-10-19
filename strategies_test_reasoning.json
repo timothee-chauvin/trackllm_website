@@ -537,7 +537,11 @@
   "openrouter#deepseek/deepseek-v4.1-flash#wafer/mxfp4": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#baseten": null,
   "openrouter#deepseek/deepseek-v4.1-flash-1017#cloudflare": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#crusoe/fp8": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#deepinfra/fp8": {
@@ -555,6 +559,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash-1017#inference-net/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#morph/fp8": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#parasail/fp8": {
     "effort": "none"
   },
@@ -562,6 +569,12 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#relace": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#together": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#wafer/mxfp4": {
     "effort": "none"
   },
   "openrouter#elorian/glimpse#together": {
