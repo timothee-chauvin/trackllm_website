@@ -449,6 +449,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash#fireworks": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash#fireworks/flex": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash#fireworks/us": {
     "effort": "none"
   },
@@ -519,6 +522,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash#sail-research/fp4": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash#sail-research/fp4/us": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash#siliconflow/fp8": {
     "effort": "none"
   },
@@ -535,6 +541,12 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#wafer/mxfp4": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#alibaba": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#atlas-cloud/fp8": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#baseten": null,
@@ -554,6 +566,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#fireworks": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#gmicloud/fp8": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#inference-net/fp8": {
@@ -906,6 +921,9 @@
     "effort": "none"
   },
   "openrouter#inception/mercury-2.5-preview#inception": {
+    "effort": "none"
+  },
+  "openrouter#inception/mercury-3#inception": {
     "effort": "none"
   },
   "openrouter#inclusionai/ling-2.6-1t#novita": null,
@@ -1264,6 +1282,9 @@
   "openrouter#moonshotai/kimi-k3#inference-net/fp4": {
     "effort": "none"
   },
+  "openrouter#moonshotai/kimi-k3#makora/fp4": {
+    "effort": "none"
+  },
   "openrouter#moonshotai/kimi-k3#morph/fp8": {
     "effort": "none"
   },
@@ -1340,6 +1361,7 @@
   "openrouter#nvidia/nemotron-3.5-lightning#venice/fp4": {
     "effort": "none"
   },
+  "openrouter#nvidia/nemotron-3.5-super-vl#baseten/fp4": null,
   "openrouter#nvidia/nemotron-3.5-super-vl#coreweave/nvfp4": {
     "effort": "none"
   },
@@ -2036,6 +2058,9 @@
     "effort": "none"
   },
   "openrouter#qwen/qwen3.8-27b#mancer/fp8": {
+    "effort": "none"
+  },
+  "openrouter#qwen/qwen3.8-27b#modal": {
     "effort": "none"
   },
   "openrouter#qwen/qwen3.8-27b#modelrun/fp4": {

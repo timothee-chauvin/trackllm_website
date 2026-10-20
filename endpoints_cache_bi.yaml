@@ -224,6 +224,12 @@ too_expensive:
   - 1.65
   - 4.95
 - api: openrouter
+  model: elorian/glimpse
+  provider: together
+  cost:
+  - 0.6
+  - 3.0
+- api: openrouter
   model: fireworks/ember-1
   provider: fireworks
   cost:
@@ -505,6 +511,12 @@ too_expensive:
   cost:
   - 4.5
   - 22.5
+- api: openrouter
+  model: moonshotai/kimi-k3
+  provider: fireworks/flex
+  cost:
+  - 2.1
+  - 10.5
 - api: openrouter
   model: moonshotai/kimi-k3
   provider: fireworks/us
@@ -1022,6 +1034,12 @@ too_expensive:
   - 0.522
   - 1.044
 - api: openrouter
+  model: xiaomi/mimo-v2.5-pro
+  provider: xiaomi/fp8
+  cost:
+  - 0.435
+  - 0.87
+- api: openrouter
   model: xiaomi/mimo-v2.6-pro-ultraspeed
   provider: xiaomi/fp8
   cost:
@@ -1033,6 +1051,12 @@ too_expensive:
   cost:
   - 0.7
   - 2.2
+- api: openrouter
+  model: z-ai/glm-5.3-flash
+  provider: atlas-cloud/fp8
+  cost:
+  - 0.15
+  - 0.5
 - api: openrouter
   model: z-ai/glm-5.3-flash
   provider: siliconflow/fp8
@@ -2812,6 +2836,16 @@ unprobeable:
     guardrail restrictions and data policy. We removed them for the following reasons
     (an endpoint may have matched multiple reasons)...'
 - api: openrouter
+  model: deepseek/deepseek-v4.1-flash-1017
+  provider: deepseek
+  cost:
+  - 0.15
+  - 0.6
+  reason: flaky
+  detail: 'plain: 404 {"message":"0 endpoints out of 1 requested are available matching
+    your guardrail restrictions and data policy. We removed them for the following
+    reasons (an endpoint may have matched multip...'
+- api: openrouter
   model: deepseek/deepseek-v4.1-flash:batch
   provider: deepinfra/fp8
   cost:
@@ -3974,6 +4008,16 @@ unprobeable:
   reason: flaky
   detail: 'No usage in response; body: {"id":"gen-1792388172-Ev0a3GjqNd1MEt5ToIxU","object":"chat.completion","created":1792388172,"model":"perplexity/sonar-reasoning-pro","provider":"Perplexity","system_fingerp...'
 - api: openrouter
+  model: qwen/qwen3-235b-a22b-2507
+  provider: gmicloud/fp8
+  cost:
+  - 0.0875
+  - 0.35
+  reason: flaky
+  detail: '{"message":"Provider returned error","code":429,"metadata":{"raw":"qwen/qwen3-235b-a22b-2507
+    is temporarily rate-limited upstream. Please retry shortly, or add your own key
+    to accumulate your rate lim...'
+- api: openrouter
   model: qwen/qwen3.7-plus:batch
   provider: alibaba
   cost:
@@ -4055,12 +4099,17 @@ failure_streaks:
     last_error: 'plain: 404 {"message":"0 endpoints out of 1 requested are available
       matching your guardrail restrictions and data policy. We removed them for the
       following reasons (an endpoint may have matched multip...'
-  openrouter#deepseek/deepseek-v4.1-flash-1017#deepseek:
-    count: 2
-    last_error: 'plain: 404 {"message":"0 endpoints out of 1 requested are available
-      matching your guardrail restrictions and data policy. We removed them for the
-      following reasons (an endpoint may have matched multip...'
-  openrouter#qwen/qwen3-235b-a22b-2507#gmicloud/fp8:
-    count: 2
-    last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"type\":\"BadRequest\",\"message\":\"The
-      requested model has been deprecated and is no longer available.\",\"backend_sta...'
+  openrouter#deepseek/deepseek-v4.1-flash-1017#atlas-cloud/fp8:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#deepseek/deepseek-v4.1-flash-1017#decart/fp4:
+    count: 1
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4.1-flash-1017
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accum...'
+  openrouter#inception/mercury-3#inception:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#xiaomi/mimo-v2.6-flash#relace/mxfp4:
+    count: 1
+    last_error: could not fetch generation cost
