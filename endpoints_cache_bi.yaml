@@ -531,6 +531,12 @@ too_expensive:
   - 15.0
 - api: openrouter
   model: moonshotai/kimi-k3
+  provider: inference-net/us/fast
+  cost:
+  - 2.24
+  - 14.519
+- api: openrouter
+  model: moonshotai/kimi-k3
   provider: makora/fp4
   cost:
   - 1.53
@@ -1640,6 +1646,12 @@ bad_temperature:
   cost:
   - 0.825
   - 4.125
+- api: openrouter
+  model: inception/mercury-3
+  provider: inception
+  cost:
+  - 0.1
+  - 0.35
 - api: openrouter
   model: moonshotai/kimi-k2.6
   provider: moonshotai/int4
@@ -4099,17 +4111,3 @@ failure_streaks:
     last_error: 'plain: 404 {"message":"0 endpoints out of 1 requested are available
       matching your guardrail restrictions and data policy. We removed them for the
       following reasons (an endpoint may have matched multip...'
-  openrouter#deepseek/deepseek-v4.1-flash-1017#atlas-cloud/fp8:
-    count: 1
-    last_error: could not fetch generation cost
-  openrouter#deepseek/deepseek-v4.1-flash-1017#decart/fp4:
-    count: 1
-    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4.1-flash-1017
-      is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accum...'
-  openrouter#inception/mercury-3#inception:
-    count: 1
-    last_error: could not fetch generation cost
-  openrouter#xiaomi/mimo-v2.6-flash#relace/mxfp4:
-    count: 1
-    last_error: could not fetch generation cost

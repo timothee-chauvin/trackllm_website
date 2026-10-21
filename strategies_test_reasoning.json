@@ -452,14 +452,21 @@
   "openrouter#deepseek/deepseek-v4.1-flash#fireworks/flex": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash#fireworks/spot": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash#fireworks/us": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#gmicloud/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash#google-vertex/global": null,
   "openrouter#deepseek/deepseek-v4.1-flash#inference-net": null,
   "openrouter#deepseek/deepseek-v4.1-flash#inference-net/fp8": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash#inference-net/us": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#io-net/fp8": {
@@ -556,6 +563,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash-1017#crusoe/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#decart/fp4": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#deepinfra/fp8": {
     "effort": "none"
   },
@@ -574,16 +584,31 @@
   "openrouter#deepseek/deepseek-v4.1-flash-1017#inference-net/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#inference-net/us": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#morph/fp8": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#novita/fp8": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#parasail/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#phala": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#primeintellect": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#reka": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#relace": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#siliconflow/fp8": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#together": {
@@ -959,8 +984,10 @@
   },
   "openrouter#inference-net/schematron-v2-small#inference-net": null,
   "openrouter#inference-net/schematron-v2-small#inference-net/bf16": null,
+  "openrouter#inference-net/schematron-v2-small#inference-net/us": null,
   "openrouter#inference-net/schematron-v2-turbo#inference-net": null,
   "openrouter#inference-net/schematron-v2-turbo#inference-net/bf16": null,
+  "openrouter#inference-net/schematron-v2-turbo#inference-net/us": null,
   "openrouter#kwaipilot/kat-coder-air-v2.5#streamlake": {
     "skip": "hidden reasoning"
   },
@@ -1280,6 +1307,9 @@
   "openrouter#moonshotai/kimi-k2.7-code#together": null,
   "openrouter#moonshotai/kimi-k2.7-code#venice/int4": null,
   "openrouter#moonshotai/kimi-k3#inference-net/fp4": {
+    "effort": "none"
+  },
+  "openrouter#moonshotai/kimi-k3#inference-net/us": {
     "effort": "none"
   },
   "openrouter#moonshotai/kimi-k3#makora/fp4": {
@@ -2143,6 +2173,7 @@
   "openrouter#stepfun/step-5-preview#deepinfra/fp8": null,
   "openrouter#stepfun/step-5-preview#featherless/fp4": null,
   "openrouter#stepfun/step-5-preview#inference-net/fp4": null,
+  "openrouter#stepfun/step-5-preview#inference-net/us": null,
   "openrouter#stepfun/step-5-preview#stepfun/fp8": null,
   "openrouter#switchpoint/router#switchpoint": null,
   "openrouter#tencent/hunyuan-a13b-instruct#siliconflow/fp8": {
@@ -2313,6 +2344,9 @@
     "effort": "none"
   },
   "openrouter#xiaomi/mimo-v2.6-pro#novita/fp8": {
+    "effort": "none"
+  },
+  "openrouter#xiaomi/mimo-v2.6-pro#streamlake": {
     "effort": "none"
   },
   "openrouter#xiaomi/mimo-v2.6-pro#xiaomi/fp8": {
@@ -2567,6 +2601,7 @@
   "openrouter#z-ai/glm-5.3#inceptron/fp4": null,
   "openrouter#z-ai/glm-5.3#inference-net": null,
   "openrouter#z-ai/glm-5.3#inference-net/fp4": null,
+  "openrouter#z-ai/glm-5.3#inference-net/us": null,
   "openrouter#z-ai/glm-5.3#io-net/fp4": null,
   "openrouter#z-ai/glm-5.3#io-net/fp8": null,
   "openrouter#z-ai/glm-5.3#makora/fp4": null,
@@ -2623,6 +2658,7 @@
   "openrouter#z-ai/glm-5.3-flash#gmicloud/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#inceptron/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#inference-net/fp4": null,
+  "openrouter#z-ai/glm-5.3-flash#inference-net/us": null,
   "openrouter#z-ai/glm-5.3-flash#io-net/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#makora": null,
   "openrouter#z-ai/glm-5.3-flash#modal/fp8": null,
