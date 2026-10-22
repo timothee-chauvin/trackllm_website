@@ -339,6 +339,12 @@ too_expensive:
   - 4.25
 - api: openrouter
   model: meta/muse-spark-open
+  provider: makora/fp4
+  cost:
+  - 1.25
+  - 4.25
+- api: openrouter
+  model: meta/muse-spark-open
   provider: modal
   cost:
   - 1.25
@@ -514,6 +520,12 @@ too_expensive:
 - api: openrouter
   model: moonshotai/kimi-k3
   provider: fireworks/flex
+  cost:
+  - 2.1
+  - 10.5
+- api: openrouter
+  model: moonshotai/kimi-k3
+  provider: fireworks/spot
   cost:
   - 2.1
   - 10.5
@@ -4111,3 +4123,8 @@ failure_streaks:
     last_error: 'plain: 404 {"message":"0 endpoints out of 1 requested are available
       matching your guardrail restrictions and data policy. We removed them for the
       following reasons (an endpoint may have matched multip...'
+  openrouter#z-ai/glm-5.3-flash#baseten/fp8:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"z-ai/glm-5.3-flash
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rate limits: ht...'

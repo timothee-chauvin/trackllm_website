@@ -587,10 +587,19 @@
   "openrouter#deepseek/deepseek-v4.1-flash-1017#inference-net/us": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#ionstream": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#makora/fp8": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#morph/fp8": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#novita/fp8": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#open-inference/fp4": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#parasail/fp8": {
@@ -606,6 +615,12 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#relace": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#sail-research/fp4": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#sail-research/fp4/us": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#siliconflow/fp8": {
@@ -1328,6 +1343,7 @@
     "effort": "none"
   },
   "openrouter#morph/morph-v3-fast#morph": null,
+  "openrouter#morph/morph-v3-fast#morph/fp8": null,
   "openrouter#morph/morph-v3-large#morph": null,
   "openrouter#morph/morph-v3-large#morph/fp8": null,
   "openrouter#nex-agi/nex-n2-mini#nex-agi": {
@@ -1399,6 +1415,9 @@
     "effort": "none"
   },
   "openrouter#nvidia/nemotron-3.5-super-vl#deepinfra/fp4": {
+    "effort": "none"
+  },
+  "openrouter#nvidia/nemotron-3.5-super-vl#io-net/nvfp4": {
     "effort": "none"
   },
   "openrouter#nvidia/nemotron-3.5-super-vl#together": {
@@ -2576,6 +2595,7 @@
   "openrouter#z-ai/glm-5.3#alibaba/prime": {
     "max_tokens": 1
   },
+  "openrouter#z-ai/glm-5.3#amazon-bedrock/us-east-1": null,
   "openrouter#z-ai/glm-5.3#atlas-cloud/fp8": null,
   "openrouter#z-ai/glm-5.3#baidu/fp8": null,
   "openrouter#z-ai/glm-5.3#baseten/fast": null,
@@ -2596,6 +2616,7 @@
   "openrouter#z-ai/glm-5.3#digitalocean": null,
   "openrouter#z-ai/glm-5.3#fireworks": null,
   "openrouter#z-ai/glm-5.3#fireworks/fast": null,
+  "openrouter#z-ai/glm-5.3#fireworks/spot": null,
   "openrouter#z-ai/glm-5.3#friendli": null,
   "openrouter#z-ai/glm-5.3#gmicloud/fp8": null,
   "openrouter#z-ai/glm-5.3#inceptron/fp4": null,
