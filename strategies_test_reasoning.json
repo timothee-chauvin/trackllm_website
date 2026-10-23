@@ -424,6 +424,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash#cloudflare": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash#cohere": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash#coreweave/fp8": {
     "effort": "none"
   },
@@ -485,6 +488,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#modal": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash#modelrun/fp4": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash#morph": {
@@ -556,6 +562,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash-1017#atlas-cloud/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#baidu/fp8": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#baseten": null,
   "openrouter#deepseek/deepseek-v4.1-flash-1017#cloudflare": {
     "effort": "none"
@@ -573,6 +582,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#deepinfra/fp8/priority": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#digitalocean": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#fireworks": {
@@ -593,7 +605,13 @@
   "openrouter#deepseek/deepseek-v4.1-flash-1017#makora/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#modal": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#morph/fp8": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#nebius/fp8": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#novita/fp8": {
@@ -1174,6 +1192,21 @@
     "effort": "none"
   },
   "openrouter#minimax/minimax-m3#venice/fp8": null,
+  "openrouter#minimax/minimax-m3.1-flash#inference-net/fp4": {
+    "max_tokens": 1
+  },
+  "openrouter#minimax/minimax-m3.1-flash#minimax": {
+    "max_tokens": 1
+  },
+  "openrouter#minimax/minimax-m3.1-flash#parasail/fp8": {
+    "max_tokens": 1
+  },
+  "openrouter#minimax/minimax-m3.1-flash#together": {
+    "max_tokens": 1
+  },
+  "openrouter#minimax/minimax-m3.1-flash#wafer": {
+    "max_tokens": 1
+  },
   "openrouter#mistralai/codestral-2508#mistral": null,
   "openrouter#mistralai/codestral-2508#mistral/eu": null,
   "openrouter#mistralai/devstral-2512#mistral": null,
@@ -2160,6 +2193,9 @@
   "openrouter#reflection/beam-1.0-501b-a23b#baseten/fp4": {
     "max_tokens": 4
   },
+  "openrouter#reflection/beam-1.0-501b-a23b#digitalocean": {
+    "max_tokens": 4
+  },
   "openrouter#reflection/beam-1.0-501b-a23b#nebius/fp8": {
     "max_tokens": 4
   },
@@ -2218,6 +2254,7 @@
   "openrouter#tencent/hy3#tencent/fp8": null,
   "openrouter#tencent/hy3-preview#gmicloud/bf16": null,
   "openrouter#tencent/hy3-preview#siliconflow": null,
+  "openrouter#tencent/hy4-preview#cohere": null,
   "openrouter#tencent/hy4-preview#deepinfra/fp4": {
     "effort": "none"
   },
@@ -2326,6 +2363,9 @@
     "effort": "none"
   },
   "openrouter#xiaomi/mimo-v2.5-pro#xiaomi/fp8": {
+    "effort": "none"
+  },
+  "openrouter#xiaomi/mimo-v2.6-flash#cohere": {
     "effort": "none"
   },
   "openrouter#xiaomi/mimo-v2.6-flash#darkbloom/fp4": {
@@ -2665,6 +2705,7 @@
   "openrouter#z-ai/glm-5.3-flash#baseten/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#baseten/fp8/us": null,
   "openrouter#z-ai/glm-5.3-flash#cloudflare": null,
+  "openrouter#z-ai/glm-5.3-flash#cohere": null,
   "openrouter#z-ai/glm-5.3-flash#coreweave/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#coreweave/nvfp4": null,
   "openrouter#z-ai/glm-5.3-flash#crusoe/fp4": null,
@@ -2687,6 +2728,7 @@
   "openrouter#z-ai/glm-5.3-flash#morph": null,
   "openrouter#z-ai/glm-5.3-flash#morph/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#near-ai/fp8": null,
+  "openrouter#z-ai/glm-5.3-flash#nebius/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#nextbit/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#nextbit/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#novita/fp8": null,

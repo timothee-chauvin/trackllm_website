@@ -573,6 +573,12 @@ too_expensive:
   - 15.0
 - api: openrouter
   model: moonshotai/kimi-k3
+  provider: pareto-alpha/us
+  cost:
+  - 3.0
+  - 15.0
+- api: openrouter
+  model: moonshotai/kimi-k3
   provider: relace/fp4
   cost:
   - 0.35
@@ -1063,6 +1069,12 @@ too_expensive:
   cost:
   - 4.35
   - 8.7
+- api: openrouter
+  model: z-ai/glm-5.2
+  provider: gmicloud/fp8
+  cost:
+  - 1.4
+  - 4.4
 - api: openrouter
   model: z-ai/glm-5.3
   provider: siliconflow/fp8
@@ -4124,7 +4136,7 @@ failure_streaks:
       matching your guardrail restrictions and data policy. We removed them for the
       following reasons (an endpoint may have matched multip...'
   openrouter#z-ai/glm-5.3-flash#baseten/fp8:
-    count: 1
+    count: 2
     last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"z-ai/glm-5.3-flash
       is temporarily rate-limited upstream. Please retry shortly, or add your own
       key to accumulate your rate limits: ht...'
