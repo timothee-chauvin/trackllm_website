@@ -487,6 +487,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash#makora/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash#mancer/fp8": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash#modal": {
     "effort": "none"
   },
@@ -588,6 +591,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#fireworks": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#fireworks/spot": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#gmicloud/fp8": {
@@ -1192,10 +1198,28 @@
     "effort": "none"
   },
   "openrouter#minimax/minimax-m3#venice/fp8": null,
+  "openrouter#minimax/minimax-m3.1-flash#digitalocean": {
+    "max_tokens": 1
+  },
+  "openrouter#minimax/minimax-m3.1-flash#gmicloud/fp8": {
+    "max_tokens": 1
+  },
   "openrouter#minimax/minimax-m3.1-flash#inference-net/fp4": {
     "max_tokens": 1
   },
+  "openrouter#minimax/minimax-m3.1-flash#inference-net/fp4/us": {
+    "max_tokens": 1
+  },
   "openrouter#minimax/minimax-m3.1-flash#minimax": {
+    "max_tokens": 1
+  },
+  "openrouter#minimax/minimax-m3.1-flash#modelrun/fp4": {
+    "max_tokens": 1
+  },
+  "openrouter#minimax/minimax-m3.1-flash#nebius/fp4": {
+    "max_tokens": 1
+  },
+  "openrouter#minimax/minimax-m3.1-flash#novita/fp16": {
     "max_tokens": 1
   },
   "openrouter#minimax/minimax-m3.1-flash#parasail/fp8": {
@@ -1445,6 +1469,9 @@
     "effort": "none"
   },
   "openrouter#nvidia/nemotron-3.5-super-vl#crusoe/bf16": {
+    "effort": "none"
+  },
+  "openrouter#nvidia/nemotron-3.5-super-vl#darkbloom/nvfp4": {
     "effort": "none"
   },
   "openrouter#nvidia/nemotron-3.5-super-vl#deepinfra/fp4": {
@@ -2196,6 +2223,9 @@
   "openrouter#reflection/beam-1.0-501b-a23b#digitalocean": {
     "max_tokens": 4
   },
+  "openrouter#reflection/beam-1.0-501b-a23b#io-net/fp4": {
+    "max_tokens": 4
+  },
   "openrouter#reflection/beam-1.0-501b-a23b#nebius/fp8": {
     "max_tokens": 4
   },
@@ -2480,6 +2510,9 @@
   "openrouter#z-ai/glm-5#streamlake/fp8": null,
   "openrouter#z-ai/glm-5#together": null,
   "openrouter#z-ai/glm-5#venice/fp8": null,
+  "openrouter#z-ai/glm-5#venice/turbo": {
+    "effort": "none"
+  },
   "openrouter#z-ai/glm-5#z-ai/fp8": null,
   "openrouter#z-ai/glm-5-turbo#atlas-cloud/fp8": null,
   "openrouter#z-ai/glm-5-turbo#z-ai": null,
@@ -2709,6 +2742,7 @@
   "openrouter#z-ai/glm-5.3-flash#coreweave/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#coreweave/nvfp4": null,
   "openrouter#z-ai/glm-5.3-flash#crusoe/fp4": null,
+  "openrouter#z-ai/glm-5.3-flash#darkbloom/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#decart/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#deepinfra/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#deepinfra/fp8": null,
@@ -2723,6 +2757,7 @@
   "openrouter#z-ai/glm-5.3-flash#inference-net/us": null,
   "openrouter#z-ai/glm-5.3-flash#io-net/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#makora": null,
+  "openrouter#z-ai/glm-5.3-flash#mistral": null,
   "openrouter#z-ai/glm-5.3-flash#modal/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#modal/nvfp4": null,
   "openrouter#z-ai/glm-5.3-flash#morph": null,

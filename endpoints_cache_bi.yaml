@@ -428,6 +428,12 @@ too_expensive:
   - 0.3
   - 1.2
 - api: openrouter
+  model: minimax/minimax-m3.1-flash
+  provider: sambanova
+  cost:
+  - 0.3
+  - 1.2
+- api: openrouter
   model: mistralai/mixtral-8x22b-instruct
   provider: mistral/eu
   cost:
@@ -1718,6 +1724,18 @@ bad_temperature:
   cost:
   - 3.0
   - 15.0
+- api: openrouter
+  model: moonshotai/kimi-k3.1-pro
+  provider: moonshotai/highspeed
+  cost:
+  - 4.0
+  - 20.0
+- api: openrouter
+  model: moonshotai/kimi-k3.1-pro
+  provider: moonshotai/mxfp4
+  cost:
+  - 2.0
+  - 10.0
 - api: openrouter
   model: openai/gpt-5
   provider: azure
@@ -4106,6 +4124,16 @@ unprobeable:
     {\n\t\t\"code\": \"400\",\n\t\t\"message\": \"max_tokens must be at least 2 for
     this deployment.\",\n\t\t\"type\": \"...'
 - api: openrouter
+  model: z-ai/glm-5.3-flash
+  provider: baseten/fp8
+  cost:
+  - 0.15
+  - 0.5
+  reason: flaky
+  detail: '{"message":"Provider returned error","code":429,"metadata":{"raw":"z-ai/glm-5.3-flash
+    is temporarily rate-limited upstream. Please retry shortly, or add your own key
+    to accumulate your rate limits: ht...'
+- api: openrouter
   model: z-ai/glm-5.3-flash:batch
   provider: deepinfra/fp4
   cost:
@@ -4135,8 +4163,3 @@ failure_streaks:
     last_error: 'plain: 404 {"message":"0 endpoints out of 1 requested are available
       matching your guardrail restrictions and data policy. We removed them for the
       following reasons (an endpoint may have matched multip...'
-  openrouter#z-ai/glm-5.3-flash#baseten/fp8:
-    count: 2
-    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"z-ai/glm-5.3-flash
-      is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulate your rate limits: ht...'
