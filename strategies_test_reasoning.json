@@ -1225,10 +1225,16 @@
   "openrouter#minimax/minimax-m3.1-flash#parasail/fp8": {
     "max_tokens": 1
   },
+  "openrouter#minimax/minimax-m3.1-flash#relace/fp4": {
+    "max_tokens": 1
+  },
   "openrouter#minimax/minimax-m3.1-flash#together": {
     "max_tokens": 1
   },
   "openrouter#minimax/minimax-m3.1-flash#wafer": {
+    "max_tokens": 1
+  },
+  "openrouter#minimax/minimax-m3.1-flash#wafer/nvfp4": {
     "max_tokens": 1
   },
   "openrouter#mistralai/codestral-2508#mistral": null,
