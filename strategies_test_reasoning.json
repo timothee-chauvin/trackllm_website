@@ -195,6 +195,7 @@
   "openrouter#deepseek/deepseek-v4-flash#baidu/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash#cloudflare": null,
   "openrouter#deepseek/deepseek-v4-flash#coreweave/fp8": null,
+  "openrouter#deepseek/deepseek-v4-flash#crusoe/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash#deepinfra/fp4": null,
   "openrouter#deepseek/deepseek-v4-flash#deepinfra/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash#deepseek": null,
@@ -339,6 +340,7 @@
   "openrouter#deepseek/deepseek-v4-pro#baseten/fp4": null,
   "openrouter#deepseek/deepseek-v4-pro#cloudflare": null,
   "openrouter#deepseek/deepseek-v4-pro#coreweave/fp8": null,
+  "openrouter#deepseek/deepseek-v4-pro#crusoe/fp8": null,
   "openrouter#deepseek/deepseek-v4-pro#deepinfra/fp4": null,
   "openrouter#deepseek/deepseek-v4-pro#deepinfra/fp8": null,
   "openrouter#deepseek/deepseek-v4-pro#deepseek": null,
@@ -648,6 +650,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#siliconflow/fp8": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#streamlake": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#together": {
@@ -2068,6 +2073,7 @@
   },
   "openrouter#qwen/qwen3.5-9b#deepinfra/bf16": null,
   "openrouter#qwen/qwen3.5-9b#parasail/bf16": null,
+  "openrouter#qwen/qwen3.5-9b#primeintellect/bf16": null,
   "openrouter#qwen/qwen3.5-9b#siliconflow/fp8": null,
   "openrouter#qwen/qwen3.5-9b#together": null,
   "openrouter#qwen/qwen3.5-9b#venice/fp8": null,

@@ -4158,13 +4158,31 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
+  openrouter#deepseek/deepseek-v4-pro-0813#baseten/fp4:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n\t\"error\":
+      {\n\t\t\"code\": \"400\",\n\t\t\"message\": \"max_tokens must be at least 2
+      for this deployment.\",\n\t\t\"type\": \"...'
+  openrouter#deepseek/deepseek-v4.1-flash#baseten/fast:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4.1-flash
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rate ...'
   openrouter#deepseek/deepseek-v4.1-flash#deepseek:
     count: 1
     last_error: 'plain: 404 {"message":"0 endpoints out of 1 requested are available
       matching your guardrail restrictions and data policy. We removed them for the
       following reasons (an endpoint may have matched multip...'
-  openrouter#liquid/lfm-2.5-2.6b#liquid/fp8:
+  openrouter#deepseek/deepseek-v4.1-flash-1017#streamlake:
     count: 1
+    last_error: could not fetch generation cost
+  openrouter#liquid/lfm-2.5-2.6b#liquid/fp8:
+    count: 2
     last_error: 'plain: 404 {"message":"0 endpoints out of 1 requested are available
       matching your guardrail restrictions and data policy. We removed them for the
       following reasons (an endpoint may have matched multip...'
+  openrouter#z-ai/glm-5.3-flash#baseten/fp8/us:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"z-ai/glm-5.3-flash
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rate limits: ht...'
