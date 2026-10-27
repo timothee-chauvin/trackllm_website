@@ -655,6 +655,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash-1017#streamlake": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#streamlake/fp8": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#together": {
     "effort": "none"
   },
@@ -940,6 +943,7 @@
   "openrouter#google/gemma-4-26b-a4b-it#nextbit/bf16": null,
   "openrouter#google/gemma-4-26b-a4b-it#novita/bf16": null,
   "openrouter#google/gemma-4-26b-a4b-it#parasail/bf16": null,
+  "openrouter#google/gemma-4-26b-a4b-it#primeintellect/bf16": null,
   "openrouter#google/gemma-4-26b-a4b-it#reka": null,
   "openrouter#google/gemma-4-26b-a4b-it#siliconflow/fp8": null,
   "openrouter#google/gemma-4-26b-a4b-it#venice/bf16": null,
@@ -1131,6 +1135,7 @@
   "openrouter#minimax/minimax-m2.1#atlas-cloud/fp8": {
     "max_tokens": 128
   },
+  "openrouter#minimax/minimax-m2.1#minimax": null,
   "openrouter#minimax/minimax-m2.1#minimax/fp8": {
     "max_tokens": 64
   },
@@ -1146,6 +1151,7 @@
   "openrouter#minimax/minimax-m2.5#gmicloud/fp8": null,
   "openrouter#minimax/minimax-m2.5#inceptron/fp8": null,
   "openrouter#minimax/minimax-m2.5#mara": null,
+  "openrouter#minimax/minimax-m2.5#minimax": null,
   "openrouter#minimax/minimax-m2.5#minimax/fp8": {
     "max_tokens": 128
   },
@@ -1166,6 +1172,7 @@
   "openrouter#minimax/minimax-m2.7#gmicloud/fp8": null,
   "openrouter#minimax/minimax-m2.7#groq": null,
   "openrouter#minimax/minimax-m2.7#mara": null,
+  "openrouter#minimax/minimax-m2.7#minimax": null,
   "openrouter#minimax/minimax-m2.7#minimax/fp8": null,
   "openrouter#minimax/minimax-m2.7#minimax/highspeed": null,
   "openrouter#minimax/minimax-m2.7#morph": null,
@@ -1410,6 +1417,9 @@
   "openrouter#moonshotai/kimi-k3#sail-research/fp4/us": {
     "effort": "none"
   },
+  "openrouter#moonshotai/kimi-k3#wafer/fast": {
+    "effort": "none"
+  },
   "openrouter#morph/morph-v3-fast#morph": null,
   "openrouter#morph/morph-v3-fast#morph/fp8": null,
   "openrouter#morph/morph-v3-large#morph": null,
@@ -1489,6 +1499,9 @@
     "effort": "none"
   },
   "openrouter#nvidia/nemotron-3.5-super-vl#io-net/nvfp4": {
+    "effort": "none"
+  },
+  "openrouter#nvidia/nemotron-3.5-super-vl#nebius/bf16": {
     "effort": "none"
   },
   "openrouter#nvidia/nemotron-3.5-super-vl#together": {
@@ -2238,6 +2251,9 @@
   "openrouter#reflection/beam-1.0-501b-a23b#io-net/fp4": {
     "max_tokens": 4
   },
+  "openrouter#reflection/beam-1.0-501b-a23b#nebius/fp4": {
+    "max_tokens": 4
+  },
   "openrouter#reflection/beam-1.0-501b-a23b#nebius/fp8": {
     "max_tokens": 4
   },
@@ -2296,6 +2312,9 @@
   "openrouter#tencent/hy3#tencent/fp8": null,
   "openrouter#tencent/hy3-preview#gmicloud/bf16": null,
   "openrouter#tencent/hy3-preview#siliconflow": null,
+  "openrouter#tencent/hy4-preview#atlas-cloud/fp8": {
+    "effort": "none"
+  },
   "openrouter#tencent/hy4-preview#cohere": null,
   "openrouter#tencent/hy4-preview#deepinfra/fp4": {
     "effort": "none"
@@ -2770,6 +2789,7 @@
   "openrouter#z-ai/glm-5.3-flash#io-net/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#makora": null,
   "openrouter#z-ai/glm-5.3-flash#mistral": null,
+  "openrouter#z-ai/glm-5.3-flash#modal/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#modal/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#modal/nvfp4": null,
   "openrouter#z-ai/glm-5.3-flash#morph": null,

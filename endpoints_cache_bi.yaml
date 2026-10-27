@@ -43,6 +43,12 @@ liars:
   - 0.3
   - 1.2
 - api: openrouter
+  model: deepseek/deepseek-v4.1-flash
+  provider: open-inference/fp4
+  cost:
+  - 0.02
+  - 0.66539
+- api: openrouter
   model: google/gemini-2.5-flash-image
   provider: google-vertex/global
   cost:
@@ -72,6 +78,12 @@ liars:
   cost:
   - 0.966
   - 3.036
+- api: openrouter
+  model: z-ai/glm-5.2
+  provider: morph/fp8
+  cost:
+  - 1.801
+  - 5.132
 - api: openrouter
   model: z-ai/glm-5.2
   provider: streamlake/fp8
@@ -409,6 +421,12 @@ too_expensive:
   cost:
   - 0.6
   - 2.4
+- api: openrouter
+  model: minimax/minimax-m3
+  provider: minimax
+  cost:
+  - 0.3
+  - 1.2
 - api: openrouter
   model: minimax/minimax-m3
   provider: modelrun/fp8
@@ -2631,6 +2649,42 @@ bad_temperature:
   - 12.0
   - 60.0
 - api: openrouter
+  model: openai/gpt-6.1-terra
+  provider: openai
+  cost:
+  - 1.0
+  - 5.0
+- api: openrouter
+  model: openai/gpt-6.1-terra
+  provider: openai/fast
+  cost:
+  - 2.0
+  - 10.0
+- api: openrouter
+  model: openai/gpt-6.1-terra
+  provider: openai/flex
+  cost:
+  - 0.5
+  - 2.5
+- api: openrouter
+  model: openai/gpt-6.1-terra-pro
+  provider: openai
+  cost:
+  - 1.0
+  - 5.0
+- api: openrouter
+  model: openai/gpt-6.1-terra-pro
+  provider: openai/fast
+  cost:
+  - 2.0
+  - 10.0
+- api: openrouter
+  model: openai/gpt-6.1-terra-pro
+  provider: openai/flex
+  cost:
+  - 0.5
+  - 2.5
+- api: openrouter
   model: openai/gpt-chat-latest
   provider: openai
   cost:
@@ -3354,6 +3408,16 @@ unprobeable:
   reason: flaky
   detail: 'cached: hidden reasoning'
 - api: openrouter
+  model: liquid/lfm-2.5-2.6b
+  provider: liquid/fp8
+  cost:
+  - 0.35
+  - 0.5
+  reason: flaky
+  detail: 'plain: 404 {"message":"0 endpoints out of 1 requested are available matching
+    your guardrail restrictions and data policy. We removed them for the following
+    reasons (an endpoint may have matched multip...'
+- api: openrouter
   model: mancer/weaver
   provider: mancer/fp8
   cost:
@@ -3930,6 +3994,22 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
+  model: openai/gpt-6.1-terra-pro:batch
+  provider: openai
+  cost:
+  - 0.5
+  - 2.5
+  reason: batch
+  detail: null
+- api: openrouter
+  model: openai/gpt-6.1-terra:batch
+  provider: openai
+  cost:
+  - 0.5
+  - 2.5
+  reason: batch
+  detail: null
+- api: openrouter
   model: openai/gpt-audio
   provider: openai
   cost:
@@ -4159,15 +4239,13 @@ unprobeable:
   detail: null
 failure_streaks:
   openrouter#deepseek/deepseek-v4-pro-0813#baseten/fp4:
-    count: 1
+    count: 2
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n\t\"error\":
       {\n\t\t\"code\": \"400\",\n\t\t\"message\": \"max_tokens must be at least 2
       for this deployment.\",\n\t\t\"type\": \"...'
   openrouter#deepseek/deepseek-v4.1-flash#baseten/fast:
-    count: 1
-    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4.1-flash
-      is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulate your rate ...'
+    count: 2
+    last_error: Timeout after 15.0s
   openrouter#deepseek/deepseek-v4.1-flash#deepseek:
     count: 1
     last_error: 'plain: 404 {"message":"0 endpoints out of 1 requested are available
@@ -4176,13 +4254,25 @@ failure_streaks:
   openrouter#deepseek/deepseek-v4.1-flash-1017#streamlake:
     count: 1
     last_error: could not fetch generation cost
-  openrouter#liquid/lfm-2.5-2.6b#liquid/fp8:
-    count: 2
-    last_error: 'plain: 404 {"message":"0 endpoints out of 1 requested are available
-      matching your guardrail restrictions and data policy. We removed them for the
-      following reasons (an endpoint may have matched multip...'
-  openrouter#z-ai/glm-5.3-flash#baseten/fp8/us:
+  openrouter#moonshotai/kimi-k2.6#moonshotai:
     count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"invalid
+      top_p: only 0.95 is allowed for this model\",\"type\":\"invalid_request_error\"}}","prov...'
+  openrouter#moonshotai/kimi-k2.7-code#moonshotai:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"invalid
+      top_p: only 0.95 is allowed for this model\",\"type\":\"invalid_request_error\"}}","prov...'
+  openrouter#moonshotai/kimi-k3#moonshotai:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"invalid
+      top_p: only 0.95 is allowed for this model\",\"type\":\"invalid_request_error\"}}","prov...'
+  openrouter#openai/gpt-oss-120b#sail-research/fp4:
+    count: 1
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"openai/gpt-oss-120b
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      key to accumulate your rat...'
+  openrouter#z-ai/glm-5.3-flash#baseten/fp8/us:
+    count: 2
     last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"z-ai/glm-5.3-flash
       is temporarily rate-limited upstream. Please retry shortly, or add your own
       key to accumulate your rate limits: ht...'
