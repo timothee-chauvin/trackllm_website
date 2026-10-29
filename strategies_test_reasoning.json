@@ -402,6 +402,7 @@
   },
   "openrouter#deepseek/deepseek-v4-pro-0813#wafer": null,
   "openrouter#deepseek/deepseek-v4-pro-0813#wafer/mxfp4": null,
+  "openrouter#deepseek/deepseek-v4-pro-0813#wafer/us": null,
   "openrouter#deepseek/deepseek-v4.1-flash#alibaba": {
     "effort": "none"
   },
@@ -561,6 +562,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash#wafer/mxfp4": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash#wafer/us": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#alibaba": {
     "effort": "none"
   },
@@ -572,6 +576,9 @@
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#baseten": null,
   "openrouter#deepseek/deepseek-v4.1-flash-1017#cloudflare": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#cohere": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#crusoe/fp8": {
@@ -616,7 +623,13 @@
   "openrouter#deepseek/deepseek-v4.1-flash-1017#makora/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#mistral/fp8": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#modal": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#modelrun/fp4": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#morph/fp8": {
@@ -632,6 +645,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#parasail/fp8": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#particle-ai": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#phala": {
@@ -664,7 +680,13 @@
   "openrouter#deepseek/deepseek-v4.1-flash-1017#together": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#venice/fp8": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#wafer/mxfp4": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#wafer/us": {
     "effort": "none"
   },
   "openrouter#elorian/glimpse#together": {
@@ -1248,6 +1270,9 @@
     "max_tokens": 1
   },
   "openrouter#minimax/minimax-m3.1-flash#streamlake": {
+    "max_tokens": 1
+  },
+  "openrouter#minimax/minimax-m3.1-flash#streamlake/fp8": {
     "max_tokens": 1
   },
   "openrouter#minimax/minimax-m3.1-flash#together": {
@@ -1861,6 +1886,9 @@
   },
   "openrouter#openai/o4-mini-high#openai": {
     "max_tokens": 256
+  },
+  "openrouter#particle-ai/particle-1#particle-ai": {
+    "effort": "none"
   },
   "openrouter#perceptron/perceptron-mk1#perceptron": {
     "max_tokens": 4
@@ -2820,6 +2848,7 @@
   "openrouter#z-ai/glm-5.3-flash#parasail/fast": null,
   "openrouter#z-ai/glm-5.3-flash#parasail/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#parasail/fp8": null,
+  "openrouter#z-ai/glm-5.3-flash#particle-ai/nvfp4": null,
   "openrouter#z-ai/glm-5.3-flash#phala/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#phala/nvfp4": null,
   "openrouter#z-ai/glm-5.3-flash#primeintellect": null,
@@ -2838,6 +2867,9 @@
   "openrouter#z-ai/glm-5.3-flash#venice": null,
   "openrouter#z-ai/glm-5.3-flash#wafer": null,
   "openrouter#z-ai/glm-5.3-flash#wafer/nvfp4": null,
+  "openrouter#z-ai/glm-5.3-flash#wafer/us": {
+    "skip": "hidden reasoning"
+  },
   "openrouter#z-ai/glm-5.3-flash#z-ai/fp8": null,
   "openrouter#z-ai/glm-5.3-flashx#z-ai/fp8": null,
   "openrouter#z-ai/glm-5.3-prime#alibaba": {

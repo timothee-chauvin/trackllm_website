@@ -1113,6 +1113,12 @@ too_expensive:
   - 0.5
 - api: openrouter
   model: z-ai/glm-5.3-flash
+  provider: novita/fp8
+  cost:
+  - 0.075
+  - 0.25
+- api: openrouter
+  model: z-ai/glm-5.3-flash
   provider: siliconflow/fp8
   cost:
   - 0.15
@@ -1550,6 +1556,18 @@ bad_temperature:
   cost:
   - 2.0
   - 10.0
+- api: openrouter
+  model: anthropic/claude-sonnet-5.5
+  provider: amazon-bedrock/eu-west-1
+  cost:
+  - 2.2
+  - 11.0
+- api: openrouter
+  model: anthropic/claude-sonnet-5.5
+  provider: amazon-bedrock/us-east-1
+  cost:
+  - 2.2
+  - 11.0
 - api: openrouter
   model: anthropic/claude-sonnet-5.5
   provider: anthropic
@@ -3607,6 +3625,24 @@ unprobeable:
     is temporarily rate-limited upstream. Please retry shortly, or add your own key
     to accumulate your rate limits: ...'
 - api: openrouter
+  model: moonshotai/kimi-k2.6
+  provider: moonshotai
+  cost:
+  - 0.95
+  - 4.0
+  reason: flaky
+  detail: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"invalid
+    top_p: only 0.95 is allowed for this model\",\"type\":\"invalid_request_error\"}}","prov...'
+- api: openrouter
+  model: moonshotai/kimi-k2.7-code
+  provider: moonshotai
+  cost:
+  - 0.95
+  - 4.0
+  reason: flaky
+  detail: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"invalid
+    top_p: only 0.95 is allowed for this model\",\"type\":\"invalid_request_error\"}}","prov...'
+- api: openrouter
   model: moonshotai/kimi-k2.7-code
   provider: phala
   cost:
@@ -3633,6 +3669,15 @@ unprobeable:
   detail: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\n\t\"error\":
     {\n\t\t\"code\": \"400\",\n\t\t\"message\": \"Cannot override enforced sampling
     params: {''top_p'': 1.0}. Lo...'
+- api: openrouter
+  model: moonshotai/kimi-k3
+  provider: moonshotai
+  cost:
+  - 3.0
+  - 15.0
+  reason: flaky
+  detail: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"invalid
+    top_p: only 0.95 is allowed for this model\",\"type\":\"invalid_request_error\"}}","prov...'
 - api: openrouter
   model: moonshotai/kimi-k3:batch
   provider: deepinfra/bf16
@@ -4068,6 +4113,16 @@ unprobeable:
   reason: flaky
   detail: 'cached: hidden reasoning'
 - api: openrouter
+  model: openai/gpt-oss-120b
+  provider: sail-research/fp4
+  cost:
+  - 0.06
+  - 0.4
+  reason: flaky
+  detail: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"openai/gpt-oss-120b
+    is temporarily rate-limited upstream. Please retry shortly, or add your own key
+    to accumulate your rat...'
+- api: openrouter
   model: openai/gpt-oss-120b:batch
   provider: deepinfra/bf16
   cost:
@@ -4275,30 +4330,13 @@ failure_streaks:
     last_error: 'plain: 404 {"message":"0 endpoints out of 1 requested are available
       matching your guardrail restrictions and data policy. We removed them for the
       following reasons (an endpoint may have matched multip...'
-  openrouter#deepseek/deepseek-v4.1-flash-1017#fireworks/us:
-    count: 1
-    last_error: could not fetch generation cost
   openrouter#deepseek/deepseek-v4.1-flash-1017#streamlake:
     count: 1
     last_error: could not fetch generation cost
-  openrouter#moonshotai/kimi-k2.6#moonshotai:
-    count: 2
-    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"invalid
-      top_p: only 0.95 is allowed for this model\",\"type\":\"invalid_request_error\"}}","prov...'
-  openrouter#moonshotai/kimi-k2.7-code#moonshotai:
-    count: 2
-    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"invalid
-      top_p: only 0.95 is allowed for this model\",\"type\":\"invalid_request_error\"}}","prov...'
-  openrouter#moonshotai/kimi-k3#moonshotai:
-    count: 2
-    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"invalid
-      top_p: only 0.95 is allowed for this model\",\"type\":\"invalid_request_error\"}}","prov...'
-  openrouter#openai/gpt-oss-120b#sail-research/fp4:
-    count: 2
-    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"openai/gpt-oss-120b
-      is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulate your rat...'
   openrouter#qwen/qwen3-next-80b-a3b-thinking#google-vertex/global:
     count: 1
     last_error: '{"message":"Provider returned error","code":404,"metadata":{"raw":"[{\n  \"error\":
       {\n    \"code\": 404,\n    \"message\": \"Publisher model `projects/127931989596/locations/us-east5/publishers/qwen/...'
+  openrouter#z-ai/glm-5.3-flash#wafer/us:
+    count: 1
+    last_error: 'cached: hidden reasoning'
