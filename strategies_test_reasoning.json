@@ -308,6 +308,9 @@
   "openrouter#deepseek/deepseek-v4-flash-0731#together": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#venice": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#wafer/fast": null,
+  "openrouter#deepseek/deepseek-v4-flash-0731#wafer/us": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-flash-vision-exp#atlas-cloud/fp8": {
     "effort": "none"
   },
@@ -2324,6 +2327,7 @@
   "openrouter#stepfun/step-3.7-flash#stepfun/fp8": null,
   "openrouter#stepfun/step-5-preview#deepinfra/fp8": null,
   "openrouter#stepfun/step-5-preview#featherless/fp4": null,
+  "openrouter#stepfun/step-5-preview#gmicloud/fp8": null,
   "openrouter#stepfun/step-5-preview#inference-net/fp4": null,
   "openrouter#stepfun/step-5-preview#inference-net/us": null,
   "openrouter#stepfun/step-5-preview#stepfun/fp8": null,
