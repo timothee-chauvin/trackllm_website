@@ -665,6 +665,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash-1017#relace": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#relace/fp4": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#sail-research/fp4": {
     "effort": "none"
   },
@@ -1272,10 +1275,14 @@
   "openrouter#minimax/minimax-m3.1-flash#relace/fp4": {
     "max_tokens": 1
   },
+  "openrouter#minimax/minimax-m3.1-flash#sambanova": null,
   "openrouter#minimax/minimax-m3.1-flash#streamlake": {
     "max_tokens": 1
   },
   "openrouter#minimax/minimax-m3.1-flash#streamlake/fp8": {
+    "max_tokens": 1
+  },
+  "openrouter#minimax/minimax-m3.1-flash#tenstorrent/fp8": {
     "max_tokens": 1
   },
   "openrouter#minimax/minimax-m3.1-flash#together": {
@@ -1449,13 +1456,22 @@
   "openrouter#moonshotai/kimi-k3#phala": {
     "effort": "none"
   },
+  "openrouter#moonshotai/kimi-k3#relace/fp4": {
+    "effort": "none"
+  },
   "openrouter#moonshotai/kimi-k3#sail-research/fp4": {
     "effort": "none"
   },
   "openrouter#moonshotai/kimi-k3#sail-research/fp4/us": {
     "effort": "none"
   },
+  "openrouter#moonshotai/kimi-k3#wafer": {
+    "effort": "none"
+  },
   "openrouter#moonshotai/kimi-k3#wafer/fast": {
+    "effort": "none"
+  },
+  "openrouter#moonshotai/kimi-k3#wafer/us": {
     "effort": "none"
   },
   "openrouter#morph/morph-v3-fast#morph": null,
@@ -1514,6 +1530,9 @@
     "effort": "none"
   },
   "openrouter#nvidia/nemotron-3.5-lightning#deepinfra/bf16": null,
+  "openrouter#nvidia/nemotron-3.5-lightning#fireworks": {
+    "effort": "none"
+  },
   "openrouter#nvidia/nemotron-3.5-lightning#io-net": {
     "effort": "none"
   },
@@ -1542,6 +1561,7 @@
   "openrouter#nvidia/nemotron-3.5-super-vl#nebius/bf16": {
     "effort": "none"
   },
+  "openrouter#nvidia/nemotron-3.5-super-vl#primeintellect/nvfp4": null,
   "openrouter#nvidia/nemotron-3.5-super-vl#together": {
     "effort": "none"
   },
@@ -2287,6 +2307,9 @@
   "openrouter#reflection/beam-1.0-501b-a23b#baseten/fp4": {
     "max_tokens": 4
   },
+  "openrouter#reflection/beam-1.0-501b-a23b#coreweave/fp4": {
+    "max_tokens": 4
+  },
   "openrouter#reflection/beam-1.0-501b-a23b#digitalocean": {
     "max_tokens": 4
   },
@@ -2495,6 +2518,9 @@
   },
   "openrouter#xiaomi/mimo-v2.6-flash#makora/fp8": null,
   "openrouter#xiaomi/mimo-v2.6-flash#novita/fp8": {
+    "effort": "none"
+  },
+  "openrouter#xiaomi/mimo-v2.6-flash#relace/fp4": {
     "effort": "none"
   },
   "openrouter#xiaomi/mimo-v2.6-flash#relace/mxfp4": {
@@ -2728,6 +2754,9 @@
   "openrouter#z-ai/glm-5.2#relace": {
     "effort": "none"
   },
+  "openrouter#z-ai/glm-5.2#relace/fp4": {
+    "effort": "none"
+  },
   "openrouter#z-ai/glm-5.2#relace/fp8": {
     "effort": "none"
   },
@@ -2737,6 +2766,9 @@
   "openrouter#z-ai/glm-5.2#together": null,
   "openrouter#z-ai/glm-5.2#venice/fp8": null,
   "openrouter#z-ai/glm-5.2#wafer": {
+    "effort": "none"
+  },
+  "openrouter#z-ai/glm-5.2#wafer/us": {
     "effort": "none"
   },
   "openrouter#z-ai/glm-5.2#z-ai/fp8": null,
@@ -2798,6 +2830,7 @@
   "openrouter#z-ai/glm-5.3#reka/fast": null,
   "openrouter#z-ai/glm-5.3#reka/fp8": null,
   "openrouter#z-ai/glm-5.3#relace": null,
+  "openrouter#z-ai/glm-5.3#relace/fp4": null,
   "openrouter#z-ai/glm-5.3#sail-research/fp8": null,
   "openrouter#z-ai/glm-5.3#sail-research/us": null,
   "openrouter#z-ai/glm-5.3#siliconflow/fp8": {
@@ -2867,6 +2900,7 @@
   "openrouter#z-ai/glm-5.3-flash#siliconflow/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#streamlake": null,
   "openrouter#z-ai/glm-5.3-flash#streamlake/fp8": null,
+  "openrouter#z-ai/glm-5.3-flash#tenstorrent/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#together": null,
   "openrouter#z-ai/glm-5.3-flash#venice": null,
   "openrouter#z-ai/glm-5.3-flash#wafer": null,
