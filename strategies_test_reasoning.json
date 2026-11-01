@@ -638,6 +638,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash-1017#morph/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#near-ai": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#nebius/fp8": {
     "effort": "none"
   },
@@ -1817,6 +1820,7 @@
   "openrouter#openai/gpt-oss-120b#phala": {
     "max_tokens": 4
   },
+  "openrouter#openai/gpt-oss-120b#primeintellect/fp4": null,
   "openrouter#openai/gpt-oss-120b#sambanova": null,
   "openrouter#openai/gpt-oss-120b#siliconflow/fp8": null,
   "openrouter#openai/gpt-oss-120b#together": {
@@ -1870,6 +1874,7 @@
   "openrouter#openai/gpt-oss-20b#primeintellect": {
     "max_tokens": 4
   },
+  "openrouter#openai/gpt-oss-20b#primeintellect/fp4": null,
   "openrouter#openai/gpt-oss-20b#siliconflow/fp8": null,
   "openrouter#openai/gpt-oss-20b#together": {
     "max_tokens": 4
@@ -2272,6 +2277,9 @@
     "effort": "none"
   },
   "openrouter#qwen/qwen3.8-27b#phala": {
+    "effort": "none"
+  },
+  "openrouter#qwen/qwen3.8-27b#primeintellect/fp8": {
     "effort": "none"
   },
   "openrouter#qwen/qwen3.8-27b#reka": {
