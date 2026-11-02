@@ -246,6 +246,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4-flash-0731#baseten/fp8": null,
+  "openrouter#deepseek/deepseek-v4-flash-0731#chutes/fp8": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-flash-0731#cloudflare": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#cloudflare/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#cohere": {
@@ -289,10 +292,16 @@
   "openrouter#deepseek/deepseek-v4-flash-0731#open-inference/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#parasail/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash-0731#phala": null,
+  "openrouter#deepseek/deepseek-v4-flash-0731#primeintellect/fp4": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4-flash-0731#reka": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4-flash-0731#reka/fp4": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4-flash-0731#relace/fast": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4-flash-0731#relace/fp4": null,
@@ -538,6 +547,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash#relace": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash#relace/fast": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash#relace/fp4": {
     "effort": "none"
   },
@@ -668,6 +680,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash-1017#relace": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#relace/fast": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#relace/fp4": {
     "effort": "none"
   },
@@ -678,6 +693,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#siliconflow/fp8": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#stepfun/fp8": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#streamlake": {
@@ -1002,6 +1020,7 @@
   "openrouter#google/gemma-4-31b-it#open-inference/bf16": null,
   "openrouter#google/gemma-4-31b-it#parasail/fp8": null,
   "openrouter#google/gemma-4-31b-it#phala": null,
+  "openrouter#google/gemma-4-31b-it#primeintellect/fp8": null,
   "openrouter#google/gemma-4-31b-it#reka": null,
   "openrouter#google/gemma-4-31b-it#sambanova": null,
   "openrouter#google/gemma-4-31b-it#siliconflow/fp8": null,
@@ -2194,6 +2213,9 @@
   "openrouter#qwen/qwen3.6-35b-a3b#io-net/fp8": null,
   "openrouter#qwen/qwen3.6-35b-a3b#parasail/fp8": null,
   "openrouter#qwen/qwen3.6-35b-a3b#phala": null,
+  "openrouter#qwen/qwen3.6-35b-a3b#primeintellect/fp8": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.6-35b-a3b#reka": {
     "effort": "none"
   },
