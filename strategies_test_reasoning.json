@@ -668,6 +668,12 @@
   "openrouter#deepseek/deepseek-v4.1-flash-1017#particle-ai": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#particle-ai/us": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#particle-ai/us/flex": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#phala": {
     "effort": "none"
   },
@@ -1016,6 +1022,7 @@
   "openrouter#google/gemma-4-31b-it#io-net": null,
   "openrouter#google/gemma-4-31b-it#modelrun/fp4": null,
   "openrouter#google/gemma-4-31b-it#morph/fp4": null,
+  "openrouter#google/gemma-4-31b-it#nextbit/fp4": null,
   "openrouter#google/gemma-4-31b-it#novita/bf16": null,
   "openrouter#google/gemma-4-31b-it#open-inference/bf16": null,
   "openrouter#google/gemma-4-31b-it#parasail/fp8": null,
@@ -1937,6 +1944,9 @@
   "openrouter#particle-ai/particle-1#particle-ai": {
     "effort": "none"
   },
+  "openrouter#particle-ai/particle-1#particle-ai/us": {
+    "effort": "none"
+  },
   "openrouter#perceptron/perceptron-mk1#perceptron": {
     "max_tokens": 4
   },
@@ -2308,6 +2318,9 @@
     "effort": "none"
   },
   "openrouter#qwen/qwen3.8-27b#reka/fp8": {
+    "effort": "none"
+  },
+  "openrouter#qwen/qwen3.8-27b#streamlake": {
     "effort": "none"
   },
   "openrouter#qwen/qwen3.8-27b#tenstorrent/fp4": {
@@ -2802,6 +2815,7 @@
     "effort": "none"
   },
   "openrouter#z-ai/glm-5.2#z-ai/fp8": null,
+  "openrouter#z-ai/glm-5.3#akashml/fp4": null,
   "openrouter#z-ai/glm-5.3#akashml/fp8": null,
   "openrouter#z-ai/glm-5.3#alibaba": null,
   "openrouter#z-ai/glm-5.3#alibaba/fast": {
@@ -2940,6 +2954,7 @@
   },
   "openrouter#z-ai/glm-5.3-flash#z-ai/fp8": null,
   "openrouter#z-ai/glm-5.3-flashx#z-ai/fp8": null,
+  "openrouter#z-ai/glm-5.3-flashx-legal#z-ai/fp8": null,
   "openrouter#z-ai/glm-5.3-prime#alibaba": {
     "max_tokens": 1
   },

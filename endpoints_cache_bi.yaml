@@ -207,6 +207,12 @@ too_expensive:
   - 2.55
 - api: openrouter
   model: deepseek/deepseek-v4-pro
+  provider: gmicloud/fp8
+  cost:
+  - 0.957
+  - 1.914
+- api: openrouter
+  model: deepseek/deepseek-v4-pro
   provider: novita/fp8
   cost:
   - 1.6
@@ -246,6 +252,12 @@ too_expensive:
   provider: coreweave/fp8
   cost:
   - 1.31
+  - 3.96
+- api: openrouter
+  model: deepseek/deepseek-v4-pro-0813
+  provider: digitalocean
+  cost:
+  - 1.32
   - 3.96
 - api: openrouter
   model: deepseek/deepseek-v4-pro-0813
@@ -531,6 +543,12 @@ too_expensive:
   - 9.5
 - api: openrouter
   model: moonshotai/kimi-k3
+  provider: decart/mxfp4
+  cost:
+  - 1.95
+  - 9.75
+- api: openrouter
+  model: moonshotai/kimi-k3
   provider: deepinfra/mxfp4
   cost:
   - 2.85
@@ -589,6 +607,12 @@ too_expensive:
   cost:
   - 3.0
   - 15.0
+- api: openrouter
+  model: moonshotai/kimi-k3
+  provider: phala
+  cost:
+  - 2.55
+  - 12.75
 - api: openrouter
   model: moonshotai/kimi-k3
   provider: together
@@ -931,6 +955,12 @@ too_expensive:
   cost:
   - 2.2
   - 6.6
+- api: openrouter
+  model: x-ai/grok-4.7
+  provider: amazon-bedrock/global
+  cost:
+  - 2.0
+  - 6.0
 - api: openrouter
   model: x-ai/grok-4.7
   provider: xai
@@ -2314,6 +2344,12 @@ bad_temperature:
   - 300.0
 - api: openrouter
   model: openai/gpt-6-luna
+  provider: amazon-bedrock/global
+  cost:
+  - 0.1
+  - 0.5
+- api: openrouter
+  model: openai/gpt-6-luna
   provider: amazon-bedrock/us-east-1
   cost:
   - 0.11
@@ -2570,6 +2606,12 @@ bad_temperature:
   cost:
   - 12.0
   - 60.0
+- api: openrouter
+  model: openai/gpt-6.1-terra
+  provider: amazon-bedrock/us-east-1
+  cost:
+  - 1.1
+  - 5.5
 - api: openrouter
   model: openai/gpt-6.1-terra
   provider: azure/eu
@@ -4039,11 +4081,6 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
-  openrouter#moonshotai/kimi-k3#decart/mxfp4:
-    count: 1
-    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"moonshotai/kimi-k3
-      is temporarily rate-limited upstream. Please retry shortly, or add your own
-      key to accumulate your rate...'
   openrouter#z-ai/glm-5.3-flash#tenstorrent/fp8:
     count: 1
     last_error: '{"message":"Provider returned error","code":404,"metadata":{"raw":"{\"error\":{\"code\":\"model_not_found\",\"message\":\"Model
