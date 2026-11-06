@@ -374,6 +374,18 @@ too_expensive:
   - 1.5
   - 7.5
 - api: openrouter
+  model: google/gemini-omni-1.1-flash
+  provider: google-ai-studio
+  cost:
+  - 1.5
+  - 9.0
+- api: openrouter
+  model: google/gemini-omni-1.2-flash
+  provider: google-ai-studio
+  cost:
+  - 1.5
+  - 9.0
+- api: openrouter
   model: meta-llama/llama-guard-4-12b
   provider: deepinfra/bf16/priority
   cost:
@@ -711,6 +723,12 @@ too_expensive:
   - 10.0
 - api: openrouter
   model: moonshotai/kimi-k3.1-pro
+  provider: phala/us
+  cost:
+  - 2.0
+  - 10.0
+- api: openrouter
+  model: moonshotai/kimi-k3.1-pro
   provider: relace/fp4
   cost:
   - 0.4
@@ -739,6 +757,12 @@ too_expensive:
   cost:
   - 1.8
   - 9.0
+- api: openrouter
+  model: moonshotai/kimi-k3.1-pro
+  provider: wafer/us
+  cost:
+  - 2.0
+  - 10.0
 - api: openrouter
   model: morph/morph-v3-fast
   provider: morph/fp8
@@ -865,6 +889,12 @@ too_expensive:
   cost:
   - 0.6
   - 3.6
+- api: openrouter
+  model: qwen/qwen3.5-397b-a17b
+  provider: venice
+  cost:
+  - 0.75
+  - 4.5
 - api: openrouter
   model: qwen/qwen3.6-27b
   provider: alibaba
@@ -4254,15 +4284,32 @@ unprobeable:
   detail: null
 failure_streaks:
   openrouter#deepseek/deepseek-v4.1-flash-1017#baseten:
-    count: 1
+    count: 2
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n\t\"error\":
       {\n\t\t\"code\": \"400\",\n\t\t\"message\": \"max_tokens must be at least 2
       for this deployment.\",\n\t\t\"type\": \"...'
-  openrouter#moonshotai/kimi-k3.1-pro#alibaba:
+  openrouter#mistralai/mistral-large-4-0#mistral/eu:
     count: 1
+    last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"object\":\"error\",\"message\":\"reasoning_effort
+      none is not supported for this model, supported values: [<ReasoningEffort.high:
+      ...'
+  openrouter#mistralai/mistral-large-4-0#mistral/zdr:
+    count: 1
+    last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"object\":\"error\",\"message\":\"reasoning_effort
+      none is not supported for this model, supported values: [<ReasoningEffort.high:
+      ...'
+  openrouter#moonshotai/kimi-k3.1-pro#alibaba:
+    count: 2
     last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"code\":\"invalid_parameter_error\",\"param\":null,\"message\":\"Parameter
       ''top_p''=1.0 is not supported for k...'
+  openrouter#moonshotai/kimi-k3.1-pro#fireworks:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"object\":\"error\",\"type\":\"invalid_request_error\",\"code\":\"invalid_request_error\",\"message\":\"Param...'
   openrouter#moonshotai/kimi-k3.1-pro#primalabs:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"OpenAIException
+      - __all__: invalid top_p: only 0.95 is allowed for this model\",\"type\":\"inval...'
+  openrouter#moonshotai/kimi-k3.1-pro#primalabs/mxfp4:
     count: 1
     last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"OpenAIException
       - __all__: invalid top_p: only 0.95 is allowed for this model\",\"type\":\"inval...'

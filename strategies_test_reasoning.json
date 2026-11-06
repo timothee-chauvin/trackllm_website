@@ -597,6 +597,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#baseten": null,
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#baseten/fast": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#cloudflare": {
     "effort": "none"
   },
@@ -610,6 +613,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#decart/fp4": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#decart/fp8": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#deepinfra/fp8": {
@@ -688,6 +694,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#phala": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#primalabs": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#primeintellect": {
@@ -1278,6 +1287,9 @@
   "openrouter#minimax/minimax-m3#novita": {
     "max_tokens": 1
   },
+  "openrouter#minimax/minimax-m3#parasail/fast": {
+    "effort": "none"
+  },
   "openrouter#minimax/minimax-m3#parasail/fp8": {
     "effort": "none"
   },
@@ -1522,6 +1534,8 @@
   "openrouter#moonshotai/kimi-k3#wafer/us": {
     "effort": "none"
   },
+  "openrouter#moonshotai/kimi-k3.1-pro#sail-research/fp4": null,
+  "openrouter#moonshotai/kimi-k3.1-pro#sail-research/fp4/us": null,
   "openrouter#morph/morph-v3-fast#morph": null,
   "openrouter#morph/morph-v3-fast#morph/fp8": null,
   "openrouter#morph/morph-v3-large#morph": null,
