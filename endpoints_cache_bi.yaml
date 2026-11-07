@@ -669,6 +669,12 @@ too_expensive:
   - 9.5
 - api: openrouter
   model: moonshotai/kimi-k3.1-pro
+  provider: digitalocean
+  cost:
+  - 2.0
+  - 10.0
+- api: openrouter
+  model: moonshotai/kimi-k3.1-pro
   provider: inference-net/fast
   cost:
   - 3.0
@@ -727,6 +733,12 @@ too_expensive:
   cost:
   - 2.0
   - 10.0
+- api: openrouter
+  model: moonshotai/kimi-k3.1-pro
+  provider: primalabs/mxfp4
+  cost:
+  - 1.8
+  - 9.0
 - api: openrouter
   model: moonshotai/kimi-k3.1-pro
   provider: relace/fp4
@@ -3054,6 +3066,14 @@ unprobeable:
   reason: flaky
   detail: 'cached: hidden reasoning'
 - api: openrouter
+  model: deepseek/deepseek-v4-flash-0731:batch
+  provider: deepinfra/fp8
+  cost:
+  - 0.048
+  - 0.144
+  reason: batch
+  detail: null
+- api: openrouter
   model: deepseek/deepseek-v4-pro-0813
   provider: baseten/fp4
   cost:
@@ -3073,6 +3093,16 @@ unprobeable:
   detail: '{"message":"0 endpoints out of 1 requested are available matching your
     guardrail restrictions and data policy. We removed them for the following reasons
     (an endpoint may have matched multiple reasons)...'
+- api: openrouter
+  model: deepseek/deepseek-v4.1-flash-1017
+  provider: baseten
+  cost:
+  - 0.3
+  - 1.2
+  reason: flaky
+  detail: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n\t\"error\":
+    {\n\t\t\"code\": \"400\",\n\t\t\"message\": \"max_tokens must be at least 2 for
+    this deployment.\",\n\t\t\"type\": \"...'
 - api: openrouter
   model: deepseek/deepseek-v4.1-flash-1017
   provider: deepseek
@@ -3522,6 +3552,14 @@ unprobeable:
   reason: flaky
   detail: 'cached: hidden reasoning'
 - api: openrouter
+  model: meta/muse-glimmer-30b:batch
+  provider: deepinfra/bf16
+  cost:
+  - 0.24
+  - 0.96
+  reason: batch
+  detail: null
+- api: openrouter
   model: meta/muse-spark-1.2-contributor
   provider: meta
   cost:
@@ -3550,6 +3588,14 @@ unprobeable:
   reason: flaky
   detail: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"code\":400,\"msg\":\"invalid
     request params\"}","provider_name":"AtlasCloud","is_byok":false}}'
+- api: openrouter
+  model: minimax/minimax-m3:batch
+  provider: deepinfra/fp8
+  cost:
+  - 0.224
+  - 0.88
+  reason: batch
+  detail: null
 - api: openrouter
   model: mistralai/mistral-medium-3-5:batch
   provider: mistral
@@ -3638,6 +3684,15 @@ unprobeable:
   reason: flaky
   detail: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"invalid
     top_p: only 0.95 is allowed for this model\",\"type\":\"invalid_request_error\"}}","prov...'
+- api: openrouter
+  model: moonshotai/kimi-k3.1-pro
+  provider: alibaba
+  cost:
+  - 2.3
+  - 11.5
+  reason: flaky
+  detail: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"code\":\"invalid_parameter_error\",\"param\":null,\"message\":\"Parameter
+    ''top_p''=1.0 is not supported for k...'
 - api: openrouter
   model: moonshotai/kimi-k3:batch
   provider: deepinfra/bf16
@@ -4170,6 +4225,14 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
+  model: qwen/qwen3.8-27b:batch
+  provider: deepinfra/bf16
+  cost:
+  - 0.16
+  - 2.0
+  reason: batch
+  detail: null
+- api: openrouter
   model: tencent/hy-mt2-30b-a3b
   provider: tencent/fp8
   cost:
@@ -4177,6 +4240,14 @@ unprobeable:
   - 0.295
   reason: flaky
   detail: 'cached: hidden reasoning'
+- api: openrouter
+  model: thinkingmachines/inkling-small:batch
+  provider: deepinfra/fp8
+  cost:
+  - 0.36
+  - 0.96
+  reason: batch
+  detail: null
 - api: openrouter
   model: x-ai/grok-4.3:batch
   provider: xai
@@ -4283,33 +4354,20 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
-  openrouter#deepseek/deepseek-v4.1-flash-1017#baseten:
-    count: 2
-    last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n\t\"error\":
-      {\n\t\t\"code\": \"400\",\n\t\t\"message\": \"max_tokens must be at least 2
-      for this deployment.\",\n\t\t\"type\": \"...'
   openrouter#mistralai/mistral-large-4-0#mistral/eu:
-    count: 1
+    count: 2
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"object\":\"error\",\"message\":\"reasoning_effort
       none is not supported for this model, supported values: [<ReasoningEffort.high:
       ...'
   openrouter#mistralai/mistral-large-4-0#mistral/zdr:
-    count: 1
+    count: 2
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"object\":\"error\",\"message\":\"reasoning_effort
       none is not supported for this model, supported values: [<ReasoningEffort.high:
       ...'
-  openrouter#moonshotai/kimi-k3.1-pro#alibaba:
-    count: 2
-    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"code\":\"invalid_parameter_error\",\"param\":null,\"message\":\"Parameter
-      ''top_p''=1.0 is not supported for k...'
   openrouter#moonshotai/kimi-k3.1-pro#fireworks:
-    count: 1
+    count: 2
     last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"object\":\"error\",\"type\":\"invalid_request_error\",\"code\":\"invalid_request_error\",\"message\":\"Param...'
   openrouter#moonshotai/kimi-k3.1-pro#primalabs:
-    count: 1
-    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"OpenAIException
-      - __all__: invalid top_p: only 0.95 is allowed for this model\",\"type\":\"inval...'
-  openrouter#moonshotai/kimi-k3.1-pro#primalabs/mxfp4:
     count: 1
     last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"OpenAIException
       - __all__: invalid top_p: only 0.95 is allowed for this model\",\"type\":\"inval...'
