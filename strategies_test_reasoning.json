@@ -649,6 +649,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash-1017#fireworks/spot": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#fireworks/ultrafast": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#fireworks/us": {
     "effort": "none"
   },
@@ -1548,6 +1551,9 @@
   },
   "openrouter#moonshotai/kimi-k3.1-pro#sail-research/fp4": null,
   "openrouter#moonshotai/kimi-k3.1-pro#sail-research/fp4/us": null,
+  "openrouter#moonshotai/kimi-k3.1-pro#wafer/us": {
+    "effort": "none"
+  },
   "openrouter#morph/morph-v3-fast#morph": null,
   "openrouter#morph/morph-v3-fast#morph/fp8": null,
   "openrouter#morph/morph-v3-large#morph": null,

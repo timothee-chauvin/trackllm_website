@@ -206,6 +206,12 @@ too_expensive:
   - 0.14
   - 0.28
 - api: openrouter
+  model: deepseek/deepseek-v4-flash
+  provider: siliconflow/fp8
+  cost:
+  - 0.13
+  - 0.28
+- api: openrouter
   model: deepseek/deepseek-v4-flash-0731
   provider: siliconflow/fp8
   cost:
@@ -799,6 +805,12 @@ too_expensive:
   cost:
   - 30.0
   - 60.0
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: siliconflow/fp8
+  cost:
+  - 0.15
+  - 0.6
 - api: openrouter
   model: openai/gpt-oss-20b
   provider: siliconflow/fp8
@@ -3114,11 +3126,27 @@ unprobeable:
     your guardrail restrictions and data policy. We removed them for the following
     reasons (an endpoint may have matched multip...'
 - api: openrouter
+  model: deepseek/deepseek-v4.1-flash-1017:batch
+  provider: morph/fp8
+  cost:
+  - 0.011
+  - 0.2
+  reason: batch
+  detail: null
+- api: openrouter
   model: deepseek/deepseek-v4.1-flash:batch
   provider: deepinfra/fp8
   cost:
   - 0.112
   - 0.336
+  reason: batch
+  detail: null
+- api: openrouter
+  model: deepseek/deepseek-v4.1-flash:batch
+  provider: morph/fp8
+  cost:
+  - 0.011
+  - 0.2
   reason: batch
   detail: null
 - api: openrouter
@@ -3597,6 +3625,26 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
+  model: mistralai/mistral-large-4-0
+  provider: mistral/eu
+  cost:
+  - 0.77
+  - 2.31
+  reason: flaky
+  detail: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"object\":\"error\",\"message\":\"reasoning_effort
+    none is not supported for this model, supported values: [<ReasoningEffort.high:
+    ...'
+- api: openrouter
+  model: mistralai/mistral-large-4-0
+  provider: mistral/zdr
+  cost:
+  - 0.7
+  - 2.1
+  reason: flaky
+  detail: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"object\":\"error\",\"message\":\"reasoning_effort
+    none is not supported for this model, supported values: [<ReasoningEffort.high:
+    ...'
+- api: openrouter
   model: mistralai/mistral-medium-3-5:batch
   provider: mistral
   cost:
@@ -3694,11 +3742,43 @@ unprobeable:
   detail: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"code\":\"invalid_parameter_error\",\"param\":null,\"message\":\"Parameter
     ''top_p''=1.0 is not supported for k...'
 - api: openrouter
+  model: moonshotai/kimi-k3.1-pro
+  provider: fireworks
+  cost:
+  - 2.0
+  - 10.0
+  reason: flaky
+  detail: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"object\":\"error\",\"type\":\"invalid_request_error\",\"code\":\"invalid_request_error\",\"message\":\"Param...'
+- api: openrouter
   model: moonshotai/kimi-k3:batch
   provider: deepinfra/bf16
   cost:
   - 2.28
   - 11.4
+  reason: batch
+  detail: null
+- api: openrouter
+  model: moonshotai/kimi-k3:batch
+  provider: morph/fp8
+  cost:
+  - 1.084
+  - 6.0
+  reason: batch
+  detail: null
+- api: openrouter
+  model: morph/morph-v3-fast:batch
+  provider: morph/us
+  cost:
+  - 0.4
+  - 0.6
+  reason: batch
+  detail: null
+- api: openrouter
+  model: morph/morph-v3-large:batch
+  provider: morph/fp8
+  cost:
+  - 0.45
+  - 0.95
   reason: batch
   detail: null
 - api: openrouter
@@ -4292,6 +4372,14 @@ unprobeable:
     {\n\t\t\"code\": \"400\",\n\t\t\"message\": \"max_tokens must be at least 2 for
     this deployment.\",\n\t\t\"type\": \"...'
 - api: openrouter
+  model: z-ai/glm-5.2:batch
+  provider: morph/fp8
+  cost:
+  - 0.37
+  - 1.5
+  reason: batch
+  detail: null
+- api: openrouter
   model: z-ai/glm-5.3
   provider: baseten/fp4
   cost:
@@ -4339,6 +4427,14 @@ unprobeable:
   detail: null
 - api: openrouter
   model: z-ai/glm-5.3-flash:batch
+  provider: morph/fp8
+  cost:
+  - 0.061
+  - 0.124
+  reason: batch
+  detail: null
+- api: openrouter
+  model: z-ai/glm-5.3-flash:batch
   provider: sail-research/fp4
   cost:
   - 0.05
@@ -4353,20 +4449,15 @@ unprobeable:
   - 2.0
   reason: batch
   detail: null
+- api: openrouter
+  model: z-ai/glm-5.3:batch
+  provider: morph/fp8
+  cost:
+  - 0.37
+  - 1.5
+  reason: batch
+  detail: null
 failure_streaks:
-  openrouter#mistralai/mistral-large-4-0#mistral/eu:
-    count: 2
-    last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"object\":\"error\",\"message\":\"reasoning_effort
-      none is not supported for this model, supported values: [<ReasoningEffort.high:
-      ...'
-  openrouter#mistralai/mistral-large-4-0#mistral/zdr:
-    count: 2
-    last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\"object\":\"error\",\"message\":\"reasoning_effort
-      none is not supported for this model, supported values: [<ReasoningEffort.high:
-      ...'
-  openrouter#moonshotai/kimi-k3.1-pro#fireworks:
-    count: 2
-    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"object\":\"error\",\"type\":\"invalid_request_error\",\"code\":\"invalid_request_error\",\"message\":\"Param...'
   openrouter#moonshotai/kimi-k3.1-pro#primalabs:
     count: 1
     last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"OpenAIException
