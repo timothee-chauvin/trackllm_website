@@ -570,6 +570,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash#relace/fp4": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash#river": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash#sail-research/fp4": {
     "effort": "none"
   },
@@ -670,6 +673,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash-1017#ionstream": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#ionstream/flex": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#makora/fp8": {
     "effort": "none"
   },
@@ -728,6 +734,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#relace/fp4": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#river": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#sail-research/fp4": {
@@ -1579,6 +1588,9 @@
   "openrouter#nex-agi/nex-n2.5-pro#nex-agi/fp8": {
     "effort": "none"
   },
+  "openrouter#nex-agi/nex-n2.6#nex-agi/fp8": {
+    "max_tokens": 1
+  },
   "openrouter#nousresearch/hermes-3-llama-3.1-405b#deepinfra/fp8": null,
   "openrouter#nousresearch/hermes-3-llama-3.1-70b#deepinfra/fp8": {
     "effort": "none"
@@ -2200,6 +2212,9 @@
   "openrouter#qwen/qwen3.5-122b-a10b#siliconflow/fp8": null,
   "openrouter#qwen/qwen3.5-27b#alibaba": null,
   "openrouter#qwen/qwen3.5-27b#atlas-cloud/fp8": null,
+  "openrouter#qwen/qwen3.5-27b#chutes/fp8": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.5-27b#deepinfra/fp8": null,
   "openrouter#qwen/qwen3.5-27b#novita/bf16": null,
   "openrouter#qwen/qwen3.5-27b#phala": null,
@@ -2340,6 +2355,9 @@
   "openrouter#qwen/qwen3.8-27b#dekallm": {
     "effort": "none"
   },
+  "openrouter#qwen/qwen3.8-27b#gmicloud/bf16": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.8-27b#io-net/fp8": {
     "effort": "none"
   },
@@ -2443,6 +2461,8 @@
   },
   "openrouter#relace/relace-search#relace/bf16": null,
   "openrouter#ricursiveai/ripple-65b-preview#gmicloud/bf16": null,
+  "openrouter#ricursiveai/ripple-65b-preview#primeintellect/bf16": null,
+  "openrouter#ricursiveai/ripple-65b-preview#together": null,
   "openrouter#sao10k/l3-lunaris-8b#deepinfra/turbo": null,
   "openrouter#sao10k/l3-lunaris-8b#novita/bf16": null,
   "openrouter#sao10k/l3-lunaris-8b#parasail/bf16": null,
@@ -2956,6 +2976,7 @@
   "openrouter#z-ai/glm-5.3#reka/fp8": null,
   "openrouter#z-ai/glm-5.3#relace": null,
   "openrouter#z-ai/glm-5.3#relace/fp4": null,
+  "openrouter#z-ai/glm-5.3#river": null,
   "openrouter#z-ai/glm-5.3#sail-research/fp8": null,
   "openrouter#z-ai/glm-5.3#sail-research/us": null,
   "openrouter#z-ai/glm-5.3#siliconflow/fp8": {
@@ -3021,6 +3042,7 @@
   "openrouter#z-ai/glm-5.3-flash#relace": null,
   "openrouter#z-ai/glm-5.3-flash#relace/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#relace/fp8": null,
+  "openrouter#z-ai/glm-5.3-flash#river": null,
   "openrouter#z-ai/glm-5.3-flash#sail-research/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#sail-research/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#sail-research/us": null,

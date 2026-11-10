@@ -398,6 +398,12 @@ too_expensive:
   - 0.27
   - 0.27
 - api: openrouter
+  model: meta/muse-ember
+  provider: meta
+  cost:
+  - 0.1
+  - 0.5
+- api: openrouter
   model: meta/muse-spark-1.1
   provider: meta
   cost:
@@ -1292,6 +1298,36 @@ bad_temperature:
   cost:
   - 10.0
   - 50.0
+- api: openrouter
+  model: anthropic/claude-fable-5.2
+  provider: amazon-bedrock
+  cost:
+  - 8.0
+  - 40.0
+- api: openrouter
+  model: anthropic/claude-fable-5.2
+  provider: anthropic
+  cost:
+  - 8.0
+  - 40.0
+- api: openrouter
+  model: anthropic/claude-fable-5.2
+  provider: anthropic/fast
+  cost:
+  - 16.0
+  - 80.0
+- api: openrouter
+  model: anthropic/claude-fable-5.2
+  provider: azure
+  cost:
+  - 8.0
+  - 40.0
+- api: openrouter
+  model: anthropic/claude-fable-5.2
+  provider: google-vertex/global
+  cost:
+  - 8.0
+  - 40.0
 - api: openrouter
   model: anthropic/claude-haiku-5.5
   provider: amazon-bedrock
@@ -2950,6 +2986,14 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
+  model: anthropic/claude-fable-5.2:batch
+  provider: anthropic
+  cost:
+  - 4.0
+  - 20.0
+  reason: batch
+  detail: null
+- api: openrouter
   model: anthropic/claude-fable-5:batch
   provider: anthropic
   cost:
@@ -4310,6 +4354,14 @@ unprobeable:
   cost:
   - 0.16
   - 2.0
+  reason: batch
+  detail: null
+- api: openrouter
+  model: qwen/qwen3.8-max-0902:batch
+  provider: alibaba
+  cost:
+  - 1.15
+  - 3.45
   reason: batch
   detail: null
 - api: openrouter
