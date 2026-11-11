@@ -101,6 +101,10 @@
   "openrouter#arcee-ai/trinity-large-thinking#venice/fp8": null,
   "openrouter#arcee-ai/trinity-mini#clarifai/bf16": null,
   "openrouter#baidu/ernie-4.5-vl-424b-a47b#novita/fp16": null,
+  "openrouter#baidu/ernie-5.5-flash-preview#baidu": null,
+  "openrouter#baidu/ernie-light-dt-1.0-intl#baidu": {
+    "effort": "none"
+  },
   "openrouter#bytedance-seed/seed-1.6#seed/fp8": null,
   "openrouter#bytedance-seed/seed-1.6-flash#seed/fp8": null,
   "openrouter#bytedance-seed/seed-2-1-turbo#seed/fp8": {
@@ -1067,6 +1071,7 @@
   "openrouter#google/gemma-4-31b-it#dekallm": null,
   "openrouter#google/gemma-4-31b-it#friendli": null,
   "openrouter#google/gemma-4-31b-it#io-net": null,
+  "openrouter#google/gemma-4-31b-it#kt": null,
   "openrouter#google/gemma-4-31b-it#modal": null,
   "openrouter#google/gemma-4-31b-it#modelrun/fp4": null,
   "openrouter#google/gemma-4-31b-it#morph/fp4": null,
@@ -1149,6 +1154,9 @@
   "openrouter#inference-net/schematron-v2-turbo#inference-net": null,
   "openrouter#inference-net/schematron-v2-turbo#inference-net/bf16": null,
   "openrouter#inference-net/schematron-v2-turbo#inference-net/us": null,
+  "openrouter#kt/midm-k-3.0-pro#kt": {
+    "effort": "none"
+  },
   "openrouter#kwaipilot/kat-coder-air-v2.5#streamlake": {
     "skip": "hidden reasoning"
   },
@@ -1570,6 +1578,9 @@
   "openrouter#morph/morph-v3-fast#morph/fp8": null,
   "openrouter#morph/morph-v3-large#morph": null,
   "openrouter#morph/morph-v3-large#morph/fp8": null,
+  "openrouter#motif-technologies/motif-3#kt": {
+    "effort": "none"
+  },
   "openrouter#nex-agi/nex-n2-mini#nex-agi": {
     "max_tokens": 4
   },
@@ -1616,6 +1627,9 @@
   "openrouter#nvidia/nemotron-3-ultra-550b-a55b#deepinfra/bf16": null,
   "openrouter#nvidia/nemotron-3-ultra-550b-a55b#deepinfra/fp4": null,
   "openrouter#nvidia/nemotron-3-ultra-550b-a55b#deepinfra/fp4/flex": {
+    "effort": "none"
+  },
+  "openrouter#nvidia/nemotron-3-ultra-550b-a55b#kt": {
     "effort": "none"
   },
   "openrouter#nvidia/nemotron-3-ultra-550b-a55b#together": null,
@@ -2580,6 +2594,7 @@
   "openrouter#upstage/solar-pro-3#upstage/fp4": {
     "skip": "hidden reasoning"
   },
+  "openrouter#upstage/solar-pro4#kt": null,
   "openrouter#upstage/solar-pro4#upstage": {
     "effort": "none"
   },
@@ -2979,6 +2994,7 @@
   "openrouter#z-ai/glm-5.3#river": null,
   "openrouter#z-ai/glm-5.3#sail-research/fp8": null,
   "openrouter#z-ai/glm-5.3#sail-research/us": null,
+  "openrouter#z-ai/glm-5.3#sambanova": null,
   "openrouter#z-ai/glm-5.3#siliconflow/fp8": {
     "max_tokens": 1
   },
@@ -3016,6 +3032,7 @@
   "openrouter#z-ai/glm-5.3-flash#inference-net/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#inference-net/us": null,
   "openrouter#z-ai/glm-5.3-flash#io-net/fp8": null,
+  "openrouter#z-ai/glm-5.3-flash#kt": null,
   "openrouter#z-ai/glm-5.3-flash#makora": null,
   "openrouter#z-ai/glm-5.3-flash#makora/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#mistral": null,
