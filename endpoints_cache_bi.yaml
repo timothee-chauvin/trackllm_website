@@ -747,6 +747,12 @@ too_expensive:
   - 10.0
 - api: openrouter
   model: moonshotai/kimi-k3.1-pro
+  provider: decart/mxfp4
+  cost:
+  - 1.76
+  - 8.8
+- api: openrouter
+  model: moonshotai/kimi-k3.1-pro
   provider: deepinfra/bf16
   cost:
   - 1.9
@@ -1070,6 +1076,12 @@ too_expensive:
   - 0.8
   - 3.2
 - api: openrouter
+  model: unbiased/pareto-26.10-preview
+  provider: unbiased
+  cost:
+  - 0.8
+  - 3.2
+- api: openrouter
   model: unbiased/pareto-26.9
   provider: unbiased
   cost:
@@ -1347,6 +1359,12 @@ bad_temperature:
   - 10.0
   - 50.0
 - api: openrouter
+  model: anthropic/claude-fable-5
+  provider: google-vertex/us
+  cost:
+  - 11.0
+  - 55.0
+- api: openrouter
   model: anthropic/claude-fable-5.1
   provider: amazon-bedrock
   cost:
@@ -1370,6 +1388,12 @@ bad_temperature:
   cost:
   - 10.0
   - 50.0
+- api: openrouter
+  model: anthropic/claude-fable-5.1
+  provider: google-vertex/us
+  cost:
+  - 11.0
+  - 55.0
 - api: openrouter
   model: anthropic/claude-fable-5.2
   provider: amazon-bedrock
@@ -3250,6 +3274,14 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
+  model: deepseek/deepseek-v4.1-flash-1017:batch
+  provider: sail-research/fp4
+  cost:
+  - 0.05
+  - 0.15
+  reason: batch
+  detail: null
+- api: openrouter
   model: deepseek/deepseek-v4.1-flash:batch
   provider: deepinfra/fp8
   cost:
@@ -3873,6 +3905,14 @@ unprobeable:
   - 10.0
   reason: flaky
   detail: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"object\":\"error\",\"type\":\"invalid_request_error\",\"code\":\"invalid_request_error\",\"message\":\"Param...'
+- api: openrouter
+  model: moonshotai/kimi-k3.1-pro:batch
+  provider: sail-research/fp4
+  cost:
+  - 0.7
+  - 6.0
+  reason: batch
+  detail: null
 - api: openrouter
   model: moonshotai/kimi-k3:batch
   provider: deepinfra/bf16
@@ -4591,12 +4631,12 @@ unprobeable:
   detail: null
 failure_streaks:
   openrouter#deepseek/deepseek-v4.1-flash#baseten:
-    count: 1
+    count: 2
     last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4.1-flash
       is temporarily rate-limited upstream. Please retry shortly, or add your own
       provider key to use your own...'
   openrouter#deepseek/deepseek-v4.1-flash#baseten/us:
-    count: 1
+    count: 2
     last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n\t\"error\":
       {\n\t\t\"code\": \"400\",\n\t\t\"message\": \"max_tokens must be at least 2
       for this deployment.\",\n\t\t\"type\": \"...'

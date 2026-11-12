@@ -1912,6 +1912,7 @@
   "openrouter#openai/gpt-oss-120b#groq": {
     "max_tokens": 4
   },
+  "openrouter#openai/gpt-oss-120b#io-net/fp4": null,
   "openrouter#openai/gpt-oss-120b#mancer/fp8": null,
   "openrouter#openai/gpt-oss-120b#mara": null,
   "openrouter#openai/gpt-oss-120b#near-ai/fp4": null,
