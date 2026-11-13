@@ -1017,6 +1017,9 @@
   "openrouter#google/gemini-3.8-flash#google-ai-studio/priority": {
     "skip": "hidden reasoning"
   },
+  "openrouter#google/gemini-nano-banana-2.1#google-vertex/global": {
+    "max_tokens": 4
+  },
   "openrouter#google/gemma-2-27b-it#nextbit/int4": {
     "skip": "hidden reasoning"
   },
@@ -1117,6 +1120,9 @@
   "openrouter#inclusionai/ling-2.6-1t#novita": null,
   "openrouter#inclusionai/ling-2.6-flash#novita": null,
   "openrouter#inclusionai/ling-3.0-flash#deepinfra/bf16": null,
+  "openrouter#inclusionai/ling-3.0-flash#deepinfra/fp4": {
+    "effort": "none"
+  },
   "openrouter#inclusionai/ling-3.0-flash#novita": null,
   "openrouter#inclusionai/ling-3.0-flash#novita/fast": {
     "effort": "none"
@@ -1131,6 +1137,9 @@
     "effort": "none"
   },
   "openrouter#inclusionai/ling-3.0-flash-vl#deepinfra/fp16": {
+    "effort": "none"
+  },
+  "openrouter#inclusionai/ling-3.0-flash-vl#deepinfra/fp4": {
     "effort": "none"
   },
   "openrouter#inclusionai/ling-3.0-flash-vl#novita/bf16": {
@@ -1569,6 +1578,9 @@
   "openrouter#moonshotai/kimi-k3#wafer/us": {
     "effort": "none"
   },
+  "openrouter#moonshotai/kimi-k3.1-pro#morph/fp8": {
+    "effort": "none"
+  },
   "openrouter#moonshotai/kimi-k3.1-pro#sail-research/fp4": null,
   "openrouter#moonshotai/kimi-k3.1-pro#sail-research/fp4/us": null,
   "openrouter#moonshotai/kimi-k3.1-pro#wafer/us": {
@@ -1668,6 +1680,9 @@
     "effort": "none"
   },
   "openrouter#nvidia/nemotron-3.5-super-vl#nebius/bf16": {
+    "effort": "none"
+  },
+  "openrouter#nvidia/nemotron-3.5-super-vl#nebius/fp4": {
     "effort": "none"
   },
   "openrouter#nvidia/nemotron-3.5-super-vl#primeintellect/nvfp4": null,
@@ -2573,7 +2588,25 @@
   "openrouter#thinkingmachines/inkling#together": {
     "max_tokens": 1
   },
+  "openrouter#thinkingmachines/inkling-2-small#cloudflare": {
+    "max_tokens": 2
+  },
+  "openrouter#thinkingmachines/inkling-2-small#modal/nvfp4": {
+    "max_tokens": 2
+  },
+  "openrouter#thinkingmachines/inkling-2-small#nebius/fp4": {
+    "max_tokens": 2
+  },
+  "openrouter#thinkingmachines/inkling-2-small#primeintellect/fp4": {
+    "max_tokens": 2
+  },
+  "openrouter#thinkingmachines/inkling-2-small#together": {
+    "max_tokens": 2
+  },
   "openrouter#thinkingmachines/inkling-small#baseten/fp8": {
+    "max_tokens": 2
+  },
+  "openrouter#thinkingmachines/inkling-small#deepinfra/fp4": {
     "max_tokens": 2
   },
   "openrouter#thinkingmachines/inkling-small#deepinfra/fp8": {
@@ -2950,6 +2983,7 @@
   "openrouter#z-ai/glm-5.3#baseten/fp8": null,
   "openrouter#z-ai/glm-5.3#baseten/us/fast": null,
   "openrouter#z-ai/glm-5.3#cloudflare": null,
+  "openrouter#z-ai/glm-5.3#cohere/nvfp4": null,
   "openrouter#z-ai/glm-5.3#coreweave/fp8": null,
   "openrouter#z-ai/glm-5.3#coreweave/nvfp4": null,
   "openrouter#z-ai/glm-5.3#crusoe/fp4": null,

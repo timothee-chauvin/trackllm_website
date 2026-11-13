@@ -308,6 +308,12 @@ too_expensive:
   - 1.65
   - 4.95
 - api: openrouter
+  model: deepseek/deepseek-v4.1-flash
+  provider: venice/ultrafast
+  cost:
+  - 3.0
+  - 12.0
+- api: openrouter
   model: elorian/glimpse
   provider: together
   cost:
@@ -421,6 +427,48 @@ too_expensive:
   cost:
   - 2.2
   - 11.0
+- api: openrouter
+  model: google/gemini-4-hydrogen
+  provider: google-ai-studio
+  cost:
+  - 1.5
+  - 7.5
+- api: openrouter
+  model: google/gemini-4-hydrogen
+  provider: google-ai-studio/flex
+  cost:
+  - 0.75
+  - 3.75
+- api: openrouter
+  model: google/gemini-4-hydrogen
+  provider: google-ai-studio/priority
+  cost:
+  - 2.7
+  - 13.5
+- api: openrouter
+  model: google/gemini-4-hydrogen
+  provider: google-vertex/eu
+  cost:
+  - 1.65
+  - 8.25
+- api: openrouter
+  model: google/gemini-4-hydrogen
+  provider: google-vertex/global
+  cost:
+  - 1.5
+  - 7.5
+- api: openrouter
+  model: google/gemini-4-hydrogen
+  provider: google-vertex/global/priority
+  cost:
+  - 2.7
+  - 13.5
+- api: openrouter
+  model: google/gemini-4-hydrogen
+  provider: google-vertex/us
+  cost:
+  - 1.65
+  - 8.25
 - api: openrouter
   model: google/gemini-nano-banana-2.1
   provider: google-ai-studio
@@ -835,6 +883,12 @@ too_expensive:
   cost:
   - 0.4
   - 7.8833
+- api: openrouter
+  model: moonshotai/kimi-k3.1-pro
+  provider: river
+  cost:
+  - 2.0
+  - 10.0
 - api: openrouter
   model: moonshotai/kimi-k3.1-pro
   provider: sail-research/fp4
@@ -3246,6 +3300,26 @@ unprobeable:
     guardrail restrictions and data policy. We removed them for the following reasons
     (an endpoint may have matched multiple reasons)...'
 - api: openrouter
+  model: deepseek/deepseek-v4.1-flash
+  provider: baseten
+  cost:
+  - 0.3
+  - 1.2
+  reason: flaky
+  detail: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n\t\"error\":
+    {\n\t\t\"code\": \"400\",\n\t\t\"message\": \"max_tokens must be at least 2 for
+    this deployment.\",\n\t\t\"type\": \"...'
+- api: openrouter
+  model: deepseek/deepseek-v4.1-flash
+  provider: baseten/us
+  cost:
+  - 0.3
+  - 1.2
+  reason: flaky
+  detail: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n\t\"error\":
+    {\n\t\t\"code\": \"400\",\n\t\t\"message\": \"max_tokens must be at least 2 for
+    this deployment.\",\n\t\t\"type\": \"...'
+- api: openrouter
   model: deepseek/deepseek-v4.1-flash-1017
   provider: baseten
   cost:
@@ -3627,6 +3701,14 @@ unprobeable:
   cost:
   - 1.0
   - 5.0
+  reason: batch
+  detail: null
+- api: openrouter
+  model: google/gemini-4-hydrogen:batch
+  provider: google-vertex/global
+  cost:
+  - 0.75
+  - 3.75
   reason: batch
   detail: null
 - api: openrouter
@@ -4630,16 +4712,6 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
-  openrouter#deepseek/deepseek-v4.1-flash#baseten:
-    count: 2
-    last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"deepseek/deepseek-v4.1-flash
-      is temporarily rate-limited upstream. Please retry shortly, or add your own
-      provider key to use your own...'
-  openrouter#deepseek/deepseek-v4.1-flash#baseten/us:
-    count: 2
-    last_error: '{"message":"Provider returned error","code":400,"metadata":{"raw":"{\n\t\"error\":
-      {\n\t\t\"code\": \"400\",\n\t\t\"message\": \"max_tokens must be at least 2
-      for this deployment.\",\n\t\t\"type\": \"...'
   openrouter#moonshotai/kimi-k3.1-pro#primalabs:
     count: 1
     last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"OpenAIException
