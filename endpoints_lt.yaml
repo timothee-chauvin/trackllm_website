@@ -54,24 +54,6 @@ endpoints_lt:
   - 0.025
   - 0.12
 - api: openrouter
-  model: inclusionai/ling-3.0-flash-fin
-  provider: novita
-  cost:
-  - 0.042
-  - 0.1232
-- api: openrouter
-  model: inclusionai/ling-3.0-flash-sante
-  provider: novita
-  cost:
-  - 0.042
-  - 0.1232
-- api: openrouter
-  model: openai/gpt-oss-120b
-  provider: io-net/fp4
-  cost:
-  - 0.03
-  - 0.15
-- api: openrouter
   model: openai/gpt-oss-120b
   provider: near-ai/fp4
   cost:
@@ -162,6 +144,12 @@ endpoints_lt:
   - 0.12
   - 0.17
 - api: openrouter
+  model: google/gemma-4-26b-a4b-it
+  provider: nextbit/bf16
+  cost:
+  - 0.0675
+  - 0.225
+- api: openrouter
   model: deepseek/deepseek-v4-flash
   provider: digitalocean
   cost:
@@ -205,6 +193,12 @@ endpoints_lt:
   - 0.25
 - api: openrouter
   model: deepseek/deepseek-v4-flash-0731
+  provider: wafer/fast
+  cost:
+  - 0.1
+  - 0.23
+- api: openrouter
+  model: deepseek/deepseek-v4-flash-0731
   provider: wafer/us
   cost:
   - 0.0434
@@ -215,12 +209,6 @@ endpoints_lt:
   cost:
   - 0.067
   - 0.29
-- api: openrouter
-  model: deepseek/deepseek-v4-flash-0731
-  provider: wafer/fast
-  cost:
-  - 0.14
-  - 0.23
 - api: openrouter
   model: google/gemma-4-26b-a4b-it
   provider: makora
@@ -245,12 +233,6 @@ endpoints_lt:
   cost:
   - 0.06
   - 0.33
-- api: openrouter
-  model: google/gemma-4-26b-a4b-it
-  provider: nextbit/bf16
-  cost:
-  - 0.09
-  - 0.3
 - api: openrouter
   model: mistralai/mistral-small-3.2-24b-instruct
   provider: parasail/bf16
@@ -504,18 +486,6 @@ endpoints_lt:
   - 0.15
   - 0.47
 - api: openrouter
-  model: deepseek/deepseek-v4.1-flash
-  provider: morph/fp8
-  cost:
-  - 0.04
-  - 0.6
-- api: openrouter
-  model: deepseek/deepseek-v4.1-flash-1017
-  provider: morph/fp8
-  cost:
-  - 0.04
-  - 0.6
-- api: openrouter
   model: deepseek/deepseek-v4.1-flash-1017
   provider: cohere/fp8
   cost:
@@ -528,17 +498,35 @@ endpoints_lt:
   - 0.15
   - 0.5
 - api: openrouter
-  model: deepseek/deepseek-v4.1-flash-1017
-  provider: ionstream
+  model: deepseek/deepseek-v4.1-flash
+  provider: morph/fp8
   cost:
-  - 0.165
-  - 0.495
+  - 0.104
+  - 0.583
+- api: openrouter
+  model: deepseek/deepseek-v4.1-flash-1017
+  provider: morph/fast
+  cost:
+  - 0.104
+  - 0.583
+- api: openrouter
+  model: deepseek/deepseek-v4.1-flash-1017
+  provider: morph/fp8
+  cost:
+  - 0.104
+  - 0.583
 - api: openrouter
   model: deepseek/deepseek-v4.1-flash-1017
   provider: cloudflare
   cost:
   - 0.1
   - 0.6
+- api: openrouter
+  model: openai/gpt-oss-120b
+  provider: io-net/fp4
+  cost:
+  - 0.25
+  - 0.45
 - api: openrouter
   model: meta-llama/llama-3.3-70b-instruct
   provider: akashml/fp8
@@ -659,6 +647,12 @@ endpoints_lt:
   cost:
   - 0.165
   - 0.66
+- api: openrouter
+  model: deepseek/deepseek-v4.1-flash-1017
+  provider: ionstream
+  cost:
+  - 0.21
+  - 0.62
 - api: openrouter
   model: meta-llama/llama-4-maverick
   provider: digitalocean
@@ -1176,6 +1170,12 @@ endpoints_lt:
   - 0.45
   - 3.2
 - api: openrouter
+  model: qwen/qwen3.8-27b
+  provider: gmicloud/fp8
+  cost:
+  - 0.45
+  - 3.2
+- api: openrouter
   model: deepseek/deepseek-v4-pro-0813
   provider: novita/fp8
   cost:
@@ -1314,6 +1314,12 @@ endpoints_lt:
   - 0.276
   - 9.6
 - api: openrouter
+  model: moonshotai/kimi-k3.1-pro
+  provider: morph/fp8
+  cost:
+  - 0.747
+  - 9.526
+- api: openrouter
   model: deepseek/deepseek-v4.1-flash-1017
   provider: fireworks/ultrafast
   cost:
@@ -1355,12 +1361,6 @@ endpoints_lt:
   cost:
   - 2.5
   - 10.0
-- api: openrouter
-  model: moonshotai/kimi-k3.1-pro
-  provider: morph/fp8
-  cost:
-  - 0.941
-  - 12.0
 - api: openrouter
   model: moonshotai/kimi-k3
   provider: morph/fp8

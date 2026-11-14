@@ -692,6 +692,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash-1017#modelrun/fp4": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#morph/fast": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#morph/fp8": {
     "effort": "none"
   },
@@ -1353,6 +1356,9 @@
   "openrouter#minimax/minimax-m3.1-flash#gmicloud/fp8": {
     "max_tokens": 1
   },
+  "openrouter#minimax/minimax-m3.1-flash#inferact-vllm/nvfp4": {
+    "max_tokens": 1
+  },
   "openrouter#minimax/minimax-m3.1-flash#inference-net/fp4": {
     "max_tokens": 1
   },
@@ -1579,6 +1585,9 @@
     "effort": "none"
   },
   "openrouter#moonshotai/kimi-k3.1-pro#morph/fp8": {
+    "effort": "none"
+  },
+  "openrouter#moonshotai/kimi-k3.1-pro#relace/fp4": {
     "effort": "none"
   },
   "openrouter#moonshotai/kimi-k3.1-pro#sail-research/fp4": null,
@@ -2388,6 +2397,9 @@
   "openrouter#qwen/qwen3.8-27b#gmicloud/bf16": {
     "effort": "none"
   },
+  "openrouter#qwen/qwen3.8-27b#gmicloud/fp8": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.8-27b#io-net/fp8": {
     "effort": "none"
   },
@@ -2589,6 +2601,9 @@
     "max_tokens": 1
   },
   "openrouter#thinkingmachines/inkling-2-small#cloudflare": {
+    "max_tokens": 2
+  },
+  "openrouter#thinkingmachines/inkling-2-small#deepinfra/fp4": {
     "max_tokens": 2
   },
   "openrouter#thinkingmachines/inkling-2-small#modal/nvfp4": {
@@ -2993,6 +3008,7 @@
   "openrouter#z-ai/glm-5.3#deepinfra/fp8": null,
   "openrouter#z-ai/glm-5.3#dekallm": null,
   "openrouter#z-ai/glm-5.3#digitalocean": null,
+  "openrouter#z-ai/glm-5.3#featherless": null,
   "openrouter#z-ai/glm-5.3#fireworks": null,
   "openrouter#z-ai/glm-5.3#fireworks/fast": null,
   "openrouter#z-ai/glm-5.3#fireworks/spot": null,
