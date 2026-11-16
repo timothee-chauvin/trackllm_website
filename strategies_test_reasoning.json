@@ -2195,6 +2195,9 @@
   "openrouter#qwen/qwen3-30b-a3b#deepinfra/fp8/flex": {
     "effort": "none"
   },
+  "openrouter#qwen/qwen3-30b-a3b#deepinfra/fp8/priority": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3-30b-a3b#nextbit/fp8": {
     "max_tokens": 1
   },
@@ -2556,6 +2559,9 @@
     "effort": "none"
   },
   "openrouter#qwen/qwen3.8-omni-flash#alibaba": {
+    "effort": "none"
+  },
+  "openrouter#qwen/qwen4-max#alibaba": {
     "effort": "none"
   },
   "openrouter#reflection/beam-1.0-501b-a23b#baseten/fp4": {
