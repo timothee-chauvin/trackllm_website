@@ -79,11 +79,23 @@ liars:
   - 0.05
   - 0.15
 - api: openrouter
+  model: google/gemma-3-12b-it
+  provider: nextbit/int4
+  cost:
+  - 0.075
+  - 0.15
+- api: openrouter
   model: google/gemma-4-26b-a4b-it
   provider: primeintellect/bf16
   cost:
   - 0.037
   - 0.111
+- api: openrouter
+  model: google/gemma-4-31b-it
+  provider: primeintellect/fp8
+  cost:
+  - 0.093
+  - 0.155
 - api: openrouter
   model: google/gemma-4-31b-it
   provider: together
@@ -4352,6 +4364,14 @@ unprobeable:
   detail: null
 - api: openrouter
   model: z-ai/glm-5.3-flash:batch
+  provider: morph/fp8
+  cost:
+  - 0.024
+  - 0.069
+  reason: batch
+  detail: null
+- api: openrouter
+  model: z-ai/glm-5.3-flash:batch
   provider: sail-research/fp4
   cost:
   - 0.05
@@ -4390,4 +4410,10 @@ unprobeable:
   - 2.2
   reason: batch
   detail: null
-failure_streaks: {}
+failure_streaks:
+  openrouter#deepseek/deepseek-v4-flash-vision-exp#siliconflow/fp8:
+    count: 1
+    last_error: could not fetch generation cost
+  openrouter#meta/muse-glimmer-30b#modelrun/bf16:
+    count: 1
+    last_error: could not fetch generation cost

@@ -625,6 +625,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash-1017#alibaba": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#ambient/fp4": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#atlas-cloud/fp8": {
     "effort": "none"
   },
@@ -1268,6 +1271,7 @@
   "openrouter#meta/muse-glimmer-30b#fireworks": {
     "max_tokens": 4
   },
+  "openrouter#meta/muse-glimmer-30b#modelrun/bf16": null,
   "openrouter#meta/muse-glimmer-30b#parasail/bf16": {
     "max_tokens": 4
   },
@@ -1385,6 +1389,9 @@
     "max_tokens": 1
   },
   "openrouter#minimax/minimax-m3.1-flash#inference-net/fp4/us": {
+    "max_tokens": 1
+  },
+  "openrouter#minimax/minimax-m3.1-flash#makora/fp4": {
     "max_tokens": 1
   },
   "openrouter#minimax/minimax-m3.1-flash#minimax": {
@@ -1589,6 +1596,9 @@
   "openrouter#moonshotai/kimi-k3#inference-net/us": {
     "effort": "none"
   },
+  "openrouter#moonshotai/kimi-k3#kt": {
+    "effort": "none"
+  },
   "openrouter#moonshotai/kimi-k3#makora/fp4": {
     "effort": "none"
   },
@@ -1705,6 +1715,9 @@
     "effort": "none"
   },
   "openrouter#nvidia/nemotron-3.5-lightning#io-net": {
+    "effort": "none"
+  },
+  "openrouter#nvidia/nemotron-3.5-lightning#modelrun/fp4": {
     "effort": "none"
   },
   "openrouter#nvidia/nemotron-3.5-lightning#phala": {
@@ -2096,6 +2109,9 @@
     "effort": "none"
   },
   "openrouter#particle-ai/particle-1#particle-ai/us": {
+    "effort": "none"
+  },
+  "openrouter#particle-ai/particle-1#particle-ai/us/flex": {
     "effort": "none"
   },
   "openrouter#perceptron/perceptron-mk1#perceptron": {
@@ -2531,6 +2547,9 @@
   "openrouter#qwen/qwen3.8-27b#reka/fp8": {
     "effort": "none"
   },
+  "openrouter#qwen/qwen3.8-27b#siliconflow/fp8": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.8-27b#streamlake": {
     "effort": "none"
   },
@@ -2646,6 +2665,9 @@
   "openrouter#tencent/hy3-preview#gmicloud/bf16": null,
   "openrouter#tencent/hy3-preview#siliconflow": null,
   "openrouter#tencent/hy4#tencent/fp4": {
+    "effort": "none"
+  },
+  "openrouter#tencent/hy4-flash#tencent/fp8": {
     "effort": "none"
   },
   "openrouter#tencent/hy4-preview#atlas-cloud/fp8": {
@@ -3206,6 +3228,7 @@
   "openrouter#z-ai/glm-5.3-flash#parasail/fp4": null,
   "openrouter#z-ai/glm-5.3-flash#parasail/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#particle-ai/nvfp4": null,
+  "openrouter#z-ai/glm-5.3-flash#particle-ai/nvfp4/flex": null,
   "openrouter#z-ai/glm-5.3-flash#phala/fp8": null,
   "openrouter#z-ai/glm-5.3-flash#phala/nvfp4": null,
   "openrouter#z-ai/glm-5.3-flash#primeintellect": null,
