@@ -3,8 +3,8 @@ endpoints_lt:
   model: mistralai/mistral-nemo
   provider: io-net/fp16
   cost:
-  - 0.01541
-  - 0.0201
+  - 0.01656
+  - 0.0216
 - api: openrouter
   model: mistralai/mistral-nemo
   provider: dekallm/fp8
@@ -204,12 +204,6 @@ endpoints_lt:
   - 0.05
   - 0.33
 - api: openrouter
-  model: xiaomi/mimo-v2.6-flash
-  provider: io-net/fp8
-  cost:
-  - 0.1
-  - 0.28
-- api: openrouter
   model: google/gemma-4-26b-a4b-it
   provider: dekallm/bf16
   cost:
@@ -327,7 +321,7 @@ endpoints_lt:
   model: openai/gpt-oss-120b
   provider: mancer/fp8
   cost:
-  - 0.08
+  - 0.095
   - 0.375
 - api: openrouter
   model: xiaomi/mimo-v2.6-flash
@@ -432,6 +426,12 @@ endpoints_lt:
   - 0.05
   - 0.5
 - api: openrouter
+  model: xiaomi/mimo-v2.6-flash
+  provider: makora/fp8
+  cost:
+  - 0.2
+  - 0.35
+- api: openrouter
   model: deepseek/deepseek-v4.1-flash-1017
   provider: streamlake/fp8
   cost:
@@ -442,12 +442,6 @@ endpoints_lt:
   provider: particle-ai/us
   cost:
   - 0.06
-  - 0.5
-- api: openrouter
-  model: deepseek/deepseek-v4.1-flash-1017
-  provider: wafer/mxfp4
-  cost:
-  - 0.066
   - 0.5
 - api: openrouter
   model: prism-ml/ternary-bonsai-2-27b
@@ -463,16 +457,22 @@ endpoints_lt:
   - 0.52
 - api: openrouter
   model: deepseek/deepseek-v4.1-flash-1017
-  provider: novita/fp8
+  provider: wafer/mxfp4
+  cost:
+  - 0.079
+  - 0.5
+- api: openrouter
+  model: deepseek/deepseek-v4.1-flash-1017
+  provider: antdigital/fp8
   cost:
   - 0.12
   - 0.48
 - api: openrouter
-  model: xiaomi/mimo-v2.6-flash
-  provider: makora/fp8
+  model: deepseek/deepseek-v4.1-flash-1017
+  provider: novita/fp8
   cost:
-  - 0.2
-  - 0.4
+  - 0.12
+  - 0.48
 - api: openrouter
   model: nvidia/nemotron-3.5-super-vl
   provider: coreweave/nvfp4
@@ -692,6 +692,12 @@ endpoints_lt:
 - api: openrouter
   model: deepseek/deepseek-v4.1-flash-1017
   provider: digitalocean
+  cost:
+  - 0.18
+  - 0.72
+- api: openrouter
+  model: deepseek/deepseek-v4.1-flash-1017
+  provider: nebius/fp4
   cost:
   - 0.18
   - 0.72
@@ -1272,6 +1278,12 @@ endpoints_lt:
   - 3.0
   - 4.0
 - api: openrouter
+  model: moonshotai/kimi-k3.1-pro
+  provider: morph/fp8
+  cost:
+  - 0.444
+  - 6.664
+- api: openrouter
   model: anthracite-org/magnum-v4-72b
   provider: mancer/fp8
   cost:
@@ -1350,12 +1362,6 @@ endpoints_lt:
   - 2.5
   - 10.0
 - api: openrouter
-  model: moonshotai/kimi-k3.1-pro
-  provider: morph/fp8
-  cost:
-  - 0.793
-  - 11.898
-- api: openrouter
   model: moonshotai/kimi-k3
   provider: kt
   cost:
@@ -1377,7 +1383,7 @@ endpoints_lt:
   model: moonshotai/kimi-k3
   provider: makora/fp4
   cost:
-  - 1.0
+  - 1.2
   - 18.0
 - api: openrouter
   model: openai/gpt-4o-2024-05-13
