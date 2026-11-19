@@ -440,6 +440,36 @@ too_expensive:
   - 1.65
   - 8.25
 - api: openrouter
+  model: google/gemini-4-neon
+  provider: google-ai-studio
+  cost:
+  - 3.0
+  - 15.0
+- api: openrouter
+  model: google/gemini-4-neon
+  provider: google-ai-studio/flex
+  cost:
+  - 1.5
+  - 7.5
+- api: openrouter
+  model: google/gemini-4-neon
+  provider: google-ai-studio/priority
+  cost:
+  - 5.4
+  - 27.0
+- api: openrouter
+  model: google/gemini-4-neon
+  provider: google-vertex/global
+  cost:
+  - 3.0
+  - 15.0
+- api: openrouter
+  model: google/gemini-4-neon
+  provider: google-vertex/global/priority
+  cost:
+  - 5.4
+  - 27.0
+- api: openrouter
   model: google/gemini-nano-banana-2.1
   provider: google-ai-studio
   cost:
@@ -547,6 +577,12 @@ too_expensive:
   cost:
   - 0.28
   - 1.1
+- api: openrouter
+  model: minimax/minimax-m3
+  provider: featherless/fp8
+  cost:
+  - 0.55
+  - 2.2
 - api: openrouter
   model: minimax/minimax-m3
   provider: minimax
@@ -3729,6 +3765,14 @@ unprobeable:
   cost:
   - 0.75
   - 3.75
+  reason: batch
+  detail: null
+- api: openrouter
+  model: google/gemini-4-neon:batch
+  provider: google-vertex/global
+  cost:
+  - 1.5
+  - 7.5
   reason: batch
   detail: null
 - api: openrouter

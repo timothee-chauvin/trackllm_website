@@ -692,6 +692,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash-1017#gmicloud/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#inceptron/fp4": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#inference-net/fp8": {
     "effort": "none"
   },
@@ -747,6 +750,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#particle-ai/us/flex": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#pearl-research/fp8": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#phala": {
@@ -2503,6 +2509,9 @@
     "effort": "none"
   },
   "openrouter#qwen/qwen3.8-27b#deepinfra/bf16": {
+    "effort": "none"
+  },
+  "openrouter#qwen/qwen3.8-27b#deepinfra/fp8": {
     "effort": "none"
   },
   "openrouter#qwen/qwen3.8-27b#dekallm": {
