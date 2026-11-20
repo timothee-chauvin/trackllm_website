@@ -797,6 +797,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash-1017#streamlake/fp8": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#tenstorrent/fp8": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#together": {
     "effort": "none"
   },
@@ -1231,6 +1234,9 @@
   "openrouter#meta-llama/llama-3.1-70b-instruct#coreweave/bf16": null,
   "openrouter#meta-llama/llama-3.1-70b-instruct#deepinfra/turbo": null,
   "openrouter#meta-llama/llama-3.1-70b-instruct#wandb/bf16": null,
+  "openrouter#meta-llama/llama-3.1-8b-instruct#amazon-bedrock/us-east-1": {
+    "skip": "hidden reasoning"
+  },
   "openrouter#meta-llama/llama-3.1-8b-instruct#cloudflare/fp8": null,
   "openrouter#meta-llama/llama-3.1-8b-instruct#coreweave/bf16": null,
   "openrouter#meta-llama/llama-3.1-8b-instruct#deepinfra/bf16": null,
@@ -1243,6 +1249,7 @@
   "openrouter#meta-llama/llama-3.2-3b-instruct#cloudflare": null,
   "openrouter#meta-llama/llama-3.2-3b-instruct#parasail/bf16": null,
   "openrouter#meta-llama/llama-3.3-70b-instruct#akashml/fp8": null,
+  "openrouter#meta-llama/llama-3.3-70b-instruct#amazon-bedrock/us-east-1": null,
   "openrouter#meta-llama/llama-3.3-70b-instruct#cloudflare/fp8": null,
   "openrouter#meta-llama/llama-3.3-70b-instruct#coreweave/fp16": null,
   "openrouter#meta-llama/llama-3.3-70b-instruct#crusoe/bf16": null,
@@ -1760,6 +1767,9 @@
   "openrouter#nvidia/nemotron-3.5-super-vl#nebius/fp4": {
     "effort": "none"
   },
+  "openrouter#nvidia/nemotron-3.5-super-vl#primalabs/nvfp4": {
+    "effort": "none"
+  },
   "openrouter#nvidia/nemotron-3.5-super-vl#primeintellect/nvfp4": null,
   "openrouter#nvidia/nemotron-3.5-super-vl#together": {
     "effort": "none"
@@ -2082,6 +2092,9 @@
     "max_tokens": 4
   },
   "openrouter#openai/gpt-oss-20b#wandb/fp4": {
+    "max_tokens": 4
+  },
+  "openrouter#openai/gpt-oss-safeguard-20b#amazon-bedrock/us-east-2": {
     "max_tokens": 4
   },
   "openrouter#openai/gpt-oss-safeguard-20b#groq": {
@@ -2682,6 +2695,9 @@
   "openrouter#tencent/hy4#tencent/fp4": {
     "effort": "none"
   },
+  "openrouter#tencent/hy4#together": {
+    "effort": "none"
+  },
   "openrouter#tencent/hy4-flash#tencent/fp8": {
     "effort": "none"
   },
@@ -3148,6 +3164,7 @@
   "openrouter#z-ai/glm-5.3#deepinfra/fp8": null,
   "openrouter#z-ai/glm-5.3#dekallm": null,
   "openrouter#z-ai/glm-5.3#digitalocean": null,
+  "openrouter#z-ai/glm-5.3#doubleword/nvfp4": null,
   "openrouter#z-ai/glm-5.3#featherless": null,
   "openrouter#z-ai/glm-5.3#fireworks": null,
   "openrouter#z-ai/glm-5.3#fireworks/fast": null,
