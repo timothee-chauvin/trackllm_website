@@ -121,6 +121,12 @@ liars:
   - 0.005
   - 0.022
 - api: openrouter
+  model: qwen/qwen3-next-80b-a3b-instruct
+  provider: deepinfra/fp8
+  cost:
+  - 0.09
+  - 1.1
+- api: openrouter
   model: qwen/qwen3.5-9b
   provider: primeintellect/bf16
   cost:
@@ -4700,10 +4706,9 @@ unprobeable:
   detail: null
 failure_streaks:
   openrouter#meta-llama/llama-3.1-8b-instruct#amazon-bedrock/us-east-1:
+    count: 2
+    last_error: 'cached: hidden reasoning'
+  openrouter#moonshotai/kimi-k3.1-pro#alibaba/prime:
     count: 1
-    last_error: 'plain: empty response'
-  openrouter#mistralai/pixtral-large-2502#amazon-bedrock:
-    count: 1
-    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"mistralai/pixtral-large-2502
-      is temporarily rate-limited upstream. Please retry shortly, or add your own
-      provider key to u...'
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"code\":\"invalid_parameter_error\",\"param\":null,\"message\":\"Parameter
+      ''top_p''=1.0 is not supported for k...'
