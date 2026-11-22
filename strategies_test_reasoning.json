@@ -1090,6 +1090,7 @@
   "openrouter#google/gemma-4-26b-a4b-it#cloudflare": null,
   "openrouter#google/gemma-4-26b-a4b-it#coreweave/bf16": null,
   "openrouter#google/gemma-4-26b-a4b-it#darkbloom": null,
+  "openrouter#google/gemma-4-26b-a4b-it#darkbloom/int4": null,
   "openrouter#google/gemma-4-26b-a4b-it#deepinfra/fp8": null,
   "openrouter#google/gemma-4-26b-a4b-it#dekallm/bf16": null,
   "openrouter#google/gemma-4-26b-a4b-it#google-vertex/global": null,
@@ -1716,12 +1717,18 @@
   "openrouter#nvidia/nemotron-3-ultra-550b-a55b#baseten/fp4/us": {
     "effort": "none"
   },
+  "openrouter#nvidia/nemotron-3-ultra-550b-a55b#coreweave/bf16": {
+    "max_tokens": 32
+  },
   "openrouter#nvidia/nemotron-3-ultra-550b-a55b#deepinfra/bf16": null,
   "openrouter#nvidia/nemotron-3-ultra-550b-a55b#deepinfra/fp4": null,
   "openrouter#nvidia/nemotron-3-ultra-550b-a55b#deepinfra/fp4/flex": {
     "effort": "none"
   },
   "openrouter#nvidia/nemotron-3-ultra-550b-a55b#deepinfra/fp4/priority": {
+    "effort": "none"
+  },
+  "openrouter#nvidia/nemotron-3-ultra-550b-a55b#fireworks": {
     "effort": "none"
   },
   "openrouter#nvidia/nemotron-3-ultra-550b-a55b#kt": {
@@ -2365,6 +2372,12 @@
     "effort": "none"
   },
   "openrouter#qwen/qwen3.5-27b#deepinfra/fp8": null,
+  "openrouter#qwen/qwen3.5-27b#deepinfra/fp8/flex": {
+    "effort": "none"
+  },
+  "openrouter#qwen/qwen3.5-27b#deepinfra/fp8/priority": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.5-27b#novita/bf16": null,
   "openrouter#qwen/qwen3.5-27b#phala": null,
   "openrouter#qwen/qwen3.5-27b#reka": null,
@@ -2699,6 +2712,9 @@
   "openrouter#tencent/hy3#tencent/fp8": null,
   "openrouter#tencent/hy3-preview#gmicloud/bf16": null,
   "openrouter#tencent/hy3-preview#siliconflow": null,
+  "openrouter#tencent/hy4#deepinfra/fp4": {
+    "effort": "none"
+  },
   "openrouter#tencent/hy4#tencent/fp4": {
     "effort": "none"
   },
@@ -2758,6 +2774,9 @@
   },
   "openrouter#thinkingmachines/inkling#together": {
     "max_tokens": 1
+  },
+  "openrouter#thinkingmachines/inkling-2-mini#io-net/nvfp4": {
+    "max_tokens": 2
   },
   "openrouter#thinkingmachines/inkling-2-mini#primeintellect/fp4": {
     "max_tokens": 2
