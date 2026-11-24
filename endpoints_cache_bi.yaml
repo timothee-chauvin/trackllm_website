@@ -801,6 +801,12 @@ too_expensive:
   - 13.5
 - api: openrouter
   model: moonshotai/kimi-k3.1-pro
+  provider: io-net/fp4
+  cost:
+  - 2.8
+  - 12.0
+- api: openrouter
+  model: moonshotai/kimi-k3.1-pro
   provider: makora
   cost:
   - 2.0
@@ -2956,6 +2962,12 @@ bad_temperature:
   - 5.5
 - api: openrouter
   model: openai/gpt-6.1-terra
+  provider: google-vertex/global
+  cost:
+  - 1.0
+  - 5.0
+- api: openrouter
+  model: openai/gpt-6.1-terra
   provider: openai
   cost:
   - 1.0
@@ -3040,6 +3052,12 @@ bad_temperature:
   - 44.0
 - api: openrouter
   model: openai/gpt-6.2-astra
+  provider: google-vertex/global
+  cost:
+  - 8.0
+  - 40.0
+- api: openrouter
+  model: openai/gpt-6.2-astra
   provider: openai
   cost:
   - 8.0
@@ -3122,6 +3140,12 @@ bad_temperature:
   cost:
   - 2.2
   - 11.0
+- api: openrouter
+  model: openai/gpt-6.2-sol
+  provider: google-vertex/global
+  cost:
+  - 2.0
+  - 10.0
 - api: openrouter
   model: openai/gpt-6.2-sol
   provider: openai
@@ -4513,6 +4537,15 @@ unprobeable:
   detail: 'cached: hidden reasoning'
 - api: openrouter
   model: openai/gpt-oss-120b
+  provider: fireworks
+  cost:
+  - 0.15
+  - 0.6
+  reason: flaky
+  detail: 'plain: 404 {"message":"Provider returned error","code":404,"metadata":{"raw":"{\"error\":{\"message\":\"Model
+    not found, inaccessible, and/or not deployed\",\"param\":\"model\",\"code\":\"NOT_FOUND\",...'
+- api: openrouter
+  model: openai/gpt-oss-120b
   provider: sail-research/fp4
   cost:
   - 0.06
@@ -4764,10 +4797,13 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
-  openrouter#openai/gpt-oss-120b#fireworks:
-    count: 2
-    last_error: 'plain: 404 {"message":"Provider returned error","code":404,"metadata":{"raw":"{\"error\":{\"message\":\"Model
-      not found, inaccessible, and/or not deployed\",\"param\":\"model\",\"code\":\"NOT_FOUND\",...'
+  openrouter#moonshotai/kimi-k3.1-pro#fireworks/us:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"object\":\"error\",\"type\":\"invalid_request_error\",\"code\":\"invalid_request_error\",\"message\":\"Param...'
+  openrouter#moonshotai/kimi-k3.1-pro#pareto-inference/mxfp4:
+    count: 1
+    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"This
+      model takes top_p 0.95 only.\",\"type\":\"invalid_request_error\",\"param\":\"top_p\",\"cod...'
   openrouter#z-ai/glm-5.3#baidu/fp8:
     count: 1
     last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"z-ai/glm-5.3
