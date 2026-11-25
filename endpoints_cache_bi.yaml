@@ -145,6 +145,12 @@ liars:
   - 0.017
   - 0.025
 - api: openrouter
+  model: qwen/qwen3.6-35b-a3b
+  provider: deepinfra/fp8
+  cost:
+  - 0.1
+  - 0.95
+- api: openrouter
   model: qwen/qwen3.8-27b
   provider: primeintellect/fp8
   cost:
@@ -841,6 +847,12 @@ too_expensive:
   cost:
   - 2.0
   - 10.0
+- api: openrouter
+  model: moonshotai/kimi-k3.1-pro
+  provider: pareto-inference/mxfp4
+  cost:
+  - 1.4
+  - 7.0
 - api: openrouter
   model: moonshotai/kimi-k3.1-pro
   provider: primalabs/mxfp4
@@ -2702,6 +2714,12 @@ bad_temperature:
   cost:
   - 0.11
   - 0.55
+- api: openrouter
+  model: openai/gpt-6-luna
+  provider: google-vertex/global
+  cost:
+  - 0.1
+  - 0.5
 - api: openrouter
   model: openai/gpt-6-luna
   provider: openai
@@ -4798,12 +4816,13 @@ unprobeable:
   detail: null
 failure_streaks:
   openrouter#moonshotai/kimi-k3.1-pro#fireworks/us:
-    count: 1
+    count: 2
     last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"object\":\"error\",\"type\":\"invalid_request_error\",\"code\":\"invalid_request_error\",\"message\":\"Param...'
-  openrouter#moonshotai/kimi-k3.1-pro#pareto-inference/mxfp4:
+  openrouter#xiaomi/mimo-v2.6-flash-mopd#featherless/fp8:
     count: 1
-    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"message\":\"This
-      model takes top_p 0.95 only.\",\"type\":\"invalid_request_error\",\"param\":\"top_p\",\"cod...'
+    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"xiaomi/mimo-v2.6-flash-mopd
+      is temporarily rate-limited upstream. Please retry shortly, or add your own
+      provider key to us...'
   openrouter#z-ai/glm-5.3#baidu/fp8:
     count: 1
     last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"z-ai/glm-5.3

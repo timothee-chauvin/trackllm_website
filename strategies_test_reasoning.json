@@ -134,6 +134,7 @@
   "openrouter#deepseek/deepseek-chat-v3-0324#atlas-cloud/fp8": null,
   "openrouter#deepseek/deepseek-chat-v3-0324#crusoe/bf16": null,
   "openrouter#deepseek/deepseek-chat-v3-0324#deepinfra/fp4": null,
+  "openrouter#deepseek/deepseek-chat-v3-0324#featherless/fp4": null,
   "openrouter#deepseek/deepseek-chat-v3-0324#gmicloud/fp8": null,
   "openrouter#deepseek/deepseek-chat-v3-0324#modelrun/fp4": null,
   "openrouter#deepseek/deepseek-chat-v3-0324#novita/fp8": null,
@@ -173,6 +174,7 @@
   "openrouter#deepseek/deepseek-v3.2#baidu/fp8": null,
   "openrouter#deepseek/deepseek-v3.2#deepinfra/fp4": null,
   "openrouter#deepseek/deepseek-v3.2#digitalocean": null,
+  "openrouter#deepseek/deepseek-v3.2#featherless/fp8": null,
   "openrouter#deepseek/deepseek-v3.2#friendli": null,
   "openrouter#deepseek/deepseek-v3.2#gmicloud/fp8": null,
   "openrouter#deepseek/deepseek-v3.2#google-vertex": null,
@@ -207,6 +209,7 @@
   "openrouter#deepseek/deepseek-v4-flash#deepinfra/fp8/priority": null,
   "openrouter#deepseek/deepseek-v4-flash#deepseek": null,
   "openrouter#deepseek/deepseek-v4-flash#digitalocean": null,
+  "openrouter#deepseek/deepseek-v4-flash#featherless/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash#fireworks": null,
   "openrouter#deepseek/deepseek-v4-flash#gmicloud/fp8": null,
   "openrouter#deepseek/deepseek-v4-flash#io-net/fp8": null,
@@ -503,6 +506,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash#digitalocean": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash#featherless/fp8": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash#fireworks": {
     "effort": "none"
   },
@@ -683,6 +689,9 @@
   "openrouter#deepseek/deepseek-v4.1-flash-1017#digitalocean": {
     "effort": "none"
   },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#featherless/fp8": {
+    "effort": "none"
+  },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#fireworks": {
     "effort": "none"
   },
@@ -816,6 +825,9 @@
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#together": {
+    "effort": "none"
+  },
+  "openrouter#deepseek/deepseek-v4.1-flash-1017#together/fast": {
     "effort": "none"
   },
   "openrouter#deepseek/deepseek-v4.1-flash-1017#together/us": {
@@ -2662,6 +2674,9 @@
   "openrouter#qwen/qwen3.8-flash#alibaba/us-east-1": {
     "effort": "none"
   },
+  "openrouter#qwen/qwen3.8-flash#featherless/fp8": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.8-flash#makora/fp4": {
     "effort": "none"
   },
@@ -2770,6 +2785,9 @@
   "openrouter#tencent/hy4-flash#deepinfra/fp4": {
     "effort": "none"
   },
+  "openrouter#tencent/hy4-flash#fireworks": {
+    "effort": "none"
+  },
   "openrouter#tencent/hy4-flash#primalabs/fp8": {
     "effort": "none"
   },
@@ -2830,6 +2848,12 @@
   "openrouter#thinkingmachines/inkling#together": {
     "max_tokens": 1
   },
+  "openrouter#thinkingmachines/inkling#together/us": {
+    "max_tokens": 1
+  },
+  "openrouter#thinkingmachines/inkling-2-mini#deepinfra/fp4": {
+    "max_tokens": 2
+  },
   "openrouter#thinkingmachines/inkling-2-mini#io-net/nvfp4": {
     "max_tokens": 2
   },
@@ -2881,6 +2905,7 @@
   "openrouter#unbiased/pareto-26.9#unbiased": null,
   "openrouter#undi95/remm-slerp-l2-13b#mancer/fp8": null,
   "openrouter#undi95/remm-slerp-l2-13b#nextbit/bf16": null,
+  "openrouter#upstage/solar-mini-4-5#upstage/zdr": null,
   "openrouter#upstage/solar-mini4#upstage": {
     "effort": "none"
   },
@@ -2891,6 +2916,7 @@
   "openrouter#upstage/solar-pro-3#upstage/fp4": {
     "skip": "hidden reasoning"
   },
+  "openrouter#upstage/solar-pro-4-contributor#upstage": null,
   "openrouter#upstage/solar-pro4#kt": null,
   "openrouter#upstage/solar-pro4#upstage": {
     "effort": "none"
@@ -2953,6 +2979,9 @@
     "effort": "none"
   },
   "openrouter#xiaomi/mimo-v2.6-flash#deepinfra/fp8": {
+    "effort": "none"
+  },
+  "openrouter#xiaomi/mimo-v2.6-flash#featherless/fp8": {
     "effort": "none"
   },
   "openrouter#xiaomi/mimo-v2.6-flash#gmicloud/bf16": {
@@ -3149,6 +3178,9 @@
     "effort": "none"
   },
   "openrouter#z-ai/glm-5.2#digitalocean": null,
+  "openrouter#z-ai/glm-5.2#featherless": {
+    "effort": "none"
+  },
   "openrouter#z-ai/glm-5.2#fireworks": null,
   "openrouter#z-ai/glm-5.2#fireworks/fast": null,
   "openrouter#z-ai/glm-5.2#fireworks/fast-us": {
