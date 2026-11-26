@@ -783,6 +783,12 @@ too_expensive:
   - 10.0
 - api: openrouter
   model: moonshotai/kimi-k3.1-pro
+  provider: doubleword/mxfp4
+  cost:
+  - 2.0
+  - 10.0
+- api: openrouter
+  model: moonshotai/kimi-k3.1-pro
   provider: inference-net/fast
   cost:
   - 2.7
@@ -4012,6 +4018,30 @@ unprobeable:
   reason: batch
   detail: null
 - api: openrouter
+  model: mistralai/codestral-2508:batch
+  provider: mistral
+  cost:
+  - 0.15
+  - 0.45
+  reason: batch
+  detail: null
+- api: openrouter
+  model: mistralai/ministral-8b-2512:batch
+  provider: mistral
+  cost:
+  - 0.075
+  - 0.075
+  reason: batch
+  detail: null
+- api: openrouter
+  model: mistralai/mistral-large-2512:batch
+  provider: mistral
+  cost:
+  - 0.25
+  - 0.75
+  reason: batch
+  detail: null
+- api: openrouter
   model: mistralai/mistral-large-4-0
   provider: mistral/eu
   cost:
@@ -4047,6 +4077,14 @@ unprobeable:
   - 0.03
   reason: flaky
   detail: 'cached: hidden reasoning'
+- api: openrouter
+  model: mistralai/mistral-small-2603:batch
+  provider: mistral
+  cost:
+  - 0.075
+  - 0.3
+  reason: batch
+  detail: null
 - api: openrouter
   model: moonshotai/kimi-k2.7-code
   provider: siliconflow/fp8
@@ -4099,6 +4137,14 @@ unprobeable:
   cost:
   - 2.0
   - 10.0
+  reason: flaky
+  detail: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"object\":\"error\",\"type\":\"invalid_request_error\",\"code\":\"invalid_request_error\",\"message\":\"Param...'
+- api: openrouter
+  model: moonshotai/kimi-k3.1-pro
+  provider: fireworks/us
+  cost:
+  - 2.5
+  - 12.5
   reason: flaky
   detail: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"object\":\"error\",\"type\":\"invalid_request_error\",\"code\":\"invalid_request_error\",\"message\":\"Param...'
 - api: openrouter
@@ -4815,14 +4861,9 @@ unprobeable:
   reason: batch
   detail: null
 failure_streaks:
-  openrouter#moonshotai/kimi-k3.1-pro#fireworks/us:
-    count: 2
-    last_error: 'plain: 400 {"message":"Provider returned error","code":400,"metadata":{"raw":"{\"error\":{\"object\":\"error\",\"type\":\"invalid_request_error\",\"code\":\"invalid_request_error\",\"message\":\"Param...'
-  openrouter#xiaomi/mimo-v2.6-flash-mopd#featherless/fp8:
+  openrouter#qwen/qwen3.8-27b#tenstorrent/fast:
     count: 1
-    last_error: 'plain: 429 {"message":"Provider returned error","code":429,"metadata":{"raw":"xiaomi/mimo-v2.6-flash-mopd
-      is temporarily rate-limited upstream. Please retry shortly, or add your own
-      provider key to us...'
+    last_error: Timeout after 15.0s
   openrouter#z-ai/glm-5.3#baidu/fp8:
     count: 1
     last_error: '{"message":"Provider returned error","code":429,"metadata":{"raw":"z-ai/glm-5.3
