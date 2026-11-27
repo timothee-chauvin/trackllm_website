@@ -1245,6 +1245,9 @@
   "openrouter#inclusionai/ling-3.1-flash#novita": {
     "effort": "none"
   },
+  "openrouter#inclusionai/lingsante-3.1-air-vl#deepinfra/fp4": {
+    "effort": "none"
+  },
   "openrouter#inclusionai/ring-2.6-1t#novita": {
     "max_tokens": 4
   },
@@ -1446,6 +1449,9 @@
   },
   "openrouter#minimax/minimax-m3#venice/fp8": null,
   "openrouter#minimax/minimax-m3.1-flash#digitalocean": {
+    "max_tokens": 1
+  },
+  "openrouter#minimax/minimax-m3.1-flash#featherless/fp8": {
     "max_tokens": 1
   },
   "openrouter#minimax/minimax-m3.1-flash#fireworks": {
@@ -2483,6 +2489,7 @@
   },
   "openrouter#qwen/qwen3.5-9b#parasail/bf16": null,
   "openrouter#qwen/qwen3.5-9b#primeintellect/bf16": null,
+  "openrouter#qwen/qwen3.5-9b#primeintellect/fast": null,
   "openrouter#qwen/qwen3.5-9b#siliconflow/fp8": null,
   "openrouter#qwen/qwen3.5-9b#together": null,
   "openrouter#qwen/qwen3.5-9b#venice/fp8": null,
@@ -2639,6 +2646,12 @@
     "effort": "none"
   },
   "openrouter#qwen/qwen3.8-27b#phala": {
+    "effort": "none"
+  },
+  "openrouter#qwen/qwen3.8-27b#primeintellect/fast": {
+    "effort": "none"
+  },
+  "openrouter#qwen/qwen3.8-27b#primeintellect/flex": {
     "effort": "none"
   },
   "openrouter#qwen/qwen3.8-27b#primeintellect/fp8": {
