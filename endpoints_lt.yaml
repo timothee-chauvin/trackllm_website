@@ -25,6 +25,12 @@ endpoints_lt:
   - 0.045
 - api: openrouter
   model: mistralai/mistral-nemo
+  provider: nextbit/int4
+  cost:
+  - 0.03
+  - 0.03
+- api: openrouter
+  model: mistralai/mistral-nemo
   provider: parasail/fp8
   cost:
   - 0.03
@@ -41,6 +47,12 @@ endpoints_lt:
   cost:
   - 0.04
   - 0.05
+- api: openrouter
+  model: qwen/qwen3.5-9b
+  provider: primeintellect/flex
+  cost:
+  - 0.038
+  - 0.057
 - api: openrouter
   model: nvidia/nemotron-3.5-lightning
   provider: darkbloom/int4
@@ -114,6 +126,18 @@ endpoints_lt:
   - 0.08
   - 0.13
 - api: openrouter
+  model: qwen/qwen3.5-9b
+  provider: primeintellect/bf16
+  cost:
+  - 0.085
+  - 0.125
+- api: openrouter
+  model: google/gemma-4-26b-a4b-it
+  provider: primeintellect/flex
+  cost:
+  - 0.05
+  - 0.18
+- api: openrouter
   model: google/gemma-4-26b-a4b-it
   provider: darkbloom
   cost:
@@ -144,6 +168,12 @@ endpoints_lt:
   - 0.12
   - 0.17
 - api: openrouter
+  model: google/gemma-4-26b-a4b-it
+  provider: nextbit/fp4
+  cost:
+  - 0.0675
+  - 0.225
+- api: openrouter
   model: deepseek/deepseek-v4.1-flash-1017
   provider: ambient/fp4
   cost:
@@ -168,6 +198,12 @@ endpoints_lt:
   - 0.07
   - 0.24
 - api: openrouter
+  model: deepseek/deepseek-v4-flash-0731
+  provider: wafer/us
+  cost:
+  - 0.0456
+  - 0.27
+- api: openrouter
   model: nex-agi/nex-n2.5-pro
   provider: nex-agi/fp8
   cost:
@@ -179,12 +215,6 @@ endpoints_lt:
   cost:
   - 0.11
   - 0.22
-- api: openrouter
-  model: deepseek/deepseek-v4-flash-0731
-  provider: wafer/us
-  cost:
-  - 0.047
-  - 0.3
 - api: openrouter
   model: deepseek/deepseek-v4.1-flash-1017
   provider: pearl-research/fp8
@@ -204,6 +234,12 @@ endpoints_lt:
   - 0.07
   - 0.281
 - api: openrouter
+  model: deepseek/deepseek-v4-flash-0731
+  provider: streamlake/fp8
+  cost:
+  - 0.088
+  - 0.264
+- api: openrouter
   model: google/gemma-4-26b-a4b-it
   provider: io-net/bf16
   cost:
@@ -219,7 +255,7 @@ endpoints_lt:
   model: deepseek/deepseek-v4-flash-0731
   provider: wafer/fast
   cost:
-  - 0.14
+  - 0.13
   - 0.23
 - api: openrouter
   model: google/gemma-4-26b-a4b-it
@@ -230,6 +266,12 @@ endpoints_lt:
 - api: openrouter
   model: deepseek/deepseek-v4.1-flash-1017
   provider: cloudflare
+  cost:
+  - 0.075
+  - 0.3
+- api: openrouter
+  model: deepseek/deepseek-v4.1-flash-1017
+  provider: pareto-inference/fp8
   cost:
   - 0.075
   - 0.3
@@ -248,12 +290,6 @@ endpoints_lt:
 - api: openrouter
   model: google/gemma-4-26b-a4b-it
   provider: nextbit/bf16
-  cost:
-  - 0.09
-  - 0.3
-- api: openrouter
-  model: google/gemma-4-26b-a4b-it
-  provider: nextbit/fp4
   cost:
   - 0.09
   - 0.3
@@ -305,6 +341,12 @@ endpoints_lt:
   cost:
   - 0.14
   - 0.28
+- api: openrouter
+  model: qwen/qwen3.5-9b
+  provider: primeintellect/fast
+  cost:
+  - 0.17
+  - 0.25
 - api: openrouter
   model: xiaomi/mimo-v2.6-flash
   provider: cohere
@@ -360,6 +402,12 @@ endpoints_lt:
   - 0.09
   - 0.36
 - api: openrouter
+  model: google/gemma-4-26b-a4b-it
+  provider: primeintellect/bf16
+  cost:
+  - 0.1
+  - 0.36
+- api: openrouter
   model: openai/gpt-oss-120b
   provider: mancer/fp8
   cost:
@@ -378,6 +426,12 @@ endpoints_lt:
   - 0.165
   - 0.33
 - api: openrouter
+  model: qwen/qwen3.6-35b-a3b
+  provider: primeintellect/flex
+  cost:
+  - 0.06
+  - 0.45
+- api: openrouter
   model: deepseek/deepseek-v4.1-flash-1017
   provider: cohere/fp8
   cost:
@@ -389,12 +443,6 @@ endpoints_lt:
   cost:
   - 0.105
   - 0.42
-- api: openrouter
-  model: deepseek/deepseek-v4-flash-0731
-  provider: streamlake/fp8
-  cost:
-  - 0.132
-  - 0.396
 - api: openrouter
   model: google/gemma-3-27b-it
   provider: parasail/fp8
@@ -546,12 +594,6 @@ endpoints_lt:
   - 0.147
   - 0.588
 - api: openrouter
-  model: qwen/qwen3.6-35b-a3b
-  provider: ambient/fp8
-  cost:
-  - 0.05
-  - 0.69
-- api: openrouter
   model: deepseek/deepseek-v4.1-flash
   provider: fireworks/spot
   cost:
@@ -572,12 +614,6 @@ endpoints_lt:
 - api: openrouter
   model: deepseek/deepseek-v4.1-flash-1017
   provider: fireworks/spot
-  cost:
-  - 0.15
-  - 0.6
-- api: openrouter
-  model: deepseek/deepseek-v4.1-flash-1017
-  provider: pareto-inference/fp8
   cost:
   - 0.15
   - 0.6
@@ -617,6 +653,12 @@ endpoints_lt:
   cost:
   - 0.15
   - 0.6
+- api: openrouter
+  model: deepseek/deepseek-v4.1-flash-1017
+  provider: baidu/fp8
+  cost:
+  - 0.1498
+  - 0.60455
 - api: openrouter
   model: deepseek/deepseek-v4.1-flash
   provider: reka
@@ -744,6 +786,12 @@ endpoints_lt:
   - 0.15
   - 0.75
 - api: openrouter
+  model: google/gemma-4-26b-a4b-it
+  provider: primeintellect/fast
+  cost:
+  - 0.2
+  - 0.72
+- api: openrouter
   model: qwen/qwen3-coder-next
   provider: parasail/bf16
   cost:
@@ -773,6 +821,18 @@ endpoints_lt:
   cost:
   - 0.195
   - 0.78
+- api: openrouter
+  model: qwen/qwen3.6-35b-a3b
+  provider: ambient/fp8
+  cost:
+  - 0.1
+  - 0.88
+- api: openrouter
+  model: qwen/qwen3.6-35b-a3b
+  provider: primeintellect/fp8
+  cost:
+  - 0.117
+  - 0.878
 - api: openrouter
   model: deepseek/deepseek-v4.1-flash
   provider: cloudflare
@@ -869,12 +929,6 @@ endpoints_lt:
   cost:
   - 0.04
   - 1.35
-- api: openrouter
-  model: deepseek/deepseek-v4.1-flash-1017
-  provider: baidu/fp8
-  cost:
-  - 0.28
-  - 1.13
 - api: openrouter
   model: meta-llama/llama-3.3-70b-instruct
   provider: coreweave/fp16
@@ -1002,6 +1056,12 @@ endpoints_lt:
   - 0.8
   - 1.0
 - api: openrouter
+  model: qwen/qwen3.8-27b
+  provider: primeintellect/flex
+  cost:
+  - 0.054
+  - 1.765
+- api: openrouter
   model: deepseek/deepseek-v4.1-flash
   provider: together/us
   cost:
@@ -1031,6 +1091,12 @@ endpoints_lt:
   cost:
   - 0.06
   - 1.96
+- api: openrouter
+  model: qwen/qwen3.6-35b-a3b
+  provider: primeintellect/fast
+  cost:
+  - 0.24
+  - 1.8
 - api: openrouter
   model: qwen/qwen3.8-27b
   provider: pearl-research/fp8
@@ -1103,6 +1169,12 @@ endpoints_lt:
   cost:
   - 0.04
   - 2.3
+- api: openrouter
+  model: qwen/qwen3.8-27b
+  provider: primeintellect/fp8
+  cost:
+  - 0.238
+  - 2.185
 - api: openrouter
   model: qwen/qwen3.8-27b
   provider: parasail/fp8
@@ -1208,6 +1280,12 @@ endpoints_lt:
 - api: openrouter
   model: qwen/qwen3.8-27b
   provider: cloudflare
+  cost:
+  - 0.45
+  - 3.2
+- api: openrouter
+  model: qwen/qwen3.8-27b
+  provider: primeintellect/fast
   cost:
   - 0.45
   - 3.2

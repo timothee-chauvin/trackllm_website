@@ -1245,6 +1245,9 @@
   "openrouter#inclusionai/ling-3.1-flash#novita": {
     "effort": "none"
   },
+  "openrouter#inclusionai/ling-3.2-flash#antdigital/fp8": {
+    "effort": "none"
+  },
   "openrouter#inclusionai/lingsante-3.1-air-vl#deepinfra/fp4": {
     "effort": "none"
   },
@@ -1561,6 +1564,7 @@
   "openrouter#mistralai/mistral-nemo#io-net/fp8": null,
   "openrouter#mistralai/mistral-nemo#mistral": null,
   "openrouter#mistralai/mistral-nemo#mistral/eu": null,
+  "openrouter#mistralai/mistral-nemo#nextbit/int4": null,
   "openrouter#mistralai/mistral-nemo#novita/fp8": null,
   "openrouter#mistralai/mistral-nemo#parasail/fp8": {
     "skip": "hidden reasoning"
@@ -2490,6 +2494,7 @@
   "openrouter#qwen/qwen3.5-9b#parasail/bf16": null,
   "openrouter#qwen/qwen3.5-9b#primeintellect/bf16": null,
   "openrouter#qwen/qwen3.5-9b#primeintellect/fast": null,
+  "openrouter#qwen/qwen3.5-9b#primeintellect/flex": null,
   "openrouter#qwen/qwen3.5-9b#siliconflow/fp8": null,
   "openrouter#qwen/qwen3.5-9b#together": null,
   "openrouter#qwen/qwen3.5-9b#venice/fp8": null,
@@ -2545,6 +2550,12 @@
   "openrouter#qwen/qwen3.6-35b-a3b#io-net/fp8": null,
   "openrouter#qwen/qwen3.6-35b-a3b#parasail/fp8": null,
   "openrouter#qwen/qwen3.6-35b-a3b#phala": null,
+  "openrouter#qwen/qwen3.6-35b-a3b#primeintellect/fast": {
+    "effort": "none"
+  },
+  "openrouter#qwen/qwen3.6-35b-a3b#primeintellect/flex": {
+    "effort": "none"
+  },
   "openrouter#qwen/qwen3.6-35b-a3b#primeintellect/fp8": {
     "effort": "none"
   },
